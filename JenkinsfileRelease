@@ -64,12 +64,14 @@ pipeline {
 		stage('Release') {
 			steps {
 				script {
-					sh "wget -O ./common-release-pipeline.groovy http://artifactory.pnet.ch/artifactory/libs-release-local/ch/post/it/common/jenkins/pipeline/00.02.01.00/pipeline-00.02.01.00.jar!jenkins-release-pipeline.groovy"
-					def commonReleasePipelineLib = load("common-release-pipeline.groovy")
-					sh "rm -rf common-release-pipeline.groovy"
-					sh "rm -rf jenkins-build-pipeline.groovy"
-					withEnv(["EVOTING_HOME=${env.WORKSPACE}"]) {
-						commonReleasePipelineLib.performRelease(PROJECT_NAME, SCM_URL, BRANCH_NAME, AUTO_MERGE, 'clean deploy', '-Pdoc -DskipTests --settings ${EVOTING_HOME}/.mvn/settings.xml', WORKSPACE, RELEASE_VERSION, NEW_SNAPSHOT_VERSION, "mathias.meier@post.ch")
+					sh "wget -O ./jenkins-release-crypto-primitives.groovy https://artifactory.tools.pnet.ch/artifactory/libs-release-evoting-local/ch/post/it/evoting/jenkins/pipeline/jenkins-release-crypto-primitives.groovy"
+					def cryptoPrimitivesReleasePipelineLib = load 'jenkins-release-crypto-primitives.groovy'
+					sh "rm -rf jenkins-release-crypto-primitives.groovy"
+					sh "rm -rf jenkins-release-crypto-primitives.groovy"
+					withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 's-cicd-evoting', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS']]) {
+						withEnv(["EVOTING_HOME=${env.WORKSPACE}"]) {
+							cryptoPrimitivesReleasePipelineLib.performRelease(PROJECT_NAME, "https://\${GIT_USER}:\${GIT_PASS}@\${GIT_END_URL}", BRANCH_NAME, AUTO_MERGE, 'clean deploy', '-Pdoc -DskipTests --settings ${EVOTING_HOME}/.mvn/settings.xml', WORKSPACE, RELEASE_VERSION, NEW_SNAPSHOT_VERSION, "mathias.meier@post.ch")
+						}
 					}
 				}
 			}
