@@ -16,12 +16,15 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
+import java.util.ArrayList;
+
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamal;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPrivateKey;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
+import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -54,7 +57,8 @@ public class ElGamalService implements ElGamal {
 
 	@Override
 	public GqGroup getEncryptionParameters(final String seed) {
-		return new EncryptionParameters().getEncryptionParameters(seed);
+		final ArrayList<Integer> sp = PrimesInternal.getSmallPrimes();
+		return new EncryptionParameters().getEncryptionParameters(seed, sp);
 	}
 
 	@Override
