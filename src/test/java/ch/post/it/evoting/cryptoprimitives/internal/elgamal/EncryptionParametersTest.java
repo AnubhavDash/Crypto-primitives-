@@ -22,6 +22,10 @@ import static org.mockito.Mockito.mockStatic;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -34,11 +38,14 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 
+import com.google.common.base.Throwables;
+
+import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.Random;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
 
@@ -46,6 +53,7 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParamete
 class EncryptionParametersTest {
 
 	private static final String SEED = "Election_name";
+	private static final ArrayList<Integer> SMALL_PRIMES = PrimesInternal.getSmallPrimes();
 	private static final int NAME_MAX_LENGTH = 10;
 
 	private static EncryptionParameters encryptionParameters;
@@ -64,16 +72,48 @@ class EncryptionParametersTest {
 	@Test
 	@DisplayName("calling getEncryptionParameters with null seed throws NullPointerException")
 	void getEncryptionParametersNullSeed() {
-		assertThrows(NullPointerException.class, () -> encryptionParameters.getEncryptionParameters(null));
+		assertThrows(NullPointerException.class, () -> encryptionParameters.getEncryptionParameters(null, SMALL_PRIMES));
+	}
+
+	@Test
+	@DisplayName("calling getEncryptionParameters with null small primes list throws NullPointerException")
+	void getEncryptionParametersNullSmallPrimes() {
+		assertThrows(NullPointerException.class, () -> encryptionParameters.getEncryptionParameters(SEED, null));
+	}
+
+	@Test
+	@DisplayName("calling getEncryptionParameters with small primes list containing non-prime throws IllegalArgumentException")
+	void getEncryptionParametersWithNonPrimeInSmallPrimesThrows() {
+		final ArrayList<Integer> listWithNonPrime = new ArrayList<>(List.of(7, 8, 9, 10, 11));
+		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+				() -> encryptionParameters.getEncryptionParameters(SEED, listWithNonPrime));
+		assertEquals("The given number is not a prime. [Number: 8]", Throwables.getRootCause(exception).getMessage());
+	}
+
+	@Test
+	@DisplayName("calling getEncryptionParameters with an empty small primes list does not throw")
+	void getEncryptionParametersEmptySmallPrimesDoesNotThrow() {
+		assertDoesNotThrow(() -> encryptionParameters.getEncryptionParameters(SEED, new ArrayList<>()));
 	}
 
 	@Test
 	@DisplayName("calling getEncryptionParameters with fixed seed gives expected parameters")
 	void getEncryptionParametersFixedSeed() {
-		final GqGroup expectedParameters = new GqGroup(BigInteger.valueOf(150741944098619L), BigInteger.valueOf(75370972049309L),
-				BigInteger.valueOf(3));
+		final GqGroup expectedParameters = new GqGroup(BigInteger.valueOf(194568543564959L), BigInteger.valueOf(97284271782479L),
+				BigInteger.valueOf(2));
 
-		assertEquals(expectedParameters, encryptionParameters.getEncryptionParameters(SEED));
+		assertEquals(expectedParameters, encryptionParameters.getEncryptionParameters(SEED, SMALL_PRIMES));
+	}
+
+	@Test
+	@DisplayName("calling getEncryptionParameters twice with the same seed but different small primes gives the same result")
+	void getEncryptionParametersTwice() {
+		final int electionNameLength = secureRandom.nextInt(NAME_MAX_LENGTH) + 1;
+		final String randomSeed = random.genRandomBase64String(electionNameLength);
+		final GqGroup gqGroup1 = encryptionParameters.getEncryptionParameters(randomSeed, SMALL_PRIMES);
+		final GqGroup gqGroup2 = encryptionParameters.getEncryptionParameters(randomSeed, new ArrayList<>());
+
+		assertEquals(gqGroup1, gqGroup2);
 	}
 
 	@RepeatedTest(100)
@@ -82,7 +122,7 @@ class EncryptionParametersTest {
 		final int electionNameLength = secureRandom.nextInt(NAME_MAX_LENGTH) + 1;
 		final String randomSeed = random.genRandomBase64String(electionNameLength);
 
-		assertDoesNotThrow(() -> encryptionParameters.getEncryptionParameters(randomSeed));
+		assertDoesNotThrow(() -> encryptionParameters.getEncryptionParameters(randomSeed, SMALL_PRIMES));
 	}
 
 	static Stream<Arguments> getEncryptionParametersProvider() {
@@ -118,7 +158,7 @@ class EncryptionParametersTest {
 		try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = mockStatic(SecurityLevelConfig.class)) {
 			mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(securityLevel);
 
-			final GqGroup encryptionParameters = new EncryptionParameters().getEncryptionParameters(seed);
+			final GqGroup encryptionParameters = new EncryptionParameters().getEncryptionParameters(seed, SMALL_PRIMES);
 
 			assertEquals(expectedParameters, encryptionParameters, String.format("assertion failed for: %s", description));
 		}
