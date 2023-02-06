@@ -18,6 +18,11 @@
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class PrimesInternal {
 
@@ -48,5 +53,17 @@ public class PrimesInternal {
 			}
 			return true;
 		}
+	}
+
+	public static ArrayList<Integer> getSmallPrimes() {
+		final InputStream smallPrimesInputStream = checkNotNull(PrimesInternal.class.getResourceAsStream("/small_primes.txt"));
+		final ArrayList<Integer> smallPrimes = new ArrayList<>();
+		try (final Scanner scanner = new Scanner(smallPrimesInputStream)) {
+			while (scanner.hasNextInt()) {
+				smallPrimes.add(scanner.nextInt());
+			}
+		}
+
+		return smallPrimes;
 	}
 }
