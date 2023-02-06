@@ -20,9 +20,7 @@ package ch.post.it.evoting.cryptoprimitives.internal.math;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -58,16 +56,12 @@ public class PrimesInternal {
 	}
 
 	public static ArrayList<Integer> getSmallPrimes() {
-		final URL smallPrimesInput = PrimesInternal.class.getClassLoader().getResource("small_primes.txt");
-		checkNotNull(smallPrimesInput);
-		final File smallPrimesFile = new File(smallPrimesInput.getPath());
+		final InputStream smallPrimesInputStream = checkNotNull(PrimesInternal.class.getResourceAsStream("/small_primes.txt"));
 		final ArrayList<Integer> smallPrimes = new ArrayList<>();
-		try (final Scanner scanner = new Scanner(smallPrimesFile)) {
+		try (final Scanner scanner = new Scanner(smallPrimesInputStream)) {
 			while (scanner.hasNextInt()) {
 				smallPrimes.add(scanner.nextInt());
 			}
-		} catch (FileNotFoundException e) {
-			throw new IllegalStateException("Could not read small primes file.", e);
 		}
 
 		return smallPrimes;

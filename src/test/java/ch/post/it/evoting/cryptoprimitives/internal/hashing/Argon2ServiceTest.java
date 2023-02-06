@@ -35,6 +35,7 @@ import org.mockito.Mockito;
 
 import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Context;
 import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Hash;
+import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Profile;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
@@ -60,14 +61,14 @@ class Argon2ServiceTest {
 			// Given
 			when(randomService.randomBytes(16))
 					.thenReturn(HexFormat.of().parseHex("7332424c365a744a44376e784b7a576e"));
-			final Argon2Context config = new Argon2Context(14, 1, 2);
+			final Argon2Context config = Argon2Profile.TEST.getContext();
 
 			// When
 			final Argon2Service service = new Argon2Service(randomService, config);
 			final Argon2Hash argon2Hash = service.genArgon2id(new byte[] {});
 
 			// Then
-			assertArrayEquals(HexFormat.of().parseHex("f808c0575c5fdd94184d21b301ad17b82869c553a9760fa6a64cd4648a0f7b23"), argon2Hash.getTag());
+			assertArrayEquals(HexFormat.of().parseHex("f11fb1bd1d0240f57064cb14e8281509447719c6090e7d37f37f4831af81b6e8"), argon2Hash.getTag());
 		}
 
 		private Stream<Arguments> genArgon2idJsonFileArgumentProvider() {
@@ -126,14 +127,14 @@ class Argon2ServiceTest {
 		@DisplayName("empty byte array")
 		void getArgon2idWithEmptyInput() {
 			// Given
-			final Argon2Context config = new Argon2Context(14, 1, 2);
+			final Argon2Context config = Argon2Profile.TEST.getContext();
 
 			// When
 			final Argon2Service service = new Argon2Service(randomService, config);
 			final byte[] t = service.getArgon2id(new byte[] {}, HexFormat.of().parseHex("7332424c365a744a44376e784b7a576e"));
 
 			// Then
-			assertArrayEquals(HexFormat.of().parseHex("f808c0575c5fdd94184d21b301ad17b82869c553a9760fa6a64cd4648a0f7b23"), t);
+			assertArrayEquals(HexFormat.of().parseHex("f11fb1bd1d0240f57064cb14e8281509447719c6090e7d37f37f4831af81b6e8"), t);
 		}
 
 		private Stream<Arguments> getArgon2idJsonFileArgumentProvider() {
