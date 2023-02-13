@@ -96,7 +96,7 @@ public final class EncryptionParameters {
 					i = i + 1;
 				}
 			}
-		} while (!(isProbablePrime(q.add(delta), certaintyLevel)) || !(isProbablePrime(TWO.multiply(q.add(delta)).add(ONE), certaintyLevel)));
+		} while (!(q.add(delta).isProbablePrime(certaintyLevel)) || !(TWO.multiply(q.add(delta)).add(ONE).isProbablePrime(certaintyLevel)));
 		q = q.add(delta);
 		final BigInteger p = TWO.multiply(q).add(ONE);
 
@@ -118,27 +118,6 @@ public final class EncryptionParameters {
 		shakeDigest.doFinal(result, 0, outputLength);
 
 		return result;
-	}
-
-	/**
-	 * This method wraps the {@link BigInteger#isProbablePrime(int)} method.
-	 * <p>
-	 * To speed up execution, a less expensive Fermat test is done, before calling isProbablePrime.
-	 * </p>
-	 *
-	 * @param q              the BigInteger to be tested for primality. Must be non-null.
-	 * @param certaintyLevel the certainty level for the isProbablePrime method. Must be positive.
-	 * @return {@code true} if the given q is probably prime, {@code false} if not.
-	 */
-	private boolean isProbablePrime(final BigInteger q, final int certaintyLevel) {
-		checkNotNull(q);
-		checkArgument(certaintyLevel > 0, "The certainty level must be positive.");
-
-		final BigInteger r = TWO.modPow(q.subtract(ONE), q);
-		if (r.equals(ONE)) {return q.isProbablePrime(certaintyLevel);
-		} else {
-			return false;
-		}
 	}
 
 }
