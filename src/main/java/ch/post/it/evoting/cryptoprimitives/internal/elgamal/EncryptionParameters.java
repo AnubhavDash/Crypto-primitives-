@@ -22,8 +22,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import org.bouncycastle.crypto.digests.SHAKEDigest;
 
@@ -49,12 +51,14 @@ public final class EncryptionParameters {
 	private static final BigInteger SIX = BigInteger.valueOf(6);
 
 	private final SecurityLevelInternal lambda;
+	private final SecureRandom secureRandom;
 
 	/**
 	 * Constructs an instance with a {@link SecurityLevelInternal}.
 	 */
 	public EncryptionParameters() {
 		this.lambda = SecurityLevelConfig.getSystemSecurityLevel();
+		this.secureRandom = new SecureRandom();
 	}
 
 	/**
@@ -107,6 +111,10 @@ public final class EncryptionParameters {
 			g = THREE;
 		}
 
+		if (!millerRabin(q, 64) || !millerRabin(p, 64)) {
+			throw new IllegalStateException("p and q must both pass the Miller-Rabin test");
+		}
+
 		return new GqGroup(p, q, g);
 	}
 
@@ -118,6 +126,28 @@ public final class EncryptionParameters {
 		shakeDigest.doFinal(result, 0, outputLength);
 
 		return result;
+	}
+
+	private boolean millerRabin(final BigInteger n, final int rounds) {
+		final BigInteger nMinusOne = n.subtract(ONE);
+		final int s = nMinusOne.getLowestSetBit();
+		final BigInteger d = nMinusOne.shiftRight(s);
+		return IntStream.range(0, rounds).parallel().allMatch(i -> {
+			BigInteger a;
+			do {
+				a = new BigInteger(n.bitLength(), secureRandom);
+			} while (a.compareTo(ONE) <= 0 || a.compareTo(n) >=0);
+
+			int j = 0;
+			BigInteger x = a.modPow(d, n);
+			while (!((j == 0 && x.equals(ONE)) || x.equals(nMinusOne))) {
+				if (j > 0 && x.equals(ONE) || ++j == s) {
+					return false;
+				}
+				x = x.modPow(TWO, n);
+			}
+			return true;
+		});
 	}
 
 }
