@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class PrimesInternal {
@@ -57,7 +58,7 @@ public class PrimesInternal {
 		}
 	}
 
-	public static ArrayList<Integer> getSmallPrimes() {
+	public static List<Integer> getSmallPrimes() {
 		final ArrayList<Integer> smallPrimes = new ArrayList<>();
 		try (final InputStream smallPrimesInputStream = checkNotNull(PrimesInternal.class.getResourceAsStream("/small_primes.txt"));
 				final Scanner scanner = new Scanner(smallPrimesInputStream)) {

@@ -22,10 +22,8 @@ import static org.mockito.Mockito.mockStatic;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -53,7 +51,7 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParamete
 class EncryptionParametersTest {
 
 	private static final String SEED = "Election_name";
-	private static final ArrayList<Integer> SMALL_PRIMES = PrimesInternal.getSmallPrimes();
+	private static final List<Integer> SMALL_PRIMES = PrimesInternal.getSmallPrimes();
 	private static final int NAME_MAX_LENGTH = 10;
 
 	private static EncryptionParameters encryptionParameters;
@@ -84,7 +82,7 @@ class EncryptionParametersTest {
 	@Test
 	@DisplayName("calling getEncryptionParameters with small primes list containing non-prime throws IllegalArgumentException")
 	void getEncryptionParametersWithNonPrimeInSmallPrimesThrows() {
-		final ArrayList<Integer> listWithNonPrime = new ArrayList<>(List.of(7, 8, 9, 10, 11));
+		final List<Integer> listWithNonPrime = new ArrayList<>(List.of(7, 8, 9, 10, 11));
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 				() -> encryptionParameters.getEncryptionParameters(SEED, listWithNonPrime));
 		assertEquals("The given number is not a prime. [Number: 8]", Throwables.getRootCause(exception).getMessage());
@@ -93,7 +91,7 @@ class EncryptionParametersTest {
 	@Test
 	@DisplayName("calling getEncryptionParameters with an empty small primes list does not throw")
 	void getEncryptionParametersEmptySmallPrimesDoesNotThrow() {
-		assertDoesNotThrow(() -> encryptionParameters.getEncryptionParameters(SEED, new ArrayList<>()));
+		assertDoesNotThrow(() -> encryptionParameters.getEncryptionParameters(SEED, Collections.emptyList()));
 	}
 
 	@Test
@@ -111,7 +109,7 @@ class EncryptionParametersTest {
 		final int electionNameLength = secureRandom.nextInt(NAME_MAX_LENGTH) + 1;
 		final String randomSeed = random.genRandomBase64String(electionNameLength);
 		final GqGroup gqGroup1 = encryptionParameters.getEncryptionParameters(randomSeed, SMALL_PRIMES);
-		final GqGroup gqGroup2 = encryptionParameters.getEncryptionParameters(randomSeed, new ArrayList<>());
+		final GqGroup gqGroup2 = encryptionParameters.getEncryptionParameters(randomSeed, Collections.emptyList());
 
 		assertEquals(gqGroup1, gqGroup2);
 	}

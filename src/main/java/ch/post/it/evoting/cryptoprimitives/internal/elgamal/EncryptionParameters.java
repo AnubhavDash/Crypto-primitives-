@@ -25,6 +25,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.bouncycastle.crypto.digests.SHAKEDigest;
@@ -69,13 +70,14 @@ public final class EncryptionParameters {
 	 * @return a {@link GqGroup} containing the verifiable encryption parameters p, q and g.
 	 */
 	@SuppressWarnings("java:S117")
-	public GqGroup getEncryptionParameters(final String seed, final ArrayList<Integer> smallPrimes) {
+	public GqGroup getEncryptionParameters(final String seed, final List<Integer> smallPrimes) {
 		checkNotNull(seed);
 		checkNotNull(smallPrimes);
 		smallPrimes.forEach(prime -> checkArgument(PrimesInternal.isSmallPrime(prime), "The given number is not a prime. [Number: %s]", prime));
 
 		final int certaintyLevel = lambda.getSecurityLevelBits();
-		final List<BigInteger> sp = smallPrimes.stream().map(BigInteger::valueOf).toList();
+		final ArrayList<BigInteger> sp = smallPrimes.stream().map(BigInteger::valueOf)
+				.collect(Collectors.toCollection(ArrayList::new));
 		final int l = smallPrimes.size();
 		final int pBitLength = lambda.getPBitLength();
 
