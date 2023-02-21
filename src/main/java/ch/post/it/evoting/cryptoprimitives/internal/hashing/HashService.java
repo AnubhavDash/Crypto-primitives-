@@ -40,14 +40,14 @@ import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.HashFunction;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.XOF;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.HashFunction;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.XOF;
 
 /**
  * Recursive hash service using a default SHA3-256 message digest.
@@ -111,10 +111,10 @@ public class HashService implements Hash {
 
 				return hashFunction.hash(
 						concat(
-							Stream.concat(
-								Stream.of(ARRAY_PREFIX),
-								w.stream().parallel().map(this::recursiveHash)
-							).toArray(byte[][]::new)
+								Stream.concat(
+										Stream.of(ARRAY_PREFIX),
+										w.stream().parallel().map(this::recursiveHash)
+								).toArray(byte[][]::new)
 						)
 				);
 
@@ -160,12 +160,8 @@ public class HashService implements Hash {
 		checkArgument(q.compareTo(BigInteger.ZERO) > 0, "The upper bound must be strictly positive.");
 		checkArgument(q.bitLength() >= 512, "The exclusive upper bound must have a bit length of at least 512.");
 
-		BigInteger h = byteArrayToInteger(recursiveHashOfLength(q.bitLength(), v));
-		while (h.compareTo(q) >= 0) {
-			final HashableList h_prependedTo_v = Stream.concat(Stream.of(HashableBigInteger.from(h)), Arrays.stream(v))
-					.collect(HashableList.toHashableList());
-			h = byteArrayToInteger(recursiveHashOfLength(q.bitLength(), h_prependedTo_v));
-		}
+		final BigInteger h_prime = byteArrayToInteger(recursiveHashOfLength(q.bitLength() + 256, v));
+		final BigInteger h = h_prime.mod(q);
 
 		return ZqElement.create(h, new ZqGroup(q));
 	}
@@ -215,7 +211,7 @@ public class HashService implements Hash {
 			} else if (value instanceof HashableList hashableList) {
 				final List<? extends Hashable> w = hashableList.toHashableForm();
 				final byte[] h = Stream.concat(Stream.of(ARRAY_PREFIX), w.parallelStream().map(w_i -> recursiveHashOfLength(l, w_i)))
-						.reduce(new byte[]{}, Bytes::concat);
+						.reduce(new byte[] {}, Bytes::concat);
 				return ByteArrays.cutToBitLength(shake256(L, h), l);
 			} else {
 				throw new IllegalArgumentException(String.format("Object of type %s cannot be hashed.", value.getClass()));
