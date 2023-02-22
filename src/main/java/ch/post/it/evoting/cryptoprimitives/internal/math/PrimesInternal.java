@@ -20,8 +20,11 @@ package ch.post.it.evoting.cryptoprimitives.internal.math;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class PrimesInternal {
@@ -55,13 +58,15 @@ public class PrimesInternal {
 		}
 	}
 
-	public static ArrayList<Integer> getSmallPrimes() {
-		final InputStream smallPrimesInputStream = checkNotNull(PrimesInternal.class.getResourceAsStream("/small_primes.txt"));
+	public static List<Integer> getSmallPrimes() {
 		final ArrayList<Integer> smallPrimes = new ArrayList<>();
-		try (final Scanner scanner = new Scanner(smallPrimesInputStream)) {
+		try (final InputStream smallPrimesInputStream = checkNotNull(PrimesInternal.class.getResourceAsStream("/small_primes.txt"));
+				final Scanner scanner = new Scanner(smallPrimesInputStream)) {
 			while (scanner.hasNextInt()) {
 				smallPrimes.add(scanner.nextInt());
 			}
+		} catch (IOException e) {
+			throw new UncheckedIOException("Unable to read small_primes.txt", e);
 		}
 
 		return smallPrimes;

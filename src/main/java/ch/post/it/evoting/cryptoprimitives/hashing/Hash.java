@@ -53,7 +53,7 @@ public interface Hash {
 	/**
 	 * Computes the hash in Z<sub>q</sub> of multiple (potentially) recursive inputs.
 	 *
-	 * @param exclusiveUpperBound the exlusive upper bound for the hash to be returned. Must be strictly positive.
+	 * @param exclusiveUpperBound the exclusive upper bound for the hash to be returned. Must be strictly positive.
 	 * @param values              the objects to be hashed. Must be non-null.
 	 * @return the result of the hashing as a {@link ZqElement} smaller than q
 	 * @throws NullPointerException     if any of the arguments is null
