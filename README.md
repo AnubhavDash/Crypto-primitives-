@@ -102,6 +102,7 @@ An overview of all major changes within the published releases is available [her
 
 We plan for the following improvements to the crypto-primitives library:
 
+* Improve the KDFToZq algorithm to ensure that it is collision resistant.
 * Provide expanded information in test vectors (including the expected challenge).
 
 ## Additional Documentation

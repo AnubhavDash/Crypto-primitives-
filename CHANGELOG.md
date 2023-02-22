@@ -1,13 +1,28 @@
 # Changelog
 
-## Release 1.2
+## Release 1.2.1
 
-Release 1.2 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
+Release 1.2.1 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
 We want to thank the experts for their high-quality, constructive remarks:
 
 * Vanessa Teague (Thinking Cybersecurity), Olivier Pereira (Université catholique Louvain), Thomas Edmund Haines (Australian National University)
 * Aleksander Essex (Western University Canada)
 * Rolf Haenni, Reto Koenig, Philipp Locher, Eric Dubuis (Bern University of Applied Sciences)
+
+The following functionalities and improvements are included in release 1.2.1:
+
+* [Code, Specification] Improved performance of the GetEncryptionParameters algorithm (feedback from François Weissbaum and Patrick Liniger from the Swiss Armed Forces Command Support Organisation).
+* [Code, Specification] Included a proper Miller-Rabin primality test in the GetEncryptionParameters algorithm and stated formal error bounds for primality of the group parameters p and q (feedback from Aleksander Essex).
+* [Specification] Strengthened justification for parameters generation (feedback from Aleksander Essex).
+* [Specification] Improved description of primality testing (feedback from Aleksander Essex).
+* [Code, Specification] Improved the RecursiveHashToZq algorithm to ensure that it is collision resistant.
+* [Code] Updated dependencies and third-party libraries.
+
+---
+
+## Release 1.2
+
+Release 1.2 includes some feedback from the Federal Chancellery's mandated experts (see above)
 
 The following functionalities and improvements are included in release 1.2:
 
