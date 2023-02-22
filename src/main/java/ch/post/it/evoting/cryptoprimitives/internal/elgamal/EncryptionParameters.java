@@ -22,8 +22,11 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.bouncycastle.crypto.digests.SHAKEDigest;
 
@@ -49,12 +52,14 @@ public final class EncryptionParameters {
 	private static final BigInteger SIX = BigInteger.valueOf(6);
 
 	private final SecurityLevelInternal lambda;
+	private final SecureRandom secureRandom;
 
 	/**
 	 * Constructs an instance with a {@link SecurityLevelInternal}.
 	 */
 	public EncryptionParameters() {
 		this.lambda = SecurityLevelConfig.getSystemSecurityLevel();
+		this.secureRandom = new SecureRandom();
 	}
 
 	/**
@@ -65,13 +70,14 @@ public final class EncryptionParameters {
 	 * @return a {@link GqGroup} containing the verifiable encryption parameters p, q and g.
 	 */
 	@SuppressWarnings("java:S117")
-	public GqGroup getEncryptionParameters(final String seed, final ArrayList<Integer> smallPrimes) {
+	public GqGroup getEncryptionParameters(final String seed, final List<Integer> smallPrimes) {
 		checkNotNull(seed);
 		checkNotNull(smallPrimes);
 		smallPrimes.forEach(prime -> checkArgument(PrimesInternal.isSmallPrime(prime), "The given number is not a prime. [Number: %s]", prime));
 
 		final int certaintyLevel = lambda.getSecurityLevelBits();
-		final List<BigInteger> sp = smallPrimes.stream().map(BigInteger::valueOf).toList();
+		final ArrayList<BigInteger> sp = smallPrimes.stream().map(BigInteger::valueOf)
+				.collect(Collectors.toCollection(ArrayList::new));
 		final int l = smallPrimes.size();
 		final int pBitLength = lambda.getPBitLength();
 
@@ -96,7 +102,7 @@ public final class EncryptionParameters {
 					i = i + 1;
 				}
 			}
-		} while (!(isProbablePrime(q.add(delta), certaintyLevel)) || !(isProbablePrime(TWO.multiply(q.add(delta)).add(ONE), certaintyLevel)));
+		} while (!(q.add(delta).isProbablePrime(certaintyLevel)) || !(TWO.multiply(q.add(delta)).add(ONE).isProbablePrime(certaintyLevel)));
 		q = q.add(delta);
 		final BigInteger p = TWO.multiply(q).add(ONE);
 
@@ -105,6 +111,10 @@ public final class EncryptionParameters {
 			g = TWO;
 		} else {
 			g = THREE;
+		}
+
+		if (!millerRabin(q, 64) || !millerRabin(p, 64)) {
+			throw new IllegalStateException("p and q must both pass the Miller-Rabin test");
 		}
 
 		return new GqGroup(p, q, g);
@@ -120,25 +130,26 @@ public final class EncryptionParameters {
 		return result;
 	}
 
-	/**
-	 * This method wraps the {@link BigInteger#isProbablePrime(int)} method.
-	 * <p>
-	 * To speed up execution, a less expensive Fermat test is done, before calling isProbablePrime.
-	 * </p>
-	 *
-	 * @param q              the BigInteger to be tested for primality. Must be non-null.
-	 * @param certaintyLevel the certainty level for the isProbablePrime method. Must be positive.
-	 * @return {@code true} if the given q is probably prime, {@code false} if not.
-	 */
-	private boolean isProbablePrime(final BigInteger q, final int certaintyLevel) {
-		checkNotNull(q);
-		checkArgument(certaintyLevel > 0, "The certainty level must be positive.");
+	private boolean millerRabin(final BigInteger n, final int rounds) {
+		final BigInteger nMinusOne = n.subtract(ONE);
+		final int s = nMinusOne.getLowestSetBit();
+		final BigInteger d = nMinusOne.shiftRight(s);
+		return IntStream.range(0, rounds).parallel().allMatch(i -> {
+			BigInteger a;
+			do {
+				a = new BigInteger(n.bitLength(), secureRandom);
+			} while (a.compareTo(ONE) <= 0 || a.compareTo(n) >=0);
 
-		final BigInteger r = TWO.modPow(q.subtract(ONE), q);
-		if (r.equals(ONE)) {return q.isProbablePrime(certaintyLevel);
-		} else {
-			return false;
-		}
+			int j = 0;
+			BigInteger x = a.modPow(d, n);
+			while (!((j == 0 && x.equals(ONE)) || x.equals(nMinusOne))) {
+				if (j > 0 && x.equals(ONE) || ++j == s) {
+					return false;
+				}
+				x = x.modPow(TWO, n);
+			}
+			return true;
+		});
 	}
 
 }
