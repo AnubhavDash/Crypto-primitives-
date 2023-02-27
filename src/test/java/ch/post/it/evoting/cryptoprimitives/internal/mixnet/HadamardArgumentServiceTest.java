@@ -48,6 +48,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
+import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
@@ -307,8 +308,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 					zero, // s_m
 					zero, one, three, four, two, one, two // t
 			).when(hadamardRandomService).genRandomInteger(any());
-			when(hadamardHashService.recursiveHash(any()))
-					.thenReturn(new byte[] { 0b10 });
+			when(hadamardHashService.recursiveHash(any(Hashable[].class))).thenReturn(new byte[] { 0b10 });
 			HadamardArgumentService specificHadamardArgumentService = new HadamardArgumentService(hadamardRandomService, hadamardHashService,
 					hadamardPublicKey, hadamardCommitmentKey);
 
