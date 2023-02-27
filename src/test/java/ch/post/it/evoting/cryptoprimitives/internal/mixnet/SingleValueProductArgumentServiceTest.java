@@ -48,6 +48,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamal;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
+import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
@@ -258,8 +259,7 @@ class SingleValueProductArgumentServiceTest extends TestGroupSetup {
 			final SingleValueProductWitness witness = new SingleValueProductWitness(GroupVector.from(a), r);
 
 			final HashService hashService = mock(HashService.class);
-			when(hashService.recursiveHash(any()))
-					.thenReturn(new byte[] { 0b1010 });
+			when(hashService.recursiveHash(any(Hashable[].class))).thenReturn(new byte[] { 0b1010 });
 			final SingleValueProductArgumentService svpArgumentProvider = new SingleValueProductArgumentService(randomService, hashService, pk, ck);
 			assertEquals(expected, svpArgumentProvider.getSingleValueProductArgument(statement, witness));
 		}
