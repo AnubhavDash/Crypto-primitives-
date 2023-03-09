@@ -236,11 +236,27 @@ class ConversionsTest {
 	}
 
 	@Nested
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	@DisplayName("Test String to byte array conversion")
 	class StringToByteArrayTest {
 		@Test
 		void testConversionOfNullStringToByteArrayThrows() {
 			assertThrows(NullPointerException.class, () -> stringToByteArray(null));
+		}
+
+		Stream<String> invalidUTF8Strings() {
+			return Stream.of(
+					"\uD8E5",
+					"All good until here \uDFFF",
+					"\uDEEF and something else"
+			);
+		}
+
+		@ParameterizedTest(name = "string = \"{0}\"")
+		@MethodSource("invalidUTF8Strings")
+		void testConversionOfNonUTF8StringToByteArrayThrows(final String str) {
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> stringToByteArray(str));
+			assertEquals("The string does not correspond to a valid sequence of UTF-8 encoding.", exception.getMessage());
 		}
 
 		@Test
@@ -265,11 +281,11 @@ class ConversionsTest {
 			assertEquals("The length of the byte array must be strictly positive.", exception.getMessage());
 		}
 
-		Stream<Arguments> invalidUTF8ByteArrays() {
+		Stream<byte[]> invalidUTF8ByteArrays() {
 			return Stream.of(
-					Arguments.of(new byte[] { -37, -10 }),
-					Arguments.of(new byte[] { -50, -29, 48 }),
-					Arguments.of(new byte[] { 107, -93, 75, 41 })
+					new byte[] { -37, -10 },
+					new byte[] { -50, -29, 48 },
+					new byte[] { 107, -93, 75, 41 }
 			);
 		}
 
@@ -278,6 +294,12 @@ class ConversionsTest {
 		void testConversionOfInvalidUTF8ByteArrayToStringThrows(byte[] byteArray) {
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> byteArrayToString(byteArray));
 			assertEquals("The byte array does not correspond to a valid sequence of UTF-8 encoding.", exception.getMessage());
+		}
+
+		@Test
+		void testConversionWithSpecificByteArrayReturnsExpectedValue() {
+			final String expected = "€";
+			assertEquals(expected, byteArrayToString(new byte[] { -30, -126, -84 }));
 		}
 
 	}
