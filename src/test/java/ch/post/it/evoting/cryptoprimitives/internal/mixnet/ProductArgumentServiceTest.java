@@ -51,6 +51,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
+import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
@@ -320,7 +321,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 					four, one, zero, // d_0, d_1, r_d
 					one, two // s_0, s_x
 			).when(productRandomService).genRandomInteger(any());
-			when(productHashService.recursiveHash(any()))
+			when(productHashService.recursiveHash(any(Hashable[].class)))
 					.thenReturn(new byte[] { 0b10 }, new byte[] { 0b11 }, new byte[] { 0b01 }, new byte[] { 0b10 });
 			final ProductArgumentService specificProductArgumentService = new ProductArgumentService(productRandomService, productHashService,
 					productPublicKey, productCommitmentKey);
