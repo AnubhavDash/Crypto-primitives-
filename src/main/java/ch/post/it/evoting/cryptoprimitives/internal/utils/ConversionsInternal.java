@@ -21,8 +21,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
@@ -82,8 +84,19 @@ public final class ConversionsInternal {
 	public static byte[] stringToByteArray(final String s) {
 		checkNotNull(s);
 
-		// Corresponds to UTF-8(S)
-		return s.getBytes(StandardCharsets.UTF_8);
+		final CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder();
+
+		try {
+			// Check that s is a valid UTF-8 string
+			final ByteBuffer buffer = encoder.encode(CharBuffer.wrap(s));
+
+			final byte[] result = new byte[buffer.remaining()];
+			buffer.get(result);
+
+			return result;
+		} catch (CharacterCodingException e) {
+			throw new IllegalArgumentException("The string does not correspond to a valid sequence of UTF-8 encoding.");
+		}
 	}
 
 	/**
@@ -93,7 +106,7 @@ public final class ConversionsInternal {
 		checkNotNull(b);
 		checkArgument(b.length > 0, "The length of the byte array must be strictly positive.");
 
-		CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
+		final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
 		// The try-catch clause implements the pseudo-code's if statement
 		try {
 			// Corresponds to UTF-8^-1(B)
