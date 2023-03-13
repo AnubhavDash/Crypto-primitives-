@@ -17,7 +17,6 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.utils;
 
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays.cutToBitLength;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.stringToByteArray;
 import static com.google.common.base.Preconditions.checkArgument;
@@ -121,16 +120,11 @@ public class KDFService implements KeyDerivation {
 		final BigInteger q = exclusiveUpperBound;
 
 		checkArgument(l_straight >= L, "The pseudo random key length must be greater than the hash function output length.");
+		checkArgument(ByteArrays.byteLength(q) >= L);
 
-		final int l_curved = ByteArrays.byteLength(q);
-		checkArgument(l_curved >= L);
-
+		final int l_curved = ByteArrays.byteLength(q) + 32;
 		byte[] h = KDF(PRK, info, l_curved);
-		BigInteger u = byteArrayToInteger(cutToBitLength(h, q.bitLength()));
-		while (u.compareTo(q) >= 0) {
-			h = KDF(h, info, l_curved);
-			u = byteArrayToInteger(cutToBitLength(h, q.bitLength()));
-		}
+		BigInteger u = byteArrayToInteger(h).mod(q);
 
 		return ZqElement.create(u, new ZqGroup(q));
 	}
