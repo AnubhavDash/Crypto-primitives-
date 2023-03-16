@@ -17,6 +17,7 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.securitylevel;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Date.from;
 
@@ -38,6 +39,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -64,24 +66,25 @@ import ch.post.it.evoting.cryptoprimitives.internal.signing.CertificateInfo;
 @SuppressWarnings({ "java:S101" })
 public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 
-	static {
-		Security.addProvider(new BouncyCastleProvider());
-	}
-
 	private static final RSASSA_PSS INSTANCE = new RSASSA_PSS();
 	private static final RandomService RANDOM_SERVICE = new RandomService();
 	private static final String SIGNATURE_ALGORITHM = "SHA256WITHRSAANDMGF1";
 	private static final String KEY_GENERATION_ALGORITHM = "RSASSA-PSS";
 	private static final int KEY_LENGTH = 3072;
-	private static final int SERIAL_LENGTH = 256;
+	private static final int SERIAL_LENGTH = 20;
+	private static final int SIGNATURE_LENGTH = 384;
 
-	public static RSASSA_PSS getInstance() {
-		return INSTANCE;
+	static {
+		Security.addProvider(new BouncyCastleProvider());
 	}
 
 	@VisibleForTesting
 	RSASSA_PSS() {
 		//Intentionally left blank
+	}
+
+	public static RSASSA_PSS getInstance() {
+		return INSTANCE;
 	}
 
 	@Override
@@ -129,6 +132,8 @@ public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 				.addRDN(BCStyle.ST, info.getAuthorityInformation().getState())
 				.build();
 
+		final BasicConstraints basicConstraints = new BasicConstraints(0);
+
 		final JcaX509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(
 				subject,
 				serial,
@@ -139,6 +144,7 @@ public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 
 		try {
 			builder.addExtension(Extension.keyUsage, true, info.getUsage());
+			builder.addExtension(Extension.basicConstraints, true, basicConstraints);
 		} catch (CertIOException e) {
 			throw new IllegalStateException("Badly configured extension.", e);
 		}
@@ -148,6 +154,9 @@ public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 
 	@Override
 	public byte[] sign(final PrivateKey privateKey, final byte[] message) {
+		checkNotNull(privateKey);
+		checkNotNull(message);
+
 		final JcaContentSignerBuilder contentSignerBuilder = getContentSigner();
 		final ContentSigner contentSigner;
 		try {
@@ -170,6 +179,8 @@ public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 		checkNotNull(publicKey);
 		checkNotNull(hash);
 		checkNotNull(signatureBytes);
+		checkArgument(signatureBytes.length == SIGNATURE_LENGTH, "The signature must have the expected size. [found: %s, expected: %s]",
+				signatureBytes.length, SIGNATURE_LENGTH);
 
 		final JcaContentVerifierProviderBuilder jcaContentVerifierProviderBuilder = new JcaContentVerifierProviderBuilder();
 		final ContentVerifierProvider contentVerifierProvider;
