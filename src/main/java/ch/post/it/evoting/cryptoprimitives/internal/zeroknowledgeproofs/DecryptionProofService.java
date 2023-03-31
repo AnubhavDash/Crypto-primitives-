@@ -234,8 +234,9 @@ public class DecryptionProofService {
 						pk.stream().limit(l),
 						IntStream.range(0, l).mapToObj(i -> phi.get(i).divide(m.get(i))))
 				.collect(toGroupVector());
+		// Since |e| << |q|, inverting y before exponentiating with e yields better performance than exponentiating y to a negated e
 		final GroupVector<GqElement, GqGroup> c_prime = IntStream.range(0, 2 * l)
-				.mapToObj(i -> x.get(i).multiply(y.get(i).exponentiate(e.negate())))
+				.mapToObj(i -> x.get(i).multiply(y.get(i).invert().exponentiate(e)))
 				.collect(toGroupVector());
 		final HashableList h_aux;
 		if (!i_aux.isEmpty()) {
