@@ -37,4 +37,15 @@ public interface HashableBigInteger extends Hashable {
 		checkNotNull(bigInteger);
 		return () -> bigInteger;
 	}
+
+	/**
+	 * Utility function which creates a HashableBigInteger whose hashable form is the provided Integer.
+	 *
+	 * @param integer the hashable form. Non null.
+	 * @return A new HashableBigInteger whose hashable form is {@code integer}
+	 */
+	static HashableBigInteger from(final Integer integer) {
+		checkNotNull(integer);
+		return () -> BigInteger.valueOf(integer);
+	}
 }
