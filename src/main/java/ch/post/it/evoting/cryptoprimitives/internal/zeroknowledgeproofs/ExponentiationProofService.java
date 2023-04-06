@@ -174,8 +174,9 @@ public class ExponentiationProofService {
 		// Operations
 		final GroupVector<GqElement, GqGroup> x = computePhiExponentiation(z, g);
 		final HashableList f = HashableList.of(HashableBigInteger.from(p), HashableBigInteger.from(q), g);
+		// Since |e| << |q|, inverting y before exponentiating with e yields better performance than exponentiating y to a negated e
 		final GroupVector<GqElement, GqGroup> c_prime = IntStream.range(0, n)
-				.mapToObj(i -> x.get(i).multiply(y.get(i).exponentiate(e.negate())))
+				.mapToObj(i -> x.get(i).multiply(y.get(i).invert().exponentiate(e)))
 				.collect(toGroupVector());
 		final HashableList h_aux;
 		if (!i_aux.isEmpty()) {
