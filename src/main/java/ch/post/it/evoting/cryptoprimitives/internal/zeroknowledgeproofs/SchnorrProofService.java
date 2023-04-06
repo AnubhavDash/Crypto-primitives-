@@ -149,7 +149,8 @@ public class SchnorrProofService {
 		// Operation.
 		final GqElement x = computePhiSchnorr(z, g);
 		final HashableList f = HashableList.of(HashableBigInteger.from(p), HashableBigInteger.from(q), g);
-		final GqElement c_prime = x.multiply(y.exponentiate(e.negate()));
+		// Since |e| << |q|, inverting y before exponentiating with e yields better performance than exponentiating y to a negated e
+		final GqElement c_prime = x.multiply(y.invert().exponentiate(e));
 
 		final HashableList h_aux;
 		if (!i_aux.isEmpty()) {
