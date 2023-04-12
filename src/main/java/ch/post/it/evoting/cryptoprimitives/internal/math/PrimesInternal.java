@@ -60,10 +60,12 @@ public class PrimesInternal {
 
 	public static List<Integer> getSmallPrimes() {
 		final ArrayList<Integer> smallPrimes = new ArrayList<>();
-		try (final InputStream smallPrimesInputStream = checkNotNull(PrimesInternal.class.getResourceAsStream("/small_primes.txt"));
-				final Scanner scanner = new Scanner(smallPrimesInputStream)) {
-			while (scanner.hasNextInt()) {
-				smallPrimes.add(scanner.nextInt());
+		try (final InputStream smallPrimesInputStream = PrimesInternal.class.getResourceAsStream("/small_primes.txt")){
+			checkNotNull(smallPrimesInputStream, "Could not find small_primes.txt resource");
+			try (final Scanner scanner = new Scanner(smallPrimesInputStream)) {
+				while (scanner.hasNextInt()) {
+					smallPrimes.add(scanner.nextInt());
+				}
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException("Unable to read small_primes.txt", e);
