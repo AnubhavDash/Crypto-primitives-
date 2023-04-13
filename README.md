@@ -41,7 +41,7 @@ Moreover, a high test coverage illustrates the fact that we extensively test the
 
 ### Fortify Analysis
 
-The Fortify analysis showed 0 critical, 2 high, 0 medium, and 62 low criticality issues. We manually reviewed all 64 issues and assessed them as false positives.
+The Fortify analysis showed 0 critical, 1 high, 0 medium, and 62 low criticality issues. We manually reviewed all 63 issues and assessed them as false positives.
 
 ### JFrog X-Ray Analysis
 
