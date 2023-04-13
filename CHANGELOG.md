@@ -1,13 +1,29 @@
 # Changelog
 
-## Release 1.2.1
+## Release 1.3.0
 
-Release 1.2.1 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
+Release 1.3.0 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
 We want to thank the experts for their high-quality, constructive remarks:
 
 * Vanessa Teague (Thinking Cybersecurity), Olivier Pereira (Université catholique Louvain), Thomas Edmund Haines (Australian National University)
 * Aleksander Essex (Western University Canada)
 * Rolf Haenni, Reto Koenig, Philipp Locher, Eric Dubuis (Bern University of Applied Sciences)
+
+The following functionalities and improvements are included in release 1.3.0:
+
+* [Code, Specification] Added additional properties in the x.509 certificates, clarified the description, and improved input validation for digital signatures (feedback from Aleksander Essex).
+* [Code, Specification] Added a section on Argon2id profiles containing a justification of the chosen parameters (feedback from Rolf Haenni, Reto Koenig, Philipp Locher, and Eric Dubuis).
+* [Code, Specification] Improved the KdfToZq algorithm to ensure collision resistance (reported in GitLab Issue [46 / #YWH-PGM232-121](https://gitlab.com/swisspost-evoting/e-voting/e-voting-documentation/-/issues/46)).
+* [Code] Added a validation in the StringToByteArray method that the input is a valid UTF-8 string (feedback from Vanessa Teague, Olivier Pereira, and Thomas Haines and reported in GitLab Issue [46 / #YWH-PGM232-122](https://gitlab.com/swisspost-evoting/e-voting/e-voting-documentation/-/issues/46)).
+* [Code] Improved the performance of the verification of the zero-knowledge proofs.
+* [Code] Minor fix of a potential resource leak.
+* [Code] Updated dependencies and third-party libraries.
+
+---
+
+## Release 1.2.1
+
+Release 1.2.1 includes some feedback from the Federal Chancellery's mandated experts (see above)
 
 The following functionalities and improvements are included in release 1.2.1:
 
@@ -15,7 +31,7 @@ The following functionalities and improvements are included in release 1.2.1:
 * [Code, Specification] Included a proper Miller-Rabin primality test in the GetEncryptionParameters algorithm and stated formal error bounds for primality of the group parameters p and q (feedback from Aleksander Essex).
 * [Specification] Strengthened justification for parameters generation (feedback from Aleksander Essex).
 * [Specification] Improved description of primality testing (feedback from Aleksander Essex).
-* [Code, Specification] Improved the RecursiveHashToZq algorithm to ensure that it is collision resistant.
+* [Code, Specification] Improved the RecursiveHashToZq algorithm to ensure that it is collision resistant (reported in GitLab Issue [46 / #YWH-PGM232-121](https://gitlab.com/swisspost-evoting/e-voting/e-voting-documentation/-/issues/46)).
 * [Code] Updated dependencies and third-party libraries.
 
 ---
