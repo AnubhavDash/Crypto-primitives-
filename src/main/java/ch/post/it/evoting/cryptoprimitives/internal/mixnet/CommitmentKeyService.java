@@ -32,6 +32,7 @@ import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
+import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 
 /**
  * Creates commitment keys.
@@ -79,6 +80,7 @@ public class CommitmentKeyService {
 		final BigInteger p = gqGroup.getP();
 		final BigInteger q = gqGroup.getQ();
 		final BigInteger g = gqGroup.getGenerator().getValue();
+		final ZqElement one = ZqElement.create(1, ZqGroup.sameOrderAs(gqGroup));
 
 		checkArgument(canGenerateKey(nu, gqGroup), "The desired number of commitment elements must be in the range (0, q - 3]");
 
@@ -86,11 +88,10 @@ public class CommitmentKeyService {
 		int i = 0;
 
 		// Using a Set to prevent duplicates.
-		// A LinkedHashSet has predicable iteration order, which is the order of insertion
+		// A LinkedHashSet has predictable iteration order, which is the order of insertion
 		final LinkedHashSet<BigInteger> v = new LinkedHashSet<>();
 
-		final Predicate<BigInteger> validElement = w -> !w.equals(BigInteger.ZERO)
-				&& !w.equals(BigInteger.ONE)
+		final Predicate<BigInteger> validElement = w -> !w.equals(BigInteger.ONE)
 				&& !w.equals(g)
 				&& !v.contains(w);
 
@@ -99,7 +100,7 @@ public class CommitmentKeyService {
 			final ZqElement u = hashService.recursiveHashToZq(q, HashableBigInteger.from(q),
 					HashableString.from(HASH_CONSTANT),
 					HashableBigInteger.from(BigInteger.valueOf(i)),
-					HashableBigInteger.from(BigInteger.valueOf(count)));
+					HashableBigInteger.from(BigInteger.valueOf(count))).add(one);
 
 			final BigInteger w = BigIntegerOperationsService.modExponentiate(u.getValue(), BigInteger.valueOf(2), p);
 
