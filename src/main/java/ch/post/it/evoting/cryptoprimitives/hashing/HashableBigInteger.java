@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.hashing;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
@@ -35,17 +36,19 @@ public interface HashableBigInteger extends Hashable {
 	 */
 	static HashableBigInteger from(final BigInteger bigInteger) {
 		checkNotNull(bigInteger);
+		checkArgument(bigInteger.signum() >= 0);
 		return () -> bigInteger;
 	}
 
 	/**
 	 * Utility function which creates a HashableBigInteger whose hashable form is the provided Integer.
 	 *
-	 * @param integer the hashable form. Non null.
+	 * @param integer the hashable form. Non-null, non-negative.
 	 * @return A new HashableBigInteger whose hashable form is {@code integer}
 	 */
 	static HashableBigInteger from(final Integer integer) {
 		checkNotNull(integer);
+		checkArgument(integer >= 0);
 		return () -> BigInteger.valueOf(integer);
 	}
 }

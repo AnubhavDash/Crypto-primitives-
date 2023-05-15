@@ -49,7 +49,9 @@ The X-Ray analysis indicates that none of the crypto-primitives' 3rd party depen
 
 ## Native Library Support
 
-We support the GNU Multi Precision Arithmetic Library (GMP) for arbitrary-precision integer operations (called BigInteger in the Java programming language). GMP speeds up certain mathematical operations such as modular exponentiation. We recommend the [article by Haenni, Locher, and Gailly](https://e-voting.bfh.ch/app/download/7833228661/HLG19.pdf?t=1601370067) for an overview of popular optimization techniques.
+We support the GNU Multi Precision Arithmetic Library (GMP) for arbitrary-precision integer operations (called BigInteger in the Java programming language). 
+GMP speeds up certain mathematical operations such as modular exponentiation. 
+We recommend the [article by Haenni, Locher, and Gailly](https://e-voting.bfh.ch/app/download/7833228661/HLG19.pdf?t=1601370067) for an overview of popular optimization techniques.
 
 _Linux:_
 

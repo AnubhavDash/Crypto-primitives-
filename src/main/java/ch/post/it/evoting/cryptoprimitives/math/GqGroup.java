@@ -94,6 +94,7 @@ public final class GqGroup implements MathematicalGroup<GqGroup>, HashableList {
 		generator = GqElementFactory.fromValue(g, this);
 
 		identity = GqElementFactory.fromValue(BigInteger.ONE, this);
+		BigIntegersOptimizations.prepareFixBaseOptimizations(g, p);
 	}
 
 	/**
