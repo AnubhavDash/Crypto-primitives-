@@ -28,6 +28,14 @@ public interface BigIntegerOperations {
 
 	String MODULUS_CHECK_MESSAGE = "The modulus must be greater than 1";
 
+	default boolean isFixBaseSupported() {
+		return false;
+	}
+
+	default void generateCache(BigInteger base, BigInteger modulus) {
+		throw new UnsupportedOperationException("This implementation does not support fixed base optimizations");
+	}
+
 	/**
 	 * Multiplies two {@link BigInteger}s and take the modulus.
 	 *

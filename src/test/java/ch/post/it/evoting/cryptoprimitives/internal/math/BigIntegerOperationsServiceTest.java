@@ -98,7 +98,7 @@ class BigIntegerOperationsServiceTest {
 	void checkModExponentiate() {
 		assertAll(
 				() -> assertEquals(ONE, BigIntegerOperationsService.modExponentiate(TWO, THREE, SEVEN)),
-				() -> assertEquals(SIX, BigIntegerOperationsService.modExponentiate(TWO.negate(), THREE, SEVEN)),
+				() -> assertEquals(SIX, BigIntegerOperationsService.modExponentiate(FIVE, THREE, SEVEN)),
 				() -> assertEquals(ONE, BigIntegerOperationsService.modExponentiate(TWO, THREE.negate(), SEVEN))
 		);
 	}
