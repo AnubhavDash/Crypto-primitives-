@@ -19,8 +19,21 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
+import java.util.HexFormat;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
+import com.google.common.base.Preconditions;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalListener;
 import com.squareup.jnagmp.Gmp;
+import com.verificatum.vmgj.FpowmTab;
+import com.verificatum.vmgj.VMG;
+
+import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
+import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
+import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 
 /**
  * Optimized BigIntegerOperations using GMP.
@@ -28,8 +41,44 @@ import com.squareup.jnagmp.Gmp;
  * <p>This class is thread-safe.</p>
  */
 public class BigIntegerOperationsGMP implements BigIntegerOperations {
-
+	private static final HashService hashService = HashService.getInstance();
+	private final Cache<String, FpowmTab> fixBaseCache = CacheBuilder.newBuilder()
+			.expireAfterAccess(30, TimeUnit.DAYS)
+			.removalListener((RemovalListener<String, FpowmTab>) removalNotification -> {
+				if (removalNotification.getValue() != null) {
+					removalNotification.getValue().free();
+				}
+			})
+			.build();
 	private final BigIntegerOperations bigIntegerOperationsJava = new BigIntegerOperationsJava();
+
+	@Override
+	public boolean isFixBaseSupported() {
+		return VMG.checkLoaded();
+	}
+
+	@Override
+	public void generateCache(final BigInteger base, final BigInteger modulus) {
+		if (!VMG.checkLoaded()) {
+			throw VMG.LOAD_ERROR;
+		}
+		final String key = deriveCacheKey(base, modulus);
+
+		try {
+			fixBaseCache.get(key, () -> new FpowmTab(base, modulus, modulus.bitLength() - 1));
+		} catch (ExecutionException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static String deriveCacheKey(final BigInteger base, final BigInteger modulus) {
+		Preconditions.checkArgument(modulus.signum() >= 0);
+		byte[] bytes = hashService.recursiveHash(
+				HashableString.from(Boolean.toString(base.signum() >= 0)),
+				HashableBigInteger.from(base.abs()),
+				HashableBigInteger.from(modulus));
+		return HexFormat.of().formatHex(bytes);
+	}
 
 	@Override
 	public BigInteger modMultiply(final BigInteger n1, final BigInteger n2, final BigInteger modulus) {
@@ -49,11 +98,20 @@ public class BigIntegerOperationsGMP implements BigIntegerOperations {
 		//-1, 0 or 1 as the value of this BigInteger is negative, zero or positive.
 		int exponentSignum = exponent.signum();
 
-		if (exponentSignum < 0) {
-			return Gmp.modPowSecure(modInvert(base, modulus), exponent.negate(), modulus);
-		}
+		BigInteger basis = exponentSignum >= 0 ? base : modInvert(base, modulus);
+		BigInteger exp = exponentSignum >= 0 ? exponent : exponent.negate();
 
-		return Gmp.modPowSecure(base, exponent, modulus);
+		String key = deriveCacheKey(basis, modulus);
+
+		FpowmTab fpowmTab = fixBaseCache.getIfPresent(key);
+		if (fpowmTab != null) {
+			return fpowmTab.fpowm(exp);
+		} else if (VMG.checkLoaded()) {
+			// VMG is faster than plain GMP, prefer this if available.
+			return VMG.powm(basis, exp, modulus);
+		} else {
+			return Gmp.modPowSecure(basis, exp, modulus);
+		}
 	}
 
 	@Override
@@ -65,7 +123,6 @@ public class BigIntegerOperationsGMP implements BigIntegerOperations {
 
 		return Gmp.modInverse(n, modulus);
 	}
-
 
 	@Override
 	public int getJacobi(final BigInteger a, final BigInteger n) {

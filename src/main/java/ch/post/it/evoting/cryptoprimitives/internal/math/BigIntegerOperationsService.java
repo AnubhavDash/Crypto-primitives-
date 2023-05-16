@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.squareup.jnagmp.Gmp;
+import com.verificatum.vmgj.VMG;
 
 /**
  * <p>This class is thread-safe.</p>
@@ -47,6 +48,13 @@ public class BigIntegerOperationsService {
 		} else {
 			bigIntegerOperations = new BigIntegerOperationsJava();
 		}
+
+		if (VMG.checkLoaded()) {
+			LOG.info("VMGJ is installed and ready to use");
+		} else {
+			LOG.warn("VMG is not installed, some native code optimisations are not available, integer operations will now take longer");
+		}
+
 	}
 
 	private BigIntegerOperationsService() {
@@ -71,5 +79,11 @@ public class BigIntegerOperationsService {
 
 	public static int getJacobi(final BigInteger a, final BigInteger n) {
 		return bigIntegerOperations.getJacobi(a, n);
+	}
+
+	public static void generateCache(final BigInteger basis, final BigInteger modulus) {
+		if (bigIntegerOperations.isFixBaseSupported()) {
+			bigIntegerOperations.generateCache(basis, modulus);
+		}
 	}
 }

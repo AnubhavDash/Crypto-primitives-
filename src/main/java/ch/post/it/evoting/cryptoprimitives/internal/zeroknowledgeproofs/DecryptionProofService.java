@@ -249,8 +249,7 @@ public class DecryptionProofService {
 		} else {
 			h_aux = HashableList.of(HashableString.from(DECRYPTION_PROOF), phi, m);
 		}
-		final byte[] h = hashService.recursiveHash(f, y, c_prime, h_aux);
-		final BigInteger e_prime_value = byteArrayToInteger(h);
+		final BigInteger e_prime_value = byteArrayToInteger(hashService.recursiveHash(f, y, c_prime, h_aux));
 		final ZqElement e_prime = ZqElement.create(e_prime_value, zqGroup);
 
 		return Verifiable.create(() -> e.equals(e_prime), String.format("Could not verify decryption proof of ciphertext %s.", ciphertext));
