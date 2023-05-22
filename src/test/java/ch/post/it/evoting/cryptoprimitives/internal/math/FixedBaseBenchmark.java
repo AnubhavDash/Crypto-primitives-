@@ -33,7 +33,7 @@ import org.openjdk.jmh.infra.Blackhole;
 @Fork(value = 1)
 @Measurement(iterations = 3)
 @Warmup(iterations = 0)
-public class FixBaseBenchmark {
+public class FixedBaseBenchmark {
 	@Benchmark
 	public void knownBaseBeforeCache(MyState state, Blackhole bh) {
 		BigIntegerOperations operations = state.bigIntegerOperationsWithoutTable;
@@ -52,7 +52,7 @@ public class FixBaseBenchmark {
 
 	@Benchmark
 	public void generateCache(MyState state) {
-		BigIntegerOperations operations = new BigIntegerOperationsGMP();
+		BigIntegerOperations operations = new BigIntegerOperationsVMGJ();
 		operations.generateCache(state.knownBase, state.p);
 	}
 
@@ -88,8 +88,8 @@ public class FixBaseBenchmark {
 		private final BigInteger knownBase;
 		private final BigInteger exponent;
 		private final BigInteger randomBase;
-		private final BigIntegerOperations bigIntegerOperationsWithoutTable = new BigIntegerOperationsGMP();
-		private final BigIntegerOperations bigIntegerOperationsWithTable = new BigIntegerOperationsGMP();
+		private final BigIntegerOperations bigIntegerOperationsWithoutTable = new BigIntegerOperationsVMGJ();
+		private final BigIntegerOperations bigIntegerOperationsWithTable = new BigIntegerOperationsVMGJ();
 
 		public MyState() {
 			p = new BigInteger("B7E151628AED2A6ABF7158809CF4F3C762E7160F38B4DA56A784D9045190CFEF324E" +

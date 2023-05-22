@@ -23,11 +23,9 @@ import java.util.HexFormat;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
-import com.squareup.jnagmp.Gmp;
 import com.verificatum.vmgj.FpowmTab;
 import com.verificatum.vmgj.VMG;
 
@@ -36,13 +34,13 @@ import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 
 /**
- * Optimized BigIntegerOperations using GMP.
+ * Optimized BigIntegerOperations using Verificatum Multiplicative Groups Library for Java (VMGJ) .
  *
  * <p>This class is thread-safe.</p>
  */
-public class BigIntegerOperationsGMP implements BigIntegerOperations {
+public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 	private static final HashService hashService = HashService.getInstance();
-	private final Cache<String, FpowmTab> fixBaseCache = CacheBuilder.newBuilder()
+	private final Cache<String, FpowmTab> fixedBaseCache = CacheBuilder.newBuilder()
 			.expireAfterAccess(30, TimeUnit.DAYS)
 			.removalListener((RemovalListener<String, FpowmTab>) removalNotification -> {
 				if (removalNotification.getValue() != null) {
@@ -53,7 +51,7 @@ public class BigIntegerOperationsGMP implements BigIntegerOperations {
 	private final BigIntegerOperations bigIntegerOperationsJava = new BigIntegerOperationsJava();
 
 	@Override
-	public boolean isFixBaseSupported() {
+	public boolean isFixedBaseExponentiationSupported() {
 		return VMG.checkLoaded();
 	}
 
@@ -65,15 +63,15 @@ public class BigIntegerOperationsGMP implements BigIntegerOperations {
 		final String key = deriveCacheKey(base, modulus);
 
 		try {
-			fixBaseCache.get(key, () -> new FpowmTab(base, modulus, modulus.bitLength() - 1));
-		} catch (ExecutionException e) {
-			throw new RuntimeException(e);
+			fixedBaseCache.get(key, () -> new FpowmTab(base, modulus, modulus.bitLength() - 1));
+		} catch (final ExecutionException e) {
+			throw new IllegalStateException("Could not create precomputed table for the given basis and modulus.", e);
 		}
 	}
 
 	private static String deriveCacheKey(final BigInteger base, final BigInteger modulus) {
-		Preconditions.checkArgument(modulus.signum() >= 0);
-		byte[] bytes = hashService.recursiveHash(
+		checkArgument(modulus.signum() >= 0);
+		final byte[] bytes = hashService.recursiveHash(
 				HashableString.from(Boolean.toString(base.signum() >= 0)),
 				HashableBigInteger.from(base.abs()),
 				HashableBigInteger.from(modulus));
@@ -96,32 +94,19 @@ public class BigIntegerOperationsGMP implements BigIntegerOperations {
 		checkArgument(modulus.testBit(0), "The modulus must be odd");
 
 		//-1, 0 or 1 as the value of this BigInteger is negative, zero or positive.
-		int exponentSignum = exponent.signum();
+		final int exponentSignum = exponent.signum();
 
-		BigInteger basis = exponentSignum >= 0 ? base : modInvert(base, modulus);
-		BigInteger exp = exponentSignum >= 0 ? exponent : exponent.negate();
+		final BigInteger basis = exponentSignum >= 0 ? base : modInvert(base, modulus);
+		final BigInteger exp = exponentSignum >= 0 ? exponent : exponent.negate();
 
-		String key = deriveCacheKey(basis, modulus);
+		final String key = deriveCacheKey(basis, modulus);
 
-		FpowmTab fpowmTab = fixBaseCache.getIfPresent(key);
+		final FpowmTab fpowmTab = fixedBaseCache.getIfPresent(key);
 		if (fpowmTab != null) {
 			return fpowmTab.fpowm(exp);
-		} else if (VMG.checkLoaded()) {
-			// VMG is faster than plain GMP, prefer this if available.
-			return VMG.powm(basis, exp, modulus);
 		} else {
-			return Gmp.modPowSecure(basis, exp, modulus);
+			return VMG.powm(basis, exp, modulus);
 		}
-	}
-
-	@Override
-	public BigInteger modInvert(final BigInteger n, final BigInteger modulus) {
-		checkNotNull(n);
-		checkNotNull(modulus);
-		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
-		checkArgument(n.gcd(modulus).equals(BigInteger.ONE), "The number to be inverted must be relatively prime to the modulus.");
-
-		return Gmp.modInverse(n, modulus);
 	}
 
 	@Override
@@ -130,7 +115,7 @@ public class BigIntegerOperationsGMP implements BigIntegerOperations {
 		checkNotNull(n);
 		checkArgument(a.compareTo(BigInteger.ZERO) > 0, "a must be positive");
 
-		// The Kronecker symbol includes the Jacobi symbol as a special case.
-		return Gmp.kronecker(a, n);
+		// The Legendre symbol includes the Jacobi symbol as a special case.
+		return VMG.legendre(a, n);
 	}
 }

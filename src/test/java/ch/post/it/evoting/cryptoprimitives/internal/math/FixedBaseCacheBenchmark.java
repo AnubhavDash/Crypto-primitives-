@@ -45,7 +45,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 @Measurement(iterations = 3)
 @Warmup(iterations = 0)
 @Threads(3)
-public class FixBaseCacheBenchmark {
+public class FixedBaseCacheBenchmark {
 	private static final HashService hashService = HashService.getInstance();
 
 	private static String deriveCacheKey(BigInteger base, BigInteger modulus) {

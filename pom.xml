@@ -17,7 +17,6 @@
 		<jmh.version>1.36</jmh.version>
 		<junit-jupiter.version>5.9.2</junit-jupiter.version>
 		<junit-platform-launcher.version>1.9.2</junit-platform-launcher.version>
-		<jnagmp.version>3.0.0</jnagmp.version>
 		<mockito.version>5.2.0</mockito.version>
 		<slf4j.version>2.0.7</slf4j.version>
 		<reproducible-build-maven-plugin.version>0.15.2</reproducible-build-maven-plugin.version>
@@ -74,11 +73,6 @@
 				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcpkix-jdk18on</artifactId>
 				<version>${bouncycastle.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.squareup.jnagmp</groupId>
-				<artifactId>jnagmp</artifactId>
-				<version>${jnagmp.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -153,10 +147,6 @@
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk18on</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.jnagmp</groupId>
-			<artifactId>jnagmp</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

@@ -49,15 +49,6 @@ public class BigIntegerOperationsJava implements BigIntegerOperations {
 	}
 
 	@Override
-	public BigInteger modInvert(final BigInteger n, final BigInteger modulus) {
-		checkNotNull(n);
-		checkNotNull(modulus);
-		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
-		checkArgument(n.gcd(modulus).equals(BigInteger.ONE), "The number to be inverted must be relatively prime to the modulus.");
-		return n.modInverse(modulus);
-	}
-
-	@Override
 	public int getJacobi(final BigInteger a, final BigInteger n) {
 		checkNotNull(a);
 		checkNotNull(n);
