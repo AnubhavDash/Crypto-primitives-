@@ -17,7 +17,7 @@ package ch.post.it.evoting.cryptoprimitives.internal.math;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.bouncycastle.pqc.math.linearalgebra.IntegerFunctions.jacobi;
+import static org.bouncycastle.pqc.legacy.math.linearalgebra.IntegerFunctions.jacobi;
 
 import java.math.BigInteger;
 
