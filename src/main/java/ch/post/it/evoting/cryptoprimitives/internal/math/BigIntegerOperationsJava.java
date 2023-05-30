@@ -20,6 +20,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.bouncycastle.pqc.legacy.math.linearalgebra.IntegerFunctions.jacobi;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.IntStream;
 
 /**
  * <p>This class is thread-safe.</p>
@@ -46,6 +49,38 @@ public class BigIntegerOperationsJava implements BigIntegerOperations {
 		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
 		checkArgument(modulus.testBit(0), "The modulus must be odd");
 		return base.modPow(exponent, modulus);
+	}
+
+	@Override
+	public BigInteger multiModExp(final List<BigInteger> bases, final List<BigInteger> exponents, final BigInteger modulus) {
+		checkNotNull(bases);
+		checkArgument(bases.stream().allMatch(Objects::nonNull), "Elements must not contain nulls");
+		final List<BigInteger> basesCopy = List.copyOf(bases);
+		checkArgument(!basesCopy.isEmpty(), "Bases must be non empty.");
+
+		checkNotNull(exponents);
+		checkArgument(exponents.stream().allMatch(exponent -> checkNotNull(exponent).signum() >= 0), "Elements must be positive");
+		final List<BigInteger> exponentsCopy = List.copyOf(exponents);
+
+		// The next check assures also that exponentsCopy is not empty
+		checkArgument(basesCopy.size() == exponentsCopy.size(), "Bases and exponents must have the same size");
+		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
+
+		final int numElements = basesCopy.size();
+
+		return IntStream.range(0, numElements)
+				.mapToObj(i -> modExponentiate(basesCopy.get(i), exponentsCopy.get(i), modulus))
+				.reduce(BigInteger.ONE, (a, b) -> modMultiply(a, b, modulus));
+	}
+
+	@Override
+	public BigInteger modInvert(final BigInteger n, final BigInteger modulus) {
+		checkNotNull(n);
+		checkNotNull(modulus);
+		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
+		checkArgument(n.gcd(modulus).equals(BigInteger.ONE), "The number to be inverted must be relatively prime to the modulus.");
+
+		return n.modInverse(modulus);
 	}
 
 	@Override

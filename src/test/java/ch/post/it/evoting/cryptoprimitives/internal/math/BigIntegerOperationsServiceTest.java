@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -32,6 +33,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import ch.post.it.evoting.cryptoprimitives.math.GqElement;
+import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
+import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
+import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
+import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
+import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
+import ch.post.it.evoting.cryptoprimitives.test.tools.generator.GqGroupGenerator;
+import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator;
 
 class BigIntegerOperationsServiceTest {
 
@@ -46,6 +56,7 @@ class BigIntegerOperationsServiceTest {
 	private static final BigInteger SEVEN = BigInteger.valueOf(7L);
 	private static final BigInteger EIGHT = BigInteger.valueOf(8L);
 	private static final BigInteger NINE = BigInteger.valueOf(9L);
+	private static final BigInteger ELEVEN = BigInteger.valueOf(11L);
 	private static final BigInteger TWENTY_ONE = BigInteger.valueOf(21L);
 
 	private static List<BigInteger> bases;
@@ -129,20 +140,31 @@ class BigIntegerOperationsServiceTest {
 
 	@Test
 	void checkMultiModExp() {
-		List<BigInteger> basesOneNegative = new ArrayList<>();
-		basesOneNegative.add(TWO);
-		basesOneNegative.add(THREE.negate());
-
-		List<BigInteger> exponentsOneNegative = new ArrayList<>();
-		exponentsOneNegative.add(FIVE);
-		exponentsOneNegative.add(SIX.negate());
+		final List<BigInteger> basesOneNegative = List.of(TWO, THREE.negate());
 
 		assertAll(
 				() -> assertEquals(FOUR, BigIntegerOperationsService.multiModExp(bases, exponents, SEVEN)),
 				() -> assertEquals(FOUR, BigIntegerOperationsService.multiModExp(basesOneNegative, exponents, SEVEN)),
-				() -> assertEquals(FOUR, BigIntegerOperationsService.multiModExp(bases, exponentsOneNegative, SEVEN)),
-				() -> assertEquals(FOUR, BigIntegerOperationsService.multiModExp(basesOneNegative, exponentsOneNegative, SEVEN))
+				() -> assertEquals(NINE, BigIntegerOperationsService.multiModExp(List.of(FOUR, FIVE), List.of(TWO, THREE), ELEVEN)),
+				() -> assertEquals(FIVE, BigIntegerOperationsService.multiModExp(List.of(FIVE, TWO.negate()), List.of(THREE, TWO), ELEVEN))
 		);
+	}
+
+	@Test
+	void checkMultiModExpLargeGroup() {
+		final GqGroup largeGqGroup = GroupTestData.getLargeGqGroup();
+		final ZqGroup largeZqGroup = new ZqGroup(largeGqGroup.getQ());
+
+		final int numElements = 10;
+		final GroupVector<GqElement, GqGroup> basesLargeGroup = new GqGroupGenerator(largeGqGroup).genRandomGqElementVector(numElements);
+		final GroupVector<ZqElement, ZqGroup> exponentsLargeGroup = new ZqGroupGenerator(largeZqGroup).genRandomZqElementVector(numElements);
+
+		final GqElement expected = IntStream.range(0, numElements)
+				.mapToObj(i -> basesLargeGroup.get(i).exponentiate(exponentsLargeGroup.get(i)))
+				.reduce(largeGqGroup.getIdentity(), GqElement::multiply);
+
+		assertEquals(expected.getValue(), BigIntegerOperationsService.multiModExp(basesLargeGroup.stream().map(GqElement::getValue).toList(),
+				exponentsLargeGroup.stream().map(ZqElement::getValue).toList(), largeGqGroup.getP()));
 	}
 
 	@Test
@@ -164,30 +186,26 @@ class BigIntegerOperationsServiceTest {
 	}
 
 	@Test
-	void multiModExpBasesModulusNotRelativelyPrime() {
-		assertEquals(ZERO, BigIntegerOperationsService.multiModExp(bases, exponents, NINE));
-
-		List<BigInteger> exponentsOneNegative = new ArrayList<>();
-		exponentsOneNegative.add(FIVE);
-		exponentsOneNegative.add(SIX.negate());
-		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.multiModExp(bases, exponentsOneNegative, NINE));
-	}
-
-	@Test
 	void multiModExpEmptyBases() {
-		List<BigInteger> emptyList = Collections.emptyList();
+		final List<BigInteger> emptyList = Collections.emptyList();
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.multiModExp(emptyList, exponents, SEVEN));
 	}
 
 	@Test
 	void multiModExpEmptyExponents() {
-		List<BigInteger> emptyList = Collections.emptyList();
+		final List<BigInteger> emptyList = Collections.emptyList();
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.multiModExp(bases, emptyList, SEVEN));
 	}
 
 	@Test
+	void multiModExpNegativeExponents() {
+		final List<BigInteger> exponentsOneNegative = List.of(FIVE, SIX.negate());
+		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.multiModExp(bases, exponentsOneNegative, SEVEN));
+	}
+
+	@Test
 	void multiModExpBasesDifferentSizeExponents() {
-		List<BigInteger> arguments = new ArrayList<>(bases);
+		final List<BigInteger> arguments = new ArrayList<>(bases);
 		arguments.add(FIVE);
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.multiModExp(arguments, exponents, SEVEN));
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.multiModExp(bases, arguments, SEVEN));

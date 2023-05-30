@@ -20,6 +20,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.util.HexFormat;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -107,6 +109,35 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 		} else {
 			return VMG.powm(basis, exp, modulus);
 		}
+	}
+
+	@Override
+	public BigInteger multiModExp(final List<BigInteger> bases, final List<BigInteger> exponents, final BigInteger modulus) {
+		checkNotNull(bases);
+		checkArgument(bases.stream().allMatch(Objects::nonNull), "Elements must not contain nulls");
+		final BigInteger[] basesArray = List.copyOf(bases).toArray(new BigInteger[0]);
+		checkArgument(basesArray.length != 0, "Bases must be non empty.");
+
+		checkNotNull(exponents);
+		checkArgument(exponents.stream().allMatch(exponent -> checkNotNull(exponent).signum() >= 0), "Elements must be positive");
+		final BigInteger[] exponentsArray = List.copyOf(exponents).toArray(new BigInteger[0]);
+
+		// The next check assures also that exponentsArray is not empty
+		checkArgument(basesArray.length == exponentsArray.length, "Bases and exponents must have the same size");
+		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
+		checkArgument(modulus.testBit(0), "The modulus must be odd");
+
+		return VMG.spowm(basesArray, exponentsArray, modulus);
+	}
+
+	@Override
+	public BigInteger modInvert(final BigInteger n, final BigInteger modulus) {
+		checkNotNull(n);
+		checkNotNull(modulus);
+		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
+		checkArgument(n.gcd(modulus).equals(BigInteger.ONE), "The number to be inverted must be relatively prime to the modulus.");
+
+		return VMG.powm(n, BigInteger.ONE.negate(), modulus);
 	}
 
 	@Override

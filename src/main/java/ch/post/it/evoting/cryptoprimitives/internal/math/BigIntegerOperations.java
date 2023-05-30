@@ -16,13 +16,8 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.IntStream;
 
 public interface BigIntegerOperations {
 
@@ -75,26 +70,7 @@ public interface BigIntegerOperations {
 	 * @param modulus   the modulus &gt; 1
 	 * @return the product of the powers b[0]^e[0] * b[1]^e[1] * ... * b[n-1]^e[n-1] mod modulus
 	 */
-	default BigInteger multiModExp(final List<BigInteger> bases, final List<BigInteger> exponents, final BigInteger modulus) {
-		checkNotNull(bases);
-		checkArgument(bases.stream().allMatch(Objects::nonNull), "Elements must not contain nulls");
-		final List<BigInteger> basesCopy = List.copyOf(bases);
-		checkArgument(!basesCopy.isEmpty(), "Bases must be non empty.");
-
-		checkNotNull(exponents);
-		checkArgument(exponents.stream().allMatch(Objects::nonNull), "Elements must not contain nulls");
-		final List<BigInteger> exponentsCopy = List.copyOf(exponents);
-
-		// The next check assures also that exponentsCopy is not empty
-		checkArgument(basesCopy.size() == exponentsCopy.size(), "Bases and exponents must have the same size");
-		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
-
-		final int numElements = basesCopy.size();
-
-		return IntStream.range(0, numElements)
-				.mapToObj(i -> modExponentiate(basesCopy.get(i), exponentsCopy.get(i), modulus))
-				.reduce(BigInteger.ONE, (a, b) -> modMultiply(a, b, modulus));
-	}
+	BigInteger multiModExp(final List<BigInteger> bases, final List<BigInteger> exponents, final BigInteger modulus);
 
 	/**
 	 * Inverts an element with respect to a modulus.
@@ -103,13 +79,7 @@ public interface BigIntegerOperations {
 	 * @param modulus the modulus &gt; 1
 	 * @return n<sup>-1</sup> mod modulus
 	 */
-	default BigInteger modInvert(BigInteger n, BigInteger modulus) {
-		checkNotNull(n);
-		checkNotNull(modulus);
-		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
-		checkArgument(n.gcd(modulus).equals(BigInteger.ONE), "The number to be inverted must be relatively prime to the modulus.");
-		return n.modInverse(modulus);
-	}
+	BigInteger modInvert(BigInteger n, BigInteger modulus);
 
 	/**
 	 * Calculates the Jacobi symbol(a|n). The Jacobi symbol allows us determining group membership efficiently.
