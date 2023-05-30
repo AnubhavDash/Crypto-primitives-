@@ -26,9 +26,9 @@ import org.junit.platform.launcher.core.LauncherFactory;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-import com.squareup.jnagmp.Gmp;
+import com.verificatum.vmgj.VMG;
 
-class BigIntegerOperationsInactiveAndMockGMPRunnerIT {
+class BigIntegerOperationsInactiveAndMockVMGJRunnerIT {
 
 	@Test
 	void shouldRepeatTestClass() {
@@ -41,8 +41,8 @@ class BigIntegerOperationsInactiveAndMockGMPRunnerIT {
 
 		final Launcher launcher = LauncherFactory.create();
 
-		try (final MockedStatic<Gmp> gmpMockedStatic = Mockito.mockStatic(Gmp.class)) {
-			gmpMockedStatic.when(Gmp::checkLoaded).thenThrow(new UnsatisfiedLinkError());
+		try (final MockedStatic<VMG> vmgjMockedStatic = Mockito.mockStatic(VMG.class)) {
+			vmgjMockedStatic.when(VMG::checkLoaded).thenReturn(false);
 			launcher.execute(request);
 		}
 	}

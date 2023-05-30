@@ -17,7 +17,6 @@ module ch.post.it.evoting.cryptoprimitives {
 	requires com.google.common;
 	requires org.bouncycastle.provider;
 	requires org.bouncycastle.pkix;
-	requires jnagmp;
 	requires org.slf4j;
 	exports ch.post.it.evoting.cryptoprimitives.elgamal;
 	exports ch.post.it.evoting.cryptoprimitives.hashing;

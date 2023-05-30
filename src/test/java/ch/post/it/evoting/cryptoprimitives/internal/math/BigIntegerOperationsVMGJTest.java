@@ -24,9 +24,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.squareup.jnagmp.Gmp;
+import com.verificatum.vmgj.VMG;
 
-class BigIntegerOperationsGMPTest {
+class BigIntegerOperationsVMGJTest {
 	private static final SecureRandom secureRandom;
 	private static final BigIntegerOperations ops;
 	private static BigInteger p;
@@ -34,15 +34,7 @@ class BigIntegerOperationsGMPTest {
 	private static BigInteger exponent;
 
 	static {
-		BigIntegerOperations localOps;
-		try {
-			Gmp.checkLoaded();
-			localOps = new BigIntegerOperationsGMP();
-		} catch (final UnsatisfiedLinkError e) {
-			localOps = new BigIntegerOperationsJava();
-		}
-
-		ops = localOps;
+		ops = VMG.checkLoaded() ? new BigIntegerOperationsVMGJ() : new BigIntegerOperationsJava();
 	}
 
 	static {
@@ -88,7 +80,7 @@ class BigIntegerOperationsGMPTest {
 	void consistencyCheck() {
 		final BigInteger resultBeforeCache = ops.modExponentiate(knownBase, exponent, p);
 
-		if (ops.isFixBaseSupported()) {
+		if (ops.isFixedBaseExponentiationSupported()) {
 			ops.generateCache(knownBase, p);
 		}
 

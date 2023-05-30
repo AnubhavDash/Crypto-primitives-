@@ -21,7 +21,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.squareup.jnagmp.Gmp;
 import com.verificatum.vmgj.VMG;
 
 /**
@@ -32,29 +31,15 @@ public class BigIntegerOperationsService {
 	private static final Logger LOG = LoggerFactory.getLogger(BigIntegerOperationsService.class);
 	private static final BigIntegerOperations bigIntegerOperations;
 
-	private static boolean gmpInstalled = false;
-
 	static {
-		try {
-			Gmp.checkLoaded();
-			gmpInstalled = true;
-			LOG.info("GMP is installed and ready to use");
-		} catch (final UnsatisfiedLinkError e) {
-			LOG.warn("GMP is not installed, native code optimisations are not available, integer operations will now take longer");
-		}
-
-		if (gmpInstalled) {
-			bigIntegerOperations = new BigIntegerOperationsGMP();
+		if (VMG.checkLoaded()) {
+			LOG.info("Verificatum Multiplicative Groups Library for Java (VMGJ)  is installed and ready to use");
+			bigIntegerOperations = new BigIntegerOperationsVMGJ();
 		} else {
+			LOG.warn("Verificatum Multiplicative Groups Library for Java (VMGJ)  is not installed, some native code optimizations are not available, "
+					+ "integer operations will now take longer. Verify that the libraries GMP, GMPMEE and VMGJ are installed and referenced in the java.library.path");
 			bigIntegerOperations = new BigIntegerOperationsJava();
 		}
-
-		if (VMG.checkLoaded()) {
-			LOG.info("VMGJ is installed and ready to use");
-		} else {
-			LOG.warn("VMG is not installed, some native code optimisations are not available, integer operations will now take longer");
-		}
-
 	}
 
 	private BigIntegerOperationsService() {
@@ -82,7 +67,7 @@ public class BigIntegerOperationsService {
 	}
 
 	public static void generateCache(final BigInteger basis, final BigInteger modulus) {
-		if (bigIntegerOperations.isFixBaseSupported()) {
+		if (bigIntegerOperations.isFixedBaseExponentiationSupported()) {
 			bigIntegerOperations.generateCache(basis, modulus);
 		}
 	}

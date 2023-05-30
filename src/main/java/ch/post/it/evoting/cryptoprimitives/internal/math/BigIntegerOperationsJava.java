@@ -17,7 +17,7 @@ package ch.post.it.evoting.cryptoprimitives.internal.math;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.bouncycastle.pqc.math.linearalgebra.IntegerFunctions.jacobi;
+import static org.bouncycastle.pqc.legacy.math.linearalgebra.IntegerFunctions.jacobi;
 
 import java.math.BigInteger;
 
@@ -46,15 +46,6 @@ public class BigIntegerOperationsJava implements BigIntegerOperations {
 		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
 		checkArgument(modulus.testBit(0), "The modulus must be odd");
 		return base.modPow(exponent, modulus);
-	}
-
-	@Override
-	public BigInteger modInvert(final BigInteger n, final BigInteger modulus) {
-		checkNotNull(n);
-		checkNotNull(modulus);
-		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
-		checkArgument(n.gcd(modulus).equals(BigInteger.ONE), "The number to be inverted must be relatively prime to the modulus.");
-		return n.modInverse(modulus);
 	}
 
 	@Override

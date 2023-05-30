@@ -24,7 +24,7 @@ public class BigIntegersOptimizations {
 		// Intentionally left blank
 	}
 
-	public static void prepareFixBaseOptimizations(final BigInteger basis, final BigInteger modulus) {
+	public static void prepareFixedBaseOptimizations(final BigInteger basis, final BigInteger modulus) {
 		BigIntegerOperationsService.generateCache(basis, modulus);
 	}
 }
