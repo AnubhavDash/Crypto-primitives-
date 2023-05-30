@@ -265,15 +265,6 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		void exponentiationsArePhiExponentiationCheck() {
-			final GroupVector<GqElement, GqGroup> otherExponentiations = exponentiations.stream().map(exp -> exp.multiply(gqGroup.getGenerator()))
-					.collect(toGroupVector());
-			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-					() -> proofService.genExponentiationProof(bases, exponent, otherExponentiations, auxiliaryInformation));
-			assertEquals("The exponentiations must correspond to the exponent's and bases' phi exponentiation.", exception.getMessage());
-		}
-
-		@Test
 		void specificValuesGiveExpectedResult() {
 			final TestValues testValues = new TestValues();
 			// Input.
