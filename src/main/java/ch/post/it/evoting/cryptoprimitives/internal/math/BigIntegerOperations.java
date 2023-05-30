@@ -28,10 +28,20 @@ public interface BigIntegerOperations {
 
 	String MODULUS_CHECK_MESSAGE = "The modulus must be greater than 1";
 
-	default boolean isFixBaseSupported() {
+	/**
+	 * @return true if fixed base exponentiation is supported, false otherwise.
+	 */
+	default boolean isFixedBaseExponentiationSupported() {
 		return false;
 	}
 
+	/**
+	 * Generates a precomputed cache of values to minimize the number of multiplications required during modular exponentiation. This precomputation
+	 * substantially speeds up computation when a fixed element of a group is repeatedly raised to many different powers.
+	 *
+	 * @param base    the base
+	 * @param modulus the modulus
+	 */
 	default void generateCache(BigInteger base, BigInteger modulus) {
 		throw new UnsupportedOperationException("This implementation does not support fixed base optimizations");
 	}
@@ -93,10 +103,16 @@ public interface BigIntegerOperations {
 	 * @param modulus the modulus &gt; 1
 	 * @return n<sup>-1</sup> mod modulus
 	 */
-	BigInteger modInvert(BigInteger n, BigInteger modulus);
+	default BigInteger modInvert(BigInteger n, BigInteger modulus) {
+		checkNotNull(n);
+		checkNotNull(modulus);
+		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
+		checkArgument(n.gcd(modulus).equals(BigInteger.ONE), "The number to be inverted must be relatively prime to the modulus.");
+		return n.modInverse(modulus);
+	}
 
 	/**
-	 * Calculates the Jacobi symbol(a|n). The Jacobi symbol allows us determining group membership efficiently. integers
+	 * Calculates the Jacobi symbol(a|n). The Jacobi symbol allows us determining group membership efficiently.
 	 *
 	 * @param a positive integer
 	 * @param n modulus

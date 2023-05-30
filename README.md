@@ -2,11 +2,22 @@
 
 ## What is the content of this repository?
 
-Cryptographic algorithms play a pivotal role in the Swiss Post Voting System: ensuring their faithful implementation is crucially important. The crypto-primitives library provides a robust and misuse-resistant library implementing some of the Swiss Post Voting System's cryptographic algorithms. We base our library upon a mathematically [precise and unambiguous specification](Crypto-Primitives-Specification.pdf). Our pseudo-code description of the cryptographic algorithms - inspired by [Haenni et al.](https://arbor.bfh.ch/13834/) – aims to bridge the representational gap between mathematics and code.
+Cryptographic algorithms play a pivotal role in the Swiss Post Voting System: ensuring their faithful implementation is crucially important. The
+crypto-primitives library provides a robust and misuse-resistant library implementing some of the Swiss Post Voting System's cryptographic algorithms.
+We base our library upon a mathematically [precise and unambiguous specification](Crypto-Primitives-Specification.pdf). Our pseudo-code description of
+the cryptographic algorithms - inspired by [Haenni et al.](https://arbor.bfh.ch/13834/) – aims to bridge the representational gap between mathematics
+and code.
 
-An essential part of the crypto-primitives library is the implementation of the [Bayer-Groth Mix net](http://www0.cs.ucl.ac.uk/staff/J.Groth/MinimalShuffle.pdf). Verifiable mix nets underpin most modern e-voting schemes since they hide the relationship between encrypted votes (potentially linked to the voter's identifier) and decrypted votes. A re-encryption mix net consists of a sequence of mixers, each of which shuffles and re-encrypts an input ciphertext and returns a different ciphertext list containing the same plaintexts. Each mixer proves knowledge of the permutation and the randomness (without revealing them to the verifier). The verifier checks these proofs to guarantee that no mixer added, deleted, or modified a vote.
+An essential part of the crypto-primitives library is the implementation of
+the [Bayer-Groth Mix net](http://www0.cs.ucl.ac.uk/staff/J.Groth/MinimalShuffle.pdf). Verifiable mix nets underpin most modern e-voting schemes since
+they hide the relationship between encrypted votes (potentially linked to the voter's identifier) and decrypted votes. A re-encryption mix net
+consists of a sequence of mixers, each of which shuffles and re-encrypts an input ciphertext and returns a different ciphertext list containing the
+same plaintexts. Each mixer proves knowledge of the permutation and the randomness (without revealing them to the verifier). The verifier checks these
+proofs to guarantee that no mixer added, deleted, or modified a vote.
 
-We augment our specification with test values obtained from an independent implementation of the pseudo-code algorithms: our code validates against [these test values](./src/test/resources) to increase our confidence in the implementation's correctness. The specification embeds the test values as JSON files within the document.
+We augment our specification with test values obtained from an independent implementation of the pseudo-code algorithms: our code validates
+against [these test values](./src/test/resources) to increase our confidence in the implementation's correctness. The specification embeds the test
+values as JSON files within the document.
 
 ## Under which license is this code available?
 
@@ -33,7 +44,8 @@ We strive for excellent code quality to minimize the risk of bugs and vulnerabil
 
 ### SonarQube Analysis
 
-We parametrize SonarQube with the built-in Sonar way quality profile. The SonarQube analysis of the crypto-primitives code reveals 0 bugs, 0 vulnerabilities, 0 security hotspots, and 0 code smells.
+We parametrize SonarQube with the built-in Sonar way quality profile. The SonarQube analysis of the crypto-primitives code reveals 0 bugs, 0
+vulnerabilities, 0 security hotspots, and 0 code smells.
 
 ![SonarQube](SonarQube.jpg)
 
@@ -41,30 +53,40 @@ Moreover, a high test coverage illustrates the fact that we extensively test the
 
 ### Fortify Analysis
 
-The Fortify analysis showed 0 critical, 1 high, 0 medium, and 62 low criticality issues. We manually reviewed all 63 issues and assessed them as false positives.
+The Fortify analysis showed 0 critical, 1 high, 0 medium, and 62 low criticality issues. We manually reviewed all 63 issues and assessed them as false
+positives.
 
 ### JFrog X-Ray Analysis
 
-The X-Ray analysis indicates that none of the crypto-primitives' 3rd party dependencies contains known vulnerabilities or non-compliant open source software licenses. As a general principle, we try to minimize external dependencies in cryptographic libraries and only rely on well-tested and widely used 3rd party components.
+The X-Ray analysis indicates that none of the crypto-primitives' 3rd party dependencies contains known vulnerabilities or non-compliant open source
+software licenses. As a general principle, we try to minimize external dependencies in cryptographic libraries and only rely on well-tested and widely
+used 3rd party components.
 
 ## Native Library Support
 
-We support the GNU Multi Precision Arithmetic Library (GMP) for arbitrary-precision integer operations (called BigInteger in the Java programming language). 
-GMP speeds up certain mathematical operations such as modular exponentiation. 
-We recommend the [article by Haenni, Locher, and Gailly](https://e-voting.bfh.ch/app/download/7833228661/HLG19.pdf?t=1601370067) for an overview of popular optimization techniques.
+We support the Verificatum Multiplicative Groups Library for Java (VMGJ) for arbitrary-precision integer operations (called BigInteger in the Java
+programming language). VMGJ allows invoking the GMP Modular Exponentiation Extension (GMPMEE) for simultaneous or fixed-base modular
+exponentiation. And GMPMEE allows invoking the GNU Multi Precision Arithmetic Library (GMP) for speeding up certain mathematical operations such as
+modular exponentiation. We recommend
+the [article by Haenni, Locher, and Gailly](https://e-voting.bfh.ch/app/download/7833228661/HLG19.pdf?t=1601370067) for an overview of popular
+optimization techniques. The following instructions explain how to integrate this optimizations.
 
 _Linux:_
 
-* Assuming [GMP](https://gmplib.org/) is installed this change should be transparent. If not, install GMP with the relevant package manager.
-* No further action is required to benefit from native code optimisations.
+* Install [GMP](https://gmplib.org/)  with the relevant package manager.
+* Create LIB-GMPMEE-10.so by following the documentation of [GMPMEE](https://github.com/verificatum/verificatum-gmpmee).
+* Create VMGJ-1.3.0.so by following the documentation of [VMGJ](https://github.com/verificatum/verificatum-vmgj).
+* Add all SO inside the path pointed by the java.library.path
 
 _Windows:_
 
-* Create GMP.dll: Build [GMP](https://gmplib.org/) for the relevant Windows architecture.
-* Crypto-primitives, building with Maven :
-  * Set the environment variable JNA_LIBRARY_PATH=\<location of gmp.dll>
-* Crypto-primitives, usage as a third-party dependency
-  * Add -Djna.library.path= \<location of gmp.dll> to the Java command line.
+* Choose a build environment to generate a valid DLL, for example [MSYS2](https://www.msys2.org/).
+* Create LIBGMP-10.dll for the relevant Windows architecture following the documentation of [GMP](https://gmplib.org/).
+* Create LIBGMPMEE-0.dll for the relevant Windows architecture following the documentation
+  of [GMPMEE](https://github.com/verificatum/verificatum-gmpmee).
+* Create VMGJ-1.3.0.dll: for the relevant Windows architecture following the documentation of [VMGJ](https://github.com/verificatum/verificatum-vmgj).
+  Some minor code changes are needed, all `long` pointers must be converted to `long long` pointers.
+* Add to the environment variable PATH the path to all DLL or add the option -Djava.library.path= \<path to all DLL> to the Java command line.
 
 ## Mathematical Variables Naming Convention
 

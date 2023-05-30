@@ -24,6 +24,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
@@ -45,6 +46,8 @@ import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.ZeroKnowledgeProo
 public class ExponentiationProofService {
 
 	private static final String EXPONENTIATION_PROOF = "ExponentiationProof";
+	private static final boolean ENABLE_PARALLEL_STREAMS = Boolean.parseBoolean(
+			System.getProperty("enable.parallel.streams", Boolean.TRUE.toString()));
 
 	private final RandomService randomService;
 	private final HashService hashService;
@@ -77,7 +80,16 @@ public class ExponentiationProofService {
 		final ZqElement x = preimage;
 		final GroupVector<GqElement, GqGroup> g = bases;
 
-		return g.stream().map(g_i -> g_i.exponentiate(x)).collect(GroupVector.toGroupVector());
+		final Stream<GqElement> gStream;
+		if (ENABLE_PARALLEL_STREAMS) {
+			gStream = g.stream().parallel();
+		} else {
+			gStream = g.stream();
+		}
+
+		return gStream
+				.map(g_i -> g_i.exponentiate(x))
+				.collect(GroupVector.toGroupVector());
 	}
 
 	/**
@@ -107,8 +119,8 @@ public class ExponentiationProofService {
 		checkArgument(x.getGroup().hasSameOrderAs(y.getGroup()),
 				"The exponent and the exponentiations must have the same group order.");
 
-		checkArgument(y.equals(computePhiExponentiation(x, g)),
-				"The exponentiations must correspond to the exponent's and bases' phi exponentiation.");
+		// By construction, we assume that the precondition y_i = g_i^x holds and, thus, we avoid to explicitly check it for performance reasons.
+		// The proof would not verify otherwise.
 
 		// Context
 		final BigInteger p = g.getGroup().getP();
