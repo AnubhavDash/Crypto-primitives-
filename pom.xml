@@ -13,7 +13,7 @@
 		<!-- Dependencies versions -->
 		<guava.version>31.1-jre</guava.version>
 		<bouncycastle.version>1.73</bouncycastle.version>
-		<jackson.version>2.15.1</jackson.version>
+		<jackson.version>2.15.2</jackson.version>
 		<jmh.version>1.36</jmh.version>
 		<junit-jupiter.version>	5.10.0-M1</junit-jupiter.version>
 		<junit-platform-launcher.version>1.10.0-M1</junit-platform-launcher.version>
@@ -35,6 +35,7 @@
 		<maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
 		<maven-surefire-plugin.version>3.1.0</maven-surefire-plugin.version>
 		<maven-source-plugin.version>3.3.0</maven-source-plugin.version>
+		<versions-maven-plugin.version>2.15.0</versions-maven-plugin.version>
 		<maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
 
 		<!-- Project settings -->
@@ -274,6 +275,11 @@
 						<notimestamp>true</notimestamp>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>versions-maven-plugin</artifactId>
+					<version>${versions-maven-plugin.version}</version>
+				</plugin>
 				<!-- JaCoCo -->
 				<plugin>
 					<groupId>org.jacoco</groupId>
@@ -401,6 +407,10 @@
 			<plugin>
 				<groupId>ch.galinet</groupId>
 				<artifactId>reproducible-build-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>
