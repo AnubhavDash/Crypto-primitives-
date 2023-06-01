@@ -41,7 +41,7 @@
 		<!-- Project settings -->
 		<maven.compiler.release>17</maven.compiler.release>
 		<maven-enforcer-plugin.requiredJavaVersion>[17.0.7]</maven-enforcer-plugin.requiredJavaVersion>
-		<maven-enforcer-plugin.requiredMavenVersion>3.8.6</maven-enforcer-plugin.requiredMavenVersion>
+		<maven-enforcer-plugin.requiredMavenVersion>[3.9.1]</maven-enforcer-plugin.requiredMavenVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.build.outputTimestamp>2023-05-31T14:01:50+02:00</project.build.outputTimestamp>
 
