@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2023 Post CH Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -187,7 +187,13 @@ public class ExponentiationProofService {
 		final GroupVector<GqElement, GqGroup> x = computePhiExponentiation(z, g);
 		final HashableList f = HashableList.of(HashableBigInteger.from(p), HashableBigInteger.from(q), g);
 		// Since |e| << |q|, inverting y before exponentiating with e yields better performance than exponentiating y to a negated e
-		final GroupVector<GqElement, GqGroup> c_prime = IntStream.range(0, n)
+		final IntStream rangeStream;
+		if (ENABLE_PARALLEL_STREAMS) {
+			rangeStream = IntStream.range(0, n).parallel();
+		} else {
+			rangeStream = IntStream.range(0, n);
+		}
+		final GroupVector<GqElement, GqGroup> c_prime = rangeStream
 				.mapToObj(i -> x.get(i).multiply(y.get(i).invert().exponentiate(e)))
 				.collect(toGroupVector());
 		final HashableList h_aux;
