@@ -135,7 +135,8 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 		checkNotNull(n);
 		checkNotNull(modulus);
 		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
-		checkArgument(n.gcd(modulus).equals(BigInteger.ONE), "The number to be inverted must be relatively prime to the modulus.");
+		// For performance reasons, we omit an explicit check that n and the modulus are relatively prime. GMP throws a division by zero error if the
+		// two operands are not relatively prime.
 
 		return VMG.powm(n, BigInteger.ONE.negate(), modulus);
 	}
