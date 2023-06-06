@@ -69,6 +69,7 @@ public class BigIntegerOperationsJava implements BigIntegerOperations {
 		final int numElements = basesCopy.size();
 
 		return IntStream.range(0, numElements)
+				.parallel()
 				.mapToObj(i -> modExponentiate(basesCopy.get(i), exponentsCopy.get(i), modulus))
 				.reduce(BigInteger.ONE, (a, b) -> modMultiply(a, b, modulus));
 	}

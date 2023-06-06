@@ -19,6 +19,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
+import java.util.List;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsService;
 
@@ -69,8 +70,6 @@ public final class GqElement extends MultiplicativeGroupElement {
 	 * <p>
 	 * The inverse of a {@link GqElement} <i>a</i> is the element <i>a<sup>-1</sup></i> such that <i>a</i> * <i>a<sup>-1</sup></i> = 1 mod <i>p</i>.
 	 * </p>
-	 *
-	 * @return
 	 */
 	public GqElement invert() {
 		final BigInteger invertedValue = BigIntegerOperationsService.modInvert(this.getValue(), this.group.getP());
@@ -137,6 +136,27 @@ public final class GqElement extends MultiplicativeGroupElement {
 
 			final BigInteger y = BigIntegerOperationsService.modExponentiate(element, BigInteger.valueOf(2), group.getP());
 			return new GqElement(y, group);
+		}
+
+		/**
+		 * Creates a GqElement from two GroupVector by computing Π<sub>i</sub> base<sub>i</sub> <sup>exponent_i</sup> mod p.
+		 *
+		 * @param bases     the GroupVector to be multiplied. They must be from the same group and non-null.
+		 * @param exponents the GroupVector to be raised. They must be a member of a group of the same order as the bases and be non-null.
+		 * @return Π<sub>i</sub> base<sub>i</sub> <sup>exponent_i</sup> mod p
+		 * @throws NullPointerException     if any of the arguments is null
+		 * @throws IllegalArgumentException if the exponents do not have the same group order as the bases
+		 */
+		public static GqElement multiModExp(final GroupVector<GqElement, GqGroup> bases, final GroupVector<ZqElement, ZqGroup> exponents) {
+			checkNotNull(bases);
+			checkNotNull(exponents);
+			// the GroupVector constructor ensures all bases belong to the same group.
+			checkArgument(exponents.getGroup().hasSameOrderAs(bases.getGroup()));
+
+			final List<BigInteger> basesList = bases.stream().parallel().map(MultiplicativeGroupElement::getValue).toList();
+			final List<BigInteger> exponentsList = exponents.stream().parallel().map(ZqElement::getValue).toList();
+
+			return new GqElement(BigIntegerOperationsService.multiModExp(basesList, exponentsList, bases.getGroup().getP()), bases.getGroup());
 		}
 
 	}

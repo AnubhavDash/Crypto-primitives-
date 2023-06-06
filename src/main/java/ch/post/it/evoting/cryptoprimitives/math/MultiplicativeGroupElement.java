@@ -31,7 +31,7 @@ public abstract class MultiplicativeGroupElement extends GroupElement<GqGroup> {
 	/**
 	 * Returns a {@code MultiplicativeGroupElement} whose value is {@code (this * element)}.
 	 *
-	 * @param other The element to be multiplied by this. It must be from the same group and non-null.
+	 * @param other the element to be multiplied by this. It must be from the same group and non-null.
 	 * @return (this * element).
 	 */
 	public abstract MultiplicativeGroupElement multiply(final MultiplicativeGroupElement other);
@@ -44,4 +44,5 @@ public abstract class MultiplicativeGroupElement extends GroupElement<GqGroup> {
 	 * @return this<sup>exponent</sup>.
 	 */
 	public abstract MultiplicativeGroupElement exponentiate(final ZqElement exponent);
+
 }

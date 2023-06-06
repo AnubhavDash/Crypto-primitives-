@@ -17,10 +17,12 @@
 package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
 import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientMessages.getMessage;
+import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -119,14 +121,25 @@ public class ElGamalMultiRecipientCiphertexts {
 		final int l = C.getElementSize();
 		final int n = a.size();
 
-		final ElGamalMultiRecipientCiphertext neutralElement = neutralElement(l, C.getGroup());
-		IntStream indices = IntStream.range(0, n);
+		IntStream indices = IntStream.range(0, l);
 		if (ENABLE_PARALLEL_STREAMS) {
 			indices = indices.parallel();
 		}
-		return indices
-				.mapToObj(i -> C.get(i).getCiphertextExponentiation(a.get(i)))
-				.reduce(neutralElement, ElGamalMultiRecipientCiphertext::getCiphertextProduct);
+
+		final GqElement gamma_prod = GqElementFactory.multiModExp(IntStream.range(0, n)
+				.mapToObj(C::get)
+				.map(ElGamalMultiRecipientCiphertext::getGamma)
+				.collect(GroupVector.toGroupVector()), a);
+
+		final List<GqElement> phi_prod = indices
+				.mapToObj(i -> GqElementFactory.multiModExp(IntStream.range(0, n)
+						.mapToObj(C::get)
+						.map(ElGamalMultiRecipientCiphertext::getPhis)
+						.map(phi -> phi.get(i))
+						.collect(GroupVector.toGroupVector()), a))
+				.toList();
+
+		return ElGamalMultiRecipientCiphertext.create(gamma_prod, phi_prod);
 	}
 
 	/**

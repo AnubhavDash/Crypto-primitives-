@@ -22,6 +22,7 @@ import static ch.post.it.evoting.cryptoprimitives.internal.mixnet.CommitmentServ
 import static ch.post.it.evoting.cryptoprimitives.internal.mixnet.CommitmentService.getCommitmentMatrix;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.Verifiable.create;
+import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -430,11 +431,13 @@ final class MultiExponentiationArgumentService {
 
 		final Memoizer<ZqElement> xPowers = new Memoizer<>(i -> x.exponentiate(BigInteger.valueOf(i)));
 
-		final GqElement prodCa = prodExp(c_A.prepend(c_A_0), xPowers);
+		final GqElement prodCa = GqElementFactory.multiModExp(c_A.prepend(c_A_0),
+				IntStream.range(0, c_A.size() + 1).parallel().mapToObj(xPowers).collect(GroupVector.toGroupVector()));
 		final GqElement commA = getCommitment(a, r, ck);
 		final Verifiable verifA = create(() -> prodCa.equals(commA), "product Ca must equal commitment A.");
 
-		final GqElement prodCb = prodExp(c_B, xPowers);
+		final GqElement prodCb = GqElementFactory.multiModExp(c_B,
+				IntStream.range(0, c_B.size()).parallel().mapToObj(xPowers).collect(GroupVector.toGroupVector()));
 		final GqElement commB = getCommitment(GroupVector.of(b), s, ck);
 		final Verifiable verifB = create(() -> prodCb.equals(commB), "product Cb must equal commitment B.");
 
@@ -478,23 +481,6 @@ final class MultiExponentiationArgumentService {
 
 	private static GroupVector<ZqElement, ZqGroup> vectorScalarMultiplication(final ZqElement value, final GroupVector<ZqElement, ZqGroup> vector) {
 		return vector.parallelStream().map(element -> element.multiply(value)).collect(toGroupVector());
-	}
-
-	/**
-	 * Calculates Π<sub>i</sub> base<sub>i</sub> <sup>pow_i</sup>
-	 *
-	 * @param bases  the bases
-	 * @param powers a function that maps from index to power
-	 * @return the product of the bases exponentiated to the matching power.
-	 */
-	private GqElement prodExp(final GroupVector<GqElement, GqGroup> bases, final IntFunction<ZqElement> powers) {
-		return IntStream.range(0, bases.size())
-				.boxed()
-				.parallel()
-				.flatMap(i -> Stream.of(i)
-						.map(bases::get)
-						.map(base -> base.exponentiate(powers.apply(i))))
-				.reduce(gqGroup.getIdentity(), GqElement::multiply);
 	}
 
 	/**
