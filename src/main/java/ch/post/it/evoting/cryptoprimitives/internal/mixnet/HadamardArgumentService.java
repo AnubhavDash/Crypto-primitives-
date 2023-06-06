@@ -36,6 +36,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.Verifiable;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
+import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupMatrix;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -234,10 +235,7 @@ public class HadamardArgumentService {
 				.collect(toGroupVector());
 
 		// Calculate c_D
-		final GqElement c_D = IntStream.range(1, m)
-				.parallel()
-				.mapToObj(i -> c_B.get(i).exponentiate(xPowers.get(i)))
-				.reduce(gqGroup.getIdentity(), GqElement::multiply);
+		final GqElement c_D = GqElementFactory.multiModExp(c_B.subVector(1, m), xPowers.subVector(1, m));
 
 		// Calculate t
 		final ZqElement t = IntStream.range(1, m)
@@ -336,10 +334,7 @@ public class HadamardArgumentService {
 				.collect(toGroupVector());
 
 		// Calculate c_D
-		final GqElement c_D = IntStream.range(1, m)
-				.parallel()
-				.mapToObj(i -> c_B.get(i).exponentiate(xPowers.get(i)))
-				.reduce(gqGroup.getIdentity(), GqElement::multiply);
+		final GqElement c_D = GqElementFactory.multiModExp(c_B.subVector(1, m), xPowers.subVector(1, m));
 
 		// (-1, ..., -1) and c_(-1)
 		final GroupVector<ZqElement, ZqGroup> minus_one = getMinusOnes(n, zqGroup);
