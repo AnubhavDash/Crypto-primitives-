@@ -4,7 +4,7 @@
 
 	<groupId>ch.post.it.evoting.cryptoprimitives</groupId>
 	<artifactId>crypto-primitives</artifactId>
-	<version>1.3.0.4</version>
+	<version>1.3.0.5</version>
 	<packaging>jar</packaging>
 
 	<name>Crypto Primitives</name>
@@ -15,7 +15,7 @@
 		<bouncycastle.version>1.73</bouncycastle.version>
 		<jackson.version>2.15.2</jackson.version>
 		<jmh.version>1.36</jmh.version>
-		<junit-jupiter.version>	5.10.0-M1</junit-jupiter.version>
+		<junit-jupiter.version>5.10.0-M1</junit-jupiter.version>
 		<junit-platform-launcher.version>1.10.0-M1</junit-platform-launcher.version>
 		<mockito.version>5.3.1</mockito.version>
 		<slf4j.version>2.0.7</slf4j.version>
@@ -43,7 +43,7 @@
 		<maven-enforcer-plugin.requiredJavaVersion>[17.0.7]</maven-enforcer-plugin.requiredJavaVersion>
 		<maven-enforcer-plugin.requiredMavenVersion>[3.9.1]</maven-enforcer-plugin.requiredMavenVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.outputTimestamp>2023-06-05T17:26:13+02:00</project.build.outputTimestamp>
+		<project.build.outputTimestamp>2023-06-06T10:48:23+02:00</project.build.outputTimestamp>
 
 		<!--  Sonar  -->
 		<sonar.scm.disabled>true</sonar.scm.disabled>
@@ -52,7 +52,7 @@
 		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 		<sonar.junit.reportPaths>${project.basedir}/target/surefire-reports/</sonar.junit.reportPaths>
 		<sonar.javascript.lcov.reportPaths>${project.basedir}/coverage/lcov.info</sonar.javascript.lcov.reportPaths>
-		<sonar.coverage.exclusions>**/test/**/*,**/tests/**/*</sonar.coverage.exclusions>
+		<sonar.coverage.exclusions>**/test/**/*,**/tests/**/*,**/com/verificatum/vmgj/**</sonar.coverage.exclusions>
 		<sonar.java.source>${maven.compiler.release}</sonar.java.source>
 		<sonar.java.target>${maven.compiler.release}</sonar.java.target>
 
