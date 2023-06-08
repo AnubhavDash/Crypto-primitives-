@@ -215,7 +215,7 @@ class HashServiceTest {
 		final byte[] concatenation = new byte[hashLength * 2 + 1];
 		concatenation[0] = 0x03;
 		System.arraycopy(messageDigest.digest(concat(new byte[] { 0x00 }, bytes1)), 0, concatenation, 1, hashLength);
-		System.arraycopy(messageDigest.digest(concat(new byte[] { 0x00 }, bytes2)), 0, concatenation, hashLength+1, hashLength);
+		System.arraycopy(messageDigest.digest(concat(new byte[] { 0x00 }, bytes2)), 0, concatenation, hashLength + 1, hashLength);
 		final byte[] expected = messageDigest.digest(concatenation);
 
 		assertArrayEquals(expected, hash);
@@ -240,12 +240,12 @@ class HashServiceTest {
 		final byte[] subConcatenation = new byte[hashLength * 2 + 1];
 		subConcatenation[0] = 0x03;
 		System.arraycopy(messageDigest.digest(concat(new byte[] { 0x00 }, bytes2)), 0, subConcatenation, 1, hashLength);
-		System.arraycopy(messageDigest.digest(concat(new byte[] { 0x00 }, bytes3)), 0, subConcatenation, hashLength+1, hashLength);
+		System.arraycopy(messageDigest.digest(concat(new byte[] { 0x00 }, bytes3)), 0, subConcatenation, hashLength + 1, hashLength);
 		final byte[] subHash = messageDigest.digest(subConcatenation);
-		final byte[] concatenation = new byte[hashLength * 2+1];
+		final byte[] concatenation = new byte[hashLength * 2 + 1];
 		concatenation[0] = 0x03;
 		System.arraycopy(messageDigest.digest(concat(new byte[] { 0x00 }, bytes1)), 0, concatenation, 1, hashLength);
-		System.arraycopy(subHash, 0, concatenation, hashLength+1, hashLength);
+		System.arraycopy(subHash, 0, concatenation, hashLength + 1, hashLength);
 		final byte[] expected = messageDigest.digest(concatenation);
 
 		assertArrayEquals(expected, hash);
@@ -409,7 +409,7 @@ class HashServiceTest {
 	void onValidGqElementReturnsExpectedResultTest(final ZqElement mockedHash, final BigInteger expectedResult) {
 
 		final HashService hashService = spy(HashService.getInstance());
-		doReturn((mockedHash)).when(hashService).recursiveHashToZq(any(), any());
+		doReturn((mockedHash)).when(hashService).recursiveHashToZq(any(), any(), any());
 
 		final GqGroup largeGqGroup = GroupTestData.getLargeGqGroup();
 
