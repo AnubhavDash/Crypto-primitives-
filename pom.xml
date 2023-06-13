@@ -43,7 +43,7 @@
 		<maven-enforcer-plugin.requiredJavaVersion>[17.0.7]</maven-enforcer-plugin.requiredJavaVersion>
 		<maven-enforcer-plugin.requiredMavenVersion>[3.9.1]</maven-enforcer-plugin.requiredMavenVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.outputTimestamp>2023-06-08T14:04:57+02:00</project.build.outputTimestamp>
+		<project.build.outputTimestamp>2023-06-13T16:44:45+02:00</project.build.outputTimestamp>
 
 		<!--  Sonar  -->
 		<sonar.scm.disabled>true</sonar.scm.disabled>
