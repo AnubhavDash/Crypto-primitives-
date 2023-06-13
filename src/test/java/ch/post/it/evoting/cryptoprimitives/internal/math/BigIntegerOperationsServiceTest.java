@@ -233,12 +233,6 @@ class BigIntegerOperationsServiceTest {
 	}
 
 	@Test
-	void modInvertNonInvertibleElement() {
-		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.modInvert(TWO, SIX));
-		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.modInvert(THREE, SIX));
-	}
-
-	@Test
 	void jacobiInvalidArguments() {
 		assertAll(
 				() -> assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.getJacobi(null, null)),

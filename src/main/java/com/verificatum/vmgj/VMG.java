@@ -28,6 +28,8 @@ package com.verificatum.vmgj;
 
 import java.math.BigInteger;
 
+import ch.post.it.evoting.cryptoprimitives.internal.utils.LibraryLoader;
+
 // We use C style to name things in this file, since it should
 // correspond to the native code.
 
@@ -61,7 +63,7 @@ public final class VMG {
 	static {
 		UnsatisfiedLinkError localError = null;
 		try {
-			System.loadLibrary("vmgj-1.3.0");
+			LibraryLoader.loadLibrary("vmgj-1.3.0", "/vmg_authorized_hashes.txt");
 		} catch (UnsatisfiedLinkError e) {
 			localError = e;
 		}
