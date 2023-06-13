@@ -42,8 +42,6 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 @SuppressWarnings("java:S117")
 public class CommitmentKeyService {
 
-	private static final String HASH_CONSTANT = "commitmentKey";
-
 	private final HashService hashService;
 
 	CommitmentKeyService(final HashService hashService) {
@@ -97,8 +95,7 @@ public class CommitmentKeyService {
 
 		while (count <= nu) {
 
-			final ZqElement u = hashService.recursiveHashToZq(q, HashableBigInteger.from(q),
-					HashableString.from(HASH_CONSTANT),
+			final ZqElement u = hashService.recursiveHashToZq(q, HashableString.from("commitmentKey"),
 					HashableBigInteger.from(BigInteger.valueOf(i)),
 					HashableBigInteger.from(BigInteger.valueOf(count))).add(one);
 
