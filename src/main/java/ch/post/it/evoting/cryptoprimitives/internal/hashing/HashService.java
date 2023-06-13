@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 import org.bouncycastle.crypto.digests.SHAKEDigest;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Streams;
 import com.google.common.primitives.Bytes;
 
 import ch.post.it.evoting.cryptoprimitives.hashing.Hash;
@@ -137,7 +138,8 @@ public class HashService implements Hash {
 
 		final BigInteger q = group.getQ();
 
-		final BigInteger x_h = recursiveHashToZq(q.subtract(BigInteger.ONE), HashableBigInteger.from(x)).getValue().add(BigInteger.ONE);
+		final BigInteger x_h = recursiveHashToZq(q.subtract(BigInteger.ONE), HashableString.from("HashAndSquare"),
+				HashableBigInteger.from(x)).getValue().add(BigInteger.ONE);
 
 		return GqElement.GqElementFactory.fromSquareRoot(x_h, group);
 	}
@@ -159,7 +161,9 @@ public class HashService implements Hash {
 		checkArgument(q.compareTo(BigInteger.ZERO) > 0, "The upper bound must be strictly positive.");
 		checkArgument(q.bitLength() >= 512, "The exclusive upper bound must have a bit length of at least 512.");
 
-		final BigInteger h_prime = byteArrayToInteger(recursiveHashOfLength(q.bitLength() + 256, v));
+		final BigInteger h_prime = byteArrayToInteger(recursiveHashOfLength(q.bitLength() + 256,
+				Streams.concat(Stream.of(HashableBigInteger.from(q)), Stream.of(HashableString.from("RecursiveHash")), Arrays.stream(v))
+						.toArray(Hashable[]::new)));
 		final BigInteger h = h_prime.mod(q);
 
 		return ZqElement.create(h, new ZqGroup(q));
