@@ -1,13 +1,29 @@
 # Changelog
 
-## Release 1.3.0
+## Release 1.3.1
 
-Release 1.3.0 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
+Release 1.3.1 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
 We want to thank the experts for their high-quality, constructive remarks:
 
-* Vanessa Teague (Thinking Cybersecurity), Olivier Pereira (Université catholique Louvain), Thomas Edmund Haines (Australian National University)
+* Thomas Edmund Haines (Australian National University), Olivier Pereira (Université catholique Louvain), Vanessa Teague (Thinking Cybersecurity)
 * Aleksander Essex (Western University Canada)
 * Rolf Haenni, Reto Koenig, Philipp Locher, Eric Dubuis (Bern University of Applied Sciences)
+
+The following functionalities and improvements are included in release 1.3.1:
+
+* [Code, Specification] Slightly modified the algorithm RecurisiveHashToZq, and thereby also the algorithms HashAndSquare and GetVerifiableCommitmentKey (feedback from Thomas Haines, Olivier Pereira, and Vanessa Teague).
+* [Code] Use Douglas Wikström's VMGJ library to allow fixed-base and product exponentiation.
+* [Code] Optimized the exponentiation proof generation and verification by adding parallelization.
+* [Code] Remove unnecessary pre-condition verifications to improve performance.
+* [Specification] Corrected error in the table showing the Argon2id profiles (feedback from Aleksander Essex, Thomas Haines, Olivier Pereira, and Vanessa Teague).
+VerifyExponentiation and VerifyDecryption - merged lines to be consistent with the generation (feedback from Rolf Haenni, Reto Koenig, Philipp Locher, and Eric Dubuis).
+* [Code] Updated dependencies and third-party libraries.
+
+---
+
+## Release 1.3.0
+
+Release 1.3.0 includes some feedback from the Federal Chancellery's mandated experts (see above) and other experts of the community.
 
 The following functionalities and improvements are included in release 1.3.0:
 

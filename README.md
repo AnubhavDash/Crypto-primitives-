@@ -53,7 +53,7 @@ Moreover, a high test coverage illustrates the fact that we extensively test the
 
 ### Fortify Analysis
 
-The Fortify analysis showed 0 critical, 1 high, 0 medium, and 62 low criticality issues. We manually reviewed all 63 issues and assessed them as false
+The Fortify analysis showed 0 critical, 7 high, 0 medium, and 65 low criticality issues. We manually reviewed all 72 issues and assessed them as false
 positives.
 
 ### JFrog X-Ray Analysis
@@ -126,7 +126,6 @@ An overview of all major changes within the published releases is available [her
 
 We plan for the following improvements to the crypto-primitives library:
 
-* Improve the KDFToZq algorithm to ensure that it is collision resistant.
 * Provide expanded information in test vectors (including the expected challenge).
 
 ## Additional Documentation
