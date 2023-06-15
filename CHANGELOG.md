@@ -16,7 +16,7 @@ The following functionalities and improvements are included in release 1.3.1:
 * [Code] Optimized the exponentiation proof generation and verification by adding parallelization.
 * [Code] Remove unnecessary pre-condition verifications to improve performance.
 * [Specification] Corrected error in the table showing the Argon2id profiles (feedback from Aleksander Essex, Thomas Haines, Olivier Pereira, and Vanessa Teague).
-VerifyExponentiation and VerifyDecryption - merged lines to be consistent with the generation (feedback from Rolf Haenni, Reto Koenig, Philipp Locher, and Eric Dubuis).
+* [Code, Specification] VerifyExponentiation and VerifyDecryption - merged lines to be consistent with the generation (feedback from Rolf Haenni, Reto Koenig, Philipp Locher, and Eric Dubuis).
 * [Code] Updated dependencies and third-party libraries.
 
 ---
