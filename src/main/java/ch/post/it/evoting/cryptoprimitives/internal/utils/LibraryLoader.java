@@ -52,7 +52,7 @@ public class LibraryLoader {
 		final List<String> expectedHash = getAuthorizedHashes(hashesResourceFileName);
 		checkState(!expectedHash.isEmpty(), "At least one authorized hash should be defined.");
 
-		for (final String javaLibraryPath : System.getProperty(JAVA_LIBRARY_PATH_PROPERTY_NAME).split(File.pathSeparator)) {
+		for (final String javaLibraryPath : checkNotNull(System.getProperty(JAVA_LIBRARY_PATH_PROPERTY_NAME)).split(File.pathSeparator)) {
 			final Path libAbsolutePath = Paths.get(javaLibraryPath).resolve(libraryFilename);
 
 			final boolean exists = Files.exists(libAbsolutePath);
