@@ -138,7 +138,7 @@ public final class EncryptionParameters {
 			BigInteger a;
 			do {
 				a = new BigInteger(n.bitLength(), secureRandom);
-			} while (a.compareTo(ONE) <= 0 || a.compareTo(n) >=0);
+			} while (a.compareTo(ONE) <= 0 || a.compareTo(nMinusOne) >=0);
 
 			int j = 0;
 			BigInteger x = a.modPow(d, n);
