@@ -1,5 +1,11 @@
 # Changelog
 
+## Release 1.3.2
+
+Release 1.3.2 is a minor maintenance patch containing the following changes:
+
+* [Code] Updated dependencies and third-party libraries.
+
 ## Release 1.3.1
 
 Release 1.3.1 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
