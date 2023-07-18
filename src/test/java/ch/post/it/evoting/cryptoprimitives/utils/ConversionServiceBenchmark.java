@@ -37,7 +37,7 @@ public class ConversionServiceBenchmark {
 
 	private static final SecureRandom secureRandom = new SecureRandom();
 
-	@Param({ "2048", "3072" })
+	@Param({ "3072" })
 	static int bitLength;
 
 	@Benchmark

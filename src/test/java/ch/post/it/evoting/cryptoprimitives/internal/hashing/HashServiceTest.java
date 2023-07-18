@@ -166,7 +166,7 @@ class HashServiceTest {
 
 	@Test
 	void testRecursiveHashOfBigIntegerValue10ReturnsSameHashOfInteger10() {
-		final BigInteger bigInteger = new BigInteger(2048, secureRandom);
+		final BigInteger bigInteger = new BigInteger(3072, secureRandom);
 		final byte[] recursiveHash = hashService.recursiveHash(HashableBigInteger.from(bigInteger));
 		final byte[] regularHash = messageDigest.digest(concat(new byte[] { 0x01 }, integerToByteArray(bigInteger)));
 		assertArrayEquals(regularHash, recursiveHash);
