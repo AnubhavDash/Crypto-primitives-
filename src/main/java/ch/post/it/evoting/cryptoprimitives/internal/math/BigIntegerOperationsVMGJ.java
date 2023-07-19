@@ -142,12 +142,12 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 	}
 
 	@Override
-	public int getJacobi(final BigInteger a, final BigInteger n) {
+	public int getLegendre(final BigInteger a, final BigInteger p) {
 		checkNotNull(a);
-		checkNotNull(n);
-		checkArgument(a.compareTo(BigInteger.ZERO) > 0, "a must be positive");
+		checkNotNull(p);
+		checkArgument(p.compareTo(BigInteger.valueOf(2)) > 0 && p.mod(BigInteger.valueOf(2)).equals(BigInteger.ONE),
+				"p must be an odd integer greater than 2");
 
-		// The Legendre symbol includes the Jacobi symbol as a special case.
-		return VMG.legendre(a, n);
+		return VMG.legendre(a, p);
 	}
 }

@@ -17,7 +17,6 @@ package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.stringToByteArray;
-import static ch.post.it.evoting.cryptoprimitives.math.GqGroup.isGroupMember;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -32,6 +31,7 @@ import org.bouncycastle.crypto.digests.SHAKEDigest;
 
 import com.google.common.primitives.Bytes;
 
+import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
@@ -107,7 +107,7 @@ public final class EncryptionParameters {
 		final BigInteger p = TWO.multiply(q).add(ONE);
 
 		final BigInteger g;
-		if (isGroupMember(TWO, p)) {
+		if (isTwoGroupMember(p)) {
 			g = TWO;
 		} else {
 			g = THREE;
@@ -150,6 +150,13 @@ public final class EncryptionParameters {
 			}
 			return true;
 		});
+	}
+
+	/**
+	 * Checks if the value two is a member of the GqGroup defined by p.
+	 */
+	private boolean isTwoGroupMember(final BigInteger p) {
+		return BigIntegerOperationsService.getLegendre(TWO, p) == 1;
 	}
 
 }

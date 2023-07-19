@@ -102,17 +102,10 @@ public final class GqGroup implements MathematicalGroup<GqGroup>, HashableList {
 	 */
 	@Override
 	public boolean isGroupMember(final BigInteger value) {
-		return isGroupMember(value, this.p);
-	}
-
-	/**
-	 * Checks if a value is a member of a GqGroup defined by p.
-	 */
-	public static boolean isGroupMember(final BigInteger value, final BigInteger p) {
 		return value != null &&
 				value.compareTo(BigInteger.ZERO) > 0 &&
-				value.compareTo(p) < 0 &&
-				BigIntegerOperationsService.getJacobi(value, p) == 1;
+				value.compareTo(this.p) < 0 &&
+				BigIntegerOperationsService.getLegendre(value, this.p) == 1;
 	}
 
 	public BigInteger getP() {
