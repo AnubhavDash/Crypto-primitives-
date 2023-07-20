@@ -109,7 +109,7 @@ public class GroupTestData {
 	}
 
 	/**
-	 * Get a {@link GqGroup} large group with 2048 bits p and q.
+	 * Get a {@link GqGroup} large group with 3072 bits p and q.
 	 *
 	 * @return a {@link GqGroup}.
 	 */
