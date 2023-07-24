@@ -27,7 +27,7 @@ public class Argon2Factory {
 		randomService = new RandomService();
 	}
 
-	public static Argon2 createArgon2(Argon2Context config) {
+	public static Argon2 createArgon2(Argon2Profile config) {
 		return new Argon2Service(INSTANCE.randomService, config);
 	}
 }

@@ -19,13 +19,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.security.Security;
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import ch.post.it.evoting.cryptoprimitives.hashing.Argon2;
-import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Context;
+import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Profile;
 import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Hash;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 
@@ -36,9 +37,9 @@ public class Argon2Service implements Argon2 {
 	}
 
 	private final RandomService randomService;
-	private final Argon2Context config;
+	private final Argon2Profile config;
 
-	public Argon2Service(final RandomService randomService, final Argon2Context config) {
+	public Argon2Service(final RandomService randomService, final Argon2Profile config) {
 		this.randomService = randomService;
 		this.config = config;
 	}
@@ -67,15 +68,15 @@ public class Argon2Service implements Argon2 {
 
 		final byte[] k = Arrays.copyOf(inputKeyingMaterial, inputKeyingMaterial.length);
 		final byte[] s = Arrays.copyOf(salt, salt.length);
-		final int m = config.m();
-		final int p = config.p();
-		final int i = config.i();
+		final int m = config.get_m();
+		final int p = config.get_p();
+		final int i = config.get_i();
 
-		final Argon2Config c = new Argon2Config(32, s, m, p, i);
+		final Argon2Configuration c = new Argon2Configuration(32, s, m, p, i);
 		return argon2id(c, k);
 	}
 
-	private byte[] argon2id(final Argon2Config c, final byte[] k) {
+	private byte[] argon2id(final Argon2Configuration c, final byte[] k) {
 		final Argon2Parameters parameters = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
 				.withSalt(c.salt())
 				.withMemoryPowOfTwo(c.memory())
@@ -90,5 +91,38 @@ public class Argon2Service implements Argon2 {
 		generator.generateBytes(k, t);
 
 		return t;
+	}
+
+	private record Argon2Configuration(int tagLength, byte[] salt, int memory, int parallelism, int iterations) {
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+			Argon2Configuration that = (Argon2Configuration) o;
+			return tagLength == that.tagLength && memory == that.memory && parallelism == that.parallelism && iterations == that.iterations
+					&& Arrays.equals(salt, that.salt);
+		}
+
+		@Override
+		public int hashCode() {
+			int result = Objects.hash(tagLength, memory, parallelism, iterations);
+			result = 31 * result + Arrays.hashCode(salt);
+			return result;
+		}
+
+		@Override
+		public String toString() {
+			return "Argon2Configuration{" +
+					"tagLength=" + tagLength +
+					", salt=" + Arrays.toString(salt) +
+					", memory=" + memory +
+					", parallelism=" + parallelism +
+					", iterations=" + iterations +
+					'}';
+		}
 	}
 }

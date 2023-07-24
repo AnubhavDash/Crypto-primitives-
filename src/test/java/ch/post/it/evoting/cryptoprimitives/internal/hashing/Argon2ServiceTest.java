@@ -18,7 +18,7 @@ package ch.post.it.evoting.cryptoprimitives.internal.hashing;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.mockito.Mockito.when;
 
-import java.util.Base64;
+import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.stream.Stream;
@@ -33,10 +33,11 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
-import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Context;
-import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Hash;
 import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Profile;
+import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Hash;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.math.Base64;
+import ch.post.it.evoting.cryptoprimitives.math.BaseEncodingFactory;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
 
@@ -44,10 +45,12 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParamete
 class Argon2ServiceTest {
 
 	private static RandomService randomService;
+	private static Base64 base64;
 
 	@BeforeAll
 	static void setup() {
 		randomService = Mockito.mock(RandomService.class);
+		base64 = BaseEncodingFactory.createBase64();
 	}
 
 	@Nested
@@ -61,7 +64,7 @@ class Argon2ServiceTest {
 			// Given
 			when(randomService.randomBytes(16))
 					.thenReturn(HexFormat.of().parseHex("7332424c365a744a44376e784b7a576e"));
-			final Argon2Context config = Argon2Profile.TEST.getContext();
+			final Argon2Profile config = Argon2Profile.TEST;
 
 			// When
 			final Argon2Service service = new Argon2Service(randomService, config);
@@ -80,6 +83,8 @@ class Argon2ServiceTest {
 				final Integer m = context.get("m", Integer.class);
 				final Integer p = context.get("p", Integer.class);
 				final Integer i = context.get("i", Integer.class);
+
+
 
 				// Input.
 				final JsonData input = testParameters.getInput();
@@ -104,16 +109,18 @@ class Argon2ServiceTest {
 		void genArgon2idWithRealValues(final Integer m, final Integer p, final Integer i, final String k, final String mocked_s, final String t,
 				final String s, final String description) {
 			// Given
-			when(randomService.randomBytes(16)).thenReturn(Base64.getDecoder().decode(mocked_s));
-			final Argon2Context config = new Argon2Context(m, p, i);
+			when(randomService.randomBytes(16)).thenReturn(base64.base64Decode(mocked_s));
+			final Argon2Profile config = Arrays.stream(Argon2Profile.values())
+					.filter(profile -> (profile.get_m() == m) && (profile.get_p() == p) && (profile.get_i() == i))
+					.findFirst().orElseThrow();
 
 			// When
 			final Argon2Service service = new Argon2Service(randomService, config);
-			final Argon2Hash argon2Hash = service.genArgon2id(Base64.getDecoder().decode(k));
+			final Argon2Hash argon2Hash = service.genArgon2id(base64.base64Decode(k));
 
 			// Then
-			assertArrayEquals(Base64.getDecoder().decode(t), argon2Hash.getTag(), String.format("tag assertion failed for: %s", description));
-			assertArrayEquals(Base64.getDecoder().decode(s), argon2Hash.getSalt(), String.format("salt assertion failed for: %s", description));
+			assertArrayEquals(base64.base64Decode(t), argon2Hash.getTag(), String.format("tag assertion failed for: %s", description));
+			assertArrayEquals(base64.base64Decode(s), argon2Hash.getSalt(), String.format("salt assertion failed for: %s", description));
 		}
 
 	}
@@ -127,7 +134,7 @@ class Argon2ServiceTest {
 		@DisplayName("empty byte array")
 		void getArgon2idWithEmptyInput() {
 			// Given
-			final Argon2Context config = Argon2Profile.TEST.getContext();
+			final Argon2Profile config = Argon2Profile.TEST;
 
 			// When
 			final Argon2Service service = new Argon2Service(randomService, config);
@@ -166,14 +173,16 @@ class Argon2ServiceTest {
 		void getArgon2idWithRealValues(final Integer m, final Integer p, final Integer i, final String k, final String s, final String t,
 				final String description) {
 			// Given
-			final Argon2Context config = new Argon2Context(m, p, i);
+			final Argon2Profile config = Arrays.stream(Argon2Profile.values())
+					.filter(profile -> (profile.get_m() == m) && (profile.get_p() == p) && (profile.get_i() == i))
+					.findFirst().orElseThrow();
 
 			// When
 			final Argon2Service service = new Argon2Service(randomService, config);
-			final byte[] actual_t = service.getArgon2id(Base64.getDecoder().decode(k), Base64.getDecoder().decode(s));
+			final byte[] actual_t = service.getArgon2id(base64.base64Decode(k), base64.base64Decode(s));
 
 			// Then
-			assertArrayEquals(Base64.getDecoder().decode(t), actual_t, String.format("tag assertion failed for: %s", description));
+			assertArrayEquals(base64.base64Decode(t), actual_t, String.format("tag assertion failed for: %s", description));
 		}
 
 	}
