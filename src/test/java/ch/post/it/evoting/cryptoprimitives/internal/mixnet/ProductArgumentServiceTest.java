@@ -70,7 +70,6 @@ import ch.post.it.evoting.cryptoprimitives.mixnet.SingleValueProductArgument;
 import ch.post.it.evoting.cryptoprimitives.mixnet.SingleValueProductStatement;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ZeroArgument;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
 import ch.post.it.evoting.cryptoprimitives.utils.VerificationResult;
@@ -93,7 +92,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 		nu = secureRandom.nextInt(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2;
 
 		hashService = TestHashService.create(gqGroup.getQ());
-		publicKey = new ElGamalGenerator(gqGroup).genRandomPublicKey(k);
+		publicKey = elGamalGenerator.genRandomPublicKey(k);
 
 		commitmentKey = new TestCommitmentKeyGenerator(gqGroup).genCommitmentKey(nu);
 	}
@@ -125,7 +124,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with public key from different group than commitment key throws an IllegalArgumentException")
 		void constructProductArgumentWithPublicKeyGroupDifferentCommitmentKeyGroup() {
-			final ElGamalMultiRecipientPublicKey otherPublicKey = new ElGamalGenerator(otherGqGroup).genRandomPublicKey(k);
+			final ElGamalMultiRecipientPublicKey otherPublicKey = otherGroupElGamalGenerator.genRandomPublicKey(k);
 			final Exception exception = assertThrows(IllegalArgumentException.class,
 					() -> new ProductArgumentService(randomService, hashService, otherPublicKey, commitmentKey));
 			assertEquals("The public key and the commitment key must have the same group.", exception.getMessage());

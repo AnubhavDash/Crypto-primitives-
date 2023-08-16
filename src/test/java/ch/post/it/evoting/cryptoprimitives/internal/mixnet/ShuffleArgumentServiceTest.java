@@ -48,13 +48,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamal;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientMessages;
-import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
@@ -72,7 +70,6 @@ import ch.post.it.evoting.cryptoprimitives.mixnet.ShuffleWitness;
 import ch.post.it.evoting.cryptoprimitives.mixnet.SingleValueProductArgument;
 import ch.post.it.evoting.cryptoprimitives.test.tools.GroupVectors;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.Generators;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
@@ -81,19 +78,15 @@ import ch.post.it.evoting.cryptoprimitives.utils.VerificationResult;
 @DisplayName("A ShuffleArgumentService")
 class ShuffleArgumentServiceTest extends TestGroupSetup {
 
-	private static final ElGamal elGamal = new ElGamalService();
 	private static final int KEY_ELEMENTS_NUMBER = 11;
 	private static final RandomService randomService = new RandomService();
 	private static final SecureRandom secureRandom = new SecureRandom();
 	private static final PermutationService permutationService = new PermutationService(randomService);
-
-	private static ElGamalGenerator elGamalGenerator;
 	private static TestCommitmentKeyGenerator commitmentKeyGenerator;
 	private static HashService hashService;
 
 	@BeforeAll
 	static void setUpAll() {
-		elGamalGenerator = new ElGamalGenerator(gqGroup);
 		commitmentKeyGenerator = new TestCommitmentKeyGenerator(gqGroup);
 		hashService = TestHashService.create(gqGroup.getQ());
 	}
@@ -143,7 +136,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("public and commitments keys from different group throws IllegalArgumentException")
 		void constructPublicCommitmentKeysDiffGroup() {
-			final ElGamalMultiRecipientPublicKey otherPublicKey = new ElGamalGenerator(otherGqGroup).genRandomPublicKey(publicKey.size());
+			final ElGamalMultiRecipientPublicKey otherPublicKey = otherGroupElGamalGenerator.genRandomPublicKey(publicKey.size());
 
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> new ShuffleArgumentService(otherPublicKey, commitmentKey, randomService, hashService));
@@ -330,7 +323,6 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class VerifyShuffleArgumentTest {
 
-		private ElGamalGenerator elGamalGenerator;
 		private ElGamalMultiRecipientPublicKey publicKey;
 		private ShuffleArgumentService shuffleArgumentService;
 
@@ -343,7 +335,6 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 
 		@BeforeAll
 		void setUpAll() {
-			elGamalGenerator = new ElGamalGenerator(gqGroup);
 			final TestCommitmentKeyGenerator commitmentKeyGenerator = new TestCommitmentKeyGenerator(gqGroup);
 
 			publicKey = elGamalGenerator.genRandomPublicKey(KEY_ELEMENTS_NUMBER);
