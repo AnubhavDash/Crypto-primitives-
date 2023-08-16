@@ -16,7 +16,6 @@
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
 import static ch.post.it.evoting.cryptoprimitives.internal.mixnet.TestParser.parseCommitment;
-import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -24,11 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigInteger;
@@ -65,7 +60,6 @@ import ch.post.it.evoting.cryptoprimitives.mixnet.ZeroStatement;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ZeroWitness;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.Generators;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
@@ -101,7 +95,6 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 		final TestCommitmentKeyGenerator commitmentKeyGenerator = new TestCommitmentKeyGenerator(gqGroup);
 		commitmentKey = commitmentKeyGenerator.genCommitmentKey(KEY_ELEMENTS_NUMBER);
 
-		final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(gqGroup);
 		publicKey = elGamalGenerator.genRandomPublicKey(KEY_ELEMENTS_NUMBER);
 
 		// Init services.
@@ -139,7 +132,7 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 	@DisplayName("constructed with keys from different groups throws IllegalArgumentException")
 	void constructDiffGroupKeys() {
 		// Create public key from other group.
-		final ElGamalMultiRecipientPublicKey otherPublicKey = new ElGamalGenerator(otherGqGroup).genRandomPublicKey(KEY_ELEMENTS_NUMBER);
+		final ElGamalMultiRecipientPublicKey otherPublicKey = otherGroupElGamalGenerator.genRandomPublicKey(KEY_ELEMENTS_NUMBER);
 
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 				() -> new ZeroArgumentService(otherPublicKey, commitmentKey, randomService, hashService));

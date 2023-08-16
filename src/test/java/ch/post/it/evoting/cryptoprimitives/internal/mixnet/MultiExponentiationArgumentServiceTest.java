@@ -74,7 +74,6 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 	private static TestMultiExponentiationStatementGenerator statementGenerator;
 	private static TestMultiExponentiationWitnessGenerator witnessGenerator;
 	private static ElGamalMultiRecipientPublicKey publicKey;
-	private static ElGamalGenerator elGamalGenerator;
 	private static CommitmentKey commitmentKey;
 	private static TestMultiExponentiationStatementWitnessPairGenerator statementWitnessPairGenerator;
 	private static RandomService randomService;
@@ -88,7 +87,6 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 
 	@BeforeAll
 	static void setUpAll() {
-		elGamalGenerator = new ElGamalGenerator(gqGroup);
 		publicKeySize = secureRandom.nextInt(10) + 1;
 		publicKey = elGamalGenerator.genRandomPublicKey(publicKeySize);
 

@@ -63,7 +63,6 @@ import ch.post.it.evoting.cryptoprimitives.mixnet.HadamardStatement;
 import ch.post.it.evoting.cryptoprimitives.mixnet.HadamardWitness;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ZeroArgument;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
@@ -92,7 +91,6 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 	static void setupAll() {
 		n = secureRandom.nextInt(MATRIX_BOUNDS) + 1;
 		m = secureRandom.nextInt(MATRIX_BOUNDS - 1) + 2; // The Hadamard argument only works with 2 or more columns
-		ElGamalGenerator elGamalGenerator = new ElGamalGenerator(gqGroup);
 		publicKey = elGamalGenerator.genRandomPublicKey(n);
 		commitmentKeyGenerator = new TestCommitmentKeyGenerator(gqGroup);
 		commitmentKey = commitmentKeyGenerator.genCommitmentKey(n);
@@ -129,7 +127,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 	@Test
 	@DisplayName("Instantiating a Hadamard argument provider with a public key and a commitment key from a different group throws")
 	void constructHadamardArgumentServiceWithKeysDifferentGroup() {
-		ElGamalMultiRecipientPublicKey otherPublicKey = new ElGamalGenerator(otherGqGroup).genRandomPublicKey(n);
+		ElGamalMultiRecipientPublicKey otherPublicKey = otherGroupElGamalGenerator.genRandomPublicKey(n);
 		Exception exception = assertThrows(IllegalArgumentException.class,
 				() -> new HadamardArgumentService(randomService, hashService, otherPublicKey, commitmentKey));
 		assertEquals("The public key and the commitment key must belong to the same group.", exception.getMessage());
