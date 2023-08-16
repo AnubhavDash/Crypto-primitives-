@@ -22,11 +22,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -99,19 +97,6 @@ class ShuffleServiceTest extends TestGroupSetup {
 	}
 
 	@Test
-	void immutableShuffle() {
-		final List<ElGamalMultiRecipientCiphertext> ciphertexts = new ArrayList<>();
-		final List<ZqElement> reEncryptionExponents = new ArrayList<>();
-
-		final Shuffle shuffle = new Shuffle(ciphertexts, Permutation.EMPTY, reEncryptionExponents);
-		ciphertexts.add(null);
-		reEncryptionExponents.add(null);
-
-		assertEquals(0, shuffle.getCiphertexts().size());
-		assertEquals(0, shuffle.getReEncryptionExponents().size());
-	}
-
-	@Test
 	void testSpecificValues() {
 		//Define group
 		final BigInteger p = BigInteger.valueOf(23);
@@ -148,7 +133,7 @@ class ShuffleServiceTest extends TestGroupSetup {
 				Arrays.asList(13, 1, 3, 4),
 				Arrays.asList(3, 3, 6, 6)
 		);
-		final List<ElGamalMultiRecipientCiphertext> ciphertexts = ElGamalUtils.valuesToCiphertext(ciphertextValues, localGroup);
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = ElGamalUtils.valuesToCiphertext(ciphertextValues, localGroup);
 
 		//Expected ciphertexts
 		final Stream<List<Integer>> expectedCiphertextValues = Stream.of(
@@ -156,7 +141,7 @@ class ShuffleServiceTest extends TestGroupSetup {
 				Arrays.asList(4, 6, 3, 9),
 				Arrays.asList(13, 1, 13, 8)
 		);
-		final List<ElGamalMultiRecipientCiphertext> expectedCiphertexts = ElGamalUtils.valuesToCiphertext(expectedCiphertextValues, localGroup);
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> expectedCiphertexts = ElGamalUtils.valuesToCiphertext(expectedCiphertextValues, localGroup);
 
 		//Create shuffle
 		final ShuffleService shuffleService = new ShuffleService(randomService, permutationService);
@@ -164,7 +149,7 @@ class ShuffleServiceTest extends TestGroupSetup {
 
 		assertEquals(expectedCiphertexts, shuffle.getCiphertexts());
 		assertEquals(permutation, shuffle.getPermutation());
-		assertEquals(randomIntegers.stream().map(r -> ZqElement.create(r, exponentGroup)).collect(Collectors.toList()),
+		assertEquals(randomIntegers.stream().map(r -> ZqElement.create(r, exponentGroup)).collect(GroupVector.toGroupVector()),
 				shuffle.getReEncryptionExponents());
 	}
 }
