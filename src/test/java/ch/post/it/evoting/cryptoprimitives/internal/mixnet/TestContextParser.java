@@ -20,12 +20,7 @@ import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactor
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -37,20 +32,12 @@ class TestContextParser {
 	private final GqGroup gqGroup;
 
 	TestContextParser(final JsonData contextData) {
-		try (MockedStatic<SecurityLevelConfig> mockedSecurityLevel = Mockito.mockStatic(SecurityLevelConfig.class)) {
-			final BigInteger p = contextData.get("p", BigInteger.class);
-			final BigInteger q = contextData.get("q", BigInteger.class);
-			final BigInteger g = contextData.get("g", BigInteger.class);
+		final BigInteger p = contextData.get("p", BigInteger.class);
+		final BigInteger q = contextData.get("q", BigInteger.class);
+		final BigInteger g = contextData.get("g", BigInteger.class);
 
-			if (p.bitLength() == 3072) {
-				mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(SecurityLevelInternal.STANDARD);
-			} else {
-				throw new IllegalArgumentException("Unexpected bit length of p");
-			}
-
-			this.gqGroup = new GqGroup(p, q, g);
-			this.context = contextData;
-		}
+		this.gqGroup = new GqGroup(p, q, g);
+		this.context = contextData;
 	}
 
 	GqGroup getGqGroup() {

@@ -61,10 +61,7 @@ class EncryptionParametersTest {
 
 	@BeforeAll
 	static void setUpAll() {
-		try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = mockStatic(SecurityLevelConfig.class)) {
-			mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(SecurityLevelInternal.TESTING_ONLY);
-			encryptionParameters = new EncryptionParameters();
-		}
+		encryptionParameters = new EncryptionParameters();
 	}
 
 	@Test
