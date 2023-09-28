@@ -51,14 +51,14 @@ public final class EncryptionParameters {
 	private static final BigInteger FIVE = BigInteger.valueOf(5);
 	private static final BigInteger SIX = BigInteger.valueOf(6);
 
-	private final SecurityLevelInternal lambda;
+	private final SecurityLevelInternal securityLevel;
 	private final SecureRandom secureRandom;
 
 	/**
 	 * Constructs an instance with a {@link SecurityLevelInternal}.
 	 */
 	public EncryptionParameters() {
-		this.lambda = SecurityLevelConfig.getSystemSecurityLevel();
+		this.securityLevel = SecurityLevelConfig.getSystemSecurityLevel();
 		this.secureRandom = new SecureRandom();
 	}
 
@@ -66,7 +66,7 @@ public final class EncryptionParameters {
 	 * Picks verifiable encryption parameters used for the election. The election name is used as the seed.
 	 *
 	 * @param seed        the election name. Must be non-null.
-	 * @param smallPrimes a list of small primes. Must be non-null and not empty.
+	 * @param smallPrimes a list of small primes. Must be non-null.
 	 * @return a {@link GqGroup} containing the verifiable encryption parameters p, q and g.
 	 */
 	@SuppressWarnings("java:S117")
@@ -75,13 +75,13 @@ public final class EncryptionParameters {
 		checkNotNull(smallPrimes);
 		smallPrimes.forEach(prime -> checkArgument(PrimesInternal.isSmallPrime(prime), "The given number is not a prime. [Number: %s]", prime));
 
-		final int certaintyLevel = lambda.getSecurityLevelBits();
+		final int lambda = securityLevel.getSecurityStrength();
 		final ArrayList<BigInteger> sp = smallPrimes.stream().map(BigInteger::valueOf)
 				.collect(Collectors.toCollection(ArrayList::new));
 		final int l = smallPrimes.size();
-		final int pBitLength = lambda.getPBitLength();
+		final int pBitLength = securityLevel.getPBitLength();
 
-		final byte[] q_b_hat = shake128(stringToByteArray(seed), pBitLength / 8);
+		final byte[] q_b_hat = shake256(stringToByteArray(seed), pBitLength / 8);
 		final byte[] q_b = Bytes.concat(new byte[] { 0x02 }, q_b_hat);
 		final BigInteger q_prime = byteArrayToInteger(q_b).shiftRight(3);
 		BigInteger q = q_prime.subtract(q_prime.mod(SIX)).add(FIVE);
@@ -89,20 +89,22 @@ public final class EncryptionParameters {
 		for (int i = 0; i < l; i++) {
 			r.add(i, q.mod(sp.get(i)));
 		}
-		final BigInteger jump = SIX;
 		BigInteger delta = ZERO;
 		do {
-			delta = delta.add(jump);
-			int i = 0;
-			while (i < l) {
-				if ((r.get(i).add(delta).mod(sp.get(i)).equals(ZERO)) || (TWO.multiply(r.get(i).add(delta)).add(ONE).mod(sp.get(i)).equals(ZERO))) {
-					delta = delta.add(jump);
-					i = 0;
-				} else {
-					i = i + 1;
+			do {
+				delta = delta.add(SIX);
+				int i = 0;
+				while (i < l) {
+					if ((r.get(i).add(delta).mod(sp.get(i)).equals(ZERO)) || (TWO.multiply(r.get(i).add(delta)).add(ONE).mod(sp.get(i))
+							.equals(ZERO))) {
+						delta = delta.add(SIX);
+						i = 0;
+					} else {
+						i = i + 1;
+					}
 				}
-			}
-		} while (!(q.add(delta).isProbablePrime(certaintyLevel)) || !(TWO.multiply(q.add(delta)).add(ONE).isProbablePrime(certaintyLevel)));
+			} while (!(millerRabin(q.add(delta), 1)) || !(millerRabin(TWO.multiply(q.add(delta)).add(ONE), 1)));
+		} while (!(millerRabin(q.add(delta), lambda / 2)) || !(millerRabin(TWO.multiply(q.add(delta)).add(ONE), lambda / 2)));
 		q = q.add(delta);
 		final BigInteger p = TWO.multiply(q).add(ONE);
 
@@ -113,16 +115,12 @@ public final class EncryptionParameters {
 			g = THREE;
 		}
 
-		if (!millerRabin(q, 64) || !millerRabin(p, 64)) {
-			throw new IllegalStateException("p and q must both pass the Miller-Rabin test");
-		}
-
 		return new GqGroup(p, q, g);
 	}
 
-	private byte[] shake128(final byte[] message, final int outputLength) {
+	private byte[] shake256(final byte[] message, final int outputLength) {
 		final byte[] result = new byte[outputLength];
-		final SHAKEDigest shakeDigest = new SHAKEDigest(128);
+		final SHAKEDigest shakeDigest = new SHAKEDigest(256);
 
 		shakeDigest.update(message, 0, message.length);
 		shakeDigest.doFinal(result, 0, outputLength);
@@ -138,7 +136,7 @@ public final class EncryptionParameters {
 			BigInteger a;
 			do {
 				a = new BigInteger(n.bitLength(), secureRandom);
-			} while (a.compareTo(ONE) <= 0 || a.compareTo(nMinusOne) >=0);
+			} while (a.compareTo(ONE) <= 0 || a.compareTo(nMinusOne) >= 0);
 
 			int j = 0;
 			BigInteger x = a.modPow(d, n);

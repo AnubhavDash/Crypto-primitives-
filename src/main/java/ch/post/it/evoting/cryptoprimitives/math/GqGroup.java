@@ -76,11 +76,11 @@ public final class GqGroup implements MathematicalGroup<GqGroup>, HashableList {
 				securityLevel.getPBitLength());
 
 		//Validate p
-		checkArgument(p.isProbablePrime(securityLevel.getSecurityLevelBits()), "Group Gq parameter p must be prime");
+		checkArgument(p.isProbablePrime(securityLevel.getSecurityStrength()), "Group Gq parameter p must be prime");
 		this.p = p;
 
 		//Validate q
-		checkArgument(q.isProbablePrime(securityLevel.getSecurityLevelBits()), "Group Gq parameter q must be prime");
+		checkArgument(q.isProbablePrime(securityLevel.getSecurityStrength()), "Group Gq parameter q must be prime");
 		checkArgument(q.compareTo(BigInteger.ZERO) > 0);
 		checkArgument(q.compareTo(p) < 0);
 		final BigInteger computedP = q.multiply(BigInteger.valueOf(2)).add(BigInteger.ONE);

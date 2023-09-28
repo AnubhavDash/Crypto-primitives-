@@ -94,8 +94,8 @@ class EncryptionParametersTest {
 	@Test
 	@DisplayName("calling getEncryptionParameters with fixed seed gives expected parameters")
 	void getEncryptionParametersFixedSeed() {
-		final GqGroup expectedParameters = new GqGroup(BigInteger.valueOf(194568543564959L), BigInteger.valueOf(97284271782479L),
-				BigInteger.valueOf(2));
+		final GqGroup expectedParameters = new GqGroup(BigInteger.valueOf(208155596507627L), BigInteger.valueOf(104077798253813L),
+				BigInteger.valueOf(3));
 
 		assertEquals(expectedParameters, encryptionParameters.getEncryptionParameters(SEED, SMALL_PRIMES));
 	}
@@ -144,7 +144,7 @@ class EncryptionParametersTest {
 		});
 	}
 
-	@ParameterizedTest(name = "bitLength = {0} and seed = {1}")
+	@ParameterizedTest(name = "{2} with seed = {0}")
 	@MethodSource("getEncryptionParametersProvider")
 	@DisplayName("calling getEncryptionParameters with fixed seed gives expected parameters")
 	void getEncryptionParameters(final String seed, final GqGroup expectedParameters,
