@@ -15,17 +15,16 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
+import static ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsService.millerRabin;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.stringToByteArray;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.bouncycastle.crypto.digests.SHAKEDigest;
 
@@ -52,14 +51,12 @@ public final class EncryptionParameters {
 	private static final BigInteger SIX = BigInteger.valueOf(6);
 
 	private final SecurityLevelInternal securityLevel;
-	private final SecureRandom secureRandom;
 
 	/**
 	 * Constructs an instance with a {@link SecurityLevelInternal}.
 	 */
 	public EncryptionParameters() {
 		this.securityLevel = SecurityLevelConfig.getSystemSecurityLevel();
-		this.secureRandom = new SecureRandom();
 	}
 
 	/**
@@ -95,8 +92,7 @@ public final class EncryptionParameters {
 				delta = delta.add(SIX);
 				int i = 0;
 				while (i < l) {
-					if ((r.get(i).add(delta).mod(sp.get(i)).equals(ZERO)) || (TWO.multiply(r.get(i).add(delta)).add(ONE).mod(sp.get(i))
-							.equals(ZERO))) {
+					if ((r.get(i).add(delta).mod(sp.get(i)).equals(ZERO)) || (TWO.multiply(r.get(i).add(delta)).add(ONE).mod(sp.get(i)).equals(ZERO))) {
 						delta = delta.add(SIX);
 						i = 0;
 					} else {
@@ -126,28 +122,6 @@ public final class EncryptionParameters {
 		shakeDigest.doFinal(result, 0, outputLength);
 
 		return result;
-	}
-
-	private boolean millerRabin(final BigInteger n, final int rounds) {
-		final BigInteger nMinusOne = n.subtract(ONE);
-		final int s = nMinusOne.getLowestSetBit();
-		final BigInteger d = nMinusOne.shiftRight(s);
-		return IntStream.range(0, rounds).parallel().allMatch(i -> {
-			BigInteger a;
-			do {
-				a = new BigInteger(n.bitLength(), secureRandom);
-			} while (a.compareTo(ONE) <= 0 || a.compareTo(nMinusOne) >= 0);
-
-			int j = 0;
-			BigInteger x = a.modPow(d, n);
-			while (!((j == 0 && x.equals(ONE)) || x.equals(nMinusOne))) {
-				if (j > 0 && x.equals(ONE) || ++j == s) {
-					return false;
-				}
-				x = x.modPow(TWO, n);
-			}
-			return true;
-		});
 	}
 
 	/**

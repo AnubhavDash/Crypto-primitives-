@@ -18,6 +18,7 @@ package ch.post.it.evoting.cryptoprimitives.internal.math;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -34,7 +35,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import ch.post.it.evoting.cryptoprimitives.internal.elgamal.EncryptionParameters;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -249,5 +249,25 @@ class BigIntegerOperationsServiceTest {
 		assertEquals(1, BigIntegerOperationsService.getLegendre(ONE, FIVE));
 		assertEquals(0, BigIntegerOperationsService.getLegendre(TWENTY_ONE, SEVEN));
 		assertEquals(1, BigIntegerOperationsService.getLegendre(FIVE, ELEVEN));
+	}
+
+	@Test
+	void millerRabinNullArgument() {
+		assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.millerRabin(null, 1));
+	}
+
+	@Test
+	void millerRabinInvalidArguments() {
+		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.millerRabin(BigInteger.ZERO, 1));
+		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.millerRabin(FIVE, 0));
+		assertThrows(IllegalArgumentException.class, () ->	BigIntegerOperationsService.millerRabin(ONE, 3));
+		assertThrows(IllegalArgumentException.class, () ->	BigIntegerOperationsService.millerRabin(EIGHT, 3));
+	}
+
+	@Test
+	void millerRabinValidArguments() {
+		assertTrue(BigIntegerOperationsService.millerRabin(THREE, 1));
+		assertTrue(BigIntegerOperationsService.millerRabin(FIVE, 3));
+		assertTrue(BigIntegerOperationsService.millerRabin(SEVEN, 3));
 	}
 }
