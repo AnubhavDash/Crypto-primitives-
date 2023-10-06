@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
 import java.math.BigInteger;
@@ -43,23 +44,27 @@ import org.mockito.MockedStatic;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
+import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
 import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.SchnorrProof;
 
 @DisplayName("SchnorrProofService calling")
 class SchnorrProofServiceTest extends TestGroupSetup {
+
+	private static ElGamalGenerator elGamalGenerator;
 	private static RandomService randomService;
 	private static SchnorrProofService schnorrProofService;
 
 	@BeforeAll
 	static void setUpAll() {
+		elGamalGenerator = new ElGamalGenerator(gqGroup);
 		randomService = new RandomService();
 
 		final HashService hashService = TestHashService.create(gqGroup.getQ());
@@ -118,15 +123,20 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 			final GqElement resultThreeFive = computePhiSchnorr(threeGq, five);
 			final GqElement resultThreeNine = computePhiSchnorr(threeGq, nine);
 
-			assertEquals(one, resultZeroOne);
-			assertEquals(one, resultZeroFour);
-			assertEquals(one, resultZeroFive);
-			assertEquals(one, resultZeroNine);
+			final GqElement expectedOneImage = one;
+			final GqElement expectedThreeImage = three;
+			final GqElement expectedFourImage = four;
+			final GqElement expectedNineImage = nine;
 
-			assertEquals(one, resultThreeOne);
-			assertEquals(nine, resultThreeFour);
-			assertEquals(four, resultThreeFive);
-			assertEquals(three, resultThreeNine);
+			assertEquals(expectedOneImage, resultZeroOne);
+			assertEquals(expectedOneImage, resultZeroFour);
+			assertEquals(expectedOneImage, resultZeroFive);
+			assertEquals(expectedOneImage, resultZeroNine);
+
+			assertEquals(expectedOneImage, resultThreeOne);
+			assertEquals(expectedNineImage, resultThreeFour);
+			assertEquals(expectedFourImage, resultThreeFive);
+			assertEquals(expectedThreeImage, resultThreeNine);
 		}
 	}
 

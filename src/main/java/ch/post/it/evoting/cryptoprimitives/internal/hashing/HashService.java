@@ -139,7 +139,8 @@ public class HashService implements Hash {
 
 		final BigInteger q = group.getQ();
 
-		final BigInteger x_h = recursiveHashToZq(q, HashableString.from("HashAndSquare"), HashableBigInteger.from(x)).getValue().add(BigInteger.ONE);
+		final BigInteger x_h = recursiveHashToZq(q.subtract(BigInteger.ONE), HashableString.from("HashAndSquare"),
+				HashableBigInteger.from(x)).getValue().add(BigInteger.ONE);
 
 		return GqElement.GqElementFactory.fromSquareRoot(x_h, group);
 	}

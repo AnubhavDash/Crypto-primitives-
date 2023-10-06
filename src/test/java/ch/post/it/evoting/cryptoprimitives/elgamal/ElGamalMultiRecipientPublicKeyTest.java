@@ -23,6 +23,7 @@ import static org.mockito.Mockito.spy;
 
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -37,9 +38,17 @@ import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
+import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 
 @DisplayName("A multi-recipient public key")
 class ElGamalMultiRecipientPublicKeyTest extends TestGroupSetup {
+
+	private static ElGamalGenerator elGamalGenerator;
+
+	@BeforeAll
+	static void setUpAll() {
+		elGamalGenerator = new ElGamalGenerator(gqGroup);
+	}
 
 	// Provides parameters for the withInvalidParameters test.
 	static Stream<Arguments> createInvalidArgumentsProvider() {

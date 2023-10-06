@@ -42,10 +42,10 @@ class TestContextParser {
 			final BigInteger q = contextData.get("q", BigInteger.class);
 			final BigInteger g = contextData.get("g", BigInteger.class);
 
-			if (p.bitLength() == 3072) {
-				mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(SecurityLevelInternal.STANDARD);
-			} else {
-				throw new IllegalArgumentException("Unexpected bit length of p");
+			switch (p.bitLength()) {
+			case 3072 -> mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(SecurityLevelInternal.EXTENDED);
+			case 2048 -> mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(SecurityLevelInternal.LEGACY);
+			default -> throw new IllegalArgumentException("Unexpected bit length of p");
 			}
 
 			this.gqGroup = new GqGroup(p, q, g);

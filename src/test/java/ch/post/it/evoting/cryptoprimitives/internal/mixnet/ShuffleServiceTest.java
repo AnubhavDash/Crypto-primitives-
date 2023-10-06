@@ -43,9 +43,10 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.mixnet.Permutation;
 import ch.post.it.evoting.cryptoprimitives.mixnet.Shuffle;
-import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
+import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
+import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 
-class ShuffleServiceTest extends TestGroupSetup {
+class ShuffleServiceTest {
 
 	static int NUM_ELEMENTS = 10;
 	static int NUM_CIPHERTEXTS = 10;
@@ -53,11 +54,15 @@ class ShuffleServiceTest extends TestGroupSetup {
 	static PermutationService permutationService = new PermutationService(randomService);
 	static ShuffleService shuffleService = new ShuffleService(randomService, permutationService);
 
+	private static GqGroup group;
 	private static ElGamalMultiRecipientPublicKey randomPublicKey;
 	private static List<ElGamalMultiRecipientCiphertext> randomCiphertexts;
+	private static ElGamalGenerator elGamalGenerator;
 
 	@BeforeAll
 	static void setUp() {
+		group = GroupTestData.getGqGroup();
+		elGamalGenerator = new ElGamalGenerator(group);
 		randomPublicKey = elGamalGenerator.genRandomPublicKey(NUM_ELEMENTS);
 		randomCiphertexts = Collections.singletonList(elGamalGenerator.genRandomCiphertext(NUM_ELEMENTS));
 	}
@@ -86,7 +91,8 @@ class ShuffleServiceTest extends TestGroupSetup {
 
 	@Test
 	void testCiphertextAndKeyFromDifferentGroupsThrows() {
-		final ElGamalMultiRecipientPublicKey otherGroupKey = otherGroupElGamalGenerator.genRandomPublicKey(NUM_ELEMENTS);
+		final ElGamalGenerator otherGenerator = new ElGamalGenerator(GroupTestData.getDifferentGqGroup(group));
+		final ElGamalMultiRecipientPublicKey otherGroupKey = otherGenerator.genRandomPublicKey(NUM_ELEMENTS);
 		assertThrows(IllegalArgumentException.class, () -> shuffleService.genShuffle(randomCiphertexts, otherGroupKey));
 	}
 

@@ -18,20 +18,17 @@ package ch.post.it.evoting.cryptoprimitives.test.tools.serialization;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
+import java.util.Base64;
 import java.util.stream.StreamSupport;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-
-import ch.post.it.evoting.cryptoprimitives.math.Base64;
-import ch.post.it.evoting.cryptoprimitives.math.BaseEncodingFactory;
 
 /**
  * Represents one of the general object present in the json test files and provides utility method to convert data to the supported types.
  */
 public final class JsonData {
 
-	private static final Base64 BASE_64 = BaseEncodingFactory.createBase64();
 	/* The underlying jackson node. */
 	private final JsonNode jsonNode;
 
@@ -71,7 +68,7 @@ public final class JsonData {
 		} else if (clazz.equals(String[].class)) {
 			return clazz.cast(getStringArray(field));
 		} else if (clazz.equals(byte[].class)) {
-			return clazz.cast(BASE_64.base64Decode(jsonNode.get(field).asText()));
+			return clazz.cast(Base64.getDecoder().decode(jsonNode.get(field).asText()));
 		} else if (clazz.equals(Boolean.class)) {
 			return clazz.cast(jsonNode.get(field).asBoolean());
 		} else if (clazz.equals(Integer.class)) {

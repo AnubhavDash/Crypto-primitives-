@@ -34,7 +34,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import ch.post.it.evoting.cryptoprimitives.internal.elgamal.EncryptionParameters;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -234,20 +233,21 @@ class BigIntegerOperationsServiceTest {
 	}
 
 	@Test
-	void legendreInvalidArguments() {
+	void jacobiInvalidArguments() {
 		assertAll(
-				() -> assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.getLegendre(null, null)),
-				() -> assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.getLegendre(null, THREE)),
-				() -> assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.getLegendre(ONE, null)),
-				() -> assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.getLegendre(ONE, TWO))
+				() -> assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.getJacobi(null, null)),
+				() -> assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.getJacobi(ZERO, null)),
+				() -> assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.getJacobi(null, ONE)),
+				() -> assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.getJacobi(ZERO, ZERO)),
+				() -> assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.getJacobi(MINUS_ONE, ONE))
 		);
 	}
 
 	@Test
-	void legendreValidArguments() {
-		assertEquals(-1, BigIntegerOperationsService.getLegendre(EIGHT, THREE));
-		assertEquals(1, BigIntegerOperationsService.getLegendre(ONE, FIVE));
-		assertEquals(0, BigIntegerOperationsService.getLegendre(TWENTY_ONE, SEVEN));
-		assertEquals(1, BigIntegerOperationsService.getLegendre(FIVE, ELEVEN));
+	void jacobiValidArguments() {
+		assertEquals(1, BigIntegerOperationsService.getJacobi(ONE, FIVE));
+		assertEquals(1, BigIntegerOperationsService.getJacobi(FIVE, ONE));
+		assertEquals(-1, BigIntegerOperationsService.getJacobi(THREE, EIGHT));
+		assertEquals(0, BigIntegerOperationsService.getJacobi(TWENTY_ONE, SEVEN));
 	}
 }

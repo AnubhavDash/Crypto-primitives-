@@ -35,6 +35,7 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.mixnet.MultiExponentiationArgument;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
+import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 
 class MultiExponentiationArgumentTest extends TestGroupSetup {
 
@@ -199,7 +200,8 @@ class MultiExponentiationArgumentTest extends TestGroupSetup {
 	@Test
 	void builtWithWrongSizeCBAndE() {
 		final GroupVector<GqElement, GqGroup> longerCBVector = gqGroupGenerator.genRandomGqElementVector(2 * m + 1);
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> longerEVector = elGamalGenerator.genRandomCiphertextVector(2 * m + 1, l);
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> longerEVector = new ElGamalGenerator(gqGroup)
+				.genRandomCiphertextVector(2 * m + 1, l);
 
 		final MultiExponentiationArgument.Builder builder = new MultiExponentiationArgument.Builder();
 		builder.with_c_A_0(cA0)

@@ -67,11 +67,13 @@ class ElGamalMultiRecipientCiphertextTest extends TestGroupSetup {
 
 	private static List<GqElement> validPhis;
 	private static GqElement validGamma;
+	private static ElGamalGenerator elGamalGenerator;
 
 	private static RandomService randomService;
 
 	@BeforeAll
 	static void setUpAll() {
+		elGamalGenerator = new ElGamalGenerator(gqGroup);
 		randomService = new RandomService();
 	}
 
@@ -377,6 +379,7 @@ class ElGamalMultiRecipientCiphertextTest extends TestGroupSetup {
 		ElGamalMultiRecipientMessage originalMessage = elGamalGenerator.genRandomMessage(noOfMessageElements);
 		ElGamalMultiRecipientKeyPair keyPair = ElGamalMultiRecipientKeyPair.genKeyPair(gqGroup, noOfMessageElements, randomService);
 		ElGamalMultiRecipientCiphertext ciphertext = ElGamalGenerator.encryptMessage(originalMessage, keyPair, zqGroup);
+
 		ElGamalMultiRecipientCiphertext exponentiatedCiphertext = ciphertext.getCiphertextExponentiation(exponent);
 		ElGamalMultiRecipientMessage decryptedExponentiatedCipherText = ElGamalMultiRecipientMessages
 				.getMessage(exponentiatedCiphertext, keyPair.getPrivateKey());
@@ -513,7 +516,8 @@ class ElGamalMultiRecipientCiphertextTest extends TestGroupSetup {
 		@DisplayName("a ciphertext and a secret key with different order throws an IllegalArgumentException.")
 		void getPartialDecryptionCiphertextAndSecretKeyShouldBePartOfSameGroup() {
 
-			final ElGamalMultiRecipientPrivateKey secretKey = otherGroupElGamalGenerator.genRandomPrivateKey(secretKeySize);
+			final ElGamalMultiRecipientPrivateKey secretKey =
+					new ElGamalGenerator(GroupTestData.getDifferentGqGroup(gqGroup)).genRandomPrivateKey(secretKeySize);
 
 			final IllegalArgumentException illegalArgumentException =
 					assertThrows(IllegalArgumentException.class, () -> getPartialDecryption(ciphertext, secretKey));

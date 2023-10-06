@@ -62,8 +62,8 @@ public class BigIntegerOperationsService {
 		return bigIntegerOperations.modInvert(n, modulus);
 	}
 
-	public static int getLegendre(final BigInteger a, final BigInteger p) {
-		return bigIntegerOperations.getLegendre(a, p);
+	public static int getJacobi(final BigInteger a, final BigInteger n) {
+		return bigIntegerOperations.getJacobi(a, n);
 	}
 
 	public static void generateCache(final BigInteger basis, final BigInteger modulus) {
