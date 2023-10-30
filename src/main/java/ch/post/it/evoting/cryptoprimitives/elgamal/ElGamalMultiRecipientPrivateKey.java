@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import com.google.common.base.Preconditions;
+
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientObject;
@@ -50,8 +52,8 @@ public final class ElGamalMultiRecipientPrivateKey implements ElGamalMultiRecipi
 	 */
 	public ElGamalMultiRecipientPrivateKey(final GroupVector<ZqElement, ZqGroup> keyElements) {
 		this.privateKeyElements = checkNotNull(keyElements);
+		privateKeyElements.forEach(Preconditions::checkNotNull);
 		checkArgument(!privateKeyElements.isEmpty(), "An ElGamal private key cannot be empty.");
-		checkArgument(privateKeyElements.stream().noneMatch(Objects::isNull), "An ElGamal private key cannot contain null elements");
 	}
 
 	/**

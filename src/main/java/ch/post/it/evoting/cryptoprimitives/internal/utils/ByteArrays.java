@@ -27,7 +27,7 @@ import java.math.BigInteger;
 public class ByteArrays {
 
 	private ByteArrays() {
-		//Intentional
+		// Intentionally left blank.
 	}
 
 	/**

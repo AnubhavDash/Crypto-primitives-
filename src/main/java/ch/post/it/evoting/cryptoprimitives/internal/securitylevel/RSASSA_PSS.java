@@ -80,7 +80,7 @@ public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 
 	@VisibleForTesting
 	RSASSA_PSS() {
-		//Intentionally left blank
+		// Intentionally left blank.
 	}
 
 	public static RSASSA_PSS getInstance() {

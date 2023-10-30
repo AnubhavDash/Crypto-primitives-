@@ -166,13 +166,10 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("auxiliary information containing null throws IllegalArgumentException")
+		@DisplayName("auxiliary information containing null throws NullPointerException")
 		void auxiliaryInformationWithNull() {
 			auxiliaryInformation.set(0, null);
-
-			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> schnorrProofService
-					.genSchnorrProof(witness, statement, auxiliaryInformation));
-			assertEquals("The auxiliary information must not contain null objects.", exception.getMessage());
+			assertThrows(NullPointerException.class, () -> schnorrProofService.genSchnorrProof(witness, statement, auxiliaryInformation));
 		}
 	}
 
@@ -221,13 +218,10 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("auxiliary information containing null throws IllegalArgumentException")
+		@DisplayName("auxiliary information containing null throws NullPointerException")
 		void auxiliaryInformationWithNull() {
 			auxiliaryInformation.set(0, null);
-
-			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> schnorrProofService
-					.verifySchnorrProof(schnorrProof, statement, auxiliaryInformation));
-			assertEquals("The auxiliary information must not contain null objects.", exception.getMessage());
+			assertThrows(NullPointerException.class, () -> schnorrProofService.verifySchnorrProof(schnorrProof, statement, auxiliaryInformation));
 		}
 
 		private Stream<Arguments> jsonFileArgumentProvider() {

@@ -20,8 +20,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.IntStream;
+
+import com.google.common.base.Preconditions;
 
 /**
  * <p>This class is thread-safe.</p>
@@ -56,14 +57,16 @@ public class BigIntegerOperationsJava implements BigIntegerOperations {
 
 	@Override
 	public BigInteger multiModExp(final List<BigInteger> bases, final List<BigInteger> exponents, final BigInteger modulus) {
-		checkNotNull(bases);
-		checkArgument(bases.stream().allMatch(Objects::nonNull), "Elements must not contain nulls");
-		final List<BigInteger> basesCopy = List.copyOf(bases);
+		final List<BigInteger> basesCopy = checkNotNull(bases).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 		checkArgument(!basesCopy.isEmpty(), "Bases must be non empty.");
 
-		checkNotNull(exponents);
-		checkArgument(exponents.stream().allMatch(exponent -> checkNotNull(exponent).signum() >= 0), "Elements must be positive");
-		final List<BigInteger> exponentsCopy = List.copyOf(exponents);
+		final int exponentsSize = exponents.size();
+		final List<BigInteger> exponentsCopy = checkNotNull(exponents).stream()
+				.filter(exponent -> checkNotNull(exponent).signum() >= 0)
+				.toList();
+		checkArgument(exponentsSize == exponentsCopy.size(), "Exponents must be positive");
 
 		// The next check assures also that exponentsCopy is not empty
 		checkArgument(basesCopy.size() == exponentsCopy.size(), "Bases and exponents must have the same size");

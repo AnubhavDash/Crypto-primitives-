@@ -37,12 +37,12 @@ public class SignatureGenerationService implements SignatureGeneration {
 	private final Hash hash;
 	private final SignatureSupportingAlgorithm signatureSupportingAlgorithm;
 
-	public SignatureGenerationService(final PrivateKey privateKey, final X509Certificate certificate, final Hash hash, 
+	public SignatureGenerationService(final PrivateKey privateKey, final X509Certificate certificate, final Hash hash,
 			final SignatureSupportingAlgorithm signatureSupportingAlgorithm) {
-		this.privKey = privateKey;
-		this.certificate = certificate;
-		this.hash = hash;
-		this.signatureSupportingAlgorithm = signatureSupportingAlgorithm;
+		this.privKey = checkNotNull(privateKey);
+		this.certificate = checkNotNull(certificate);
+		this.hash = checkNotNull(hash);
+		this.signatureSupportingAlgorithm = checkNotNull(signatureSupportingAlgorithm);
 	}
 
 	/**

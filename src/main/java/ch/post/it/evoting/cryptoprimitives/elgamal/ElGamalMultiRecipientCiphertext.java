@@ -51,6 +51,15 @@ public final class ElGamalMultiRecipientCiphertext implements ElGamalMultiRecipi
 	private final GroupVector<GqElement, GqGroup> phis;
 	private final GqGroup group;
 
+	private ElGamalMultiRecipientCiphertext(final GqElement gamma, final GroupVector<GqElement, GqGroup> phis) {
+		this.gamma = checkNotNull(gamma);
+		this.phis = checkNotNull(phis);
+		this.group = gamma.getGroup();
+
+		checkArgument(!phis.isEmpty(), "An ElGamalMultiRecipientCiphertext phis must be non empty.");
+		checkArgument(gamma.getGroup().equals(phis.getGroup()), "Gamma and phis must belong to the same GqGroup.");
+	}
+
 	/**
 	 * Creates a {@code ElGamalMultiRecipientCiphertext} using the specified gamma and phi values.
 	 *
@@ -67,19 +76,9 @@ public final class ElGamalMultiRecipientCiphertext implements ElGamalMultiRecipi
 	public static ElGamalMultiRecipientCiphertext create(final GqElement gamma, final List<GqElement> phis) {
 		checkNotNull(gamma);
 
-		final GroupVector<GqElement, GqGroup> phisVector = GroupVector.from(phis);
-
-		checkArgument(!phisVector.isEmpty(), "An ElGamalMultiRecipientCiphertext phis must be non empty.");
-		checkArgument(gamma.getGroup().equals(phisVector.getGroup()), "Gamma and phis must belong to the same GqGroup.");
+		final GroupVector<GqElement, GqGroup> phisVector = GroupVector.from(checkNotNull(phis));
 
 		return new ElGamalMultiRecipientCiphertext(gamma, phisVector);
-	}
-
-	// Private constructor without input validation. Used only to internally construct new ciphertext whose elements have already been validated.
-	private ElGamalMultiRecipientCiphertext(final GqElement gamma, final GroupVector<GqElement, GqGroup> phis) {
-		this.gamma = gamma;
-		this.phis = phis;
-		this.group = gamma.getGroup();
 	}
 
 	/**

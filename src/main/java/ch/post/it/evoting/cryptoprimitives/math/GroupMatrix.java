@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Streams;
 
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
@@ -54,22 +55,24 @@ public class GroupMatrix<E extends GroupVectorElement<G> & Hashable, G extends M
 
 	private GroupMatrix(final List<GroupVector<E, G>> rows) {
 		// Null checking.
-		checkNotNull(rows);
-		checkArgument(rows.stream().allMatch(Objects::nonNull), "A matrix cannot contain a null row.");
+		final List<GroupVector<E, G>> rowsCopy = checkNotNull(rows).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 
 		// Size checking.
-		checkArgument(allEqual(rows.stream(), GroupVector::size), "All rows of the matrix must have the same number of columns.");
-		checkArgument(allEqual(rows.stream().flatMap(GroupVector::stream), GroupVectorElement::size), "All matrix elements must have the same size.");
-		checkArgument(!rows.isEmpty() && !rows.get(0).isEmpty(), "Empty matrices are not supported.");
+		checkArgument(allEqual(rowsCopy.stream(), GroupVector::size), "All rows of the matrix must have the same number of columns.");
+		checkArgument(allEqual(rowsCopy.stream().flatMap(GroupVector::stream), GroupVectorElement::size),
+				"All matrix elements must have the same size.");
+		checkArgument(!rowsCopy.isEmpty() && !rowsCopy.get(0).isEmpty(), "Empty matrices are not supported.");
 
 		// Group checking.
-		checkArgument(allEqual(rows.stream(), GroupVector::getGroup), "All elements of the matrix must be in the same group.");
+		checkArgument(allEqual(rowsCopy.stream(), GroupVector::getGroup), "All elements of the matrix must be in the same group.");
 
-		this.rows = rows;
-		this.numRows = rows.size();
-		this.numColumns = rows.get(0).size();
-		this.group = rows.get(0).get(0).getGroup();
-		this.elementSize = rows.get(0).get(0).size();
+		this.rows = rowsCopy;
+		this.numRows = rowsCopy.size();
+		this.numColumns = rowsCopy.get(0).size();
+		this.group = rowsCopy.get(0).get(0).getGroup();
+		this.elementSize = rowsCopy.get(0).get(0).size();
 	}
 
 	/**
@@ -88,11 +91,8 @@ public class GroupMatrix<E extends GroupVectorElement<G> & Hashable, G extends M
 	 */
 	public static <L extends List<E>, E extends GroupVectorElement<G> & Hashable, G extends MathematicalGroup<G>> GroupMatrix<E, G> fromRows(
 			final List<L> rows) {
-		//Null checks
-		checkNotNull(rows);
-		checkArgument(rows.stream().allMatch(Objects::nonNull), "A matrix cannot contain a null row.");
-
-		final List<GroupVector<E, G>> rowVectors = rows.stream()
+		final List<GroupVector<E, G>> rowVectors = checkNotNull(rows).stream()
+				.map(Preconditions::checkNotNull)
 				.map(GroupVector::from)
 				.toList();
 

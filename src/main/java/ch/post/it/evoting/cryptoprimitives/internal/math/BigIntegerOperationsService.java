@@ -41,10 +41,10 @@ public class BigIntegerOperationsService {
 
 	static {
 		if (VMG.checkLoaded()) {
-			LOG.info("Verificatum Multiplicative Groups Library for Java (VMGJ)  is installed and ready to use");
+			LOG.info("Verificatum Multiplicative Groups Library for Java (VMGJ) is installed and ready to use");
 			bigIntegerOperations = new BigIntegerOperationsVMGJ();
 		} else {
-			LOG.warn("Verificatum Multiplicative Groups Library for Java (VMGJ)  is not installed, some native code optimizations are not available, "
+			LOG.warn("Verificatum Multiplicative Groups Library for Java (VMGJ) is not installed, some native code optimizations are not available, "
 					+ "integer operations will now take longer. Verify that the libraries GMP, GMPMEE and VMGJ are installed and referenced in the java.library.path");
 			bigIntegerOperations = new BigIntegerOperationsJava();
 		}
@@ -85,7 +85,7 @@ public class BigIntegerOperationsService {
 	 * Runs the Miller-Rabin probabilistic primality test.
 	 *
 	 * @param candidate n, an odd integer greater than 3 to be tested. Must be non-null.
-	 * @param rounds t, the number of rounds to be done. Must be strictly positive.
+	 * @param rounds    t, the number of rounds to be done. Must be strictly positive.
 	 * @return {@code true} if the candidate is probably prime, {@code false} if the candidate is definitely composite.
 	 */
 	public static boolean millerRabin(final BigInteger candidate, final int rounds) {

@@ -114,7 +114,7 @@ class ElGamalMultiRecipientCiphertextTest extends TestGroupSetup {
 				Arguments.of(null, validPhis, NullPointerException.class),
 				Arguments.of(validGamma, null, NullPointerException.class),
 				Arguments.of(validGamma, Collections.emptyList(), IllegalArgumentException.class),
-				Arguments.of(validGamma, invalidPhis, IllegalArgumentException.class),
+				Arguments.of(validGamma, invalidPhis, NullPointerException.class),
 				Arguments.of(validGamma, differentGroupPhis, IllegalArgumentException.class),
 				Arguments.of(otherGroupGamma, validPhis, IllegalArgumentException.class)
 		);

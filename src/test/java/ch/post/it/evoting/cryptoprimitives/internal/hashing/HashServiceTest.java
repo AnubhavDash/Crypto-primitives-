@@ -174,10 +174,7 @@ class HashServiceTest {
 
 	@Test
 	void testRecursiveHashOfNullThrows() {
-		final IllegalArgumentException illegalArgumentException =
-				assertThrows(IllegalArgumentException.class, () -> hashService.recursiveHash((Hashable) null));
-
-		assertEquals("Values contain a null value which cannot be hashed.", illegalArgumentException.getMessage());
+		assertThrows(NullPointerException.class, () -> hashService.recursiveHash((Hashable) null));
 	}
 
 	@Test

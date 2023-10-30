@@ -30,14 +30,14 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 @SuppressWarnings("java:S101")
 public class SHA3_256 implements HashFunction {
 
+	private static final SHA3_256 INSTANCE = new SHA3_256();
+
 	static {
 		Security.addProvider(new BouncyCastleProvider());
 	}
 
-	private static final SHA3_256 INSTANCE = new SHA3_256();
-
 	private SHA3_256() {
-		//Intentionally left blank
+		// Intentionally left blank.
 	}
 
 	public static SHA3_256 getInstance() {

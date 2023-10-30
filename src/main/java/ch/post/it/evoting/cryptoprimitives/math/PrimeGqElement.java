@@ -44,11 +44,15 @@ public final class PrimeGqElement extends MultiplicativeGroupElement {
 
 	@Override
 	public GqElement multiply(final MultiplicativeGroupElement other) {
+		checkNotNull(other);
+
 		return delegate.multiply(other);
 	}
 
 	@Override
 	public GqElement exponentiate(final ZqElement exponent) {
+		checkNotNull(exponent);
+
 		return delegate.exponentiate(exponent);
 	}
 
@@ -79,7 +83,7 @@ public final class PrimeGqElement extends MultiplicativeGroupElement {
 	public static class PrimeGqElementFactory {
 
 		private PrimeGqElementFactory() {
-			// empty on purpose
+			// Intentionally left blank.
 		}
 
 		/**
@@ -98,6 +102,7 @@ public final class PrimeGqElement extends MultiplicativeGroupElement {
 		 * @return a new PrimeGqElement with the specified value in the given group.
 		 */
 		public static PrimeGqElement fromValue(final int value, final GqGroup group) {
+			checkNotNull(group);
 			checkArgument(PrimesInternal.isSmallPrime(value),
 					"Cannot create a PrimeGqElement with given value as it is not a prime element. [value: %s]", value);
 			checkArgument(BigInteger.valueOf(value).compareTo(group.getGenerator().getValue()) != 0,

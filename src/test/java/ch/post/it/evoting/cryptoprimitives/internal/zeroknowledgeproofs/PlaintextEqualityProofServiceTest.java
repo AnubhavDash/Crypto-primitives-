@@ -218,13 +218,12 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("auxiliary information containing null throws IllegalArgumentException")
+		@DisplayName("auxiliary information containing null throws NullPointerException")
 		void auxiliaryInformationWithNull() {
 			auxiliaryInformation.set(0, null);
-
-			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> plaintextEqualityProofService
-					.genPlaintextEqualityProof(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey, randomness, auxiliaryInformation));
-			assertEquals("The auxiliary information must not contain null objects.", exception.getMessage());
+			assertThrows(NullPointerException.class,
+					() -> plaintextEqualityProofService.genPlaintextEqualityProof(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey,
+							randomness, auxiliaryInformation));
 		}
 
 		@Test
@@ -376,14 +375,12 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("auxiliary information containing null throws IllegalArgumentException")
+		@DisplayName("auxiliary information containing null throws NullPointerException")
 		void auxiliaryInformationWithNull() {
 			auxiliaryInformation.set(0, null);
-
-			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> plaintextEqualityProofService
-					.verifyPlaintextEquality(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey, plaintextEqualityProof,
-							auxiliaryInformation));
-			assertEquals("The auxiliary information must not contain null objects.", exception.getMessage());
+			assertThrows(NullPointerException.class,
+					() -> plaintextEqualityProofService.verifyPlaintextEquality(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey,
+							plaintextEqualityProof, auxiliaryInformation));
 		}
 
 		@Test
@@ -481,7 +478,8 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 					final ElGamalMultiRecipientCiphertext firstCiphertext = ElGamalMultiRecipientCiphertext.create(firstGamma, firstPhi);
 
 					// Parse secondCiphertext (upper_c_prime) parameters
-					final GqElement secondGamma = GqElementFactory.fromValue(input.getJsonData("upper_c_prime").get("gamma", BigInteger.class), gqGroup);
+					final GqElement secondGamma = GqElementFactory.fromValue(input.getJsonData("upper_c_prime").get("gamma", BigInteger.class),
+							gqGroup);
 					final List<GqElement> secondPhi = Arrays.stream(input.getJsonData("upper_c_prime").get("phis", BigInteger[].class))
 							.map(upperCA -> GqElementFactory.fromValue(upperCA, gqGroup)).toList();
 

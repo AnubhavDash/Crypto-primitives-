@@ -100,7 +100,7 @@ public final class GqElement extends MultiplicativeGroupElement {
 	public static class GqElementFactory {
 
 		private GqElementFactory() {
-			// empty on purpose
+			// Intentionally left blank.
 		}
 
 		/**

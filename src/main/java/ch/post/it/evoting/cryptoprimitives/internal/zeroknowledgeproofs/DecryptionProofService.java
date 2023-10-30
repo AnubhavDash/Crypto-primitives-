@@ -25,9 +25,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import com.google.common.base.Preconditions;
 
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
@@ -114,11 +115,10 @@ public class DecryptionProofService {
 		checkNotNull(ciphertext);
 		checkNotNull(keyPair);
 		checkNotNull(message);
-		checkNotNull(auxiliaryInformation);
 
-		checkArgument(auxiliaryInformation.stream().allMatch(Objects::nonNull), "The auxiliary information must not contain null elements.");
-
-		final List<String> i_aux = List.copyOf(auxiliaryInformation);
+		final List<String> i_aux = checkNotNull(auxiliaryInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 		final ElGamalMultiRecipientCiphertext C = ciphertext;
 		final ElGamalMultiRecipientPrivateKey sk = keyPair.getPrivateKey();
 		final ElGamalMultiRecipientPublicKey pk = keyPair.getPublicKey();
@@ -194,10 +194,10 @@ public class DecryptionProofService {
 		checkNotNull(publicKey);
 		checkNotNull(message);
 		checkNotNull(decryptionProof);
-		checkNotNull(auxiliaryInformation);
-		checkArgument(auxiliaryInformation.stream().allMatch(Objects::nonNull), "The auxiliary information must not contain null elements.");
 
-		final List<String> i_aux = List.copyOf(auxiliaryInformation);
+		final List<String> i_aux = checkNotNull(auxiliaryInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 		final ElGamalMultiRecipientCiphertext C = ciphertext;
 		final ElGamalMultiRecipientPublicKey pk = publicKey;
 		final ElGamalMultiRecipientMessage m = message;

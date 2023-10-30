@@ -126,6 +126,12 @@ class SymmetricServiceTest extends TestGroupSetup {
 		assertEquals("The key must be 32 bytes", Throwables.getRootCause(illegalArgumentException).getMessage());
 	}
 
+	@Test
+	@DisplayName("call default constructor")
+	void defaultConstructor() {
+		assertDoesNotThrow(() -> new SymmetricService());
+	}
+
 	@Nested
 	@DisplayName("genCiphertextSymmetric with")
 	class GenCiphertextSymmetric {
@@ -151,11 +157,8 @@ class SymmetricServiceTest extends TestGroupSetup {
 		void associatedDataWithNull() {
 			associatedData.set(0, null);
 			final byte[] plainTextBytes = plainText.getBytes(StandardCharsets.UTF_8);
-
-			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> symmetricEncryptionService
-					.genCiphertextSymmetric(encryptionKey, plainTextBytes,
-							associatedData));
-			assertEquals("The associated data must not contain null objects.", exception.getMessage());
+			assertThrows(NullPointerException.class,
+					() -> symmetricEncryptionService.genCiphertextSymmetric(encryptionKey, plainTextBytes, associatedData));
 		}
 
 		static Stream<Arguments> genCiphertextSymmetricProvider() {
@@ -219,11 +222,8 @@ class SymmetricServiceTest extends TestGroupSetup {
 		@DisplayName("Associated data containing null throws IllegalArgumentException")
 		void associatedDataWithNull() {
 			associatedData.set(0, null);
-
-			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			assertThrows(NullPointerException.class,
 					() -> symmetricEncryptionService.getPlaintextSymmetric(encryptionKey, new byte[] {}, new byte[] {}, associatedData));
-
-			assertEquals("The associated data must not contain null objects.", exception.getMessage());
 		}
 
 		static Stream<Arguments> getPlaintextSymmetricProvider() {
@@ -247,16 +247,11 @@ class SymmetricServiceTest extends TestGroupSetup {
 		@ParameterizedTest()
 		@MethodSource("getPlaintextSymmetricProvider")
 		@DisplayName("getPlaintextSymmetric returns expected output")
-		void testGetPlaintextSymmetricWithRealValues(final byte[] encryptionKey, final byte[] ciphertext, final byte[] nonce, final List<String> associatedData,
+		void testGetPlaintextSymmetricWithRealValues(final byte[] encryptionKey, final byte[] ciphertext, final byte[] nonce,
+				final List<String> associatedData,
 				final byte[] expectedResult, final String description) {
 			final byte[] actualResult = symmetricEncryptionService.getPlaintextSymmetric(encryptionKey, ciphertext, nonce, associatedData);
 			assertArrayEquals(expectedResult, actualResult, String.format("assertion failed for: %s", description));
 		}
-	}
-
-	@Test
-	@DisplayName("call default constructor")
-	void defaultConstructor() {
-		assertDoesNotThrow(() -> new SymmetricService());
 	}
 }

@@ -36,7 +36,7 @@ public final class ConversionsInternal {
 	private static final Pattern DECIMAL_PATTERN = Pattern.compile("^\\d+");
 
 	private ConversionsInternal() {
-		//Intentionally left blank
+		// Intentionally left blank.
 	}
 
 	/**
