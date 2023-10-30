@@ -32,7 +32,7 @@ public class Verifiable {
 	private final Supplier<VerificationResult> toVerify;
 
 	private Verifiable(final Supplier<VerificationResult> toVerify) {
-		this.toVerify = toVerify;
+		this.toVerify = checkNotNull(toVerify);
 	}
 
 	/**

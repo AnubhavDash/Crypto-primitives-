@@ -27,7 +27,7 @@ public class SHAKE256 implements XOF {
 	private static final SHAKE256 INSTANCE = new SHAKE256();
 
 	private SHAKE256() {
-		//Intentionally left blank
+		// Intentionally left blank.
 	}
 
 	public static SHAKE256 getInstance() {

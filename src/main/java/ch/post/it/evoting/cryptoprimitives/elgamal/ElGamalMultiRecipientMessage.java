@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import com.google.common.base.Preconditions;
+
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientObject;
@@ -46,8 +48,8 @@ public final class ElGamalMultiRecipientMessage implements ElGamalMultiRecipient
 	 */
 	public ElGamalMultiRecipientMessage(final GroupVector<GqElement, GqGroup> messageElements) {
 		this.messageElements = checkNotNull(messageElements);
+		this.messageElements.forEach(Preconditions::checkNotNull);
 		checkArgument(!this.messageElements.isEmpty(), "An ElGamal message must not be empty.");
-		checkArgument(this.messageElements.stream().noneMatch(Objects::isNull), "An ElGamal message cannot contain null elements");
 	}
 
 	@Override

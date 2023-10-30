@@ -26,12 +26,12 @@ import static com.google.common.primitives.Bytes.concat;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.bouncycastle.crypto.digests.SHAKEDigest;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Streams;
 import com.google.common.primitives.Bytes;
 
@@ -67,7 +67,6 @@ public class HashService implements Hash {
 
 	private static final byte[] ARRAY_PREFIX = new byte[] { 0x03 };
 
-	private static final String VALUES_CONTAIN_NULL = "Values contain a null value which cannot be hashed.";
 	private static final String NO_VALUES = "Cannot hash no values.";
 	private final HashFunction hashFunction;
 	private final XOF xof;
@@ -88,7 +87,7 @@ public class HashService implements Hash {
 	@Override
 	public byte[] recursiveHash(final Hashable... values) {
 		checkNotNull(values);
-		checkArgument(Arrays.stream(values).allMatch(Objects::nonNull), VALUES_CONTAIN_NULL);
+		Arrays.stream(values).forEach(Preconditions::checkNotNull);
 		checkArgument(values.length != 0, NO_VALUES);
 
 		if (values.length > 1) {
@@ -139,8 +138,7 @@ public class HashService implements Hash {
 
 		final BigInteger q = group.getQ();
 
-		final BigInteger x_h = recursiveHashToZq(q.subtract(BigInteger.ONE), HashableString.from("HashAndSquare"),
-				HashableBigInteger.from(x)).getValue().add(BigInteger.ONE);
+		final BigInteger x_h = recursiveHashToZq(q, HashableString.from("HashAndSquare"), HashableBigInteger.from(x)).getValue().add(BigInteger.ONE);
 
 		return GqElement.GqElementFactory.fromSquareRoot(x_h, group);
 	}
@@ -153,7 +151,7 @@ public class HashService implements Hash {
 	public ZqElement recursiveHashToZq(final BigInteger exclusiveUpperBound, final Hashable... values) {
 		checkNotNull(exclusiveUpperBound);
 		checkNotNull(values);
-		checkArgument(Arrays.stream(values).allMatch(Objects::nonNull), VALUES_CONTAIN_NULL);
+		Arrays.stream(values).forEach(Preconditions::checkNotNull);
 
 		final int k = values.length;
 		final BigInteger q = exclusiveUpperBound;
@@ -188,7 +186,7 @@ public class HashService implements Hash {
 	@VisibleForTesting
 	byte[] recursiveHashOfLength(final int requestedBitLength, final Hashable... values) {
 		checkNotNull(values);
-		checkArgument(Arrays.stream(values).allMatch(Objects::nonNull), VALUES_CONTAIN_NULL);
+		Arrays.stream(values).forEach(Preconditions::checkNotNull);
 
 		final int k = values.length;
 		final int l = requestedBitLength;

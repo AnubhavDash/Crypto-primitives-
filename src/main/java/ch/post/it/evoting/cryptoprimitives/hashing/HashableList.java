@@ -15,14 +15,14 @@
  */
 package ch.post.it.evoting.cryptoprimitives.hashing;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+
+import com.google.common.base.Preconditions;
 
 /**
  * Interface to be implemented by classes whose hashable form is an immutable list of {@link Hashable} objects.
@@ -56,7 +56,7 @@ public interface HashableList extends Hashable {
 	@SafeVarargs
 	static <E extends Hashable> HashableList of(final E... elements) {
 		checkNotNull(elements);
-		checkArgument(Arrays.stream(elements).allMatch(Objects::nonNull), "Elements must not contain nulls");
+		Arrays.stream(elements).forEach(Preconditions::checkNotNull);
 
 		return from(Arrays.asList(elements));
 	}

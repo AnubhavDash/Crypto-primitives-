@@ -36,7 +36,7 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 public class CommitmentService {
 
 	private CommitmentService() {
-		// intentionally left blank
+		// Intentionally left blank.
 	}
 
 	/**

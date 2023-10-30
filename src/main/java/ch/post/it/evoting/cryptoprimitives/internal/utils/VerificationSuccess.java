@@ -30,7 +30,7 @@ public final class VerificationSuccess implements VerificationResult {
 	public static final VerificationSuccess INSTANCE = new VerificationSuccess();
 
 	private VerificationSuccess() {
-		//Intentionally left blank
+		// Intentionally left blank.
 	}
 
 	@Override

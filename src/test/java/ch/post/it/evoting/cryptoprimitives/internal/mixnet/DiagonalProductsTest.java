@@ -49,7 +49,6 @@ class DiagonalProductsTest extends TestGroupSetup {
 	private static final int KEY_SIZE = 10;
 
 	private static MultiExponentiationArgumentService multiExponentiationArgumentService;
-	private static ElGamalGenerator elGamalGenerator;
 
 	private int n;
 	private int m;
@@ -59,7 +58,6 @@ class DiagonalProductsTest extends TestGroupSetup {
 
 	@BeforeAll
 	static void setUpAll() {
-		elGamalGenerator = new ElGamalGenerator(gqGroup);
 		final ElGamalMultiRecipientPublicKey publicKey = elGamalGenerator.genRandomPublicKey(KEY_SIZE);
 
 		final TestCommitmentKeyGenerator ckGenerator = new TestCommitmentKeyGenerator(gqGroup);
@@ -144,9 +142,8 @@ class DiagonalProductsTest extends TestGroupSetup {
 				.limit(l)
 				.collect(GroupVector.toGroupVector());
 		final ElGamalMultiRecipientPublicKey differentGroupPublicKey = new ElGamalMultiRecipientPublicKey(pkElements);
-		final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(otherGqGroup);
 		final List<List<ElGamalMultiRecipientCiphertext>> otherGroupRandomCiphertexts = Stream.generate(
-						() -> elGamalGenerator.genRandomCiphertexts(differentGroupPublicKey, l, n))
+						() -> otherGroupElGamalGenerator.genRandomCiphertexts(differentGroupPublicKey, l, n))
 				.limit(m)
 				.collect(Collectors.toList());
 		final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> differentGroupCiphertexts = GroupMatrix

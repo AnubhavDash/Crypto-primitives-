@@ -16,10 +16,11 @@
  */
 package ch.post.it.evoting.cryptoprimitives.mixnet;
 
-import java.util.List;
-
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
+import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
+import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
+import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 
 /**
  * Represents the result of a re-encrypting shuffle operation. It contains the re-encrypted ciphertexts, the list of exponents used for re-encryption
@@ -27,18 +28,11 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
  * <p>
  * Instances of this class are immutable.
  */
-public record Shuffle(List<ElGamalMultiRecipientCiphertext> ciphertexts,
-					  Permutation permutation, List<ZqElement> reEncryptionExponents) {
-	public static final Shuffle EMPTY = new Shuffle(List.of(), Permutation.EMPTY, List.of());
+public record Shuffle(GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts,
+					  Permutation permutation, GroupVector<ZqElement, ZqGroup> reEncryptionExponents) {
+	public static final Shuffle EMPTY = new Shuffle(GroupVector.of(), Permutation.EMPTY, GroupVector.of());
 
-	public Shuffle(final List<ElGamalMultiRecipientCiphertext> ciphertexts, final Permutation permutation,
-			final List<ZqElement> reEncryptionExponents) {
-		this.ciphertexts = List.copyOf(ciphertexts);
-		this.permutation = permutation;
-		this.reEncryptionExponents = List.copyOf(reEncryptionExponents);
-	}
-
-	public List<ElGamalMultiRecipientCiphertext> getCiphertexts() {
+	public GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> getCiphertexts() {
 		return this.ciphertexts;
 	}
 
@@ -46,7 +40,7 @@ public record Shuffle(List<ElGamalMultiRecipientCiphertext> ciphertexts,
 		return permutation;
 	}
 
-	public List<ZqElement> getReEncryptionExponents() {
+	public GroupVector<ZqElement, ZqGroup> getReEncryptionExponents() {
 		return reEncryptionExponents;
 	}
 }

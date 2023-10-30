@@ -82,11 +82,18 @@ public interface BigIntegerOperations {
 	BigInteger modInvert(BigInteger n, BigInteger modulus);
 
 	/**
-	 * Calculates the Jacobi symbol(a|n). The Jacobi symbol allows us determining group membership efficiently.
+	 * Calculates the Legendre symbol (a|p).
+	 * <p>
+	 *     The Legendre symbol allows us determining group membership efficiently.
+	 *     An integer a is a quadratic residue modulo p if and only if (a|p) = 1.
+	 *     The caller of this method needs to ensure that p is an odd prime number.
+	 * </p>
 	 *
 	 * @param a positive integer
-	 * @param n modulus
-	 * @return (a | n) Possible values -1,0,1
+	 * @param p odd prime.
+	 * @return (a | p) Possible values -1,0,1
+	 * @throws NullPointerException if any of the arguments is null
+	 * @throws IllegalArgumentException if p is not an odd integer strictly greater than 2.
 	 */
-	int getJacobi(BigInteger a, BigInteger n);
+	int getLegendre(BigInteger a, BigInteger p);
 }

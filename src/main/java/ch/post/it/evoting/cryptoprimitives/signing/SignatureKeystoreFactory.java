@@ -30,11 +30,11 @@ public class SignatureKeystoreFactory {
 	private static final Hash hash = HashFactory.createHash();
 
 	private SignatureKeystoreFactory() {
-		//Intentionally left blank
+		// Intentionally left blank.
 	}
 
-	public static <T extends Supplier<String>> SignatureKeystore<T> createSignatureKeystore(final InputStream keyStoreStream, final String keystoreType,
-			final char[] password, final Predicate<KeyStore> keystoreValidator, final T signingAlias){
+	public static <T extends Supplier<String>> SignatureKeystore<T> createSignatureKeystore(final InputStream keyStoreStream,
+			final String keystoreType, final char[] password, final Predicate<KeyStore> keystoreValidator, final T signingAlias) {
 		return new SignatureKeystoreService<>(keyStoreStream, keystoreType, password, keystoreValidator, signingAlias, hash);
 	}
 }

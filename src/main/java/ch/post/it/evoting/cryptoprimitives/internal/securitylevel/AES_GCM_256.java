@@ -44,11 +44,12 @@ public class AES_GCM_256 implements AEAD {
 	private static final int AES_GCM_TAG_BYTE_LENGTH = 16;
 	private static final String ALGORITHM_NAME = "AES_256/GCM/NoPadding";
 
-	public static AES_GCM_256 getInstance() {
-		return INSTANCE;
+	private AES_GCM_256() {
+		// Intentionally left blank.
 	}
 
-	private AES_GCM_256() {
+	public static AES_GCM_256 getInstance() {
+		return INSTANCE;
 	}
 
 	@Override

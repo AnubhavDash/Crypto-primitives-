@@ -31,7 +31,7 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 public class ElGamalMultiRecipientPublicKeys {
 
 	private ElGamalMultiRecipientPublicKeys() {
-		//Intentionally left blank
+		// Intentionally left blank.
 	}
 
 	/**

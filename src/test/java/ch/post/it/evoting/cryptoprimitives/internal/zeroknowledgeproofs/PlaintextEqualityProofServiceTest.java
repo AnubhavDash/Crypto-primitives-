@@ -56,7 +56,6 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
 import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.PlaintextEqualityProof;
@@ -65,13 +64,11 @@ import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.PlaintextEquality
 class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 
 	private static final ElGamal elGamal = new ElGamalService();
-	private static ElGamalGenerator elGamalGenerator;
 	private static RandomService randomService;
 	private static PlaintextEqualityProofService plaintextEqualityProofService;
 
 	@BeforeAll
 	static void setUpAll() {
-		elGamalGenerator = new ElGamalGenerator(gqGroup);
 		randomService = new RandomService();
 
 		final HashService hashService = TestHashService.create(gqGroup.getQ());
@@ -221,13 +218,12 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("auxiliary information containing null throws IllegalArgumentException")
+		@DisplayName("auxiliary information containing null throws NullPointerException")
 		void auxiliaryInformationWithNull() {
 			auxiliaryInformation.set(0, null);
-
-			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> plaintextEqualityProofService
-					.genPlaintextEqualityProof(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey, randomness, auxiliaryInformation));
-			assertEquals("The auxiliary information must not contain null objects.", exception.getMessage());
+			assertThrows(NullPointerException.class,
+					() -> plaintextEqualityProofService.genPlaintextEqualityProof(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey,
+							randomness, auxiliaryInformation));
 		}
 
 		@Test
@@ -274,10 +270,8 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 			randomness = zqGroupGenerator.genRandomZqElementVector(2);
 			auxiliaryInformation = Arrays.asList(randomService.genRandomBase16String(STR_LEN), randomService.genRandomBase64String(STR_LEN));
 
-			final ElGamalGenerator otherElGamalGenerator = new ElGamalGenerator(otherGqGroup);
-
-			final ElGamalMultiRecipientCiphertext otherFirstCiphertext = otherElGamalGenerator.genRandomCiphertext(1);
-			final ElGamalMultiRecipientCiphertext otherSecondCiphertext = otherElGamalGenerator.genRandomCiphertext(1);
+			final ElGamalMultiRecipientCiphertext otherFirstCiphertext = otherGroupElGamalGenerator.genRandomCiphertext(1);
+			final ElGamalMultiRecipientCiphertext otherSecondCiphertext = otherGroupElGamalGenerator.genRandomCiphertext(1);
 			final GqElement otherFirstPublicKey = otherGqGroupGenerator.genMember();
 			final GqElement otherSecondPublicKey = otherGqGroupGenerator.genMember();
 
@@ -381,14 +375,12 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("auxiliary information containing null throws IllegalArgumentException")
+		@DisplayName("auxiliary information containing null throws NullPointerException")
 		void auxiliaryInformationWithNull() {
 			auxiliaryInformation.set(0, null);
-
-			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> plaintextEqualityProofService
-					.verifyPlaintextEquality(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey, plaintextEqualityProof,
-							auxiliaryInformation));
-			assertEquals("The auxiliary information must not contain null objects.", exception.getMessage());
+			assertThrows(NullPointerException.class,
+					() -> plaintextEqualityProofService.verifyPlaintextEquality(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey,
+							plaintextEqualityProof, auxiliaryInformation));
 		}
 
 		@Test
@@ -421,10 +413,8 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 			plaintextEqualityProof = plaintextEqualityProofService.genPlaintextEqualityProof(firstCiphertext, secondCiphertext, firstPublicKey,
 					secondPublicKey, randomness, auxiliaryInformation);
 
-			final ElGamalGenerator otherElGamalGenerator = new ElGamalGenerator(otherGqGroup);
-
-			final ElGamalMultiRecipientCiphertext otherFirstCiphertext = otherElGamalGenerator.genRandomCiphertext(1);
-			final ElGamalMultiRecipientCiphertext otherSecondCiphertext = otherElGamalGenerator.genRandomCiphertext(1);
+			final ElGamalMultiRecipientCiphertext otherFirstCiphertext = otherGroupElGamalGenerator.genRandomCiphertext(1);
+			final ElGamalMultiRecipientCiphertext otherSecondCiphertext = otherGroupElGamalGenerator.genRandomCiphertext(1);
 			final GqElement otherFirstPublicKey = otherGqGroupGenerator.genMember();
 			final GqElement otherSecondPublicKey = otherGqGroupGenerator.genMember();
 
@@ -488,7 +478,8 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 					final ElGamalMultiRecipientCiphertext firstCiphertext = ElGamalMultiRecipientCiphertext.create(firstGamma, firstPhi);
 
 					// Parse secondCiphertext (upper_c_prime) parameters
-					final GqElement secondGamma = GqElementFactory.fromValue(input.getJsonData("upper_c_prime").get("gamma", BigInteger.class), gqGroup);;
+					final GqElement secondGamma = GqElementFactory.fromValue(input.getJsonData("upper_c_prime").get("gamma", BigInteger.class),
+							gqGroup);
 					final List<GqElement> secondPhi = Arrays.stream(input.getJsonData("upper_c_prime").get("phis", BigInteger[].class))
 							.map(upperCA -> GqElementFactory.fromValue(upperCA, gqGroup)).toList();
 

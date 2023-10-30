@@ -4,21 +4,21 @@
 
 	<groupId>ch.post.it.evoting.cryptoprimitives</groupId>
 	<artifactId>crypto-primitives</artifactId>
-	<version>1.3.3.0</version>
+	<version>1.4.0.4</version>
 	<packaging>jar</packaging>
 
 	<name>Crypto Primitives</name>
 
 	<properties>
 		<!-- Dependencies versions -->
-		<guava.version>32.1.2-jre</guava.version>
-		<bouncycastle.version>1.76</bouncycastle.version>
+		<guava.version>32.1.1-jre</guava.version>
+		<bouncycastle.version>1.75</bouncycastle.version>
 		<jackson.version>2.15.2</jackson.version>
-		<jmh.version>1.37</jmh.version>
-		<junit-jupiter.version>5.10.0</junit-jupiter.version>
-		<junit-platform-launcher.version>1.10.0</junit-platform-launcher.version>
-		<mockito.version>5.5.0</mockito.version>
-		<slf4j.version>2.0.9</slf4j.version>
+		<jmh.version>1.36</jmh.version>
+		<junit-jupiter.version>5.10.0-M1</junit-jupiter.version>
+		<junit-platform-launcher.version>1.10.0-M1</junit-platform-launcher.version>
+		<mockito.version>5.4.0</mockito.version>
+		<slf4j.version>2.0.7</slf4j.version>
 		<reproducible-build-maven-plugin.version>0.15.2</reproducible-build-maven-plugin.version>
 
 		<!-- Plugins versions -->
@@ -35,15 +35,15 @@
 		<maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
 		<maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
 		<maven-source-plugin.version>3.3.0</maven-source-plugin.version>
-		<versions-maven-plugin.version>2.16.1</versions-maven-plugin.version>
-		<maven-javadoc-plugin.version>3.6.0</maven-javadoc-plugin.version>
+		<versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
+		<maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
 
 		<!-- Project settings -->
 		<maven.compiler.release>17</maven.compiler.release>
 		<maven-enforcer-plugin.requiredJavaVersion>[17.0.8-1]</maven-enforcer-plugin.requiredJavaVersion>
-		<maven-enforcer-plugin.requiredMavenVersion>[3.9.1]</maven-enforcer-plugin.requiredMavenVersion>
+		<maven-enforcer-plugin.requiredMavenVersion>[3.9.4]</maven-enforcer-plugin.requiredMavenVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.outputTimestamp>2023-10-26T10:08:42+02:00</project.build.outputTimestamp>
+		<project.build.outputTimestamp>2023-10-30T15:09:00+02:00</project.build.outputTimestamp>
 
 		<!--  Sonar  -->
 		<sonar.scm.disabled>true</sonar.scm.disabled>
@@ -233,7 +233,6 @@
 						<environmentVariables>
 							<SECURITY_LEVEL>TESTING_ONLY</SECURITY_LEVEL>
 						</environmentVariables>
-						<useModulePath>false</useModulePath>
 					</configuration>
 				</plugin>
 				<plugin>

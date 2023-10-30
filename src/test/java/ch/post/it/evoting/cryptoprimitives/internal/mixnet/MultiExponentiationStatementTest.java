@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,25 +29,16 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupMatrix;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.mixnet.MultiExponentiationStatement;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 
 class MultiExponentiationStatementTest extends TestGroupSetup {
 
-	private static int UPPER_BOUND_TEST_SIZE = 10;
-	private static ElGamalGenerator elGamalGenerator;
-	private static ElGamalGenerator otherGroupElGamalGenerator;
+	private static final int UPPER_BOUND_TEST_SIZE = 10;
 	private int n;
 	private int m;
 	private int l;
 	private GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> CMatrix;
 	private ElGamalMultiRecipientCiphertext C;
 	private GroupVector<GqElement, GqGroup> cA;
-
-	@BeforeAll
-	static void setUpAll() {
-		elGamalGenerator = new ElGamalGenerator(gqGroup);
-		otherGroupElGamalGenerator = new ElGamalGenerator(otherGqGroup);
-	}
 
 	@BeforeEach
 	void setUp() {

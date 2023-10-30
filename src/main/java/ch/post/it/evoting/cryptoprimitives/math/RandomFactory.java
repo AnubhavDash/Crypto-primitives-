@@ -22,7 +22,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 public class RandomFactory {
 
 	private RandomFactory() {
-		//Intentionally left blank
+		// Intentionally left blank.
 	}
 
 	public static Random createRandom() {

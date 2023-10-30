@@ -22,7 +22,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.symmetric.SymmetricService;
 public class SymmetricFactory {
 
 	private SymmetricFactory() {
-		//Intentionally left blank
+		// Intentionally left blank.
 	}
 
 	public static Symmetric createSymmetric() {

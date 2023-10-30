@@ -29,7 +29,7 @@ public class Validations {
 			System.getProperty("enable.parallel.streams", Boolean.TRUE.toString()));
 
 	private Validations() {
-		//Intentionally left blank
+		// Intentionally left blank.
 	}
 
 	/**

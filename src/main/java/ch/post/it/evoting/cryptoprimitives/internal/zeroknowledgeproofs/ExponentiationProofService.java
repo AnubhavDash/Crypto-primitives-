@@ -22,9 +22,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import com.google.common.base.Preconditions;
 
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
@@ -100,11 +101,10 @@ public class ExponentiationProofService {
 		checkNotNull(bases);
 		checkNotNull(exponent);
 		checkNotNull(exponentiations);
-		checkNotNull(auxiliaryInformation);
 
-		checkArgument(auxiliaryInformation.stream().allMatch(Objects::nonNull), "The auxiliary information must not contain null objects.");
-
-		final List<String> i_aux = List.copyOf(auxiliaryInformation);
+		final List<String> i_aux = checkNotNull(auxiliaryInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 		final GroupVector<GqElement, GqGroup> g = bases;
 		final ZqElement x = exponent;
 		final GroupVector<GqElement, GqGroup> y = exponentiations;
@@ -157,11 +157,10 @@ public class ExponentiationProofService {
 		checkNotNull(bases);
 		checkNotNull(exponentiations);
 		checkNotNull(proof);
-		checkNotNull(auxiliaryInformation);
 
-		checkArgument(auxiliaryInformation.stream().allMatch(Objects::nonNull), "The auxiliary information must not contain null elements.");
-
-		final List<String> i_aux = List.copyOf(auxiliaryInformation);
+		final List<String> i_aux = checkNotNull(auxiliaryInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 		final GroupVector<GqElement, GqGroup> g = bases;
 		final GroupVector<GqElement, GqGroup> y = exponentiations;
 		final ZqElement e = proof.get_e();

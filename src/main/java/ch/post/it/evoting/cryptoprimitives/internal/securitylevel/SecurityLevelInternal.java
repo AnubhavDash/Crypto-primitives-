@@ -30,10 +30,9 @@ import ch.post.it.evoting.cryptoprimitives.securitylevel.SecurityLevel;
 public enum SecurityLevelInternal implements SecurityLevel {
 
 	TESTING_ONLY(16, 48, SHA3_256.getInstance(), SHAKE256.getInstance(), SHA256Digest::new, AES_GCM_256.getInstance(), RSASSA_PSS.getInstance()),
-	LEGACY(112, 2048, SHA3_256.getInstance(), SHAKE256.getInstance(), SHA256Digest::new, AES_GCM_256.getInstance(), RSASSA_PSS.getInstance()),
-	EXTENDED(128, 3072, SHA3_256.getInstance(), SHAKE256.getInstance(), SHA256Digest::new, AES_GCM_256.getInstance(), RSASSA_PSS.getInstance());
+	STANDARD(128, 3072, SHA3_256.getInstance(), SHAKE256.getInstance(), SHA256Digest::new, AES_GCM_256.getInstance(), RSASSA_PSS.getInstance());
 
-	private final int securityLevelBits;
+	private final int securityStrength;
 	private final int pBitLength;
 	private final HashFunction recursiveHashHashFunction;
 	private final XOF recursiveHashToZqXOF;
@@ -41,9 +40,9 @@ public enum SecurityLevelInternal implements SecurityLevel {
 	private final AEAD symmetricAEAD;
 	private final SignatureSupportingAlgorithm signatureSupportingAlgorithm;
 
-	SecurityLevelInternal(final int securityLevelBits, final int pBitLength, final HashFunction recursiveHashHashFunction, final XOF recursiveHashToZqXOF,
+	SecurityLevelInternal(final int securityStrength, final int pBitLength, final HashFunction recursiveHashHashFunction, final XOF recursiveHashToZqXOF,
 			final Supplier<Digest> kdfHashFunction, final AEAD symmetricAEAD, final SignatureSupportingAlgorithm signatureSupportingAlgorithm) {
-		this.securityLevelBits = securityLevelBits;
+		this.securityStrength = securityStrength;
 		this.pBitLength = pBitLength;
 		this.recursiveHashHashFunction = recursiveHashHashFunction;
 		this.recursiveHashToZqXOF = recursiveHashToZqXOF;
@@ -52,8 +51,8 @@ public enum SecurityLevelInternal implements SecurityLevel {
 		this.signatureSupportingAlgorithm = signatureSupportingAlgorithm;
 	}
 
-	public int getSecurityLevelBits() {
-		return securityLevelBits;
+	public int getSecurityStrength() {
+		return securityStrength;
 	}
 
 	public int getPBitLength() {
