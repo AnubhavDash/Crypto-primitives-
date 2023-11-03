@@ -16,6 +16,8 @@
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.integerToString;
+import static ch.post.it.evoting.cryptoprimitives.internal.utils.Strings.leftPad;
+import static ch.post.it.evoting.cryptoprimitives.internal.utils.Strings.truncate;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -27,7 +29,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 
 import ch.post.it.evoting.cryptoprimitives.math.Base16;
 import ch.post.it.evoting.cryptoprimitives.math.Base32;
@@ -204,59 +205,5 @@ public class RandomService implements Random {
 		secureRandom.nextBytes(randomBytes);
 
 		return randomBytes;
-	}
-
-	/**
-	 * Pads a string to the desired length by adding the given character to the left of the string.
-	 *
-	 * @param string              S, the string to be padded. Must be of size > 0.
-	 * @param desiredStringLength l, the desired string length. Must be greater than the string length.
-	 * @param paddingCharacter    c, the character to be used for the padding.
-	 * @return the string padded to the desired length by adding the padding character the needed number of times on the left-hand side
-	 * @throws NullPointerException     if the string is null
-	 * @throws IllegalArgumentException if the desired length is smaller than the length of the string to be padded
-	 */
-	@VisibleForTesting
-	String leftPad(final String string, final int desiredStringLength, final char paddingCharacter) {
-		checkNotNull(string);
-		checkArgument(!string.isEmpty(), "The string to be padded must contain at least one character.");
-
-		final int k = string.length();
-		final int l = desiredStringLength;
-		checkArgument(k <= l, "The desired string length must not be smaller than the string.");
-
-		// This method is equivalent to the specification
-		return Strings.padStart(string, desiredStringLength, paddingCharacter);
-	}
-
-	/**
-	 * Implements the Truncate algorithm.
-	 *
-	 * @param string S, the string to be truncated. Must be non-null and non-empty.
-	 * @param length l, the desired length for the truncated string. Must be strictly positive.
-	 * @return S<sup>'</sup>, the truncated string.
-	 * @throws NullPointerException     if the input string is null.
-	 * @throws IllegalArgumentException if
-	 *                                  <ul>
-	 *                                      <li>the input string is empty.</li>
-	 *                                      <li>the input length is not strictly positive.</li>
-	 *                                      <li>the input string length is smaller than the input length.</li>
-	 *                                  </ul>
-	 */
-	@VisibleForTesting
-	String truncate(final String string, final int length) {
-
-		final String S = checkNotNull(string);
-		final int u = S.length();
-		final int l = length;
-
-		checkArgument(u > 0, "The input string must be non-empty. [u: %s]", u);
-		checkArgument(l > 0, "The input length must be strictly positive. [l: %s]", l);
-
-		// Require.
-		checkArgument(l <= u, "The input length must be smaller or equal to the input string length. [l: %s, u: %s]", l, u);
-
-		// Operation. This implementation yields the same result as the specification's pseudo-code and we have a corresponding unit test that asserts the equivalence of the two implementations.
-		return S.substring(0, l);
 	}
 }

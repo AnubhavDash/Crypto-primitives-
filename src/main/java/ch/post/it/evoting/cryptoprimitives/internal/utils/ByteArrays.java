@@ -24,7 +24,7 @@ import java.math.BigInteger;
 /**
  * Byte array utilities.
  */
-public class ByteArrays {
+public final class ByteArrays {
 
 	private ByteArrays() {
 		// Intentionally left blank.

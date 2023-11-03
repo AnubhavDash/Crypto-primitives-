@@ -271,4 +271,14 @@ class GqElementTest {
 		GqElement inverse = element.invert();
 		assertEquals(expectedInverseValue, inverse.getValue(), "The returned element is not the inverse");
 	}
+
+	@Test
+	void test() {
+		final GqGroup gqGroup = new GqGroup(BigInteger.valueOf(47), BigInteger.valueOf(23), BigInteger.valueOf(2));
+		final GroupVector<PrimeGqElement, GqGroup> smallPrimeGroupMembers = PrimeGqElement.PrimeGqElementFactory.getSmallPrimeGroupMembers(gqGroup,
+				3);
+		assertEquals(7, smallPrimeGroupMembers.get(0).value.intValueExact());
+		assertEquals(17, smallPrimeGroupMembers.get(1).value.intValueExact());
+		assertEquals(37, smallPrimeGroupMembers.get(2).value.intValueExact());
+	}
 }
