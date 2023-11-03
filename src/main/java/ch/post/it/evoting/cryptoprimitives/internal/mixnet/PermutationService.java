@@ -18,7 +18,6 @@ package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -52,7 +51,7 @@ class PermutationService {
 				.boxed()
 				.collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
 		for (int i = 0; i < N; i++) {
-			final int offset = genRandomInteger(N - i);
+			final int offset = randomService.genRandomInteger(N - i);
 			final int tmp = pi.get(i);
 			pi.set(i, pi.get(i + offset));
 			pi.set(i + offset, tmp);
@@ -61,12 +60,4 @@ class PermutationService {
 		return new Permutation(List.copyOf(pi));
 	}
 
-	/*
-	 * Generates a random integer with an int bound.
-	 * */
-	private int genRandomInteger(final int bound) {
-		final BigInteger boundAsBigInteger = BigInteger.valueOf(bound);
-		final BigInteger randomValue = this.randomService.genRandomInteger(boundAsBigInteger);
-		return randomValue.intValueExact(); //It is guaranteed to be in the int range as the bound is an int
-	}
 }

@@ -37,11 +37,11 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedConstruction;
-import org.mockito.Mockito;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.MockedConstruction;
+import org.mockito.Mockito;
 
 import com.google.common.base.Throwables;
 
@@ -73,13 +73,16 @@ class RandomServiceTest {
 		assertThrows(IllegalArgumentException.class, () -> randomService.genRandomInteger(BigInteger.ZERO));
 		final BigInteger minusOne = BigInteger.ONE.negate();
 		assertThrows(IllegalArgumentException.class, () -> randomService.genRandomInteger(minusOne));
+
+		assertThrows(IllegalArgumentException.class, () -> randomService.genRandomInteger(0));
+		assertThrows(IllegalArgumentException.class, () -> randomService.genRandomInteger(-1));
 	}
 
 	@RepeatedTest(1000)
 	void genRandomIntegerIsEquivalentToSpecification() {
 		final BigInteger upperBound = BigInteger.valueOf(1_000_000);
 		final List<byte[]> randomBytesList = new ArrayList<>(3);
-		for (int i=0; i < 3; i++) {
+		for (int i = 0; i < 3; i++) {
 			randomBytesList.add(randomService.randomBytes(ByteArrays.byteLength(upperBound)));
 		}
 		try (MockedConstruction<SecureRandom> mockedSecureRandom = Mockito.mockConstruction(SecureRandom.class,
@@ -93,6 +96,28 @@ class RandomServiceTest {
 			final BigInteger expectedResult = genRandomIntegerSpec(upperBound, randomService2);
 
 			assertEquals(0, expectedResult.compareTo(result));
+			assertEquals(2, mockedSecureRandom.constructed().size());
+		}
+	}
+
+	@Test
+	void genRandomIntegerAreEquivalent() {
+		final BigInteger upperBound = BigInteger.valueOf(1_000_000);
+		final List<byte[]> randomBytesList = new ArrayList<>(3);
+		for (int i = 0; i < 3; i++) {
+			randomBytesList.add(randomService.randomBytes(ByteArrays.byteLength(upperBound)));
+		}
+		try (MockedConstruction<SecureRandom> mockedSecureRandom = Mockito.mockConstruction(SecureRandom.class,
+				this.prepareSecureRandom(randomBytesList))) {
+			final SecureRandom secureRandom1 = new SecureRandom();
+			final RandomService randomService1 = new RandomService(secureRandom1);
+			final int result = randomService1.genRandomInteger(upperBound.intValueExact());
+
+			final SecureRandom secureRandom2 = new SecureRandom();
+			final RandomService randomService2 = new RandomService(secureRandom2);
+			final int expectedResult = randomService2.genRandomInteger(upperBound).intValueExact();
+
+			assertEquals(expectedResult, result);
 			assertEquals(2, mockedSecureRandom.constructed().size());
 		}
 	}
