@@ -56,6 +56,14 @@ public interface Random {
 	BigInteger genRandomInteger(final BigInteger upperBound);
 
 	/**
+	 * Generates a random int between 0 (incl.) and {@code upperBound} (excl.).
+	 *
+	 * @param upperBound m, the upper bound. Must be strictly positive.
+	 * @return A random int <code>r s.t. 0 &le; r &lt; m</code>.
+	 */
+	int genRandomInteger(final int upperBound);
+
+	/**
 	 * Generates a list of unique decimal strings.
 	 * <p>
 	 * Each string in the list is guaranteed to have a different value. Strings that were generated in different calls of this method, might have the

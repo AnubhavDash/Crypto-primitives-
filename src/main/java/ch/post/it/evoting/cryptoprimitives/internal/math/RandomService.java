@@ -66,13 +66,14 @@ public class RandomService implements Random {
 	}
 
 	/**
+	 * This implementation yields the same result as the specification's pseudocode, and we have a corresponding unit test that asserts the
+	 * equivalence of the two implementations.
+	 *
 	 * @see Random#genRandomInteger(BigInteger)
-	 * This implementation yields the same result as the specification's pseudo-code and we have a
-	 * corresponding unit test that asserts the equivalence of the two implementations.
 	 */
 	public BigInteger genRandomInteger(final BigInteger upperBound) {
 		checkNotNull(upperBound);
-		checkArgument(upperBound.compareTo(BigInteger.ZERO) > 0, "The upper bound must a be a positive integer greater than 0.");
+		checkArgument(upperBound.compareTo(BigInteger.ZERO) > 0, "The upper bound must be a positive integer greater than 0.");
 		final BigInteger m = upperBound;
 
 		final int bitLength = m.bitLength();
@@ -84,6 +85,15 @@ public class RandomService implements Random {
 		} while (r.compareTo(m) >= 0);
 
 		return r;
+	}
+
+	/**
+	 * @see Random#genRandomInteger(int)
+	 */
+	public int genRandomInteger(final int upperBound) {
+		checkArgument(upperBound > 0, "The upper bound must be a positive integer greater than 0.");
+
+		return genRandomInteger(BigInteger.valueOf(upperBound)).intValueExact();
 	}
 
 	/**
