@@ -42,6 +42,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
+import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.Random;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
@@ -104,7 +105,7 @@ class EncryptionParametersTest {
 	@DisplayName("calling getEncryptionParameters twice with the same seed but different small primes gives the same result")
 	void getEncryptionParametersTwice() {
 		final int electionNameLength = secureRandom.nextInt(NAME_MAX_LENGTH) + 1;
-		final String randomSeed = random.genRandomBase64String(electionNameLength);
+		final String randomSeed = random.genRandomString(electionNameLength, Base64Alphabet.getInstance());
 		final GqGroup gqGroup1 = encryptionParameters.getEncryptionParameters(randomSeed, SMALL_PRIMES);
 		final GqGroup gqGroup2 = encryptionParameters.getEncryptionParameters(randomSeed, Collections.emptyList());
 
@@ -115,7 +116,7 @@ class EncryptionParametersTest {
 	@DisplayName("calling getEncryptionParameters with random seed does not throw")
 	void getEncryptionParametersRandomSeed() {
 		final int electionNameLength = secureRandom.nextInt(NAME_MAX_LENGTH) + 1;
-		final String randomSeed = random.genRandomBase64String(electionNameLength);
+		final String randomSeed = random.genRandomString(electionNameLength, Base64Alphabet.getInstance());
 
 		assertDoesNotThrow(() -> encryptionParameters.getEncryptionParameters(randomSeed, SMALL_PRIMES));
 	}

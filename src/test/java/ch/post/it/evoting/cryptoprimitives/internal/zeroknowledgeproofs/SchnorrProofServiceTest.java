@@ -44,6 +44,8 @@ import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
+import ch.post.it.evoting.cryptoprimitives.math.Base16Alphabet;
+import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
@@ -144,7 +146,9 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 		void setUp() {
 			witness = zqGroupGenerator.genRandomZqElementMember();
 			statement = gqGroupGenerator.genMember().getGroup().getGenerator().exponentiate(witness);
-			auxiliaryInformation = Arrays.asList(randomService.genRandomBase16String(STR_LEN), randomService.genRandomBase64String(STR_LEN));
+			auxiliaryInformation = Arrays.asList(
+					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
+					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
 		}
 
 		@Test
@@ -189,7 +193,9 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 			statement = gqGroupGenerator.genMember();
 			witness = zqGroupGenerator.genRandomZqElementMember();
 			statement = statement.getGroup().getGenerator().exponentiate(witness);
-			auxiliaryInformation = Arrays.asList(randomService.genRandomBase16String(STR_LEN), randomService.genRandomBase64String(STR_LEN));
+			auxiliaryInformation = Arrays.asList(
+					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
+					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
 			schnorrProof = schnorrProofService.genSchnorrProof(witness, statement, auxiliaryInformation);
 		}
 

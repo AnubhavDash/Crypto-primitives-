@@ -44,6 +44,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
 
 class ConversionsTest {
 
@@ -311,7 +312,7 @@ class ConversionsTest {
 
 		@RepeatedTest(10)
 		void testRandomStringToByteArrayAndBackIsOriginalValue() {
-			String value = randomService.genRandomBase64String(random.nextInt(10) + 1);
+			String value = randomService.genRandomString(random.nextInt(10) + 1, Base64Alphabet.getInstance());
 			byte[] bytes = stringToByteArray(value);
 			final String cycledValue = byteArrayToString(bytes);
 			assertEquals(value, cycledValue);

@@ -80,6 +80,11 @@ public final class PrimeGqElement extends MultiplicativeGroupElement {
 		return Objects.hash(super.hashCode(), delegate);
 	}
 
+	@Override
+	public String toString() {
+		return "PrimeGqElement [value=" + value + "," + group.toString() + "]";
+	}
+
 	public static class PrimeGqElementFactory {
 
 		private PrimeGqElementFactory() {
