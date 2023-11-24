@@ -30,16 +30,13 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 
@@ -47,6 +44,9 @@ import com.google.common.base.Throwables;
 
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal;
+import ch.post.it.evoting.cryptoprimitives.math.Alphabet;
+import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
+import ch.post.it.evoting.cryptoprimitives.math.StartVotingKeyAlphabet;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 
 class RandomServiceTest {
@@ -159,81 +159,6 @@ class RandomServiceTest {
 	}
 
 	@Test
-	void genRandomBase16StringTest() {
-		final String randomString1 = randomService.genRandomBase16String(6);
-		final String randomString2 = randomService.genRandomBase16String(8);
-		final String randomString3 = randomService.genRandomBase16String(1);
-
-		assertAll(
-				() -> assertEquals(6, randomString1.length()),
-				() -> assertEquals(8, randomString2.length()),
-				() -> assertEquals(1, randomString3.length())
-		);
-
-		// Check that the Strings chars are in the Base16 alphabet.
-		assertAll(
-				() -> assertTrue(base16Alphabet.matcher(randomString1).matches()),
-				() -> assertTrue(base16Alphabet.matcher(randomString2).matches()),
-				() -> assertTrue(base16Alphabet.matcher(randomString3).matches())
-		);
-	}
-
-	@Test
-	void genRandomBase16StringInvalidLengthShouldThrow() {
-		assertThrows(IllegalArgumentException.class, () -> randomService.genRandomBase16String(0));
-	}
-
-	@Test
-	void genRandomBase32StringTest() {
-		final String randomString1 = randomService.genRandomBase32String(6);
-		final String randomString2 = randomService.genRandomBase32String(8);
-		final String randomString3 = randomService.genRandomBase32String(1);
-
-		assertAll(
-				() -> assertEquals(6, randomString1.length()),
-				() -> assertEquals(8, randomString2.length()),
-				() -> assertEquals(1, randomString3.length())
-		);
-
-		// Check that the Strings chars are in the Base32 alphabet.
-		assertAll(
-				() -> assertTrue(base32Alphabet.matcher(randomString1).matches()),
-				() -> assertTrue(base32Alphabet.matcher(randomString2).matches()),
-				() -> assertTrue(base32Alphabet.matcher(randomString3).matches())
-		);
-	}
-
-	@Test
-	void genRandomBase32StringInvalidLengthShouldThrow() {
-		assertThrows(IllegalArgumentException.class, () -> randomService.genRandomBase32String(0));
-	}
-
-	@Test
-	void genRandomBase64StringTest() {
-		final String randomString1 = randomService.genRandomBase64String(6);
-		final String randomString2 = randomService.genRandomBase64String(8);
-		final String randomString3 = randomService.genRandomBase64String(1);
-
-		assertAll(
-				() -> assertEquals(6, randomString1.length()),
-				() -> assertEquals(8, randomString2.length()),
-				() -> assertEquals(1, randomString3.length())
-		);
-
-		// Check that the Strings chars are in the Base64 alphabet.
-		assertAll(
-				() -> assertTrue(base64Alphabet.matcher(randomString1).matches()),
-				() -> assertTrue(base64Alphabet.matcher(randomString2).matches()),
-				() -> assertTrue(base64Alphabet.matcher(randomString3).matches())
-		);
-	}
-
-	@Test
-	void genRandomBase64StringInvalidLengthShouldThrow() {
-		assertThrows(IllegalArgumentException.class, () -> randomService.genRandomBase64String(0));
-	}
-
-	@Test
 	void genRandomVector() {
 		final BigInteger upperBound = BigInteger.valueOf(100);
 		final int length = 20;
@@ -314,5 +239,50 @@ class RandomServiceTest {
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 				() -> randomService.genUniqueDecimalStrings(desiredCodesLength, tooBigNumberOfUniqueCodes));
 		assertEquals("There cannot be more than 10^l codes.", Throwables.getRootCause(exception).getMessage());
+	}
+
+	@Nested
+	class GenRandomStringAlgorithmTest {
+
+		private static final Alphabet alphabet = StartVotingKeyAlphabet.getInstance();
+		private static final int LENGTH = alphabet.size();
+
+		@ParameterizedTest
+		@ValueSource(ints = { -1, 0 })
+		@DisplayName("an invalid length throws an IllegalArgumentException")
+		void invalidLengthThrows(final int length) {
+			final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
+					() -> randomService.genRandomString(length, alphabet));
+
+			assertEquals(String.format("The desired length of string must be strictly positive. [length: %s]", length),
+					Throwables.getRootCause(illegalArgumentException).getMessage());
+		}
+
+		@Test
+		@DisplayName("a null alphabet throws a NullPointerException")
+		void nullAlphabetThrows() {
+			assertThrows(NullPointerException.class, () -> randomService.genRandomString(LENGTH, null));
+		}
+
+		@Test
+		@DisplayName("valid input behaves as expected")
+		void happyPath() {
+
+			final String S_prime = assertDoesNotThrow(() -> randomService.genRandomString(LENGTH, alphabet));
+
+			// S_prime must have length l.
+			assertEquals(LENGTH, S_prime.length());
+
+			// each element of S_prime must be part of the Alphabet.
+			final char[] chars = S_prime.toCharArray();
+			for (final char S_prime_i_char : chars) {
+				final String S_prime_i = String.valueOf(S_prime_i_char);
+				assertTrue(alphabet.contains(S_prime_i));
+			}
+
+			// a second call should return a different S_prime
+			assertNotEquals(S_prime, randomService.genRandomString(LENGTH, alphabet));
+		}
+
 	}
 }

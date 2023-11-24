@@ -50,6 +50,8 @@ import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
+import ch.post.it.evoting.cryptoprimitives.math.Base16Alphabet;
+import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -189,7 +191,9 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 			secondCiphertext = elGamal.getCiphertext(plaintext, randomness.get(1),
 					new ElGamalMultiRecipientPublicKey(GroupVector.of(secondPublicKey)));
 
-			auxiliaryInformation = Arrays.asList(randomService.genRandomBase16String(STR_LEN), randomService.genRandomBase64String(STR_LEN));
+			auxiliaryInformation = Arrays.asList(
+					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
+					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
 		}
 
 		@Test
@@ -268,7 +272,9 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 			firstPublicKey = gqGroupGenerator.genMember();
 			secondPublicKey = gqGroupGenerator.genMember();
 			randomness = zqGroupGenerator.genRandomZqElementVector(2);
-			auxiliaryInformation = Arrays.asList(randomService.genRandomBase16String(STR_LEN), randomService.genRandomBase64String(STR_LEN));
+			auxiliaryInformation = Arrays.asList(
+					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
+					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
 
 			final ElGamalMultiRecipientCiphertext otherFirstCiphertext = otherGroupElGamalGenerator.genRandomCiphertext(1);
 			final ElGamalMultiRecipientCiphertext otherSecondCiphertext = otherGroupElGamalGenerator.genRandomCiphertext(1);
@@ -334,7 +340,9 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 			secondCiphertext = elGamal.getCiphertext(plaintext, randomness.get(1),
 					new ElGamalMultiRecipientPublicKey(GroupVector.of(secondPublicKey)));
 
-			auxiliaryInformation = Arrays.asList(randomService.genRandomBase16String(STR_LEN), randomService.genRandomBase64String(STR_LEN));
+			auxiliaryInformation = Arrays.asList(
+					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
+					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
 
 			plaintextEqualityProof = plaintextEqualityProofService.genPlaintextEqualityProof(firstCiphertext, secondCiphertext, firstPublicKey,
 					secondPublicKey, randomness, auxiliaryInformation);
@@ -409,7 +417,9 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 			firstPublicKey = gqGroupGenerator.genMember();
 			secondPublicKey = gqGroupGenerator.genMember();
 			randomness = zqGroupGenerator.genRandomZqElementVector(2);
-			auxiliaryInformation = Arrays.asList(randomService.genRandomBase16String(STR_LEN), randomService.genRandomBase64String(STR_LEN));
+			auxiliaryInformation = Arrays.asList(
+					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
+					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
 			plaintextEqualityProof = plaintextEqualityProofService.genPlaintextEqualityProof(firstCiphertext, secondCiphertext, firstPublicKey,
 					secondPublicKey, randomness, auxiliaryInformation);
 

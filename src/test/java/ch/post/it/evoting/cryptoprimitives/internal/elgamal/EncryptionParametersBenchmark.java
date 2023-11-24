@@ -25,6 +25,7 @@ import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.Warmup;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
+import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.Random;
 import ch.post.it.evoting.cryptoprimitives.math.RandomFactory;
@@ -41,7 +42,7 @@ public class EncryptionParametersBenchmark {
 	@Measurement(iterations = 10)
 	@BenchmarkMode(Mode.AverageTime)
 	public GqGroup benchGetEncryptionParameters() {
-		final String seed = random.genRandomBase64String(10);
+		final String seed = random.genRandomString(10, Base64Alphabet.getInstance());
 		return encryptionParameters.getEncryptionParameters(seed, SMALL_PRIMES);
 	}
 }

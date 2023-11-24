@@ -15,9 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.integerToString;
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.Strings.leftPad;
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.Strings.truncate;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -26,13 +23,14 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import ch.post.it.evoting.cryptoprimitives.math.Base16;
-import ch.post.it.evoting.cryptoprimitives.math.Base32;
-import ch.post.it.evoting.cryptoprimitives.math.Base64;
+import ch.post.it.evoting.cryptoprimitives.math.Alphabet;
+import ch.post.it.evoting.cryptoprimitives.math.Base10Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.Random;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
@@ -44,26 +42,17 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 public class RandomService implements Random {
 
 	private final SecureRandom secureRandom;
-	private final Base16 base16;
-	private final Base32 base32;
-	private final Base64 base64;
 
 	/**
 	 * Constructs a RandomService with a {@link SecureRandom} as its randomness source.
 	 */
 	public RandomService() {
-		this.secureRandom = new SecureRandom();
-		this.base16 = new Base16Service();
-		this.base32 = new Base32Service();
-		this.base64 = new Base64Service();
+		this(new SecureRandom());
 	}
 
 	@VisibleForTesting
 	RandomService(final SecureRandom secureRandom) {
-		this.secureRandom = secureRandom;
-		this.base16 = new Base16Service();
-		this.base32 = new Base32Service();
-		this.base64 = new Base64Service();
+		this.secureRandom = checkNotNull(secureRandom);
 	}
 
 	/**
@@ -98,59 +87,9 @@ public class RandomService implements Random {
 	}
 
 	/**
-	 * @see Random#genRandomBase16String(int)
-	 */
-	public String genRandomBase16String(final int length) {
-		checkArgument(length > 0);
-		final int l = length;
-
-		// One char can be represented by 4 bits in Base16 encoding.
-		final int l_bytes = (int) Math.ceil(4.0 * l / Byte.SIZE);
-
-		// Generate the random bytes, b.
-		final byte[] b = randomBytes(l_bytes);
-
-		// Encode to a Base16 String and truncate to desired length.
-		return truncate(base16.base16Encode(b), l);
-	}
-
-	/**
-	 * @see Random#genRandomBase32String(int)
-	 */
-	public String genRandomBase32String(final int length) {
-		checkArgument(length > 0);
-		final int l = length;
-
-		// One char can be represented by 5 bits in Base32 encoding.
-		final int l_bytes = (int) Math.ceil(5.0 * l / Byte.SIZE);
-
-		// Generate the random bytes, b.
-		final byte[] b = randomBytes(l_bytes);
-
-		// Encode to a Base32 String and truncate to desired length.
-		return truncate(base32.base32Encode(b), l);
-	}
-
-	/**
-	 * @see Random#genRandomBase64String(int)
-	 */
-	public String genRandomBase64String(final int length) {
-		checkArgument(length > 0);
-		final int l = length;
-
-		// One char can be represented by 6 bits in Base64 encoding
-		final int l_bytes = (int) Math.ceil(6.0 * l / Byte.SIZE);
-
-		// Generate the random bytes
-		final byte[] b = randomBytes(l_bytes);
-
-		// Encode to a Base64 String and truncate to desired length.
-		return truncate(base64.base64Encode(b), l);
-	}
-
-	/**
 	 * @see Random#genUniqueDecimalStrings(int, int)
 	 */
+	@SuppressWarnings("java:S117")
 	public List<String> genUniqueDecimalStrings(final int desiredCodeLength, final int numberOfUniqueCodes) {
 		final int l = desiredCodeLength;
 		final int n = numberOfUniqueCodes;
@@ -159,11 +98,12 @@ public class RandomService implements Random {
 
 		checkArgument(n <= Math.pow(10, l), "There cannot be more than 10^l codes.");
 
+		final Alphabet A_10 = Base10Alphabet.getInstance();
+
 		final List<String> codes = new ArrayList<>(n);
-		final BigInteger m = BigInteger.valueOf(10).pow(l);
 		while (codes.size() < n) {
-			final BigInteger x = genRandomInteger(m);
-			final String c = leftPad(integerToString(x), l, '0');
+			final String c = genRandomString(l, A_10);
+
 			if (!codes.contains(c)) {
 				codes.add(c);
 			}
@@ -205,5 +145,28 @@ public class RandomService implements Random {
 		secureRandom.nextBytes(randomBytes);
 
 		return randomBytes;
+	}
+
+	/**
+	 * @see Random#genRandomString(int, Alphabet)
+	 */
+	@SuppressWarnings("java:S117")
+	public String genRandomString(final int length, final Alphabet alphabet) {
+
+		checkArgument(length > 0, "The desired length of string must be strictly positive. [length: %s]", length);
+		checkNotNull(alphabet);
+
+		// Input
+		final int l = length;
+		final Alphabet A = alphabet;
+		final int k = A.size();
+
+		// Operation
+		return IntStream.range(0, l)
+				.mapToObj(i -> {
+					final int m = genRandomInteger(k);
+					return A.get(m);
+				})
+				.collect(Collectors.joining());
 	}
 }

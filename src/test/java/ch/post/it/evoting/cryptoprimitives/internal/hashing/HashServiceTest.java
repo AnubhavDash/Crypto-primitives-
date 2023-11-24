@@ -60,6 +60,7 @@ import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.math.Base32Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
@@ -158,7 +159,7 @@ class HashServiceTest {
 
 	@Test
 	void testRecursiveHashOfStringReturnsHashOfString() {
-		final String string = randomService.genRandomBase32String(TEST_INPUT_LENGTH);
+		final String string = randomService.genRandomString(TEST_INPUT_LENGTH, Base32Alphabet.getInstance());
 		final byte[] expected = messageDigest.digest(concat(new byte[] { 0x02 }, stringToByteArray(string)));
 		final byte[] recursiveHash = hashService.recursiveHash(HashableString.from(string));
 		assertArrayEquals(expected, recursiveHash);
@@ -308,7 +309,7 @@ class HashServiceTest {
 	}
 
 	private HashableString genRandomHashableString() {
-		return HashableString.from(randomService.genRandomBase32String(TEST_INPUT_LENGTH));
+		return HashableString.from(randomService.genRandomString(TEST_INPUT_LENGTH, Base32Alphabet.getInstance()));
 	}
 
 	private HashableBigInteger genRandomHashableBigInteger() {

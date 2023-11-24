@@ -43,6 +43,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.google.common.base.Throwables;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.math.Base16Alphabet;
+import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
 import ch.post.it.evoting.cryptoprimitives.symmetric.SymmetricCiphertext;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
@@ -79,9 +81,10 @@ class SymmetricServiceTest extends TestGroupSetup {
 
 	@BeforeEach
 	void setUp() {
-		associatedData = Arrays.asList(randomService.genRandomBase16String(ASSOCIATED_LENGTH), randomService.genRandomBase64String(
-				ASSOCIATED_LENGTH));
-		plainText = randomService.genRandomBase64String(PLAINTEXT_LENGTH);
+		associatedData = Arrays.asList(
+				randomService.genRandomString(ASSOCIATED_LENGTH, Base16Alphabet.getInstance()),
+				randomService.genRandomString(ASSOCIATED_LENGTH, Base64Alphabet.getInstance()));
+		plainText = randomService.genRandomString(PLAINTEXT_LENGTH, Base64Alphabet.getInstance());
 		nonce = randomService.randomBytes(NONCE_LENGTH);
 	}
 
