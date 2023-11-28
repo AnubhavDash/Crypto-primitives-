@@ -18,6 +18,7 @@ package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -37,6 +38,7 @@ import org.mockito.Mockito;
 
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -128,7 +130,7 @@ class CommitmentKeyServiceTest {
 			final BigInteger q = context.get("q", BigInteger.class);
 			final BigInteger g = context.get("g", BigInteger.class);
 
-			try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = Mockito.mockStatic(SecurityLevelConfig.class)) {
+			try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = mockStatic(SecurityLevelConfig.class)) {
 				mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(testParameters.getSecurityLevel());
 				final GqGroup gqGroup = new GqGroup(p, q, g);
 
@@ -144,7 +146,8 @@ class CommitmentKeyServiceTest {
 						.collect(GroupVector.toGroupVector());
 				final CommitmentKey expectedCommitmentKey = new CommitmentKey(h, gVector);
 
-				return Arguments.of(numberOfElements, gqGroup, expectedCommitmentKey, testParameters.getDescription());
+				return Arguments.of(numberOfElements, gqGroup, expectedCommitmentKey, testParameters.getDescription(),
+						testParameters.getSecurityLevel());
 			}
 		});
 	}
@@ -153,11 +156,14 @@ class CommitmentKeyServiceTest {
 	@MethodSource("getVerifiableCommitmentKeyArgumentProvider")
 	@DisplayName("with real values")
 	void getVerifiableCommitmentKeyRealValues(final int numberOfElements, final GqGroup gqGroup, final CommitmentKey expectedCommitmentKey,
-			final String description) {
+			final String description, final SecurityLevelInternal securityLevel) {
 
-		final CommitmentKey verifiableCommitmentKey = commitmentKeyService.getVerifiableCommitmentKey(numberOfElements, gqGroup);
+		try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = mockStatic(SecurityLevelConfig.class)) {
+			mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(securityLevel);
+			final CommitmentKey verifiableCommitmentKey = commitmentKeyService.getVerifiableCommitmentKey(numberOfElements, gqGroup);
 
-		assertEquals(expectedCommitmentKey, verifiableCommitmentKey, String.format("assertion failed for: %s", description));
+			assertEquals(expectedCommitmentKey, verifiableCommitmentKey, String.format("assertion failed for: %s", description));
+		}
 	}
 
 	@Test

@@ -153,6 +153,8 @@ public class HashService implements Hash {
 		checkNotNull(values);
 		Arrays.stream(values).forEach(Preconditions::checkNotNull);
 
+		final int lambda = SecurityLevelConfig.getSystemSecurityLevel().getSecurityStrength();
+
 		final int k = values.length;
 		final BigInteger q = exclusiveUpperBound;
 		final Hashable[] v = values;
@@ -160,7 +162,7 @@ public class HashService implements Hash {
 		checkArgument(q.compareTo(BigInteger.ZERO) > 0, "The upper bound must be strictly positive.");
 		checkArgument(q.bitLength() >= 512, "The exclusive upper bound must have a bit length of at least 512.");
 
-		final BigInteger h_prime = byteArrayToInteger(recursiveHashOfLength(q.bitLength() + 256,
+		final BigInteger h_prime = byteArrayToInteger(recursiveHashOfLength(q.bitLength() + 2 * lambda,
 				Streams.concat(Stream.of(HashableBigInteger.from(q)), Stream.of(HashableString.from("RecursiveHash")), Arrays.stream(v))
 						.toArray(Hashable[]::new)));
 		final BigInteger h = h_prime.mod(q);

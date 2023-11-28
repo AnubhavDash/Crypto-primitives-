@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 
 import java.io.ByteArrayOutputStream;
@@ -50,6 +51,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.MockedStatic;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -61,6 +63,8 @@ import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.math.Base32Alphabet;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
@@ -430,17 +434,22 @@ class HashServiceTest {
 			final BigInteger resultValue = output.get("result", BigInteger.class);
 			final ZqElement result = ZqElement.create(resultValue, new ZqGroup(q));
 
-			return Arguments.of(testParameters.getDescription(), q, values, result);
+			return Arguments.of(testParameters.getDescription(), q, values, result, testParameters.getSecurityLevel());
 		});
 	}
 
 	@ParameterizedTest
 	@MethodSource("jsonFileRecursiveHashToZqArgumentProvider")
 	@DisplayName("recursiveHashToZq of specific input returns expected output")
-	void testRecursiveHashToZqWithRealValues(final String description, final BigInteger q, final Hashable[] input, final ZqElement output) {
-		final HashService testHashService = HashService.getInstance();
-		final ZqElement actual = testHashService.recursiveHashToZq(q, input);
-		assertEquals(output, actual, String.format("assertion failed for: %s", description));
+	void testRecursiveHashToZqWithRealValues(final String description, final BigInteger q, final Hashable[] input, final ZqElement output,
+			final SecurityLevelInternal securityLevel) {
+		try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = mockStatic(SecurityLevelConfig.class)) {
+			mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(securityLevel);
+
+			final HashService testHashService = HashService.getInstance();
+			final ZqElement actual = testHashService.recursiveHashToZq(q, input);
+			assertEquals(output, actual, String.format("assertion failed for: %s", description));
+		}
 	}
 
 	/**
