@@ -26,10 +26,10 @@ import com.google.common.base.Preconditions;
 
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
-import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientObject;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
+import ch.post.it.evoting.cryptoprimitives.math.GroupVectorElement;
 
 /**
  * Represents an ElGamal message containing multiple elements.
@@ -37,7 +37,7 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
  * <p>Instances of this class are immutable.
  */
 @SuppressWarnings({ "java:S117" })
-public final class ElGamalMultiRecipientMessage implements ElGamalMultiRecipientObject<GqElement, GqGroup>, HashableList {
+public final class ElGamalMultiRecipientMessage implements GroupVectorElement<GqGroup>, HashableList {
 
 	private final GroupVector<GqElement, GqGroup> messageElements;
 
@@ -70,12 +70,10 @@ public final class ElGamalMultiRecipientMessage implements ElGamalMultiRecipient
 		return this.messageElements.size();
 	}
 
-	@Override
 	public GqElement get(final int i) {
 		return this.messageElements.get(i);
 	}
 
-	@Override
 	public Stream<GqElement> stream() {
 		return this.messageElements.stream();
 	}

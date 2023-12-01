@@ -24,60 +24,27 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
-import ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 
 /**
  * Defines a Gq group element that is a small prime and different from the group generator.
  *
  * <p>Instances of this class are immutable.
  */
-public final class PrimeGqElement extends MultiplicativeGroupElement {
-
-	private final GqElement delegate;
+public final class PrimeGqElement extends GqElement {
 
 	// Private constructor without input validation. Used only for operations that provide a mathematical guarantee that the element is a prime within
 	// the group and is different from the group generator.
 	private PrimeGqElement(final int value, final GqGroup group) {
 		super(BigInteger.valueOf(value), group);
-		this.delegate = GqElementFactory.fromValue(BigInteger.valueOf(value), group);
-	}
-
-	@Override
-	public GqElement multiply(final MultiplicativeGroupElement other) {
-		checkNotNull(other);
-
-		return delegate.multiply(other);
-	}
-
-	@Override
-	public GqElement exponentiate(final ZqElement exponent) {
-		checkNotNull(exponent);
-
-		return delegate.exponentiate(exponent);
 	}
 
 	public Integer getValueAsInt() {
-		return this.delegate.getValue().intValueExact();
-	}
-
-	@Override
-	public boolean equals(final Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		if (!super.equals(o)) {
-			return false;
-		}
-		final PrimeGqElement that = (PrimeGqElement) o;
-		return delegate.equals(that.delegate);
+		return this.getValue().intValueExact();
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(super.hashCode(), delegate);
+		return Objects.hash(super.hashCode());
 	}
 
 	@Override
@@ -112,6 +79,7 @@ public final class PrimeGqElement extends MultiplicativeGroupElement {
 					"Cannot create a PrimeGqElement with given value as it is not a prime element. [value: %s]", value);
 			checkArgument(BigInteger.valueOf(value).compareTo(group.getGenerator().getValue()) != 0,
 					"Cannot create a PrimeGqElement with given value as it is the generator of the group. [value :%, group: %s]", value, group);
+			checkArgument(group.isGroupMember(BigInteger.valueOf(value)), "Cannot create a PrimeGqElement with value %s as it is not an element of group %s", value, group);
 
 			return new PrimeGqElement(value, group);
 		}
