@@ -25,6 +25,9 @@ import com.google.common.base.Preconditions;
 
 /**
  * Alphabet abstract class.
+ * <p>
+ * This abstract class is sealed and permits the following subclasses: {@link Base10Alphabet}, {@link Base16Alphabet}, {@link Base32Alphabet},
+ * {@link Base64Alphabet}, {@link StartVotingKeyAlphabet}, {@link WriteInAlphabet}.
  */
 public abstract sealed class Alphabet
 		permits Base10Alphabet, Base16Alphabet, Base32Alphabet, Base64Alphabet, StartVotingKeyAlphabet, WriteInAlphabet {
