@@ -12,31 +12,31 @@
 	<properties>
 		<!-- Dependencies versions -->
 		<guava.version>33.0.0-jre</guava.version>
-		<bouncycastle.version>1.75</bouncycastle.version>
-		<jackson.version>2.15.2</jackson.version>
-		<jmh.version>1.36</jmh.version>
-		<junit-jupiter.version>5.10.0-M1</junit-jupiter.version>
-		<junit-platform-launcher.version>1.10.0-M1</junit-platform-launcher.version>
-		<mockito.version>5.4.0</mockito.version>
-		<slf4j.version>2.0.7</slf4j.version>
+		<bouncycastle.version>1.77</bouncycastle.version>
+		<jackson.version>2.16.1</jackson.version>
+		<jmh.version>1.37</jmh.version>
+		<junit-jupiter.version>5.10.1</junit-jupiter.version>
+		<junit-platform-launcher.version>1.10.1</junit-platform-launcher.version>
+		<mockito.version>5.8.0</mockito.version>
+		<slf4j.version>2.0.11</slf4j.version>
 		<reproducible-build-maven-plugin.version>0.15.2</reproducible-build-maven-plugin.version>
 
 		<!-- Plugins versions -->
-		<jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
-		<maven-clean-plugin.version>3.3.1</maven-clean-plugin.version>
-		<maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-		<maven-dependency-check.version>8.3.1</maven-dependency-check.version>
+		<jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
+		<maven-clean-plugin.version>3.3.2</maven-clean-plugin.version>
+		<maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
+		<maven-dependency-check.version>8.4.3</maven-dependency-check.version>
 		<maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
-		<maven-enforcer-plugin.version>3.3.0</maven-enforcer-plugin.version>
-		<maven-failsafe-plugin.version>3.1.2</maven-failsafe-plugin.version>
+		<maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
+		<maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
 		<maven-install-plugin.version>3.1.1</maven-install-plugin.version>
 		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
 		<maven-release-plugin.version>3.0.1</maven-release-plugin.version>
 		<maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
-		<maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+		<maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
 		<maven-source-plugin.version>3.3.0</maven-source-plugin.version>
-		<versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
-		<maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
+		<versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
+		<maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
 
 		<!-- Project settings -->
 		<maven.compiler.release>17</maven.compiler.release>
