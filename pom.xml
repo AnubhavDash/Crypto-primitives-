@@ -11,7 +11,7 @@
 
 	<properties>
 		<!-- Dependencies versions -->
-		<guava.version>32.1.1-jre</guava.version>
+		<guava.version>33.0.0-jre</guava.version>
 		<bouncycastle.version>1.75</bouncycastle.version>
 		<jackson.version>2.15.2</jackson.version>
 		<jmh.version>1.36</jmh.version>
