@@ -28,16 +28,12 @@ import ch.post.it.evoting.cryptoprimitives.math.BaseEncodingFactory;
 
 /**
  * Represents one of the general object present in the json test files and provides utility method to convert data to the supported types.
+ *
+ * @param jsonNode The underlying jackson node.
  */
-public final class JsonData {
+public record JsonData(JsonNode jsonNode) {
 
 	private static final Base64 BASE_64 = BaseEncodingFactory.createBase64();
-	/* The underlying jackson node. */
-	private final JsonNode jsonNode;
-
-	public JsonData(final JsonNode jsonNode) {
-		this.jsonNode = jsonNode;
-	}
 
 	/**
 	 * Get a json field by its name and convert to the specified {@code clazz}. The supported target classes are:
@@ -89,10 +85,6 @@ public final class JsonData {
 	 */
 	public JsonData getJsonData(final String field) {
 		return new JsonData(jsonNode.path(field));
-	}
-
-	public JsonNode getJsonNode() {
-		return jsonNode;
 	}
 
 	/**

@@ -98,7 +98,7 @@ class HashServiceTest {
 
 		return parametersList.stream().parallel().map(testParameters -> {
 
-			final String messageDigest = testParameters.getContext().getJsonData("hash_function").getJsonNode().asText();
+			final String messageDigest = testParameters.getContext().getJsonData("hash_function").jsonNode().asText();
 
 			final JsonData input = testParameters.getInput().getJsonData("values");
 
@@ -113,11 +113,11 @@ class HashServiceTest {
 
 	private static List<Hashable> readInput(final JsonData data) {
 		final List<Hashable> values = new ArrayList<>();
-		if (data.getJsonNode().isArray()) {
-			final ArrayNode nodes = (ArrayNode) data.getJsonNode();
+		if (data.jsonNode().isArray()) {
+			final ArrayNode nodes = (ArrayNode) data.jsonNode();
 			for (final JsonNode node : nodes) {
 				final JsonData nodeData = new JsonData(node);
-				if (nodeData.getJsonNode().isArray()) {
+				if (nodeData.jsonNode().isArray()) {
 					values.add(HashableList.from(readInput(nodeData)));
 				} else {
 					values.add(readValue(nodeData));
@@ -131,7 +131,7 @@ class HashServiceTest {
 	}
 
 	private static Hashable readValue(final JsonData data) {
-		final String type = data.getJsonData("type").getJsonNode().asText();
+		final String type = data.getJsonData("type").jsonNode().asText();
 		return switch (type) {
 			case "string" -> HashableString.from(data.get("value", String.class));
 			case "integer" -> HashableBigInteger.from(data.get("value", BigInteger.class));
@@ -486,13 +486,6 @@ class HashServiceTest {
 	}
 
 	//Utilities
-	private static class Split {
-		final HashableByteArray start;
-		final HashableByteArray end;
-
-		Split(final HashableByteArray start, final HashableByteArray end) {
-			this.start = start;
-			this.end = end;
-		}
+	private record Split(HashableByteArray start, HashableByteArray end) {
 	}
 }

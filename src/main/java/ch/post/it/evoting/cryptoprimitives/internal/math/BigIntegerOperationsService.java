@@ -88,6 +88,7 @@ public class BigIntegerOperationsService {
 	 * @param rounds    t, the number of rounds to be done. Must be strictly positive.
 	 * @return {@code true} if the candidate is probably prime, {@code false} if the candidate is definitely composite.
 	 */
+	@SuppressWarnings("java:S117")
 	public static boolean millerRabin(final BigInteger candidate, final int rounds) {
 		checkNotNull(candidate);
 		checkArgument(candidate.compareTo(TWO) > 0, "n must be at least three.");

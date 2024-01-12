@@ -124,25 +124,24 @@ class RandomServiceTest {
 
 	private MockedConstruction.MockInitializer<SecureRandom> prepareSecureRandom(final List<byte[]> randomBytesList) {
 		checkArgument(randomBytesList.size() >= 3);
-		return (SecureRandom mockSecureRandom, MockedConstruction.Context context) -> {
-			doAnswer(invocation -> {
-				byte[] byteArray = invocation.getArgument(0, byte[].class);
-				System.arraycopy(randomBytesList.get(0), 0, byteArray, 0, byteArray.length);
-				return null;
-			}).doAnswer(invocation -> {
-				byte[] byteArray = invocation.getArgument(0, byte[].class);
-				System.arraycopy(randomBytesList.get(1), 0, byteArray, 0, byteArray.length);
-				return null;
-			}).doAnswer(invocation -> {
-				byte[] byteArray = invocation.getArgument(0, byte[].class);
-				System.arraycopy(randomBytesList.get(2), 0, byteArray, 0, byteArray.length);
-				return null;
-			}).doAnswer(invocation -> {
-				byte[] byteArray = invocation.getArgument(0, byte[].class);
-				System.arraycopy(randomBytesList.get(0), 1, byteArray, 1, byteArray.length - 1);
-				return null;
-			}).when(mockSecureRandom).nextBytes(Mockito.any());
-		};
+		return (SecureRandom mockSecureRandom, MockedConstruction.Context context) ->
+				doAnswer(invocation -> {
+					byte[] byteArray = invocation.getArgument(0, byte[].class);
+					System.arraycopy(randomBytesList.get(0), 0, byteArray, 0, byteArray.length);
+					return null;
+				}).doAnswer(invocation -> {
+					byte[] byteArray = invocation.getArgument(0, byte[].class);
+					System.arraycopy(randomBytesList.get(1), 0, byteArray, 0, byteArray.length);
+					return null;
+				}).doAnswer(invocation -> {
+					byte[] byteArray = invocation.getArgument(0, byte[].class);
+					System.arraycopy(randomBytesList.get(2), 0, byteArray, 0, byteArray.length);
+					return null;
+				}).doAnswer(invocation -> {
+					byte[] byteArray = invocation.getArgument(0, byte[].class);
+					System.arraycopy(randomBytesList.get(0), 1, byteArray, 1, byteArray.length - 1);
+					return null;
+				}).when(mockSecureRandom).nextBytes(Mockito.any());
 	}
 
 	private BigInteger genRandomIntegerSpec(final BigInteger upperBound, final RandomService randomService) {

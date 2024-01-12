@@ -96,19 +96,22 @@ public class HashService implements Hash {
 		} else {
 			final Hashable value = values[0];
 
-			if (value instanceof HashableByteArray hashableByteArray) {
+			switch (value) {
+			case HashableByteArray hashableByteArray -> {
 				final byte[] w = hashableByteArray.toHashableForm();
 				return hashFunction.hash(concat(BYTE_ARRAY_PREFIX, w));
-			} else if (value instanceof HashableBigInteger hashableBigInteger) {
+			}
+			case HashableBigInteger hashableBigInteger -> {
 				final BigInteger w = hashableBigInteger.toHashableForm();
 				checkArgument(w.compareTo(BigInteger.ZERO) >= 0);
 				return hashFunction.hash(concat(BIG_INTEGER_PREFIX, integerToByteArray(w)));
-			} else if (value instanceof HashableString hashableString) {
+			}
+			case HashableString hashableString -> {
 				final String w = hashableString.toHashableForm();
 				return hashFunction.hash(concat(STRING_PREFIX, stringToByteArray(w)));
-			} else if (value instanceof HashableList hashableList) {
+			}
+			case HashableList hashableList -> {
 				final List<? extends Hashable> w = hashableList.toHashableForm();
-
 				return hashFunction.hash(
 						concat(
 								Stream.concat(
@@ -117,9 +120,8 @@ public class HashService implements Hash {
 								).toArray(byte[][]::new)
 						)
 				);
-
-			} else {
-				throw new IllegalArgumentException(String.format("Object of type %s cannot be hashed.", value.getClass()));
+			}
+			default -> throw new IllegalArgumentException(String.format("Object of type %s cannot be hashed.", value.getClass()));
 			}
 		}
 	}
@@ -202,23 +204,27 @@ public class HashService implements Hash {
 		} else {
 			final Hashable value = values[0];
 
-			if (value instanceof HashableByteArray hashableByteArray) {
+			switch (value) {
+			case HashableByteArray hashableByteArray -> {
 				final byte[] w = hashableByteArray.toHashableForm();
 				return ByteArrays.cutToBitLength(shake256(L, concat(BYTE_ARRAY_PREFIX, w)), l);
-			} else if (value instanceof HashableBigInteger hashableBigInteger) {
+			}
+			case HashableBigInteger hashableBigInteger -> {
 				final BigInteger w = hashableBigInteger.toHashableForm();
 				checkArgument(w.compareTo(BigInteger.ZERO) >= 0);
 				return ByteArrays.cutToBitLength(shake256(L, concat(BIG_INTEGER_PREFIX, integerToByteArray(w))), l);
-			} else if (value instanceof HashableString hashableString) {
+			}
+			case HashableString hashableString -> {
 				final String w = hashableString.toHashableForm();
 				return ByteArrays.cutToBitLength(shake256(L, concat(STRING_PREFIX, stringToByteArray(w))), l);
-			} else if (value instanceof HashableList hashableList) {
+			}
+			case HashableList hashableList -> {
 				final List<? extends Hashable> w = hashableList.toHashableForm();
 				final byte[] h = Stream.concat(Stream.of(ARRAY_PREFIX), w.parallelStream().map(w_i -> recursiveHashOfLength(l, w_i)))
 						.reduce(new byte[] {}, Bytes::concat);
 				return ByteArrays.cutToBitLength(shake256(L, h), l);
-			} else {
-				throw new IllegalArgumentException(String.format("Object of type %s cannot be hashed.", value.getClass()));
+			}
+			default -> throw new IllegalArgumentException(String.format("Object of type %s cannot be hashed.", value.getClass()));
 			}
 		}
 	}

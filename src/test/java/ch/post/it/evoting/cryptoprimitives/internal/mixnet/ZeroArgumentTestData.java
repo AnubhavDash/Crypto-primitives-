@@ -113,11 +113,11 @@ public class ZeroArgumentTestData {
 							.multiply(finalY.exponentiate(BigInteger.valueOf(n)))
 							.equals(otherTerms))
 					.findAny();
-		} while (!matrixBLastElem.isPresent());
+		} while (matrixBLastElem.isEmpty());
 
 		// Replace B_(n,m) by the value satisfying the ensure equation.
 		final List<List<ZqElement>> rows = matrixB.rowStream()
-				.map(sgv -> new ArrayList<>(sgv))
+				.map(ArrayList::new)
 				.collect(Collectors.toCollection(ArrayList::new));
 		final List<ZqElement> lastRow = new ArrayList<>(matrixB.getRow(n - 1));
 		lastRow.set(m - 1, matrixBLastElem.get());
