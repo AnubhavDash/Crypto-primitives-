@@ -24,60 +24,32 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
-import ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 
 /**
  * Defines a Gq group element that is a small prime and different from the group generator.
  *
  * <p>Instances of this class are immutable.
  */
-public final class PrimeGqElement extends MultiplicativeGroupElement {
-
-	private final GqElement delegate;
+public final class PrimeGqElement extends GqElement {
 
 	// Private constructor without input validation. Used only for operations that provide a mathematical guarantee that the element is a prime within
 	// the group and is different from the group generator.
 	private PrimeGqElement(final int value, final GqGroup group) {
 		super(BigInteger.valueOf(value), group);
-		this.delegate = GqElementFactory.fromValue(BigInteger.valueOf(value), group);
-	}
-
-	@Override
-	public GqElement multiply(final MultiplicativeGroupElement other) {
-		checkNotNull(other);
-
-		return delegate.multiply(other);
-	}
-
-	@Override
-	public GqElement exponentiate(final ZqElement exponent) {
-		checkNotNull(exponent);
-
-		return delegate.exponentiate(exponent);
 	}
 
 	public Integer getValueAsInt() {
-		return this.delegate.getValue().intValueExact();
+		return this.getValue().intValueExact();
 	}
 
 	@Override
 	public boolean equals(final Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		if (!super.equals(o)) {
-			return false;
-		}
-		final PrimeGqElement that = (PrimeGqElement) o;
-		return delegate.equals(that.delegate);
+		return super.equals(o);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(super.hashCode(), delegate);
+		return Objects.hash(super.hashCode());
 	}
 
 	@Override
@@ -111,7 +83,9 @@ public final class PrimeGqElement extends MultiplicativeGroupElement {
 			checkArgument(PrimesInternal.isSmallPrime(value),
 					"Cannot create a PrimeGqElement with given value as it is not a prime element. [value: %s]", value);
 			checkArgument(BigInteger.valueOf(value).compareTo(group.getGenerator().getValue()) != 0,
-					"Cannot create a PrimeGqElement with given value as it is the generator of the group. [value :%, group: %s]", value, group);
+					"Cannot create a PrimeGqElement with given value as it is the generator of the group. [value: %s, group: %s]", value, group);
+			checkArgument(group.isGroupMember(BigInteger.valueOf(value)),
+					"Cannot create a PrimeGqElement with given value as it is not an element of the group. [value: %s, group: %s]", value, group);
 
 			return new PrimeGqElement(value, group);
 		}
@@ -140,10 +114,10 @@ public final class PrimeGqElement extends MultiplicativeGroupElement {
 			final BigInteger g = gqGroup.getGenerator().value;
 
 			checkArgument(r > 0, "The desired number of primes must be strictly positive");
-			checkArgument(BigInteger.valueOf(2).compareTo(g) <= 0 && g.compareTo(BigInteger.valueOf(4)) <= 0, "g must be 2, 3, or 4");
+			checkArgument(BigInteger.valueOf(2).compareTo(g) <= 0 && g.compareTo(BigInteger.valueOf(4)) <= 0, "g must be 2, 3, or 4.");
 			checkArgument(BigInteger.valueOf(r).compareTo(gqGroup.getQ().subtract(BigInteger.valueOf(4))) <= 0,
-					"The desired number of primes must be smaller than the number of elements in the GqGroup by at least 4");
-			checkArgument(r < 10000, "The desired number of primes must be strictly smaller than 10000");
+					"The desired number of primes must be smaller than the number of elements in the GqGroup by at least 4.");
+			checkArgument(r < 10000, "The desired number of primes must be strictly smaller than 10000.");
 
 			BigInteger current = BigInteger.valueOf(5);
 			final ArrayList<PrimeGqElement> p_vector = new ArrayList<>(r);
@@ -155,7 +129,8 @@ public final class PrimeGqElement extends MultiplicativeGroupElement {
 				}
 				current = current.add(BigInteger.valueOf(2));
 			}
-			checkState(count == r, "The number of primes found does not correspond to the number of desired primes.");
+			checkState(count == r, "The number of primes found does not correspond to the number of desired primes. [count: %s, desired: %s]",
+					count, r);
 
 			return GroupVector.from(p_vector);
 		}

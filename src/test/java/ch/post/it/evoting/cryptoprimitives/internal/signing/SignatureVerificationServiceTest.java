@@ -118,8 +118,8 @@ class SignatureVerificationServiceTest {
 		final Hashable message = HashableString.from("tooEarlyMessage");
 		final Hashable additionalContextData = HashableString.from("tooEarly");
 		final KeyPair keyPair = SecurityLevelConfig.getSystemSecurityLevel().getSignatureAlgorithm().genKeyPair();
-		final LocalDate from = LocalDate.now().plus(1, ChronoUnit.DAYS);
-		final LocalDate until = from.plus(365, ChronoUnit.DAYS);
+		final LocalDate from = LocalDate.now().plusDays(1);
+		final LocalDate until = from.plusDays(365);
 		final X509Certificate certificate = getCertificate(from, until, keyPair);
 		final SignatureVerificationService signatureVerificationServiceNotYetValid = new SignatureVerificationService(trustStore, hashService,
 				SecurityLevelConfig.getSystemSecurityLevel().getSignatureAlgorithm());

@@ -27,10 +27,10 @@ import com.google.common.base.Preconditions;
 
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
-import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientObject;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
+import ch.post.it.evoting.cryptoprimitives.math.GroupVectorElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 
@@ -41,7 +41,7 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
  * Instances of this class are immutable.
  */
 @SuppressWarnings("java:S117")
-public final class ElGamalMultiRecipientPrivateKey implements ElGamalMultiRecipientObject<ZqElement, ZqGroup>, HashableList {
+public final class ElGamalMultiRecipientPrivateKey implements GroupVectorElement<ZqGroup>, HashableList {
 
 	private final GroupVector<ZqElement, ZqGroup> privateKeyElements;
 
@@ -86,12 +86,10 @@ public final class ElGamalMultiRecipientPrivateKey implements ElGamalMultiRecipi
 	/**
 	 * @return the ith element.
 	 */
-	@Override
 	public ZqElement get(final int i) {
 		return this.privateKeyElements.get(i);
 	}
 
-	@Override
 	public Stream<ZqElement> stream() {
 		return this.privateKeyElements.stream();
 	}

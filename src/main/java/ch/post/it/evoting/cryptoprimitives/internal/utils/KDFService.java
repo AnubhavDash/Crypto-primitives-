@@ -37,6 +37,7 @@ import com.google.common.primitives.Bytes;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
+import ch.post.it.evoting.cryptoprimitives.securitylevel.SecurityLevel;
 import ch.post.it.evoting.cryptoprimitives.utils.Conversions;
 import ch.post.it.evoting.cryptoprimitives.utils.KeyDerivation;
 
@@ -111,6 +112,8 @@ public class KDFService implements KeyDerivation {
 		checkNotNull(pseudoRandomKey);
 		checkNotNull(exclusiveUpperBound);
 
+		final int lambda = SecurityLevelConfig.getSystemSecurityLevel().getSecurityStrength();
+
 		final int L = this.hashSupplier.get().getDigestSize();
 		final byte[] PRK = pseudoRandomKey;
 		final int l_straight = PRK.length;
@@ -122,7 +125,7 @@ public class KDFService implements KeyDerivation {
 		checkArgument(l_straight >= L, "The pseudo random key length must be greater than the hash function output length.");
 		checkArgument(ByteArrays.byteLength(q) >= L);
 
-		final int l_curved = ByteArrays.byteLength(q) + 32;
+		final int l_curved = ByteArrays.byteLength(q) + lambda / 4;
 		byte[] h = KDF(PRK, info, l_curved);
 		BigInteger u = byteArrayToInteger(h).mod(q);
 

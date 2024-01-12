@@ -21,17 +21,11 @@ import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVectorElement;
 import ch.post.it.evoting.cryptoprimitives.test.tools.math.TestGroup;
 
-public class TestGroupElement implements GroupVectorElement<TestGroup>, HashableBigInteger {
-
-	private final TestGroup group;
-
-	public TestGroupElement(TestGroup group) {
-		this.group = group;
-	}
+public record TestGroupElement(TestGroup group) implements GroupVectorElement<TestGroup>, HashableBigInteger {
 
 	@Override
 	public TestGroup getGroup() {
-		return this.group;
+		return group;
 	}
 
 	@Override

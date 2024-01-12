@@ -15,19 +15,13 @@
  */
 package ch.post.it.evoting.cryptoprimitives.test.tools.data;
 
-import static org.mockito.Mockito.mockStatic;
-
 import java.io.IOException;
 import java.math.BigInteger;
-
-import org.mockito.MockedStatic;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 
 public class GqGroupLoader {
 
