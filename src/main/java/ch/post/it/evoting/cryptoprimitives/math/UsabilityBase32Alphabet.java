@@ -18,10 +18,10 @@ package ch.post.it.evoting.cryptoprimitives.math;
 import java.util.List;
 
 /**
- * The start voting key alphabet. The alphabet corresponds to the Base32 lowercase version excluding padding "=" of "Table 3: The Base 32 Alphabet"
+ * A user-friendly Base32 alphabet. The alphabet corresponds to the Base32 lowercase version excluding padding "=" of "Table 3: The Base 32 Alphabet"
  * from RFC 4648. Moreover, the letters "l" and "o" are replaced by "8" and "9".
  */
-public final class StartVotingKeyAlphabet extends Alphabet {
+public final class UsabilityBase32Alphabet extends Alphabet {
 
 	private static final int SIZE = 32;
 	private static final List<String> ALPHABET = List.of(
@@ -66,13 +66,13 @@ public final class StartVotingKeyAlphabet extends Alphabet {
 			Character.toString(0x0039)  // 9 (U+0039) --> Added
 	);
 
-	private static final StartVotingKeyAlphabet INSTANCE = new StartVotingKeyAlphabet(SIZE, ALPHABET);
+	private static final UsabilityBase32Alphabet INSTANCE = new UsabilityBase32Alphabet(SIZE, ALPHABET);
 
-	private StartVotingKeyAlphabet(final int size, final List<String> alphabet) {
+	private UsabilityBase32Alphabet(final int size, final List<String> alphabet) {
 		super(size, alphabet);
 	}
 
-	public static StartVotingKeyAlphabet getInstance() {
+	public static UsabilityBase32Alphabet getInstance() {
 		return INSTANCE;
 	}
 }

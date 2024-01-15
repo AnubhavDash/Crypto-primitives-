@@ -45,8 +45,7 @@ import com.google.common.base.Throwables;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal;
 import ch.post.it.evoting.cryptoprimitives.math.Alphabet;
-import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
-import ch.post.it.evoting.cryptoprimitives.math.StartVotingKeyAlphabet;
+import ch.post.it.evoting.cryptoprimitives.math.UsabilityBase32Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 
 class RandomServiceTest {
@@ -243,7 +242,7 @@ class RandomServiceTest {
 	@Nested
 	class GenRandomStringAlgorithmTest {
 
-		private static final Alphabet alphabet = StartVotingKeyAlphabet.getInstance();
+		private static final Alphabet alphabet = UsabilityBase32Alphabet.getInstance();
 		private static final int LENGTH = alphabet.size();
 
 		@ParameterizedTest
