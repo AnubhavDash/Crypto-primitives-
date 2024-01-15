@@ -15,21 +15,18 @@
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import com.google.common.base.Throwables;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.google.common.base.Throwables;
+import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("A StartVotingKeyAlphabet calling")
-class StartVotingKeyAlphabetTest {
+@DisplayName("A LatinAlphabet calling")
+class LatinAlphabetTest {
 
-	private final StartVotingKeyAlphabet startVotingKeyAlphabet = StartVotingKeyAlphabet.getInstance();
+	private final LatinAlphabet latinAlphabet = LatinAlphabet.getInstance();
 
 	@DisplayName("get with a negative index throws an IllegalArgumentException")
 	@Test
@@ -37,7 +34,7 @@ class StartVotingKeyAlphabetTest {
 
 		final int index = -1;
 		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
-				() -> startVotingKeyAlphabet.get(index));
+				() -> latinAlphabet.get(index));
 
 		assertEquals(String.format("The index cannot be negative. [index: %s]", index),
 				Throwables.getRootCause(illegalArgumentException).getMessage());
@@ -46,11 +43,11 @@ class StartVotingKeyAlphabetTest {
 	@DisplayName("get with a bigger index throws an IllegalArgumentException")
 	@Test
 	void getWithBiggerIndexThrows() {
-		final int size = startVotingKeyAlphabet.size();
+		final int size = latinAlphabet.size();
 
 		final int index = size;
 		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
-				() -> startVotingKeyAlphabet.get(index));
+				() -> latinAlphabet.get(index));
 
 		assertEquals(String.format("The index must be strictly smaller than the alphabet size. [index: %s, size: %s]", index, size),
 				Throwables.getRootCause(illegalArgumentException).getMessage());
@@ -59,10 +56,10 @@ class StartVotingKeyAlphabetTest {
 	@DisplayName("get with a valid index behaves as expected")
 	@Test
 	void getHappyPath() {
-		final String expected = Character.toString(0x0063); // c (U+0063) -> 047
+		final String expected = Character.toString(0x0027); // 4 (U+0034) -> 013
 
 		final int index = 2;
-		final String character = assertDoesNotThrow(() -> startVotingKeyAlphabet.get(index));
+		final String character = assertDoesNotThrow(() -> latinAlphabet.get(index));
 
 		assertEquals(expected, character);
 	}
@@ -70,20 +67,20 @@ class StartVotingKeyAlphabetTest {
 	@DisplayName("size behaves as expected")
 	@Test
 	void sizeHappyPath() {
-		final int expected = 32;
+		final int expected = 142;
 
-		final int size = assertDoesNotThrow(startVotingKeyAlphabet::size);
+		final int size = assertDoesNotThrow(latinAlphabet::size);
 
 		assertEquals(expected, size);
 	}
 
 	@DisplayName("contains with a character non-part of the alphabet behaves as expected")
 	@ParameterizedTest
-	@ValueSource(strings = { "l", "o", "0", "1" })
+	@ValueSource(strings = { "@", "?", "*", "!" })
 	void containsWithNonCharacter(final String character) {
 		final boolean expected = false;
 
-		final boolean isContained = assertDoesNotThrow(() -> startVotingKeyAlphabet.contains(character));
+		final boolean isContained = assertDoesNotThrow(() -> latinAlphabet.contains(character));
 		assertEquals(expected, isContained);
 	}
 
@@ -92,7 +89,7 @@ class StartVotingKeyAlphabetTest {
 	void containsWithNullCharacter() {
 		final boolean expected = false;
 
-		final boolean isContained = assertDoesNotThrow(() -> startVotingKeyAlphabet.contains(null));
+		final boolean isContained = assertDoesNotThrow(() -> latinAlphabet.contains(null));
 		assertEquals(expected, isContained);
 	}
 
@@ -101,18 +98,18 @@ class StartVotingKeyAlphabetTest {
 	void containsCharacterHappyPath() {
 		final boolean expected = true;
 
-		final boolean isContained = assertDoesNotThrow(() -> startVotingKeyAlphabet.contains("a"));
+		final boolean isContained = assertDoesNotThrow(() -> latinAlphabet.contains("a"));
 
 		assertEquals(expected, isContained);
 	}
 
 	@DisplayName("contains with a code point non-part of the alphabet behaves as expected")
 	@ParameterizedTest
-	@ValueSource(ints = { 0x006C, 0x006F, 0x0030, 0x0031 })
+	@ValueSource(ints = { 0x0040, 0x003F, 0x002A, 0x0021 })
 	void containsWithNonCodePoint(final int codePoint) {
 		final boolean expected = false;
 
-		final boolean isContained = assertDoesNotThrow(() -> startVotingKeyAlphabet.contains(codePoint));
+		final boolean isContained = assertDoesNotThrow(() -> latinAlphabet.contains(codePoint));
 		assertEquals(expected, isContained);
 	}
 
@@ -122,7 +119,7 @@ class StartVotingKeyAlphabetTest {
 		final int codePoint = -1;
 
 		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
-				() -> startVotingKeyAlphabet.contains(codePoint));
+				() -> latinAlphabet.contains(codePoint));
 
 		assertEquals(String.format("The provided code point is out-of-range. [codePoint: %s]", codePoint),
 				Throwables.getRootCause(illegalArgumentException).getMessage());
@@ -134,7 +131,7 @@ class StartVotingKeyAlphabetTest {
 		final int codePoint = Character.MAX_CODE_POINT + 1;
 
 		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
-				() -> startVotingKeyAlphabet.contains(codePoint));
+				() -> latinAlphabet.contains(codePoint));
 
 		assertEquals(String.format("The provided code point is out-of-range. [codePoint: %s]", codePoint),
 				Throwables.getRootCause(illegalArgumentException).getMessage());
@@ -145,18 +142,18 @@ class StartVotingKeyAlphabetTest {
 	void containsCodePointHappyPath() {
 		final boolean expected = true;
 
-		final boolean isContained = assertDoesNotThrow(() -> startVotingKeyAlphabet.contains(0x0034));
+		final boolean isContained = assertDoesNotThrow(() -> latinAlphabet.contains(0x0034));
 
 		assertEquals(expected, isContained);
 	}
 
 	@DisplayName("indexOf with a character non-part of the alphabet behaves as expected")
 	@ParameterizedTest
-	@ValueSource(strings = { "l", "o", "0", "1" })
+	@ValueSource(strings = { "@", "?", "*", "!" })
 	void indexOfNonPartHappyPath(final String character) {
 		final int expected = -1;
 
-		final int index = assertDoesNotThrow(() -> startVotingKeyAlphabet.indexOf(character));
+		final int index = assertDoesNotThrow(() -> latinAlphabet.indexOf(character));
 
 		assertEquals(expected, index);
 	}
@@ -166,7 +163,7 @@ class StartVotingKeyAlphabetTest {
 	void indexOfNullHappyPath() {
 		final int expected = -1;
 
-		final int index = assertDoesNotThrow(() -> startVotingKeyAlphabet.indexOf(null));
+		final int index = assertDoesNotThrow(() -> latinAlphabet.indexOf(null));
 
 		assertEquals(expected, index);
 	}
@@ -176,7 +173,7 @@ class StartVotingKeyAlphabetTest {
 	void indexOfHappyPath() {
 		final int expected = 2;
 
-		final int index = assertDoesNotThrow(() -> startVotingKeyAlphabet.indexOf(Character.toString(0x0063)));
+		final int index = assertDoesNotThrow(() -> latinAlphabet.indexOf(Character.toString(0x0027)));
 
 		assertEquals(expected, index);
 	}

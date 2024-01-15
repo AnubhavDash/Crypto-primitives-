@@ -18,9 +18,9 @@ package ch.post.it.evoting.cryptoprimitives.math;
 import java.util.List;
 
 /**
- * The write-in alphabet.
+ * An extended latin alphabet including common european special characters.
  */
-public final class WriteInAlphabet extends Alphabet {
+public final class LatinAlphabet extends Alphabet {
 
 	private static final int SIZE = 142;
 	private static final List<String> ALPHABET = List.of(
@@ -183,13 +183,13 @@ public final class WriteInAlphabet extends Alphabet {
 			Character.toString(0x00FF)  // ÿ (U+00FF)
 	);
 
-	private static final WriteInAlphabet INSTANCE = new WriteInAlphabet(SIZE, ALPHABET);
+	private static final LatinAlphabet INSTANCE = new LatinAlphabet(SIZE, ALPHABET);
 
-	private WriteInAlphabet(final int size, final List<String> alphabet) {
+	private LatinAlphabet(final int size, final List<String> alphabet) {
 		super(size, alphabet);
 	}
 
-	public static WriteInAlphabet getInstance() {
+	public static LatinAlphabet getInstance() {
 		return INSTANCE;
 	}
 }
