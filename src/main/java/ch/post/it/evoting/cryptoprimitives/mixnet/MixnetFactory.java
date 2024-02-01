@@ -22,7 +22,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.mixnet.MixnetService;
 public class MixnetFactory {
 
 	private MixnetFactory() {
-		// Intentionally left blank.
+		//Intentionally left blank
 	}
 
 	public static Mixnet createMixnet() {

@@ -41,7 +41,7 @@ public class LibraryLoader {
 	private static final String JAVA_LIBRARY_PATH_PROPERTY_NAME = "java.library.path";
 
 	private LibraryLoader() {
-		// Intentionally left blank.
+		//Intentionally left blank
 	}
 
 	public static void loadLibrary(final String libName, final String hashesResourceFileName) {
@@ -96,8 +96,7 @@ public class LibraryLoader {
 				}
 			}
 		} catch (IOException e) {
-			throw new UncheckedIOException(String.format("Unable to read the resource file. [hashesResourceFilename: %s]", hashesResourceFilename),
-					e);
+			throw new UncheckedIOException(String.format("Unable to read the resource file. [hashesResourceFilename: %s]", hashesResourceFilename), e);
 		}
 
 		return hashes;

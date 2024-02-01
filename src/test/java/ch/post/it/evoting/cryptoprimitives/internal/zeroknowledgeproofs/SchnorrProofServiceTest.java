@@ -44,24 +44,26 @@ import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
-import ch.post.it.evoting.cryptoprimitives.math.Base16Alphabet;
-import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
+import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
 import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.SchnorrProof;
 
 @DisplayName("SchnorrProofService calling")
 class SchnorrProofServiceTest extends TestGroupSetup {
+
+	private static ElGamalGenerator elGamalGenerator;
 	private static RandomService randomService;
 	private static SchnorrProofService schnorrProofService;
 
 	@BeforeAll
 	static void setUpAll() {
+		elGamalGenerator = new ElGamalGenerator(gqGroup);
 		randomService = new RandomService();
 
 		final HashService hashService = TestHashService.create(gqGroup.getQ());
@@ -120,15 +122,20 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 			final GqElement resultThreeFive = computePhiSchnorr(threeGq, five);
 			final GqElement resultThreeNine = computePhiSchnorr(threeGq, nine);
 
-			assertEquals(one, resultZeroOne);
-			assertEquals(one, resultZeroFour);
-			assertEquals(one, resultZeroFive);
-			assertEquals(one, resultZeroNine);
+			final GqElement expectedOneImage = one;
+			final GqElement expectedThreeImage = three;
+			final GqElement expectedFourImage = four;
+			final GqElement expectedNineImage = nine;
 
-			assertEquals(one, resultThreeOne);
-			assertEquals(nine, resultThreeFour);
-			assertEquals(four, resultThreeFive);
-			assertEquals(three, resultThreeNine);
+			assertEquals(expectedOneImage, resultZeroOne);
+			assertEquals(expectedOneImage, resultZeroFour);
+			assertEquals(expectedOneImage, resultZeroFive);
+			assertEquals(expectedOneImage, resultZeroNine);
+
+			assertEquals(expectedOneImage, resultThreeOne);
+			assertEquals(expectedNineImage, resultThreeFour);
+			assertEquals(expectedFourImage, resultThreeFive);
+			assertEquals(expectedThreeImage, resultThreeNine);
 		}
 	}
 
@@ -146,9 +153,7 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 		void setUp() {
 			witness = zqGroupGenerator.genRandomZqElementMember();
 			statement = gqGroupGenerator.genMember().getGroup().getGenerator().exponentiate(witness);
-			auxiliaryInformation = Arrays.asList(
-					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
-					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
+			auxiliaryInformation = Arrays.asList(randomService.genRandomBase16String(STR_LEN), randomService.genRandomBase64String(STR_LEN));
 		}
 
 		@Test
@@ -170,10 +175,13 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("auxiliary information containing null throws NullPointerException")
+		@DisplayName("auxiliary information containing null throws IllegalArgumentException")
 		void auxiliaryInformationWithNull() {
 			auxiliaryInformation.set(0, null);
-			assertThrows(NullPointerException.class, () -> schnorrProofService.genSchnorrProof(witness, statement, auxiliaryInformation));
+
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> schnorrProofService
+					.genSchnorrProof(witness, statement, auxiliaryInformation));
+			assertEquals("The auxiliary information must not contain null objects.", exception.getMessage());
 		}
 	}
 
@@ -193,9 +201,7 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 			statement = gqGroupGenerator.genMember();
 			witness = zqGroupGenerator.genRandomZqElementMember();
 			statement = statement.getGroup().getGenerator().exponentiate(witness);
-			auxiliaryInformation = Arrays.asList(
-					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
-					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
+			auxiliaryInformation = Arrays.asList(randomService.genRandomBase16String(STR_LEN), randomService.genRandomBase64String(STR_LEN));
 			schnorrProof = schnorrProofService.genSchnorrProof(witness, statement, auxiliaryInformation);
 		}
 
@@ -224,10 +230,13 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("auxiliary information containing null throws NullPointerException")
+		@DisplayName("auxiliary information containing null throws IllegalArgumentException")
 		void auxiliaryInformationWithNull() {
 			auxiliaryInformation.set(0, null);
-			assertThrows(NullPointerException.class, () -> schnorrProofService.verifySchnorrProof(schnorrProof, statement, auxiliaryInformation));
+
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> schnorrProofService
+					.verifySchnorrProof(schnorrProof, statement, auxiliaryInformation));
+			assertEquals("The auxiliary information must not contain null objects.", exception.getMessage());
 		}
 
 		private Stream<Arguments> jsonFileArgumentProvider() {

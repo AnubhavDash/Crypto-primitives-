@@ -21,7 +21,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalService;
 public class ElGamalFactory {
 
 	private ElGamalFactory() {
-		// Intentionally left blank.
+		//Intentionally left blank
 	}
 
 	public static ElGamal createElGamal() {

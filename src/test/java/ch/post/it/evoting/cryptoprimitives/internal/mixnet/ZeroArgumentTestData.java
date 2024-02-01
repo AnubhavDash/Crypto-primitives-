@@ -51,18 +51,16 @@ public class ZeroArgumentTestData {
 	private int m;
 	private int n;
 
-	public ZeroArgumentTestData(CommitmentKey commitmentKey,
-			ZeroArgumentService zeroArgumentService) {
-
-		GqGroup gqGroup = commitmentKey.getGroup();
-		ZqGroup zqGroup = ZqGroup.sameOrderAs(gqGroup);
+	public ZeroArgumentTestData(final CommitmentKey commitmentKey, final ZeroArgumentService zeroArgumentService) {
+		final GqGroup gqGroup = commitmentKey.getGroup();
+		final ZqGroup zqGroup = ZqGroup.sameOrderAs(gqGroup);
 		zqGroupGenerator = new ZqGroupGenerator(zqGroup);
 		gqGroupGenerator = new GqGroupGenerator(gqGroup);
 		this.zeroArgumentService = zeroArgumentService;
 		genRandomStatementAndWitness(zqGroup, commitmentKey);
 	}
 
-	private void genRandomStatementAndWitness(ZqGroup zqGroup, CommitmentKey commitmentKey) {
+	private void genRandomStatementAndWitness(final ZqGroup zqGroup, final CommitmentKey commitmentKey) {
 		// Columns.
 		m = secureRandom.nextInt(RANDOM_UPPER_BOUND) + 1;
 		// Rows.
@@ -72,8 +70,8 @@ public class ZeroArgumentTestData {
 		// the witness' y value. Then isolate the last element of matrix B, B_(n,m) in the expanded zero product property. Once done, try every
 		// member of the Zq group as a value for B_(n,m) until the zero product property is satisfied. This is fast as long as the test groups are
 		// small.
-		GroupVector<ZqElement, ZqGroup> exponentsR = zqGroupGenerator.genRandomZqElementVector(m);
-		GroupVector<ZqElement, ZqGroup> exponentsS = zqGroupGenerator.genRandomZqElementVector(m);
+		final GroupVector<ZqElement, ZqGroup> exponentsR = zqGroupGenerator.genRandomZqElementVector(m);
+		final GroupVector<ZqElement, ZqGroup> exponentsS = zqGroupGenerator.genRandomZqElementVector(m);
 
 		// Generate a new set of random values until a valid B_(n,m) is found.
 		Optional<ZqElement> matrixBLastElem;
@@ -89,7 +87,7 @@ public class ZeroArgumentTestData {
 			// Copies to be usable in streams.
 			final GroupMatrix<ZqElement, ZqGroup> finalMatrixA = matrixA;
 			final GroupMatrix<ZqElement, ZqGroup> finalMatrixB = matrixB;
-			ZqElement finalY = y;
+			final ZqElement finalY = y;
 
 			final ZqElement sumOfOtherZeroProductTerms = IntStream.range(0, m - 1)
 					.mapToObj(
@@ -122,12 +120,12 @@ public class ZeroArgumentTestData {
 		final List<ZqElement> lastRow = new ArrayList<>(matrixB.getRow(n - 1));
 		lastRow.set(m - 1, matrixBLastElem.get());
 		rows.set(n - 1, lastRow);
-		GroupMatrix<ZqElement, ZqGroup> updatedMatrixB = GroupMatrix.fromRows(rows);
+		final GroupMatrix<ZqElement, ZqGroup> updatedMatrixB = GroupMatrix.fromRows(rows);
 
 		// Construct the remaining parts of the statement.
-		GroupVector<GqElement, GqGroup> commitmentsCa = CommitmentService
+		final GroupVector<GqElement, GqGroup> commitmentsCa = CommitmentService
 				.getCommitmentMatrix(matrixA, exponentsR, commitmentKey);
-		GroupVector<GqElement, GqGroup> commitmentsCb = CommitmentService
+		final GroupVector<GqElement, GqGroup> commitmentsCb = CommitmentService
 				.getCommitmentMatrix(updatedMatrixB, exponentsS, commitmentKey);
 
 		zeroStatement = new ZeroStatement(commitmentsCa, commitmentsCb, y);

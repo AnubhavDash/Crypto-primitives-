@@ -46,12 +46,12 @@ import org.mockito.MockedStatic;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
@@ -227,8 +227,9 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		@Test
 		void auxiliaryInformationDoesNotContainNullCheck() {
 			final List<String> auxiliaryInformationWithNull = Arrays.asList("test", null);
-			assertThrows(NullPointerException.class,
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> proofService.genExponentiationProof(bases, exponent, exponentiations, auxiliaryInformationWithNull));
+			assertEquals("The auxiliary information must not contain null objects.", exception.getMessage());
 		}
 
 		@Test

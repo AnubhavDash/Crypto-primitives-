@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 
 import java.io.ByteArrayOutputStream;
@@ -51,7 +50,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.MockedStatic;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -62,9 +60,6 @@ import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
-import ch.post.it.evoting.cryptoprimitives.math.Base32Alphabet;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
@@ -98,7 +93,7 @@ class HashServiceTest {
 
 		return parametersList.stream().parallel().map(testParameters -> {
 
-			final String messageDigest = testParameters.getContext().getJsonData("hash_function").jsonNode().asText();
+			final String messageDigest = testParameters.getContext().getJsonData("hash_function").getJsonNode().asText();
 
 			final JsonData input = testParameters.getInput().getJsonData("values");
 
@@ -113,11 +108,11 @@ class HashServiceTest {
 
 	private static List<Hashable> readInput(final JsonData data) {
 		final List<Hashable> values = new ArrayList<>();
-		if (data.jsonNode().isArray()) {
-			final ArrayNode nodes = (ArrayNode) data.jsonNode();
+		if (data.getJsonNode().isArray()) {
+			final ArrayNode nodes = (ArrayNode) data.getJsonNode();
 			for (final JsonNode node : nodes) {
 				final JsonData nodeData = new JsonData(node);
-				if (nodeData.jsonNode().isArray()) {
+				if (nodeData.getJsonNode().isArray()) {
 					values.add(HashableList.from(readInput(nodeData)));
 				} else {
 					values.add(readValue(nodeData));
@@ -131,7 +126,7 @@ class HashServiceTest {
 	}
 
 	private static Hashable readValue(final JsonData data) {
-		final String type = data.getJsonData("type").jsonNode().asText();
+		final String type = data.getJsonData("type").getJsonNode().asText();
 		return switch (type) {
 			case "string" -> HashableString.from(data.get("value", String.class));
 			case "integer" -> HashableBigInteger.from(data.get("value", BigInteger.class));
@@ -163,7 +158,7 @@ class HashServiceTest {
 
 	@Test
 	void testRecursiveHashOfStringReturnsHashOfString() {
-		final String string = randomService.genRandomString(TEST_INPUT_LENGTH, Base32Alphabet.getInstance());
+		final String string = randomService.genRandomBase32String(TEST_INPUT_LENGTH);
 		final byte[] expected = messageDigest.digest(concat(new byte[] { 0x02 }, stringToByteArray(string)));
 		final byte[] recursiveHash = hashService.recursiveHash(HashableString.from(string));
 		assertArrayEquals(expected, recursiveHash);
@@ -171,7 +166,7 @@ class HashServiceTest {
 
 	@Test
 	void testRecursiveHashOfBigIntegerValue10ReturnsSameHashOfInteger10() {
-		final BigInteger bigInteger = new BigInteger(3072, secureRandom);
+		final BigInteger bigInteger = new BigInteger(2048, secureRandom);
 		final byte[] recursiveHash = hashService.recursiveHash(HashableBigInteger.from(bigInteger));
 		final byte[] regularHash = messageDigest.digest(concat(new byte[] { 0x01 }, integerToByteArray(bigInteger)));
 		assertArrayEquals(regularHash, recursiveHash);
@@ -179,7 +174,10 @@ class HashServiceTest {
 
 	@Test
 	void testRecursiveHashOfNullThrows() {
-		assertThrows(NullPointerException.class, () -> hashService.recursiveHash((Hashable) null));
+		final IllegalArgumentException illegalArgumentException =
+				assertThrows(IllegalArgumentException.class, () -> hashService.recursiveHash((Hashable) null));
+
+		assertEquals("Values contain a null value which cannot be hashed.", illegalArgumentException.getMessage());
 	}
 
 	@Test
@@ -313,7 +311,7 @@ class HashServiceTest {
 	}
 
 	private HashableString genRandomHashableString() {
-		return HashableString.from(randomService.genRandomString(TEST_INPUT_LENGTH, Base32Alphabet.getInstance()));
+		return HashableString.from(randomService.genRandomBase32String(TEST_INPUT_LENGTH));
 	}
 
 	private HashableBigInteger genRandomHashableBigInteger() {
@@ -434,22 +432,17 @@ class HashServiceTest {
 			final BigInteger resultValue = output.get("result", BigInteger.class);
 			final ZqElement result = ZqElement.create(resultValue, new ZqGroup(q));
 
-			return Arguments.of(testParameters.getDescription(), q, values, result, testParameters.getSecurityLevel());
+			return Arguments.of(testParameters.getDescription(), q, values, result);
 		});
 	}
 
 	@ParameterizedTest
 	@MethodSource("jsonFileRecursiveHashToZqArgumentProvider")
 	@DisplayName("recursiveHashToZq of specific input returns expected output")
-	void testRecursiveHashToZqWithRealValues(final String description, final BigInteger q, final Hashable[] input, final ZqElement output,
-			final SecurityLevelInternal securityLevel) {
-		try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = mockStatic(SecurityLevelConfig.class)) {
-			mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(securityLevel);
-
-			final HashService testHashService = HashService.getInstance();
-			final ZqElement actual = testHashService.recursiveHashToZq(q, input);
-			assertEquals(output, actual, String.format("assertion failed for: %s", description));
-		}
+	void testRecursiveHashToZqWithRealValues(final String description, final BigInteger q, final Hashable[] input, final ZqElement output) {
+		final HashService testHashService = HashService.getInstance();
+		final ZqElement actual = testHashService.recursiveHashToZq(q, input);
+		assertEquals(output, actual, String.format("assertion failed for: %s", description));
 	}
 
 	/**
@@ -486,6 +479,13 @@ class HashServiceTest {
 	}
 
 	//Utilities
-	private record Split(HashableByteArray start, HashableByteArray end) {
+	private static class Split {
+		final HashableByteArray start;
+		final HashableByteArray end;
+
+		Split(final HashableByteArray start, final HashableByteArray end) {
+			this.start = start;
+			this.end = end;
+		}
 	}
 }

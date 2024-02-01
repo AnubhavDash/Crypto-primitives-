@@ -67,7 +67,7 @@ class ByteArraysTest {
 			final Integer bitLength = input.get("bit_length", Integer.class);
 			final byte[] value = input.get("value", byte[].class);
 
-			JsonData output = testParameters.getOutput();
+			final JsonData output = testParameters.getOutput();
 			final byte[] result = output.get("result", byte[].class);
 
 			return Arguments.of(value, bitLength, result, description);

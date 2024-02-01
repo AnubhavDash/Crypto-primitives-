@@ -42,7 +42,7 @@ public class TestParser {
 
 	static GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> parseCiphertexts(final JsonData ciphertextsData, final GqGroup group) {
 		final List<ElGamalMultiRecipientCiphertext> results = new LinkedList<>();
-		for (final JsonNode ciphertextNode : ciphertextsData.jsonNode()) {
+		for (final JsonNode ciphertextNode : ciphertextsData.getJsonNode()) {
 			results.add(parseCiphertext(ciphertextNode, group));
 		}
 		return GroupVector.from(results);

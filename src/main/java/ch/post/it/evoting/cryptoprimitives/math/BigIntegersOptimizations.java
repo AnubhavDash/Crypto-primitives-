@@ -15,18 +15,16 @@
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.math.BigInteger;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsService;
 
 public class BigIntegersOptimizations {
 	private BigIntegersOptimizations() {
-		// Intentionally left blank.
+		// Intentionally left blank
 	}
 
 	public static void prepareFixedBaseOptimizations(final BigInteger basis, final BigInteger modulus) {
-		BigIntegerOperationsService.generateCache(checkNotNull(basis), checkNotNull(modulus));
+		BigIntegerOperationsService.generateCache(basis, modulus);
 	}
 }

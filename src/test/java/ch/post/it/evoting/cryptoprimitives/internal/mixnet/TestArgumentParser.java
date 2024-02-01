@@ -172,7 +172,7 @@ class TestArgumentParser {
 
 		final ProductArgument productArgument;
 		final JsonData cbJsonData = argumentData.getJsonData("c_b");
-		if (!cbJsonData.jsonNode().isMissingNode()) {
+		if (!cbJsonData.getJsonNode().isMissingNode()) {
 			final BigInteger cbValue = argumentData.get("c_b", BigInteger.class);
 			final GqElement cb = GqElementFactory.fromValue(cbValue, gqGroup);
 			final HadamardArgument hadamardArgument = this.parseHadamardArgument(argumentData.getJsonData("hadamard_argument"));
@@ -197,21 +197,21 @@ class TestArgumentParser {
 	}
 
 	GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> parseCiphertextVector(final JsonData ciphertextsDataVector) {
-		if (!ciphertextsDataVector.jsonNode().isArray()) {
+		if (!ciphertextsDataVector.getJsonNode().isArray()) {
 			throw new IllegalArgumentException("Provided jsonData does not wrap an array.");
 		}
 
-		return StreamSupport.stream(ciphertextsDataVector.jsonNode().spliterator(), false)
+		return StreamSupport.stream(ciphertextsDataVector.getJsonNode().spliterator(), false)
 				.map(node -> parseCiphertext(new JsonData(node)))
 				.collect(toGroupVector());
 	}
 
 	GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> parseCiphertextMatrix(final JsonData ciphertextDataMatrix) {
-		if (!ciphertextDataMatrix.jsonNode().isArray()) {
+		if (!ciphertextDataMatrix.getJsonNode().isArray()) {
 			throw new IllegalArgumentException("Provided jsonData does not wrap an array.");
 		}
 
-		return StreamSupport.stream(ciphertextDataMatrix.jsonNode().spliterator(), false)
+		return StreamSupport.stream(ciphertextDataMatrix.getJsonNode().spliterator(), false)
 				.map(node -> parseCiphertextVector(new JsonData(node)))
 				.collect(collectingAndThen(toList(), GroupMatrix::fromRows));
 	}

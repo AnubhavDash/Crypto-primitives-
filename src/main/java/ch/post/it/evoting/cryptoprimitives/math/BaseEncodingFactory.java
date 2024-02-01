@@ -22,7 +22,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.math.Base64Service;
 public class BaseEncodingFactory {
 
 	private BaseEncodingFactory() {
-		// Intentionally left blank.
+		// Intentionally left blank
 	}
 
 	public static Base16 createBase16() {

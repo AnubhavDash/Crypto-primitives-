@@ -1,13 +1,13 @@
 /*
  *
  *  Copyright 2022 Post CH Ltd
- *
+ * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -75,8 +75,8 @@ class GroupMatrixTest {
 		final List<List<TestGroupElement>> nullRowMatrix = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
 		int nullIndex = secureRandom.nextInt(numRows);
 		nullRowMatrix.set(nullIndex, null);
-
-		assertThrows(NullPointerException.class, () -> GroupMatrix.fromRows(nullRowMatrix));
+		final IllegalArgumentException exceptionFirst = assertThrows(IllegalArgumentException.class, () -> GroupMatrix.fromRows(nullRowMatrix));
+		assertEquals("A matrix cannot contain a null row.", exceptionFirst.getMessage());
 	}
 
 	@Test
@@ -85,8 +85,8 @@ class GroupMatrixTest {
 		int nullRowIndex = secureRandom.nextInt(numRows);
 		int nullColumnIndex = secureRandom.nextInt(numColumns);
 		nullElemMatrix.get(nullRowIndex).set(nullColumnIndex, null);
-
-		assertThrows(NullPointerException.class, () -> GroupMatrix.fromRows(nullElemMatrix));
+		final IllegalArgumentException exceptionFirst = assertThrows(IllegalArgumentException.class, () -> GroupMatrix.fromRows(nullElemMatrix));
+		assertEquals("Elements must not contain nulls", exceptionFirst.getMessage());
 	}
 
 	@Test
@@ -125,6 +125,7 @@ class GroupMatrixTest {
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> GroupMatrix.fromRows(matrixElements));
 		assertEquals("All elements of the matrix must be in the same group.", exception.getMessage());
 	}
+
 
 	@Test
 	void createGroupMatrixWithDifferentSizes() {

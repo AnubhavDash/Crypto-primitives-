@@ -1,13 +1,13 @@
 /*
  *
  *  Copyright 2022 Post CH Ltd
- *
+ * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -67,7 +67,9 @@ class GroupVectorTest {
 		// With null elem.
 		TestGroup group = new TestGroup();
 		TestGroupElement e1 = new TestGroupElement(group);
-		assertThrows(NullPointerException.class, () -> GroupVector.of(e1, null));
+		final IllegalArgumentException nullIllegalArgumentException = assertThrows(IllegalArgumentException.class,
+				() -> GroupVector.of(e1, null));
+		assertEquals("Elements must not contain nulls", nullIllegalArgumentException.getMessage());
 
 		// Different group elems.
 		TestGroupElement e2 = new TestGroupElement(new TestGroup());
@@ -97,7 +99,7 @@ class GroupVectorTest {
 	void testElementsWithNullThrows() {
 		List<TestGroupElement> elements = new ArrayList<>(Collections.emptyList());
 		elements.add(null);
-		assertThrows(NullPointerException.class, () -> GroupVector.from(elements));
+		assertThrows(IllegalArgumentException.class, () -> GroupVector.from(elements));
 	}
 
 	@Test
@@ -105,7 +107,7 @@ class GroupVectorTest {
 		TestGroup group = new TestGroup();
 		TestGroupElement validElement = new TestGroupElement(group);
 		List<TestGroupElement> elements = Arrays.asList(validElement, null);
-		assertThrows(NullPointerException.class, () -> GroupVector.from(elements));
+		assertThrows(IllegalArgumentException.class, () -> GroupVector.from(elements));
 	}
 
 	@Test

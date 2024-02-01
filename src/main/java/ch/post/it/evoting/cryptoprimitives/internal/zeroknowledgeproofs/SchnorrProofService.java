@@ -21,8 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.util.List;
-
-import com.google.common.base.Preconditions;
+import java.util.Objects;
 
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
@@ -77,9 +76,8 @@ public class SchnorrProofService {
 
 		checkNotNull(witness);
 		checkNotNull(statement);
-		final List<String> auxiliaryInformationCopy = checkNotNull(auxiliaryInformation).stream()
-				.map(Preconditions::checkNotNull)
-				.toList();
+		checkNotNull(auxiliaryInformation);
+		checkArgument(auxiliaryInformation.stream().allMatch(Objects::nonNull), "The auxiliary information must not contain null objects.");
 		checkArgument(statement.equals(statement.getGroup().getGenerator().exponentiate(witness)));
 
 		// Cross group checking.
@@ -94,7 +92,7 @@ public class SchnorrProofService {
 		final BigInteger p = gqGroup.getP();
 
 		// Variables.
-		final List<String> i_aux = auxiliaryInformationCopy;
+		final List<String> i_aux = List.copyOf(auxiliaryInformation);
 		final GqElement y = statement;
 		final ZqElement x = witness;
 
@@ -128,9 +126,9 @@ public class SchnorrProofService {
 
 		checkNotNull(proof);
 		checkNotNull(statement);
-		final List<String> auxiliaryInformationCopy = checkNotNull(auxiliaryInformation).stream()
-				.map(Preconditions::checkNotNull)
-				.toList();
+		checkNotNull(auxiliaryInformation);
+
+		checkArgument(auxiliaryInformation.stream().allMatch(Objects::nonNull), "The auxiliary information must not contain null objects.");
 
 		// Cross group checking.
 		checkArgument(proof.getGroup().hasSameOrderAs(statement.getGroup()),
@@ -143,7 +141,7 @@ public class SchnorrProofService {
 		final GqElement g = gqGroup.getGenerator();
 
 		// Variables.
-		final List<String> i_aux = auxiliaryInformationCopy;
+		final List<String> i_aux = List.copyOf(auxiliaryInformation);
 		final ZqElement e = proof.get_e();
 		final ZqElement z = proof.get_z();
 		final GqElement y = statement;

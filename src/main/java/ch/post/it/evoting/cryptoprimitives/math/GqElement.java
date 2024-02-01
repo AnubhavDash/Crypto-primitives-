@@ -29,21 +29,19 @@ import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsSer
  * <p>Instances of this class are immutable.
  */
 @SuppressWarnings("java:S117")
-public sealed class GqElement extends GroupElement<GqGroup> permits PrimeGqElement {
+public final class GqElement extends MultiplicativeGroupElement {
 
-	// Package private constructor without input validation. Used only for operations that provide a mathematical guarantee that the element is within the
+	// Private constructor without input validation. Used only for operations that provide a mathematical guarantee that the element is within the
 	// group (such as multiplying two elements of the same group).
-	GqElement(final BigInteger value, final GqGroup group) {
+	private GqElement(final BigInteger value, final GqGroup group) {
 		super(value, group);
 	}
 
 	/**
-	 * Returns a {@code GqElement} whose value is {@code (this * element)}.
-	 *
-	 * @param other the element to be multiplied by this. It must be from the same group and non-null.
-	 * @return (this * element).
+	 * @see MultiplicativeGroupElement#multiply(MultiplicativeGroupElement)
 	 */
-	public GqElement multiply(final GqElement other) {
+	@Override
+	public GqElement multiply(final MultiplicativeGroupElement other) {
 		checkNotNull(other);
 		checkArgument(this.group.equals(other.group));
 
@@ -52,12 +50,9 @@ public sealed class GqElement extends GroupElement<GqGroup> permits PrimeGqEleme
 	}
 
 	/**
-	 * Returns a {@code GqElement} whose value is (this<sup>exponent</sup>).
-	 *
-	 * @param exponent the exponent to which this {@code GqElement} is to be raised. It must be a member of a group of the same order and be
-	 *                 non-null.
-	 * @return this<sup>exponent</sup>.
+	 * @see MultiplicativeGroupElement#exponentiate(ZqElement)
 	 */
+	@Override
 	public GqElement exponentiate(final ZqElement exponent) {
 		checkNotNull(exponent);
 		checkArgument(isOfSameOrderGroup(exponent));
@@ -105,7 +100,7 @@ public sealed class GqElement extends GroupElement<GqGroup> permits PrimeGqEleme
 	public static class GqElementFactory {
 
 		private GqElementFactory() {
-			// Intentionally left blank.
+			// empty on purpose
 		}
 
 		/**
@@ -118,7 +113,7 @@ public sealed class GqElement extends GroupElement<GqGroup> permits PrimeGqEleme
 		public static GqElement fromValue(final BigInteger value, final GqGroup group) {
 			checkNotNull(value);
 			checkNotNull(group);
-			checkArgument(group.isGroupMember(value), "Cannot create a GqElement with value %s as it is not an element of group %s", value, group);
+			checkArgument(group.isGroupMember(value), "Cannot create a GroupElement with value %s as it is not an element of group %s", value, group);
 
 			return new GqElement(value, group);
 		}
@@ -158,7 +153,7 @@ public sealed class GqElement extends GroupElement<GqGroup> permits PrimeGqEleme
 			// the GroupVector constructor ensures all bases belong to the same group.
 			checkArgument(exponents.getGroup().hasSameOrderAs(bases.getGroup()));
 
-			final List<BigInteger> basesList = bases.stream().parallel().map(GqElement::getValue).toList();
+			final List<BigInteger> basesList = bases.stream().parallel().map(MultiplicativeGroupElement::getValue).toList();
 			final List<BigInteger> exponentsList = exponents.stream().parallel().map(ZqElement::getValue).toList();
 
 			return new GqElement(BigIntegerOperationsService.multiModExp(basesList, exponentsList, bases.getGroup().getP()), bases.getGroup());

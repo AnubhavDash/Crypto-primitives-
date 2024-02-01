@@ -45,11 +45,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.TestSignatureSupportingAlgorithm;
 import ch.post.it.evoting.cryptoprimitives.signing.AuthorityInformation;
 import ch.post.it.evoting.cryptoprimitives.signing.KeysAndCert;
 
 class GenKeysAndCertServiceTest {
+
+	private static final SecurityLevelInternal securityLevel = SecurityLevelConfig.getSystemSecurityLevel();
 
 	private static GenKeysAndCertService keysAndCertService;
 	private static AuthorityInformation authorityInformation;
@@ -72,6 +77,7 @@ class GenKeysAndCertServiceTest {
 	@Test
 	void nullParametersIsProvided_npeIsThrown() {
 		// given
+		final RandomService randomService = new RandomService();
 
 		// when / then
 		assertThrows(NullPointerException.class, () -> new GenKeysAndCertService(null, signatureAlgorithm));

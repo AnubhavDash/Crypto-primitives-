@@ -36,8 +36,7 @@ public class TestMultiExponentiationStatementWitnessPairGenerator {
 	private final MultiExponentiationArgumentService argumentService;
 	private final CommitmentKey commitmentKey;
 
-	TestMultiExponentiationStatementWitnessPairGenerator(GqGroup group, MultiExponentiationArgumentService argumentService,
-			CommitmentKey commitmentKey) {
+	TestMultiExponentiationStatementWitnessPairGenerator(GqGroup group, MultiExponentiationArgumentService argumentService, CommitmentKey commitmentKey) {
 		this.gqGroup = group;
 		this.zqGroup = ZqGroup.sameOrderAs(gqGroup);
 		this.zqGroupGenerator = new ZqGroupGenerator(zqGroup);
@@ -46,7 +45,22 @@ public class TestMultiExponentiationStatementWitnessPairGenerator {
 		this.commitmentKey = commitmentKey;
 	}
 
-	record StatementWitnessPair(MultiExponentiationStatement statement, MultiExponentiationWitness witness) {
+	static class StatementWitnessPair {
+		private final MultiExponentiationStatement statement;
+		private final MultiExponentiationWitness witness;
+
+		StatementWitnessPair(MultiExponentiationStatement statement, MultiExponentiationWitness witness) {
+			this.statement = statement;
+			this.witness = witness;
+		}
+
+		public MultiExponentiationStatement getStatement() {
+			return statement;
+		}
+
+		public MultiExponentiationWitness getWitness() {
+			return witness;
+		}
 	}
 
 	StatementWitnessPair genPair(int n, int m, int l) {

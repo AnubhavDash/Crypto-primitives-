@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mockStatic;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -40,10 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.MockedStatic;
 
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
@@ -88,7 +84,7 @@ class KDFServiceTest {
 
 	@Test
 	void testPRKLengthSmallerThanHashLengthThrows() {
-		byte[] tooSmallPRK = new byte[DEFAULT_HASH_LENGTH_BYTES - 1];
+		final byte[] tooSmallPRK = new byte[DEFAULT_HASH_LENGTH_BYTES - 1];
 		assertThrows(IllegalArgumentException.class, () -> kdfService.KDF(tooSmallPRK, emptyInfo, requiredLength));
 	}
 
@@ -104,7 +100,7 @@ class KDFServiceTest {
 			// Context.
 			final JsonData context = testParameters.getContext();
 			final String hash = context.get("hash", String.class);
-			Supplier<Digest> hashSupplier = getDigestSupplier(hash);
+			final Supplier<Digest> hashSupplier = getDigestSupplier(hash);
 
 			// Inputs.
 			final JsonData input = testParameters.getInput();
@@ -125,7 +121,7 @@ class KDFServiceTest {
 	@DisplayName("KeyDerivation returns expected output")
 	void testKDFWithRealValues(final Supplier<Digest> hashSupplier, final byte[] PRK, final List<String> infos, final int requiredByteLength,
 			final byte[] OKM, final String description) {
-		KDFService kdfService = new KDFService(hashSupplier);
+		final KDFService kdfService = new KDFService(hashSupplier);
 		final byte[] actualResult = kdfService.KDF(PRK, infos, requiredByteLength);
 		assertArrayEquals(OKM, actualResult, String.format("assertion failed for: %s", description));
 	}
@@ -152,7 +148,7 @@ class KDFServiceTest {
 
 	@Test
 	void testKDFToZqPRKLengthSmallerThanHashLengthThrows() {
-		byte[] tooSmallPRK = new byte[DEFAULT_HASH_LENGTH_BYTES - 1];
+		final byte[] tooSmallPRK = new byte[DEFAULT_HASH_LENGTH_BYTES - 1];
 		assertThrows(IllegalArgumentException.class, () -> kdfService.KDFToZq(tooSmallPRK, emptyInfo, requestedUpperBound));
 	}
 
@@ -163,7 +159,7 @@ class KDFServiceTest {
 			// Context.
 			final JsonData context = testParameters.getContext();
 			final String hash = context.get("hash", String.class);
-			Supplier<Digest> hashSupplier = getDigestSupplier(hash);
+			final Supplier<Digest> hashSupplier = getDigestSupplier(hash);
 
 			// Inputs.
 			final JsonData input = testParameters.getInput();
@@ -175,7 +171,7 @@ class KDFServiceTest {
 			final JsonData output = testParameters.getOutput();
 			final ZqElement u = ZqElement.create(output.get("u", BigInteger.class), new ZqGroup(q));
 
-			return Arguments.of(hashSupplier, PRK, infos, q, u, testParameters.getDescription(), testParameters.getSecurityLevel());
+			return Arguments.of(hashSupplier, PRK, infos, q, u, testParameters.getDescription());
 		});
 	}
 
@@ -183,17 +179,13 @@ class KDFServiceTest {
 	@MethodSource("KDFToZqRealValuesProvider")
 	@DisplayName("KDFToZq returns expected output")
 	void testKDFToZqWithRealValues(final Supplier<Digest> hashSupplier, final byte[] PRK, final List<String> infos, final BigInteger q,
-			final ZqElement u, final String description, final SecurityLevelInternal securityLevel) {
-		try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = mockStatic(SecurityLevelConfig.class)) {
-			mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(securityLevel);
-
-			KDFService kdfService = new KDFService(hashSupplier);
-			final ZqElement actualResult = kdfService.KDFToZq(PRK, infos, q);
-			assertEquals(u, actualResult, String.format("assertion failed for: %s", description));
-		}
+			final ZqElement u, final String description) {
+		final KDFService kdfService = new KDFService(hashSupplier);
+		final ZqElement actualResult = kdfService.KDFToZq(PRK, infos, q);
+		assertEquals(u, actualResult, String.format("assertion failed for: %s", description));
 	}
 
-	private static Supplier<Digest> getDigestSupplier(String hash) {
+	private static Supplier<Digest> getDigestSupplier(final String hash) {
 		return switch (hash) {
 			case "SHA-256" -> SHA256Digest::new;
 			case "SHA-1" -> SHA1Digest::new;

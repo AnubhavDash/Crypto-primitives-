@@ -50,31 +50,16 @@ public final class ShuffleArgument implements GroupVectorElement<GqGroup>, Hasha
 	private final GqGroup group;
 
 	private ShuffleArgument(final GroupVector<GqElement, GqGroup> c_A, final GroupVector<GqElement, GqGroup> c_B,
-			final ProductArgument productArgument, final MultiExponentiationArgument multiExponentiationArgument) {
-		// Null checking.
-		this.c_A = checkNotNull(c_A);
-		this.c_B = checkNotNull(c_B);
-		this.productArgument = checkNotNull(productArgument);
-		this.multiExponentiationArgument = checkNotNull(multiExponentiationArgument);
-
-		// Cross group checking.
-		final List<GqGroup> gqGroups = Arrays
-				.asList(c_A.getGroup(), c_B.getGroup(), productArgument.getGroup(), multiExponentiationArgument.getGroup());
-		checkArgument(allEqual(gqGroups.stream(), g -> g),
-				"The commitments cA, cB, the product and the multi exponentiation arguments must belong to the same group.");
-		this.group = productArgument.getGroup();
-
-		// Cross dimensions checking.
-		final List<Integer> mDimensions = Arrays
-				.asList(c_A.size(), c_B.size(), productArgument.get_m(), multiExponentiationArgument.get_m());
-		checkArgument(allEqual(mDimensions.stream(), d -> d),
-				"The commitments cA, cB and the product and multi exponentiation arguments must have the same dimension m.");
-		this.m = productArgument.get_m();
-
-		checkArgument(productArgument.get_n() == multiExponentiationArgument.get_n(),
-				"The product and multi exponentiation arguments must have the same dimension n.");
-		this.n = productArgument.get_n();
-		this.l = multiExponentiationArgument.get_l();
+			final ProductArgument productArgument, final MultiExponentiationArgument multiExponentiationArgument, final int m, final int n,
+			final int l, final GqGroup group) {
+		this.c_A = c_A;
+		this.c_B = c_B;
+		this.productArgument = productArgument;
+		this.multiExponentiationArgument = multiExponentiationArgument;
+		this.m = m;
+		this.n = n;
+		this.l = l;
+		this.group = group;
 	}
 
 	public GroupVector<GqElement, GqGroup> get_c_A() {
@@ -178,7 +163,30 @@ public final class ShuffleArgument implements GroupVectorElement<GqGroup>, Hasha
 		 * @return A valid Shuffle Argument.
 		 */
 		public ShuffleArgument build() {
-			return new ShuffleArgument(this.c_A, this.c_B, this.productArgument, this.multiExponentiationArgument);
+			// Null checking.
+			checkNotNull(this.c_A);
+			checkNotNull(this.c_B);
+			checkNotNull(this.productArgument);
+			checkNotNull(this.multiExponentiationArgument);
+
+			// Cross group checking.
+			final List<GqGroup> gqGroups = Arrays
+					.asList(this.c_A.getGroup(), this.c_B.getGroup(), this.productArgument.getGroup(), this.multiExponentiationArgument.getGroup());
+			checkArgument(allEqual(gqGroups.stream(), g -> g),
+					"The commitments cA, cB, the product and the multi exponentiation arguments must belong to the same group.");
+
+			// Cross dimensions checking.
+			final List<Integer> mDimensions = Arrays
+					.asList(this.c_A.size(), this.c_B.size(), this.productArgument.get_m(), this.multiExponentiationArgument.get_m());
+			checkArgument(allEqual(mDimensions.stream(), d -> d),
+					"The commitments cA, cB and the product and multi exponentiation arguments must have the same dimension m.");
+
+			checkArgument(this.productArgument.get_n() == this.multiExponentiationArgument.get_n(),
+					"The product and multi exponentiation arguments must have the same dimension n.");
+
+			// Build the argument.
+			return new ShuffleArgument(this.c_A, this.c_B, this.productArgument, this.multiExponentiationArgument,
+					productArgument.get_m(), productArgument.get_n(), multiExponentiationArgument.get_l(), productArgument.getGroup());
 
 		}
 	}

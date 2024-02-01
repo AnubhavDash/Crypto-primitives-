@@ -24,21 +24,15 @@ import org.junit.jupiter.api.BeforeAll;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.GqGroupGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator;
 
-/**
- * Provides {@link GqGroup}s and {@link ZqGroup}s as well as generators that rely on them.
- */
 public class TestGroupSetup {
 	protected static final SecureRandom secureRandom = new SecureRandom();
 	protected static GqGroup gqGroup;
 	protected static GqGroupGenerator gqGroupGenerator;
-	protected static ElGamalGenerator elGamalGenerator;
 	protected static GqGroup otherGqGroup;
 	protected static GqGroupGenerator otherGqGroupGenerator;
-	protected static ElGamalGenerator otherGroupElGamalGenerator;
 	protected static ZqGroup zqGroup;
 	protected static ZqGroupGenerator zqGroupGenerator;
 	protected static ZqGroup otherZqGroup;
@@ -49,10 +43,8 @@ public class TestGroupSetup {
 		// GqGroup and corresponding ZqGroup set up.
 		gqGroup = GroupTestData.getGqGroup();
 		gqGroupGenerator = new GqGroupGenerator(gqGroup);
-		elGamalGenerator = new ElGamalGenerator(gqGroup);
 		otherGqGroup = GroupTestData.getDifferentGqGroup(gqGroup);
 		otherGqGroupGenerator = new GqGroupGenerator(otherGqGroup);
-		otherGroupElGamalGenerator = new ElGamalGenerator(otherGqGroup);
 		zqGroup = ZqGroup.sameOrderAs(gqGroup);
 		zqGroupGenerator = new ZqGroupGenerator(zqGroup);
 		otherZqGroup = ZqGroup.sameOrderAs(otherGqGroup);

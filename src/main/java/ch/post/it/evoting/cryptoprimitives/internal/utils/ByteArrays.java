@@ -24,14 +24,20 @@ import java.math.BigInteger;
 /**
  * Byte array utilities.
  */
-public final class ByteArrays {
+public class ByteArrays {
 
 	private ByteArrays() {
-		// Intentionally left blank.
+		//Intentional
 	}
 
 	/**
-	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.ByteArrays#cutToBitLength}
+	 * Cuts the given byte array to the requested bit length
+	 *
+	 * @param byteArray       the byte array to be cut
+	 * @param requestedLength the length in bits to which the array is to be cut. Greater than 0 and not greater than the byte array's bit length.
+	 * @return the byte array cut to the requested length
+	 * @throws NullPointerException     if the given byte array is null
+	 * @throws IllegalArgumentException if the requested length is not within the required range
 	 */
 	@SuppressWarnings("java:S117")
 	public static byte[] cutToBitLength(final byte[] byteArray, final int requestedLength) {

@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.bouncycastle.crypto.Digest;
@@ -31,13 +32,11 @@ import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
 import org.bouncycastle.crypto.params.HKDFParameters;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import com.google.common.primitives.Bytes;
 
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
-import ch.post.it.evoting.cryptoprimitives.securitylevel.SecurityLevel;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.utils.Conversions;
 import ch.post.it.evoting.cryptoprimitives.utils.KeyDerivation;
 
@@ -50,7 +49,7 @@ public class KDFService implements KeyDerivation {
 
 	@VisibleForTesting
 	KDFService(final Supplier<Digest> hashSupplier) {
-		this.hashSupplier = checkNotNull(hashSupplier);
+		this.hashSupplier = hashSupplier;
 	}
 
 	public static KDFService getInstance() {
@@ -63,13 +62,13 @@ public class KDFService implements KeyDerivation {
 	@SuppressWarnings({ "java:S117", "java:S100" })
 	public byte[] KDF(final byte[] pseudoRandomKey, final List<String> contextInformation, final int requiredByteLength) {
 		checkNotNull(pseudoRandomKey);
+		checkNotNull(contextInformation);
+		checkArgument(contextInformation.stream().allMatch(Objects::nonNull), "Info contains a null.");
 
 		final int L = this.hashSupplier.get().getDigestSize();
 		final byte[] PRK = pseudoRandomKey;
 		final int l_straight = PRK.length;
-		final List<String> info_vector = checkNotNull(contextInformation).stream()
-				.map(Preconditions::checkNotNull)
-				.toList();
+		final List<String> info_vector = List.copyOf(contextInformation);
 		final int l_curved = requiredByteLength;
 
 		checkArgument(l_curved > 0, "Requested byte length must be greater than 0. ");
@@ -110,22 +109,20 @@ public class KDFService implements KeyDerivation {
 	@SuppressWarnings({ "java:S117", "java:S100" })
 	public ZqElement KDFToZq(final byte[] pseudoRandomKey, final List<String> contextInformation, final BigInteger exclusiveUpperBound) {
 		checkNotNull(pseudoRandomKey);
+		checkNotNull(contextInformation);
+		checkArgument(contextInformation.stream().allMatch(Objects::nonNull), "Info contains a null.");
 		checkNotNull(exclusiveUpperBound);
-
-		final int lambda = SecurityLevelConfig.getSystemSecurityLevel().getSecurityStrength();
 
 		final int L = this.hashSupplier.get().getDigestSize();
 		final byte[] PRK = pseudoRandomKey;
 		final int l_straight = PRK.length;
-		final List<String> info = checkNotNull(contextInformation).stream()
-				.map(Preconditions::checkNotNull)
-				.toList();
+		final List<String> info = List.copyOf(contextInformation);
 		final BigInteger q = exclusiveUpperBound;
 
 		checkArgument(l_straight >= L, "The pseudo random key length must be greater than the hash function output length.");
 		checkArgument(ByteArrays.byteLength(q) >= L);
 
-		final int l_curved = ByteArrays.byteLength(q) + lambda / 4;
+		final int l_curved = ByteArrays.byteLength(q) + 32;
 		byte[] h = KDF(PRK, info, l_curved);
 		BigInteger u = byteArrayToInteger(h).mod(q);
 

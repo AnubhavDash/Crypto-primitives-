@@ -22,10 +22,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
@@ -85,13 +85,11 @@ public class ZeroKnowledgeProofService implements ZeroKnowledgeProof {
 			final ElGamalMultiRecipientKeyPair keyPair, final List<String> auxiliaryInformation) {
 		checkNotNull(ciphertexts);
 		checkNotNull(keyPair);
-		final List<String> auxiliaryInformationCopy = checkNotNull(auxiliaryInformation).stream()
-				.map(Preconditions::checkNotNull)
-				.toList();
+		checkNotNull(auxiliaryInformation);
 
 		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = ciphertexts;
 		final ElGamalMultiRecipientPrivateKey sk = keyPair.getPrivateKey();
-		final List<String> i_aux = auxiliaryInformationCopy;
+		final List<String> i_aux = auxiliaryInformation;
 		final int l = C.getElementSize();
 		final int k = sk.size();
 
@@ -123,11 +121,11 @@ public class ZeroKnowledgeProofService implements ZeroKnowledgeProof {
 		checkNotNull(ciphertexts);
 		checkNotNull(publicKey);
 		checkNotNull(verifiableDecryptions);
-		final List<String> auxiliaryInformationCopy = checkNotNull(auxiliaryInformation).stream()
-				.map(Preconditions::checkNotNull)
-				.toList();
+		checkNotNull(auxiliaryInformation);
 
-		final List<String> i_aux = auxiliaryInformationCopy;
+		checkArgument(auxiliaryInformation.stream().allMatch(Objects::nonNull), "Auxiliary information cannot contain null elements.");
+
+		final List<String> i_aux = List.copyOf(auxiliaryInformation);
 		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = ciphertexts;
 		final ElGamalMultiRecipientPublicKey pk = publicKey;
 		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C_prime = verifiableDecryptions.getCiphertexts();

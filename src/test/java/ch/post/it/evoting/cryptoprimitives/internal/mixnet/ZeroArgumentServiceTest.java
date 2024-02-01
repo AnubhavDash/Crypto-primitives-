@@ -60,6 +60,7 @@ import ch.post.it.evoting.cryptoprimitives.mixnet.ZeroStatement;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ZeroWitness;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
+import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.Generators;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
@@ -90,11 +91,12 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 	private static HashService hashService;
 
 	@BeforeAll
-	static void setUpAll() throws Exception {
+	static void setUpAll() {
 		// Generate publicKey and commitmentKey.
 		final TestCommitmentKeyGenerator commitmentKeyGenerator = new TestCommitmentKeyGenerator(gqGroup);
 		commitmentKey = commitmentKeyGenerator.genCommitmentKey(KEY_ELEMENTS_NUMBER);
 
+		final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(gqGroup);
 		publicKey = elGamalGenerator.genRandomPublicKey(KEY_ELEMENTS_NUMBER);
 
 		// Init services.
@@ -132,7 +134,7 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 	@DisplayName("constructed with keys from different groups throws IllegalArgumentException")
 	void constructDiffGroupKeys() {
 		// Create public key from other group.
-		final ElGamalMultiRecipientPublicKey otherPublicKey = otherGroupElGamalGenerator.genRandomPublicKey(KEY_ELEMENTS_NUMBER);
+		final ElGamalMultiRecipientPublicKey otherPublicKey = new ElGamalGenerator(otherGqGroup).genRandomPublicKey(KEY_ELEMENTS_NUMBER);
 
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 				() -> new ZeroArgumentService(otherPublicKey, commitmentKey, randomService, hashService));

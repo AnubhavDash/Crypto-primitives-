@@ -74,10 +74,11 @@ public final class TestParameters {
 		final String size = this.description.substring(0, 4);
 		final int bitlength = Integer.parseInt(size);
 
-		if (bitlength == 3072) {
-			return SecurityLevelInternal.STANDARD;
-		}
-		throw new IllegalArgumentException("Unexpected bit length of p");
+		return switch (bitlength) {
+			case 3072 -> SecurityLevelInternal.EXTENDED;
+			case 2048 -> SecurityLevelInternal.LEGACY;
+			default -> throw new IllegalArgumentException("Unexpected bit length of p");
+		};
 	}
 
 	public JsonData getContext() {

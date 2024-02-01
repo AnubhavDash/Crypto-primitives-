@@ -27,10 +27,10 @@ import java.util.stream.Stream;
 
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
+import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientObject;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
-import ch.post.it.evoting.cryptoprimitives.math.GroupVectorElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 
 /**
@@ -42,7 +42,7 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
  * <p>Instances of this class are immutable.
  */
 @SuppressWarnings({ "java:S117", "java:S1117" })
-public final class ElGamalMultiRecipientCiphertext implements GroupVectorElement<GqGroup>, HashableList {
+public final class ElGamalMultiRecipientCiphertext implements ElGamalMultiRecipientObject<GqElement, GqGroup>, HashableList {
 
 	private static final boolean ENABLE_PARALLEL_STREAMS = Boolean.parseBoolean(
 			System.getProperty("enable.parallel.streams", Boolean.TRUE.toString()));
@@ -50,15 +50,6 @@ public final class ElGamalMultiRecipientCiphertext implements GroupVectorElement
 	private final GqElement gamma;
 	private final GroupVector<GqElement, GqGroup> phis;
 	private final GqGroup group;
-
-	private ElGamalMultiRecipientCiphertext(final GqElement gamma, final GroupVector<GqElement, GqGroup> phis) {
-		this.gamma = checkNotNull(gamma);
-		this.phis = checkNotNull(phis);
-		this.group = gamma.getGroup();
-
-		checkArgument(!phis.isEmpty(), "An ElGamalMultiRecipientCiphertext phis must be non empty.");
-		checkArgument(gamma.getGroup().equals(phis.getGroup()), "Gamma and phis must belong to the same GqGroup.");
-	}
 
 	/**
 	 * Creates a {@code ElGamalMultiRecipientCiphertext} using the specified gamma and phi values.
@@ -76,9 +67,19 @@ public final class ElGamalMultiRecipientCiphertext implements GroupVectorElement
 	public static ElGamalMultiRecipientCiphertext create(final GqElement gamma, final List<GqElement> phis) {
 		checkNotNull(gamma);
 
-		final GroupVector<GqElement, GqGroup> phisVector = GroupVector.from(checkNotNull(phis));
+		final GroupVector<GqElement, GqGroup> phisVector = GroupVector.from(phis);
+
+		checkArgument(!phisVector.isEmpty(), "An ElGamalMultiRecipientCiphertext phis must be non empty.");
+		checkArgument(gamma.getGroup().equals(phisVector.getGroup()), "Gamma and phis must belong to the same GqGroup.");
 
 		return new ElGamalMultiRecipientCiphertext(gamma, phisVector);
+	}
+
+	// Private constructor without input validation. Used only to internally construct new ciphertext whose elements have already been validated.
+	private ElGamalMultiRecipientCiphertext(final GqElement gamma, final GroupVector<GqElement, GqGroup> phis) {
+		this.gamma = gamma;
+		this.phis = phis;
+		this.group = gamma.getGroup();
 	}
 
 	/**
@@ -164,6 +165,7 @@ public final class ElGamalMultiRecipientCiphertext implements GroupVectorElement
 	/**
 	 * @return the ith phi element.
 	 */
+	@Override
 	public GqElement get(final int i) {
 		return phis.get(i);
 	}
@@ -171,6 +173,7 @@ public final class ElGamalMultiRecipientCiphertext implements GroupVectorElement
 	/**
 	 * @return an ordered stream of gamma and phis.
 	 */
+	@Override
 	public Stream<GqElement> stream() {
 		return Stream.concat(Stream.of(this.gamma), this.phis.stream());
 	}

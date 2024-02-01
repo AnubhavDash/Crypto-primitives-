@@ -40,14 +40,13 @@ public class SignatureVerificationService implements SignatureVerification {
 	private final SignatureSupportingAlgorithm signatureSupportingAlgorithm;
 
 	public SignatureVerificationService(final KeyStore trustStore, final Hash hash, final SignatureSupportingAlgorithm signatureSupportingAlgorithm) {
-		this.trustStore = checkNotNull(trustStore);
-		this.hash = checkNotNull(hash);
-		this.signatureSupportingAlgorithm = checkNotNull(signatureSupportingAlgorithm);
+		this.trustStore = trustStore;
+		this.hash = hash;
+		this.signatureSupportingAlgorithm = signatureSupportingAlgorithm;
 	}
 
 	/**
 	 * See {@link SignatureVerification#verifySignature}
-	 *
 	 * @param authorityId           The identifier of the authority. Must be non-null.
 	 * @param message               The message that was signed. Must be non-null.
 	 * @param additionalContextData Additional context data. Must be non-null. May be empty.
@@ -92,5 +91,6 @@ public class SignatureVerificationService implements SignatureVerification {
 			throw new IllegalStateException("The trust store has not been initialized correctly.");
 		}
 	}
+
 
 }

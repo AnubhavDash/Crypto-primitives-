@@ -22,7 +22,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 public class HashFactory {
 
 	private HashFactory() {
-		// Intentionally left blank.
+		//Intentionally left blank
 	}
 
 	public static Hash createHash() {

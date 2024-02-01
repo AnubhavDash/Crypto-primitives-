@@ -32,6 +32,7 @@ import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ShuffleStatement;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
+import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 
 @DisplayName("A ShuffleStatement")
 class ShuffleStatementTest extends TestGroupSetup {
@@ -40,6 +41,7 @@ class ShuffleStatementTest extends TestGroupSetup {
 	private static final SecureRandom secureRandom = new SecureRandom();
 
 	private static ElGamalMultiRecipientPublicKey publicKey;
+	private static ElGamalGenerator elGamalGenerator;
 
 	private int n;
 	private int l;
@@ -48,6 +50,8 @@ class ShuffleStatementTest extends TestGroupSetup {
 
 	@BeforeAll
 	static void setUpAll() {
+		elGamalGenerator = new ElGamalGenerator(gqGroup);
+
 		publicKey = elGamalGenerator.genRandomPublicKey(KEY_ELEMENTS_NUMBER);
 	}
 
@@ -116,7 +120,8 @@ class ShuffleStatementTest extends TestGroupSetup {
 	@DisplayName("with ciphertexts and shuffled ciphertexts from different groups throws IllegalArgumentException")
 	void constructDiffGroupCiphertextsAndShuffled() {
 		// Ciphertexts from different group.
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> diffGroupCiphertexts = otherGroupElGamalGenerator
+		final ElGamalGenerator differentElGamalGenerator = new ElGamalGenerator(otherGqGroup);
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> diffGroupCiphertexts = differentElGamalGenerator
 				.genRandomCiphertextVector(n, l);
 
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,

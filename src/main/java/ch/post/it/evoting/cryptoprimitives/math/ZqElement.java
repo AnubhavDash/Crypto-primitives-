@@ -58,8 +58,6 @@ public final class ZqElement extends GroupElement<ZqGroup> {
 	 * @return a new ZqElement.
 	 */
 	public static ZqElement create(final int value, final ZqGroup group) {
-		checkNotNull(group);
-
 		return create(BigInteger.valueOf(value), group);
 	}
 

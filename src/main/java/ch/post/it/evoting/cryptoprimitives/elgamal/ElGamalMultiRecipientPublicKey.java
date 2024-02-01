@@ -23,14 +23,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import com.google.common.base.Preconditions;
-
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
+import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientObject;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
-import ch.post.it.evoting.cryptoprimitives.math.GroupVectorElement;
 
 /**
  * Encapsulates an ElGamal multi recipient public key with N elements, each corresponding to a different recipient. The order of the elements must
@@ -43,7 +41,7 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVectorElement;
  * <p>Instances of this class are immutable. </p>
  */
 @SuppressWarnings("java:S117")
-public final class ElGamalMultiRecipientPublicKey implements GroupVectorElement<GqGroup>, HashableList {
+public final class ElGamalMultiRecipientPublicKey implements ElGamalMultiRecipientObject<GqElement, GqGroup>, HashableList {
 
 	private final GroupVector<GqElement, GqGroup> publicKeyElements;
 
@@ -54,8 +52,8 @@ public final class ElGamalMultiRecipientPublicKey implements GroupVectorElement<
 	 */
 	public ElGamalMultiRecipientPublicKey(final GroupVector<GqElement, GqGroup> keyElements) {
 		this.publicKeyElements = checkNotNull(keyElements);
-		publicKeyElements.forEach(Preconditions::checkNotNull);
 		checkArgument(!publicKeyElements.isEmpty(), "An ElGamal public key must not be empty.");
+		checkArgument(publicKeyElements.stream().noneMatch(Objects::isNull), "An ElGamal public key cannot contain null elements");
 	}
 
 	@Override
@@ -68,10 +66,12 @@ public final class ElGamalMultiRecipientPublicKey implements GroupVectorElement<
 		return this.publicKeyElements.size();
 	}
 
+	@Override
 	public GqElement get(final int i) {
 		return this.publicKeyElements.get(i);
 	}
 
+	@Override
 	public Stream<GqElement> stream() {
 		return this.publicKeyElements.stream();
 	}

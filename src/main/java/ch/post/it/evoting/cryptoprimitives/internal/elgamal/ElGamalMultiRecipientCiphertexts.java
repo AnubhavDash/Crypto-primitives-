@@ -43,7 +43,7 @@ public class ElGamalMultiRecipientCiphertexts {
 			System.getProperty("enable.parallel.streams", Boolean.TRUE.toString()));
 
 	private ElGamalMultiRecipientCiphertexts() {
-		// Intentionally left blank.
+		//Intentionally left blank
 	}
 
 	/**

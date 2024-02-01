@@ -42,7 +42,6 @@ import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
-import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.Random;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
@@ -62,7 +61,10 @@ class EncryptionParametersTest {
 
 	@BeforeAll
 	static void setUpAll() {
-		encryptionParameters = new EncryptionParameters();
+		try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = mockStatic(SecurityLevelConfig.class)) {
+			mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(SecurityLevelInternal.TESTING_ONLY);
+			encryptionParameters = new EncryptionParameters();
+		}
 	}
 
 	@Test
@@ -95,8 +97,8 @@ class EncryptionParametersTest {
 	@Test
 	@DisplayName("calling getEncryptionParameters with fixed seed gives expected parameters")
 	void getEncryptionParametersFixedSeed() {
-		final GqGroup expectedParameters = new GqGroup(BigInteger.valueOf(208155596507627L), BigInteger.valueOf(104077798253813L),
-				BigInteger.valueOf(3));
+		final GqGroup expectedParameters = new GqGroup(BigInteger.valueOf(194568543564959L), BigInteger.valueOf(97284271782479L),
+				BigInteger.valueOf(2));
 
 		assertEquals(expectedParameters, encryptionParameters.getEncryptionParameters(SEED, SMALL_PRIMES));
 	}
@@ -105,7 +107,7 @@ class EncryptionParametersTest {
 	@DisplayName("calling getEncryptionParameters twice with the same seed but different small primes gives the same result")
 	void getEncryptionParametersTwice() {
 		final int electionNameLength = secureRandom.nextInt(NAME_MAX_LENGTH) + 1;
-		final String randomSeed = random.genRandomString(electionNameLength, Base64Alphabet.getInstance());
+		final String randomSeed = random.genRandomBase64String(electionNameLength);
 		final GqGroup gqGroup1 = encryptionParameters.getEncryptionParameters(randomSeed, SMALL_PRIMES);
 		final GqGroup gqGroup2 = encryptionParameters.getEncryptionParameters(randomSeed, Collections.emptyList());
 
@@ -116,7 +118,7 @@ class EncryptionParametersTest {
 	@DisplayName("calling getEncryptionParameters with random seed does not throw")
 	void getEncryptionParametersRandomSeed() {
 		final int electionNameLength = secureRandom.nextInt(NAME_MAX_LENGTH) + 1;
-		final String randomSeed = random.genRandomString(electionNameLength, Base64Alphabet.getInstance());
+		final String randomSeed = random.genRandomBase64String(electionNameLength);
 
 		assertDoesNotThrow(() -> encryptionParameters.getEncryptionParameters(randomSeed, SMALL_PRIMES));
 	}
@@ -145,7 +147,7 @@ class EncryptionParametersTest {
 		});
 	}
 
-	@ParameterizedTest(name = "{2} with seed = {0}")
+	@ParameterizedTest(name = "bitLength = {0} and seed = {1}")
 	@MethodSource("getEncryptionParametersProvider")
 	@DisplayName("calling getEncryptionParameters with fixed seed gives expected parameters")
 	void getEncryptionParameters(final String seed, final GqGroup expectedParameters,

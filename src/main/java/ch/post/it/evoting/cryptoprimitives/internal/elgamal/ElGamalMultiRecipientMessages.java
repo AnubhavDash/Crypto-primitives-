@@ -39,7 +39,7 @@ public class ElGamalMultiRecipientMessages {
 			System.getProperty("enable.parallel.streams", Boolean.TRUE.toString()));
 
 	private ElGamalMultiRecipientMessages() {
-		// Intentionally left blank.
+		//Intentionally left blank
 	}
 
 	/**

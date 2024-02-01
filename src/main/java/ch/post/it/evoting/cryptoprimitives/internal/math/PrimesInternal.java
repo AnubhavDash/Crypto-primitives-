@@ -30,7 +30,7 @@ import java.util.Scanner;
 public class PrimesInternal {
 
 	private PrimesInternal() {
-		// Intentionally left blank.
+		//Intentionally left blank
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class PrimesInternal {
 
 	public static List<Integer> getSmallPrimes() {
 		final ArrayList<Integer> smallPrimes = new ArrayList<>();
-		try (final InputStream smallPrimesInputStream = PrimesInternal.class.getResourceAsStream("/small_primes.txt")) {
+		try (final InputStream smallPrimesInputStream = PrimesInternal.class.getResourceAsStream("/small_primes.txt")){
 			checkNotNull(smallPrimesInputStream, "Could not find small_primes.txt resource");
 			try (final Scanner scanner = new Scanner(smallPrimesInputStream)) {
 				while (scanner.hasNextInt()) {

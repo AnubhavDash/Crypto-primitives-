@@ -22,7 +22,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.utils.KDFService;
 public class KeyDerivationFactory {
 
 	private KeyDerivationFactory() {
-		// Intentionally left blank.
+		//Intentionally left blank
 	}
 
 	public static KeyDerivation createKeyDerivation() {

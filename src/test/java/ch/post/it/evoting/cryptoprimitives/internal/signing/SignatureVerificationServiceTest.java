@@ -30,7 +30,6 @@ import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 
 import org.bouncycastle.asn1.x509.KeyUsage;
@@ -90,7 +89,7 @@ class SignatureVerificationServiceTest {
 				.setState("")
 				.setOrganisation("")
 				.build();
-		CertificateInfo certificateInfo = new CertificateInfo(authorityInformation);
+		final CertificateInfo certificateInfo = new CertificateInfo(authorityInformation);
 		certificateInfo.setValidFrom(from);
 		certificateInfo.setValidUntil(until);
 		certificateInfo.setUsage(new KeyUsage(KeyUsage.keyCertSign | KeyUsage.digitalSignature));
@@ -138,8 +137,8 @@ class SignatureVerificationServiceTest {
 		final Hashable additionalContextData = HashableString.from("tooLate");
 		final KeyPair keyPair = SecurityLevelConfig.getSystemSecurityLevel().getSignatureAlgorithm().genKeyPair();
 		final LocalDate now = LocalDate.now();
-		final LocalDate from = now.minus(365, ChronoUnit.DAYS);
-		final LocalDate until = now.minus(1, ChronoUnit.DAYS);
+		final LocalDate from = now.minusDays(365);
+		final LocalDate until = now.minusDays(1);
 		final X509Certificate certificate = getCertificate(from, until, keyPair);
 		final SignatureVerificationService signatureVerificationServiceNotYetValid = new SignatureVerificationService(trustStore, hashService,
 				SecurityLevelConfig.getSystemSecurityLevel().getSignatureAlgorithm());

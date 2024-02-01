@@ -26,12 +26,12 @@ import static com.google.common.primitives.Bytes.concat;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.bouncycastle.crypto.digests.SHAKEDigest;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Streams;
 import com.google.common.primitives.Bytes;
 
@@ -67,6 +67,7 @@ public class HashService implements Hash {
 
 	private static final byte[] ARRAY_PREFIX = new byte[] { 0x03 };
 
+	private static final String VALUES_CONTAIN_NULL = "Values contain a null value which cannot be hashed.";
 	private static final String NO_VALUES = "Cannot hash no values.";
 	private final HashFunction hashFunction;
 	private final XOF xof;
@@ -87,7 +88,7 @@ public class HashService implements Hash {
 	@Override
 	public byte[] recursiveHash(final Hashable... values) {
 		checkNotNull(values);
-		Arrays.stream(values).forEach(Preconditions::checkNotNull);
+		checkArgument(Arrays.stream(values).allMatch(Objects::nonNull), VALUES_CONTAIN_NULL);
 		checkArgument(values.length != 0, NO_VALUES);
 
 		if (values.length > 1) {
@@ -96,22 +97,19 @@ public class HashService implements Hash {
 		} else {
 			final Hashable value = values[0];
 
-			switch (value) {
-			case HashableByteArray hashableByteArray -> {
+			if (value instanceof HashableByteArray hashableByteArray) {
 				final byte[] w = hashableByteArray.toHashableForm();
 				return hashFunction.hash(concat(BYTE_ARRAY_PREFIX, w));
-			}
-			case HashableBigInteger hashableBigInteger -> {
+			} else if (value instanceof HashableBigInteger hashableBigInteger) {
 				final BigInteger w = hashableBigInteger.toHashableForm();
 				checkArgument(w.compareTo(BigInteger.ZERO) >= 0);
 				return hashFunction.hash(concat(BIG_INTEGER_PREFIX, integerToByteArray(w)));
-			}
-			case HashableString hashableString -> {
+			} else if (value instanceof HashableString hashableString) {
 				final String w = hashableString.toHashableForm();
 				return hashFunction.hash(concat(STRING_PREFIX, stringToByteArray(w)));
-			}
-			case HashableList hashableList -> {
+			} else if (value instanceof HashableList hashableList) {
 				final List<? extends Hashable> w = hashableList.toHashableForm();
+
 				return hashFunction.hash(
 						concat(
 								Stream.concat(
@@ -120,8 +118,9 @@ public class HashService implements Hash {
 								).toArray(byte[][]::new)
 						)
 				);
-			}
-			default -> throw new IllegalArgumentException(String.format("Object of type %s cannot be hashed.", value.getClass()));
+
+			} else {
+				throw new IllegalArgumentException(String.format("Object of type %s cannot be hashed.", value.getClass()));
 			}
 		}
 	}
@@ -140,7 +139,8 @@ public class HashService implements Hash {
 
 		final BigInteger q = group.getQ();
 
-		final BigInteger x_h = recursiveHashToZq(q, HashableString.from("HashAndSquare"), HashableBigInteger.from(x)).getValue().add(BigInteger.ONE);
+		final BigInteger x_h = recursiveHashToZq(q.subtract(BigInteger.ONE), HashableString.from("HashAndSquare"),
+				HashableBigInteger.from(x)).getValue().add(BigInteger.ONE);
 
 		return GqElement.GqElementFactory.fromSquareRoot(x_h, group);
 	}
@@ -153,9 +153,7 @@ public class HashService implements Hash {
 	public ZqElement recursiveHashToZq(final BigInteger exclusiveUpperBound, final Hashable... values) {
 		checkNotNull(exclusiveUpperBound);
 		checkNotNull(values);
-		Arrays.stream(values).forEach(Preconditions::checkNotNull);
-
-		final int lambda = SecurityLevelConfig.getSystemSecurityLevel().getSecurityStrength();
+		checkArgument(Arrays.stream(values).allMatch(Objects::nonNull), VALUES_CONTAIN_NULL);
 
 		final int k = values.length;
 		final BigInteger q = exclusiveUpperBound;
@@ -164,7 +162,7 @@ public class HashService implements Hash {
 		checkArgument(q.compareTo(BigInteger.ZERO) > 0, "The upper bound must be strictly positive.");
 		checkArgument(q.bitLength() >= 512, "The exclusive upper bound must have a bit length of at least 512.");
 
-		final BigInteger h_prime = byteArrayToInteger(recursiveHashOfLength(q.bitLength() + 2 * lambda,
+		final BigInteger h_prime = byteArrayToInteger(recursiveHashOfLength(q.bitLength() + 256,
 				Streams.concat(Stream.of(HashableBigInteger.from(q)), Stream.of(HashableString.from("RecursiveHash")), Arrays.stream(v))
 						.toArray(Hashable[]::new)));
 		final BigInteger h = h_prime.mod(q);
@@ -190,7 +188,7 @@ public class HashService implements Hash {
 	@VisibleForTesting
 	byte[] recursiveHashOfLength(final int requestedBitLength, final Hashable... values) {
 		checkNotNull(values);
-		Arrays.stream(values).forEach(Preconditions::checkNotNull);
+		checkArgument(Arrays.stream(values).allMatch(Objects::nonNull), VALUES_CONTAIN_NULL);
 
 		final int k = values.length;
 		final int l = requestedBitLength;
@@ -204,27 +202,23 @@ public class HashService implements Hash {
 		} else {
 			final Hashable value = values[0];
 
-			switch (value) {
-			case HashableByteArray hashableByteArray -> {
+			if (value instanceof HashableByteArray hashableByteArray) {
 				final byte[] w = hashableByteArray.toHashableForm();
 				return ByteArrays.cutToBitLength(shake256(L, concat(BYTE_ARRAY_PREFIX, w)), l);
-			}
-			case HashableBigInteger hashableBigInteger -> {
+			} else if (value instanceof HashableBigInteger hashableBigInteger) {
 				final BigInteger w = hashableBigInteger.toHashableForm();
 				checkArgument(w.compareTo(BigInteger.ZERO) >= 0);
 				return ByteArrays.cutToBitLength(shake256(L, concat(BIG_INTEGER_PREFIX, integerToByteArray(w))), l);
-			}
-			case HashableString hashableString -> {
+			} else if (value instanceof HashableString hashableString) {
 				final String w = hashableString.toHashableForm();
 				return ByteArrays.cutToBitLength(shake256(L, concat(STRING_PREFIX, stringToByteArray(w))), l);
-			}
-			case HashableList hashableList -> {
+			} else if (value instanceof HashableList hashableList) {
 				final List<? extends Hashable> w = hashableList.toHashableForm();
 				final byte[] h = Stream.concat(Stream.of(ARRAY_PREFIX), w.parallelStream().map(w_i -> recursiveHashOfLength(l, w_i)))
 						.reduce(new byte[] {}, Bytes::concat);
 				return ByteArrays.cutToBitLength(shake256(L, h), l);
-			}
-			default -> throw new IllegalArgumentException(String.format("Object of type %s cannot be hashed.", value.getClass()));
+			} else {
+				throw new IllegalArgumentException(String.format("Object of type %s cannot be hashed.", value.getClass()));
 			}
 		}
 	}

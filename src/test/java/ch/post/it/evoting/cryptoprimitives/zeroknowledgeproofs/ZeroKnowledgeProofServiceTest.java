@@ -43,6 +43,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.zeroknowledgeproofs.ZeroKnow
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
+import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 
 class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 
@@ -51,6 +52,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 	private static final RandomService randomService = new RandomService();
 
 	private ZeroKnowledgeProof zeroKnowledgeProofservice;
+	private ElGamalGenerator elGamalGenerator;
 
 	private int numCiphertexts;
 	private int keyLength;
@@ -61,8 +63,9 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 
 	@BeforeEach
 	void setup() {
-		HashService hashService = TestHashService.create(gqGroup.getQ());
+		final HashService hashService = TestHashService.create(gqGroup.getQ());
 		zeroKnowledgeProofservice = new ZeroKnowledgeProofService(randomService, hashService);
+		elGamalGenerator = new ElGamalGenerator(gqGroup);
 
 		final int maxLength = 10;
 		numCiphertexts = random.nextInt(maxLength) + 1;
@@ -95,7 +98,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 		@DisplayName("Generating verifiable decryptions with an empty list ciphertexts throws an IllegalArgumentException")
 		void genVerifiableDecryptionsWithEmptyCiphertextList() {
 			ciphertexts = GroupVector.of();
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> zeroKnowledgeProofservice.genVerifiableDecryptions(ciphertexts, keyPair, auxiliaryInformation));
 			assertEquals("There must be at least one ciphertext.", exception.getMessage());
 		}
@@ -104,7 +107,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 		@DisplayName("Generating verifiable decryptions with too long ciphertexts throws an IllegalArgumentException")
 		void genVerifiableDecryptionsWithTooLongCiphertexts() {
 			ciphertexts = elGamalGenerator.genRandomCiphertextVector(numCiphertexts, keyLength + 1);
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> zeroKnowledgeProofservice.genVerifiableDecryptions(ciphertexts, keyPair, auxiliaryInformation));
 			assertEquals("The ciphertexts must be at most as long as the keys in the key pair.", exception.getMessage());
 		}
@@ -112,8 +115,8 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("Generating verifiable decryptions with ciphertexts and keys from different groups throws an IllegalArgumentException")
 		void genVerifiableDecryptionsWithIncompatibleGroups() {
-			ciphertexts = otherGroupElGamalGenerator.genRandomCiphertextVector(numCiphertexts, ciphertextLength);
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			ciphertexts = new ElGamalGenerator(otherGqGroup).genRandomCiphertextVector(numCiphertexts, ciphertextLength);
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> zeroKnowledgeProofservice.genVerifiableDecryptions(ciphertexts, keyPair, auxiliaryInformation));
 			assertEquals("The ciphertexts and the key pair must have the same group.", exception.getMessage());
 		}
@@ -163,7 +166,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("Verifying decryptions with ciphertexts from different group throws an IllegalArgumentException")
 		void verifyDecryptionsWithOtherCiphertexts() {
-			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> otherCiphertexts = otherGroupElGamalGenerator
+			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> otherCiphertexts = new ElGamalGenerator(otherGqGroup)
 					.genRandomCiphertextVector(numCiphertexts, ciphertextLength);
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> zeroKnowledgeProofservice.verifyDecryptions(otherCiphertexts, publicKey, verifiableDecryptions, auxiliaryInformation));
@@ -173,7 +176,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("Verifying decryptions with public key from different group throws an IllegalArgumentException")
 		void verifyDecryptionsWithOtherPublicKey() {
-			final ElGamalMultiRecipientPublicKey otherPublicKey = otherGroupElGamalGenerator.genRandomPublicKey(keyLength);
+			final ElGamalMultiRecipientPublicKey otherPublicKey = new ElGamalGenerator(otherGqGroup).genRandomPublicKey(keyLength);
 
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> zeroKnowledgeProofservice.verifyDecryptions(ciphertexts, otherPublicKey, verifiableDecryptions, auxiliaryInformation));

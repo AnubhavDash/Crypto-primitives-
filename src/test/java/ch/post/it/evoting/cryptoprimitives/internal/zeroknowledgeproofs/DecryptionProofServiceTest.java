@@ -60,6 +60,7 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
+import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.Generators;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
@@ -72,10 +73,13 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 	private static final RandomService randomService = new RandomService();
 	private static final List<String> auxiliaryInformation = Arrays.asList("aux", "1");
 
+	private static ElGamalGenerator elGamalGenerator;
 	private static DecryptionProofService decryptionProofService;
 
 	@BeforeAll
 	static void setupAll() {
+		elGamalGenerator = new ElGamalGenerator(gqGroup);
+
 		HashService hashService = TestHashService.create(gqGroup.getQ());
 		decryptionProofService = new DecryptionProofService(randomService, hashService);
 	}
@@ -320,7 +324,7 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with the ciphertext from a different group throws an IllegalArgumentException")
 		void verifyDecryptionWithCiphertextFromDifferentGroup() {
-			ciphertext = otherGroupElGamalGenerator.genRandomCiphertext(messageLength);
+			ciphertext = new ElGamalGenerator(otherGqGroup).genRandomCiphertext(messageLength);
 			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> decryptionProofService.verifyDecryption(ciphertext, publicKey, message, decryptionProof, auxiliaryInformation));
 			assertEquals("The ciphertext, the public key and the message must have the same group.", exception.getMessage());
@@ -338,7 +342,7 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with the message from a different group throws an IllegalArgumentException")
 		void verifyDecryptionWithMessageFromDifferentGroup() {
-			message = otherGroupElGamalGenerator.genRandomMessage(messageLength);
+			message = new ElGamalGenerator(otherGqGroup).genRandomMessage(messageLength);
 			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> decryptionProofService.verifyDecryption(ciphertext, publicKey, message, decryptionProof, auxiliaryInformation));
 			assertEquals("The ciphertext, the public key and the message must have the same group.", exception.getMessage());
