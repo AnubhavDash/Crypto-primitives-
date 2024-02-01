@@ -15,7 +15,9 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.utils;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.security.SecureRandom;
 import java.util.stream.Collectors;
@@ -37,48 +39,6 @@ class StringsTest {
 
 	private static final SecureRandom secureRandom = new SecureRandom();
 	private static final RandomService randomService = new RandomService();
-
-	@Test
-	void leftPadWithNullStringThrows() {
-		assertThrows(NullPointerException.class, () -> Strings.leftPad(null, 1, 'c'));
-	}
-
-	@Test
-	void leftPadWithEmptyStringThrows() {
-		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> Strings.leftPad("", 1, 'c'));
-		assertEquals("The string to be padded must contain at least one character.", exception.getMessage());
-	}
-
-	@Test
-	void leftPadWithStringLengthGreaterThanDesiredLengthThrows() {
-		final String string = "Test too short desired length";
-		final int desiredLength = string.length() - 1;
-		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-				() -> Strings.leftPad(string, desiredLength, 'c'));
-		assertEquals("The desired string length must not be smaller than the string.", exception.getMessage());
-	}
-
-	@Test
-	void leftPadWithStringLengthEqualsDesiredLengthReturnsString() {
-		final String string = "test";
-		assertEquals(string, Strings.leftPad(string, string.length(), 'c'));
-	}
-
-	@Test
-	void leftPadWithStringLengthGreaterThanDesiredLengthReturnsPaddedString() {
-		final String string = "Test short string";
-		final int paddingSize = secureRandom.nextInt(10) + 1;
-		final int desiredStringLength = string.length() + paddingSize;
-		final char paddingCharacter = '&';
-		final String paddedString = Strings.leftPad(string, desiredStringLength, paddingCharacter);
-
-		for (int i = 0; i < paddingSize; i++) {
-			assertEquals(paddingCharacter, paddedString.charAt(i));
-		}
-
-		assertTrue(paddedString.contains(string));
-		assertEquals(desiredStringLength, paddedString.length());
-	}
 
 	@Test
 	@DisplayName("truncate with a null input String throws a NullPointerException.")

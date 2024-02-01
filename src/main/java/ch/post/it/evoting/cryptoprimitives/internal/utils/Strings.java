@@ -20,26 +20,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class Strings {
 
-	/**
-	 * Pads a string to the desired length by adding the given character to the left of the string.
-	 *
-	 * @param string              S, the string to be padded. Must be of size > 0.
-	 * @param desiredStringLength l, the desired string length. Must be greater than the string length.
-	 * @param paddingCharacter    c, the character to be used for the padding.
-	 * @return the string padded to the desired length by adding the padding character the needed number of times on the left-hand side
-	 * @throws NullPointerException     if the string is null
-	 * @throws IllegalArgumentException if the desired length is smaller than the length of the string to be padded
-	 */
-	public static String leftPad(final String string, final int desiredStringLength, final char paddingCharacter) {
-		checkNotNull(string);
-		checkArgument(!string.isEmpty(), "The string to be padded must contain at least one character.");
-
-		final int k = string.length();
-		final int l = desiredStringLength;
-		checkArgument(k <= l, "The desired string length must not be smaller than the string.");
-
-		// This method is equivalent to the specification
-		return com.google.common.base.Strings.padStart(string, desiredStringLength, paddingCharacter);
+	private Strings() {
+		// Intentionally left blank.
 	}
 
 	public static String truncate(final String string, final int length) {
