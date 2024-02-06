@@ -36,7 +36,6 @@ import com.google.common.primitives.Bytes;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
-import ch.post.it.evoting.cryptoprimitives.securitylevel.SecurityLevel;
 import ch.post.it.evoting.cryptoprimitives.utils.Conversions;
 import ch.post.it.evoting.cryptoprimitives.utils.KeyDerivation;
 
