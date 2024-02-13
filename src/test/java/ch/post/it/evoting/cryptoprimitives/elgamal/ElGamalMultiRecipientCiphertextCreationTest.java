@@ -180,7 +180,7 @@ class ElGamalMultiRecipientCiphertextCreationTest {
 								GqElementFactory.fromValue(BigInteger.valueOf(5), group)
 						)
 				);
-		ZqElement exponent = ZqElement.create(BigInteger.valueOf(2), ZqGroup.sameOrderAs(group));
+		ZqElement exponent = ZqElement.create(BigInteger.TWO, ZqGroup.sameOrderAs(group));
 		ElGamalMultiRecipientPublicKey publicKey =
 				new ElGamalMultiRecipientPublicKey(
 						GroupVector.of(

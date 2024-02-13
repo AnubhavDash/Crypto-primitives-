@@ -48,7 +48,7 @@ public interface Random {
 	 *
 	 * @param desiredCodeLength   l, the desired length of each code. Must be strictly positive.
 	 * @param numberOfUniqueCodes n, the number of unique codes. Must be strictly positive.
-	 * @return a list of unique decimal strings.
+	 * @return codes &#8712; (&#120120;<sub>10</sub>)<sup>l &times; n</sup> a list of unique decimal strings.
 	 */
 	List<String> genUniqueDecimalStrings(final int desiredCodeLength, final int numberOfUniqueCodes);
 
@@ -63,5 +63,5 @@ public interface Random {
 	 * @throws IllegalArgumentException if &#119897; is not strictly positive.
 	 */
 	@SuppressWarnings("java:S117")
-	public String genRandomString(final int length, final Alphabet alphabet);
+	String genRandomString(final int length, final Alphabet alphabet);
 }

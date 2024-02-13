@@ -100,7 +100,7 @@ class StringsTest {
 	void truncateEnsureEqualityOfImplementation() {
 		final int stringLength = secureRandom.nextInt(1, 10000);
 		final String string = new String(randomService.randomBytes(stringLength));
-		final int length = 5000;
+		final int length = secureRandom.nextInt(1, 10000);
 
 		assertEquals(truncateFromSpecification(string, length), Strings.truncate(string, length));
 	}

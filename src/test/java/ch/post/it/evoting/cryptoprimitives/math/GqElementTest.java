@@ -39,7 +39,7 @@ class GqElementTest {
 	static void setUp() {
 		final BigInteger q = BigInteger.valueOf(11);
 		final BigInteger p = BigInteger.valueOf(23);
-		g = BigInteger.valueOf(2);
+		g = BigInteger.TWO;
 
 		group = new GqGroup(p, q, g);
 		groupGenerator = new GqGroupGenerator(group);
@@ -82,7 +82,7 @@ class GqElementTest {
 	@Test
 	void givenTwoElementsFromDifferentGroupsWhenMultiplyThenException() {
 		BigInteger value1 = BigInteger.valueOf(3);
-		BigInteger value2 = BigInteger.valueOf(2);
+		BigInteger value2 = BigInteger.TWO;
 
 		GqElement element1 = GqElementFactory.fromValue(value1, group);
 		GqElement element2 = GqElementFactory.fromValue(value2, new GqGroup(BigInteger.valueOf(7), BigInteger.valueOf(3), g));
@@ -100,9 +100,9 @@ class GqElementTest {
 
 	@Test
 	void givenAnElementWithValueOneWhenMultipliedWithASecondElementThenTheResultIsSecondElement() {
-		BigInteger value1 = BigInteger.valueOf(2);
+		BigInteger value1 = BigInteger.TWO;
 		BigInteger value2 = BigInteger.ONE;
-		BigInteger expectedResult = BigInteger.valueOf(2);
+		BigInteger expectedResult = BigInteger.TWO;
 
 		multiplyAndAssert(value1, value2, expectedResult);
 	}
@@ -134,7 +134,7 @@ class GqElementTest {
 		GqElement element = GqElementFactory.fromValue(value1, group);
 
 		ZqGroup exponentGroup = new ZqGroup(BigInteger.valueOf(3));
-		BigInteger exponentValue = BigInteger.valueOf(2);
+		BigInteger exponentValue = BigInteger.TWO;
 		ZqElement exponent = ZqElement.create(exponentValue, exponentGroup);
 
 		assertThrows(IllegalArgumentException.class, () -> element.exponentiate(exponent));
@@ -151,7 +151,7 @@ class GqElementTest {
 
 	@Test
 	void givenElementAndExponentWhenExponentiateThenSucceeds() {
-		BigInteger value = BigInteger.valueOf(2);
+		BigInteger value = BigInteger.TWO;
 		BigInteger exponentValue = BigInteger.valueOf(4);
 		BigInteger expectedResult = BigInteger.valueOf(16);
 
@@ -197,7 +197,7 @@ class GqElementTest {
 
 	@Test
 	void givenTwoElementsWhenDivideThenSuccess() {
-		final GqElement two = GqElementFactory.fromValue(BigInteger.valueOf(2), group);
+		final GqElement two = GqElementFactory.fromValue(BigInteger.TWO, group);
 		final GqElement three = GqElementFactory.fromValue(BigInteger.valueOf(3), group);
 		final GqElement four = GqElementFactory.fromValue(BigInteger.valueOf(4), group);
 		final GqElement nine = GqElementFactory.fromValue(BigInteger.valueOf(9), group);
@@ -216,9 +216,9 @@ class GqElementTest {
 		GqElement element1_value1_q11 = GqElementFactory.fromValue(BigInteger.ONE, group);
 		GqElement element2_value1_q11 = GqElementFactory.fromValue(BigInteger.ONE, group);
 
-		GqElement element3_value2_q11 = GqElementFactory.fromValue(BigInteger.valueOf(2), group);
+		GqElement element3_value2_q11 = GqElementFactory.fromValue(BigInteger.TWO, group);
 
-		GqGroup otherGroup_g4_q3 = new GqGroup(BigInteger.valueOf(7), BigInteger.valueOf(3), BigInteger.valueOf(2));
+		GqGroup otherGroup_g4_q3 = new GqGroup(BigInteger.valueOf(7), BigInteger.valueOf(3), BigInteger.TWO);
 		GqElement element4_value1_q13 = GqElementFactory.fromValue(BigInteger.ONE, otherGroup_g4_q3);
 
 		assertAll(
@@ -272,7 +272,7 @@ class GqElementTest {
 
 	@Test
 	void test() {
-		final GqGroup gqGroup = new GqGroup(BigInteger.valueOf(47), BigInteger.valueOf(23), BigInteger.valueOf(2));
+		final GqGroup gqGroup = new GqGroup(BigInteger.valueOf(47), BigInteger.valueOf(23), BigInteger.TWO);
 		final GroupVector<PrimeGqElement, GqGroup> smallPrimeGroupMembers = PrimeGqElement.PrimeGqElementFactory.getSmallPrimeGroupMembers(gqGroup,
 				3);
 		assertEquals(7, smallPrimeGroupMembers.get(0).value.intValueExact());

@@ -147,7 +147,7 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 	public int getLegendre(final BigInteger a, final BigInteger p) {
 		checkNotNull(a);
 		checkNotNull(p);
-		checkArgument(p.compareTo(BigInteger.valueOf(2)) > 0 && p.mod(BigInteger.valueOf(2)).equals(BigInteger.ONE),
+		checkArgument(p.compareTo(BigInteger.TWO) > 0 && p.mod(BigInteger.TWO).equals(BigInteger.ONE),
 				"p must be an odd integer greater than 2");
 
 		return VMG.legendre(a, p);

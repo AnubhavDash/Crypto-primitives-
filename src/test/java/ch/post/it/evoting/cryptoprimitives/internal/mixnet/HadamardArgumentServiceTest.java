@@ -282,7 +282,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 
 			ZqElement zqZero = ZqElement.create(BigInteger.ZERO, zqGroup);
 			ZqElement zqOne = ZqElement.create(BigInteger.ONE, zqGroup);
-			ZqElement zqTwo = ZqElement.create(BigInteger.valueOf(2), zqGroup);
+			ZqElement zqTwo = ZqElement.create(BigInteger.TWO, zqGroup);
 			ZqElement zqThree = ZqElement.create(BigInteger.valueOf(3), zqGroup);
 			ZqElement zqFour = ZqElement.create(BigInteger.valueOf(4), zqGroup);
 
@@ -295,7 +295,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 
 			BigInteger zero = BigInteger.ZERO;
 			BigInteger one = BigInteger.ONE;
-			BigInteger two = BigInteger.valueOf(2);
+			BigInteger two = BigInteger.TWO;
 			BigInteger three = BigInteger.valueOf(3);
 			BigInteger four = BigInteger.valueOf(4);
 
@@ -499,7 +499,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 			// Column1 = [1, 2]
 			List<ZqElement> column1 = new ArrayList<>(2);
 			column1.add(ZqElement.create(BigInteger.ONE, group));
-			column1.add(ZqElement.create(BigInteger.valueOf(2), group));
+			column1.add(ZqElement.create(BigInteger.TWO, group));
 			columns.add(column1);
 			// Column2 = [3, 4]
 			List<ZqElement> column2 = new ArrayList<>(2);

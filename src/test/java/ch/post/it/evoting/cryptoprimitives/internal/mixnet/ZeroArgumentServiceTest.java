@@ -70,7 +70,7 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 
 	private static final BigInteger ZERO = BigInteger.valueOf(0);
 	private static final BigInteger ONE = BigInteger.ONE;
-	private static final BigInteger TWO = BigInteger.valueOf(2);
+	private static final BigInteger TWO = BigInteger.TWO;
 	private static final BigInteger THREE = BigInteger.valueOf(3);
 	private static final BigInteger FOUR = BigInteger.valueOf(4);
 	private static final BigInteger FIVE = BigInteger.valueOf(5);

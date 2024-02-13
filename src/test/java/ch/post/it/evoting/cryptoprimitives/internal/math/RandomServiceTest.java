@@ -17,7 +17,6 @@ package ch.post.it.evoting.cryptoprimitives.internal.math;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -262,14 +261,16 @@ class RandomServiceTest {
 			assertThrows(NullPointerException.class, () -> randomService.genRandomString(LENGTH, null));
 		}
 
-		@Test
+		@RepeatedTest(100)
 		@DisplayName("valid input behaves as expected")
 		void happyPath() {
 
-			final String S_prime = assertDoesNotThrow(() -> randomService.genRandomString(LENGTH, alphabet));
+			int length = secureRandom.nextInt(1, 10000);
+
+			final String S_prime = assertDoesNotThrow(() -> randomService.genRandomString(length, alphabet));
 
 			// S_prime must have length l.
-			assertEquals(LENGTH, S_prime.length());
+			assertEquals(length, S_prime.length());
 
 			// each element of S_prime must be part of the Alphabet.
 			final char[] chars = S_prime.toCharArray();
@@ -279,7 +280,7 @@ class RandomServiceTest {
 			}
 
 			// a second call should return a different S_prime
-			assertNotEquals(S_prime, randomService.genRandomString(LENGTH, alphabet));
+			assertNotEquals(S_prime, randomService.genRandomString(length, alphabet));
 		}
 
 	}

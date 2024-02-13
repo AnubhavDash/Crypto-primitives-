@@ -362,7 +362,7 @@ class HashServiceTest {
 		final HashService hashService = HashService.getInstance();
 		final BigInteger q = BigInteger.valueOf(11);
 		final BigInteger p = BigInteger.valueOf(23);
-		final BigInteger g = BigInteger.valueOf(2);
+		final BigInteger g = BigInteger.TWO;
 
 		final GqGroup group = new GqGroup(p, q, g);
 
@@ -376,7 +376,7 @@ class HashServiceTest {
 		final HashService hashService = HashService.getInstance();
 		final BigInteger q = BigInteger.valueOf(11);
 		final BigInteger p = BigInteger.valueOf(23);
-		final BigInteger g = BigInteger.valueOf(2);
+		final BigInteger g = BigInteger.TWO;
 
 		final GqGroup group = new GqGroup(p, q, g);
 
@@ -392,7 +392,7 @@ class HashServiceTest {
 						+ "12345678901234567890123456789012345678901234567889").mod(largeZqGroup.getQ());
 
 		return Stream.of(
-				Arguments.of(ZqElement.create(BigInteger.valueOf(2), largeZqGroup), BigInteger.valueOf(9)),
+				Arguments.of(ZqElement.create(BigInteger.TWO, largeZqGroup), BigInteger.valueOf(9)),
 				Arguments.of(ZqElement.create(BigInteger.ZERO, largeZqGroup), BigInteger.ONE),
 				Arguments.of(ZqElement.create(hugeBigInteger, largeZqGroup),
 						new BigInteger(

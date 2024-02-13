@@ -101,7 +101,7 @@ class ShuffleServiceTest extends TestGroupSetup {
 		//Define group
 		final BigInteger p = BigInteger.valueOf(23);
 		final BigInteger q = BigInteger.valueOf(11);
-		final BigInteger g = BigInteger.valueOf(2);
+		final BigInteger g = BigInteger.TWO;
 
 		final GqGroup localGroup = new GqGroup(p, q, g);
 

@@ -31,7 +31,7 @@ public class BigIntegerOperationsJava implements BigIntegerOperations {
 
 	private static final BigInteger ZERO = BigInteger.ZERO;
 	private static final BigInteger ONE = BigInteger.ONE;
-	private static final BigInteger TWO = BigInteger.valueOf(2);
+	private static final BigInteger TWO = BigInteger.TWO;
 
 	@Override
 	public BigInteger modMultiply(final BigInteger n1, final BigInteger n2, final BigInteger modulus) {

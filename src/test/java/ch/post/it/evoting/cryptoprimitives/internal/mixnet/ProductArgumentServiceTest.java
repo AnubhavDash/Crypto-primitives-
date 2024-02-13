@@ -291,7 +291,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 
 			final ZqElement zqZero = ZqElement.create(BigInteger.ZERO, zqGroup);
 			final ZqElement zqOne = ZqElement.create(BigInteger.ONE, zqGroup);
-			final ZqElement zqTwo = ZqElement.create(BigInteger.valueOf(2), zqGroup);
+			final ZqElement zqTwo = ZqElement.create(BigInteger.TWO, zqGroup);
 			final ZqElement zqThree = ZqElement.create(BigInteger.valueOf(3), zqGroup);
 			final ZqElement zqFour = ZqElement.create(BigInteger.valueOf(4), zqGroup);
 
@@ -306,7 +306,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 
 			final BigInteger zero = BigInteger.ZERO;
 			final BigInteger one = BigInteger.ONE;
-			final BigInteger two = BigInteger.valueOf(2);
+			final BigInteger two = BigInteger.TWO;
 			final BigInteger three = BigInteger.valueOf(3);
 			final BigInteger four = BigInteger.valueOf(4);
 

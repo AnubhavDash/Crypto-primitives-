@@ -44,7 +44,7 @@ class ElGamalMultiRecipientKeyPairTest {
 	static void setUp() {
 		BigInteger p = BigInteger.valueOf(23);
 		BigInteger q = BigInteger.valueOf(11);
-		BigInteger g = BigInteger.valueOf(2);
+		BigInteger g = BigInteger.TWO;
 
 		
 		publicKeyGroup = new GqGroup(p, q, g);

@@ -194,7 +194,7 @@ class GroupVectorTest {
 	void threeElementsWithTheSamePropertyAreAllEqualAndDifferentPropertiesNotEqual() {
 		TestGroup group = new TestGroup();
 		TestValuedElement first = new TestValuedElement(BigInteger.ONE, group);
-		TestValuedElement second = new TestValuedElement(BigInteger.valueOf(2), group);
+		TestValuedElement second = new TestValuedElement(BigInteger.TWO, group);
 		TestValuedElement third = new TestValuedElement(BigInteger.valueOf(3), group);
 		List<TestValuedElement> elements = Arrays.asList(first, second, third);
 		GroupVector<TestValuedElement, TestGroup> vector = GroupVector.from(elements);

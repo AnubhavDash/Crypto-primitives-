@@ -170,7 +170,7 @@ class DiagonalProductsTest extends TestGroupSetup {
 		// Create groups
 		final BigInteger p = BigInteger.valueOf(23);
 		final BigInteger q = BigInteger.valueOf(11);
-		final BigInteger g = BigInteger.valueOf(2);
+		final BigInteger g = BigInteger.TWO;
 
 		final GqGroup gqGroup = new GqGroup(p, q, g);
 		final ZqGroup zqGroup = new ZqGroup(q);

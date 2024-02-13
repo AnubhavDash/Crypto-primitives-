@@ -36,7 +36,7 @@ class GqElementFactoryTest {
 	static void setUp() {
 		final BigInteger p = BigInteger.valueOf(23);
 		final BigInteger q = BigInteger.valueOf(11);
-		final BigInteger g = BigInteger.valueOf(2);
+		final BigInteger g = BigInteger.TWO;
 
 		group = new GqGroup(p, q, g);
 		groupGenerator = new GqGroupGenerator(group);
@@ -44,7 +44,7 @@ class GqElementFactoryTest {
 
 	@Test
 	void givenAValueWhenAGroupElementIsCreatedWithThatValueThenHasThatValue() {
-		final BigInteger value = BigInteger.valueOf(2);
+		final BigInteger value = BigInteger.TWO;
 		final GqElement element = GqElementFactory.fromValue(value, group);
 		assertEquals(value, element.getValue(), "The returned element value is not the expected one");
 	}
@@ -116,12 +116,12 @@ class GqElementFactoryTest {
 	void testFromSquareRootWithValidInputReturnsSquaredElement() {
 		final ZqGroup zqGroup = ZqGroup.sameOrderAs(group);
 		final BigInteger one = BigInteger.ONE;
-		final BigInteger two = BigInteger.valueOf(2);
+		final BigInteger two = BigInteger.TWO;
 		final BigInteger five = BigInteger.valueOf(5);
 
 		final GqElement resultOne = GqElementFactory.fromValue(BigInteger.ONE, group);
 		final GqElement resultFour = GqElementFactory.fromValue(BigInteger.valueOf(4), group);
-		final GqElement resultTwo = GqElementFactory.fromValue(BigInteger.valueOf(2), group);
+		final GqElement resultTwo = GqElementFactory.fromValue(BigInteger.TWO, group);
 
 		assertEquals(GqElementFactory.fromSquareRoot(one, group), resultOne);
 		assertEquals(GqElementFactory.fromSquareRoot(two, group), resultFour);

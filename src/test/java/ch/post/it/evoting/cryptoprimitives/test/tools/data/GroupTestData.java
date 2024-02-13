@@ -43,12 +43,12 @@ public class GroupTestData {
 
 		final BigInteger p2 = BigInteger.valueOf(23);
 		final BigInteger q2 = BigInteger.valueOf(11);
-		final BigInteger g2 = BigInteger.valueOf(2);
+		final BigInteger g2 = BigInteger.TWO;
 		final GqGroup group2 = new GqGroup(p2, q2, g2);
 
 		final BigInteger p3 = BigInteger.valueOf(47);
 		final BigInteger q3 = BigInteger.valueOf(23);
-		final BigInteger g3 = BigInteger.valueOf(2);
+		final BigInteger g3 = BigInteger.TWO;
 		final GqGroup group3 = new GqGroup(p3, q3, g3);
 
 		final BigInteger p4 = BigInteger.valueOf(59);

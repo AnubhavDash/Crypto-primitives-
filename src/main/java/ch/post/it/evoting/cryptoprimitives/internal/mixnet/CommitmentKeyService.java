@@ -99,7 +99,7 @@ public class CommitmentKeyService {
 					HashableBigInteger.from(BigInteger.valueOf(i)),
 					HashableBigInteger.from(BigInteger.valueOf(count))).add(one);
 
-			final BigInteger w = BigIntegerOperationsService.modExponentiate(u.getValue(), BigInteger.valueOf(2), p);
+			final BigInteger w = BigIntegerOperationsService.modExponentiate(u.getValue(), BigInteger.TWO, p);
 
 			if (validElement.test(w)) {
 				v.add(w);

@@ -97,7 +97,7 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		private final GroupVector<GqElement, GqGroup> exponentiations = GroupVector.of(gNine, gFive);
 		private final ZqGroup zqGroup = new ZqGroup(q);
 		private final ZqElement zOne = ZqElement.create(BigInteger.ONE, zqGroup);
-		private final ZqElement zTwo = ZqElement.create(BigInteger.valueOf(2), zqGroup);
+		private final ZqElement zTwo = ZqElement.create(BigInteger.TWO, zqGroup);
 		// Output:
 		// e = 2
 		// z = 3
@@ -106,7 +106,7 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		private final ZqElement exponent = zThree;
 		private final ZqElement z = zThree;
 		private final List<String> auxiliaryInformation = Arrays.asList("specific", "test", "values");
-		private final List<BigInteger> randomValues = Collections.singletonList(BigInteger.valueOf(2));
+		private final List<BigInteger> randomValues = Collections.singletonList(BigInteger.TWO);
 
 		private RandomService getSpecificRandomService() {
 			return new RandomService() {

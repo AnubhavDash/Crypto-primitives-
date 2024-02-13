@@ -114,7 +114,7 @@ public final class PrimeGqElement extends GqElement {
 			final BigInteger g = gqGroup.getGenerator().value;
 
 			checkArgument(r > 0, "The desired number of primes must be strictly positive");
-			checkArgument(BigInteger.valueOf(2).compareTo(g) <= 0 && g.compareTo(BigInteger.valueOf(4)) <= 0, "g must be 2, 3, or 4.");
+			checkArgument(BigInteger.TWO.compareTo(g) <= 0 && g.compareTo(BigInteger.valueOf(4)) <= 0, "g must be 2, 3, or 4.");
 			checkArgument(BigInteger.valueOf(r).compareTo(gqGroup.getQ().subtract(BigInteger.valueOf(4))) <= 0,
 					"The desired number of primes must be smaller than the number of elements in the GqGroup by at least 4.");
 			checkArgument(r < 10000, "The desired number of primes must be strictly smaller than 10000.");
@@ -127,7 +127,7 @@ public final class PrimeGqElement extends GqElement {
 					p_vector.add(new PrimeGqElement(current.intValueExact(), gqGroup));
 					count++;
 				}
-				current = current.add(BigInteger.valueOf(2));
+				current = current.add(BigInteger.TWO);
 			}
 			checkState(count == r, "The number of primes found does not correspond to the number of desired primes. [count: %s, desired: %s]",
 					count, r);

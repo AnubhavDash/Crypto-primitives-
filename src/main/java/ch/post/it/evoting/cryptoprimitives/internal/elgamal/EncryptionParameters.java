@@ -45,7 +45,7 @@ public final class EncryptionParameters {
 
 	private static final BigInteger ZERO = BigInteger.ZERO;
 	private static final BigInteger ONE = BigInteger.ONE;
-	private static final BigInteger TWO = BigInteger.valueOf(2);
+	private static final BigInteger TWO = BigInteger.TWO;
 	private static final BigInteger THREE = BigInteger.valueOf(3);
 	private static final BigInteger FIVE = BigInteger.valueOf(5);
 	private static final BigInteger SIX = BigInteger.valueOf(6);

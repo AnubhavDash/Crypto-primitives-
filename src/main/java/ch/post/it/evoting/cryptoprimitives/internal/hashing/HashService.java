@@ -135,7 +135,7 @@ public class HashService implements Hash {
 		checkNotNull(group);
 
 		checkArgument(this.getHashLength() * Byte.SIZE < group.getQ().bitLength(),
-				"The hash length must be smaller than the bit length of this GqGroup's q.");
+				"The hash length must be smaller than the bit length of the GqGroup's q.");
 
 		final BigInteger q = group.getQ();
 

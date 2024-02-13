@@ -139,7 +139,7 @@ public sealed class GqElement extends GroupElement<GqGroup> permits PrimeGqEleme
 			checkArgument(element.compareTo(BigInteger.ZERO) > 0, "The element must be strictly greater than 0");
 			checkArgument(element.compareTo(group.getQ()) < 0, "The element must be smaller than the group's order");
 
-			final BigInteger y = BigIntegerOperationsService.modExponentiate(element, BigInteger.valueOf(2), group.getP());
+			final BigInteger y = BigIntegerOperationsService.modExponentiate(element, BigInteger.TWO, group.getP());
 			return new GqElement(y, group);
 		}
 

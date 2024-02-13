@@ -42,7 +42,7 @@ class GqGroupTest {
 
 		p = BigInteger.valueOf(23);
 		q = BigInteger.valueOf(11);
-		g = BigInteger.valueOf(2);
+		g = BigInteger.TWO;
 		smallGroup = new GqGroup(p, q, g);
 		smallGroupGenerator = new GqGroupGenerator(smallGroup);
 	}

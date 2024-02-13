@@ -348,7 +348,7 @@ class ElGamalMultiRecipientCiphertextTest extends TestGroupSetup {
 	void multiplyWithDifferentGroupOtherShouldThrow() {
 		final ElGamalMultiRecipientCiphertext ciphertext = ElGamalMultiRecipientCiphertext.create(validGamma, validPhis);
 
-		final GqGroup otherGroup = new GqGroup(BigInteger.valueOf(7), BigInteger.valueOf(3), BigInteger.valueOf(2));
+		final GqGroup otherGroup = new GqGroup(BigInteger.valueOf(7), BigInteger.valueOf(3), BigInteger.TWO);
 		final GqElement otherGroupGamma = genOtherGroupGamma(otherGroup);
 		final List<GqElement> otherGroupPhis = genOtherGroupPhis(otherGroup);
 		final ElGamalMultiRecipientCiphertext other = ElGamalMultiRecipientCiphertext.create(otherGroupGamma, otherGroupPhis);

@@ -85,7 +85,7 @@ public final class GqGroup implements MathematicalGroup<GqGroup>, HashableList {
 		checkArgument(millerRabin(q, lambda / 2), "Group Gq parameter q must be prime");
 		checkArgument(q.compareTo(BigInteger.ZERO) > 0);
 		checkArgument(q.compareTo(p) < 0);
-		final BigInteger computedP = q.multiply(BigInteger.valueOf(2)).add(BigInteger.ONE);
+		final BigInteger computedP = q.multiply(BigInteger.TWO).add(BigInteger.ONE);
 		checkArgument(computedP.equals(p), "Group Gq parameter p must be equal to 2q + 1");
 		this.q = q;
 
