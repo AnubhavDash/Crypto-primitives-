@@ -60,11 +60,16 @@ public final class EncryptionParameters {
 	}
 
 	/**
-	 * Picks verifiable encryption parameters used for the election. The election name is used as the seed.
+	 * Generates verifiable encryption parameters used for the election.
+	 * <p>
+	 *     Executions with the same seed, yield the same encryption parameters.
+	 * </p>
 	 *
-	 * @param seed        the election name. Must be non-null.
+	 * @param seed        the name of the election event. Must be non-null.
 	 * @param smallPrimes a list of small primes. Must be non-null.
 	 * @return a {@link GqGroup} containing the verifiable encryption parameters p, q and g.
+	 * @throws NullPointerException if any of the inputs is null.
+	 * @throws IllegalArgumentException if any of the numbers in small primes list is not a prime.
 	 */
 	@SuppressWarnings("java:S117")
 	public GqGroup getEncryptionParameters(final String seed, final List<Integer> smallPrimes) {

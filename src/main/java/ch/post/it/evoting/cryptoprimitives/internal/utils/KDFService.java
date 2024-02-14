@@ -121,11 +121,12 @@ public class KDFService implements KeyDerivation {
 		final BigInteger q = exclusiveUpperBound;
 
 		checkArgument(l_straight >= L, "The pseudo random key length must be greater than the hash function output length.");
-		checkArgument(ByteArrays.byteLength(q) >= L);
+		checkArgument(ByteArrays.byteLength(q) >= L,
+				"The byte length of the exclusive upper bound must be greater than the hash function output length.");
 
 		final int l_curved = ByteArrays.byteLength(q) + lambda / 4;
-		byte[] h = KDF(PRK, info, l_curved);
-		BigInteger u = byteArrayToInteger(h).mod(q);
+		final byte[] h = KDF(PRK, info, l_curved);
+		final BigInteger u = byteArrayToInteger(h).mod(q);
 
 		return ZqElement.create(u, new ZqGroup(q));
 	}

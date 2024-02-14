@@ -68,7 +68,7 @@ public interface ZeroKnowledgeProof {
 	 * Generates a proof of validity for the provided exponentiations.
 	 *
 	 * @param bases                <b>g</b> ∈ G<sub>q</sub><sup>n</sup>. Not null and not empty.
-	 * @param exponent             x ∈ Z<sub>q</sub>, a secret exponent. Not null.
+	 * @param exponent             x ∈ &#8484;<sub>q</sub>, a secret exponent. Not null.
 	 * @param exponentiations      <b>y</b> ∈ G<sub>q</sub><sup>n</sup>. Not null and not empty.
 	 * @param auxiliaryInformation i<sub>aux</sub>, auxiliary information to be used for the hash. Must be non null and not contain nulls. Can be
 	 *                             empty.
@@ -87,10 +87,10 @@ public interface ZeroKnowledgeProof {
 	/**
 	 * Verifies the validity of a given {@link ExponentiationProof}.
 	 *
-	 * @param bases                g, the bases that were used to generate the proof. Must be non null.
-	 * @param exponentiations      y, the exponentiations that were used to generate the proof. Must be non null.
-	 * @param proof                (e, z), the proof to be verified.
-	 * @param auxiliaryInformation i<sub>aux</sub>, auxiliary information that was used during proof generation. Must be non null and not contain
+	 * @param bases                g &isin; G<sub>q</sub><sup>n</sup>, the bases that were used to generate the proof. Must be non-null.
+	 * @param exponentiations      y &isin; G<sub>q</sub><sup>n</sup>, the exponentiations that were used to generate the proof. Must be non-null.
+	 * @param proof                (e, z) &isin; &#8484;<sub>q</sub><sup>2</sup>, the proof to be verified.
+	 * @param auxiliaryInformation i<sub>aux</sub>, auxiliary information that was used during proof generation. Must be non-null and not contain
 	 *                             nulls.
 	 * @return {@code true} if the exponentiation proof is valid, {@code false} otherwise.
 	 * @throws NullPointerException     if any of the bases, exponentiations, or proof is null
@@ -114,7 +114,7 @@ public interface ZeroKnowledgeProof {
 	 * @param secondCiphertext     C' = (c'<sub>0</sub>, c'<sub>1</sub>) ∈ G<sub>q</sub><sup>2</sup>. Not null.
 	 * @param firstPublicKey       h ∈ G<sub>q</sub>. Not null.
 	 * @param secondPublicKey      h' ∈ G<sub>q</sub>. Not null.
-	 * @param randomness           (r, r') ∈ Z<sub>q</sub><sup>2</sup>. Not null.
+	 * @param randomness           (r, r') ∈ &#8484;<sub>q</sub><sup>2</sup>. Not null.
 	 * @param auxiliaryInformation i<sub>aux</sub>, auxiliary information to be used for the hash. Must be non null. Can be empty.
 	 * @return a plaintext equality proof as a {@link PlaintextEqualityProof}.
 	 * @throws NullPointerException     if any of the inputs is null or {@code auxiliaryInformation} contains any null.
@@ -137,7 +137,7 @@ public interface ZeroKnowledgeProof {
 	 * @param secondCiphertext       C' = (c'<sub>0</sub>, c'<sub>1</sub>) ∈ G<sub>q</sub><sup>2</sup>. Not null.
 	 * @param firstPublicKey         h ∈ G<sub>q</sub>. Not null.
 	 * @param secondPublicKey        h' ∈ G<sub>q</sub>. Not null.
-	 * @param plaintextEqualityProof (e, z), the plaintext equality proof to be verified. Must be non null.
+	 * @param plaintextEqualityProof (e, z) &isin; &#8484;<sub>q</sub><sup>2</sup>, the plaintext equality proof to be verified. Must be non null.
 	 * @param auxiliaryInformation   i<sub>aux</sub>, auxiliary information to be used for the hash. Must be non null. Can be empty.
 	 * @return {@code true} if the plaintext equality proof is valid, {@code false} otherwise.
 	 * @throws NullPointerException     if any of the bases, exponentiations, or plaintextEqualityProof is null
@@ -155,7 +155,7 @@ public interface ZeroKnowledgeProof {
 	/**
 	 * Generates a proof of knowledge of a discrete logarithm.
 	 *
-	 * @param witness              x ∈ Z<sub>q</sub>. Not null.
+	 * @param witness              x ∈ &#8484;<sub>q</sub>. Not null.
 	 * @param statement            y ∈ G<sub>q</sub>. Not null.
 	 * @param auxiliaryInformation i<sub>aux</sub>, auxiliary information to be used for the hash. Must be non null. Can be empty.
 	 * @return a {@link SchnorrProof}.
@@ -167,7 +167,7 @@ public interface ZeroKnowledgeProof {
 	/**
 	 * Verifies the validity of a Schnorr proof.
 	 *
-	 * @param proof                (e,z) ∈ Z<sub>q</sub> X Z<sub>q</sub>. Not null.
+	 * @param proof                (e,z) ∈ &#8484;<sub>q</sub> X Z<sub>q</sub>. Not null.
 	 * @param statement            y ∈ G<sub>q</sub>. Not null.
 	 * @param auxiliaryInformation i<sub>aux</sub>, auxiliary information to be used for the hash. Must be non null. Can be empty.
 	 * @return {@code true} if the schnorr proof is valid, {@code false} otherwise.
