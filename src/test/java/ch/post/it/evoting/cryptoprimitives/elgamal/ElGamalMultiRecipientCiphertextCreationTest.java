@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -180,7 +180,7 @@ class ElGamalMultiRecipientCiphertextCreationTest {
 								GqElementFactory.fromValue(BigInteger.valueOf(5), group)
 						)
 				);
-		ZqElement exponent = ZqElement.create(BigInteger.valueOf(2), ZqGroup.sameOrderAs(group));
+		ZqElement exponent = ZqElement.create(BigInteger.TWO, ZqGroup.sameOrderAs(group));
 		ElGamalMultiRecipientPublicKey publicKey =
 				new ElGamalMultiRecipientPublicKey(
 						GroupVector.of(

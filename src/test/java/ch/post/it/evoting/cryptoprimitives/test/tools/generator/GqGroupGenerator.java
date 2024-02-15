@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ public class GqGroupGenerator {
 
 		final Set<BigInteger> members =
 				integersModP()
-						.map(bi -> bi.modPow(BigInteger.valueOf(2), group.getP()))
+						.map(bi -> bi.modPow(BigInteger.TWO, group.getP()))
 						.collect(Collectors.toSet());
 		members.remove(BigInteger.ZERO);
 		return members;
@@ -96,7 +96,7 @@ public class GqGroupGenerator {
 		BigInteger member;
 		do {
 			final BigInteger randomInteger = randomBigInteger(group.getP().bitLength());
-			member = randomInteger.modPow(BigInteger.valueOf(2), group.getP());
+			member = randomInteger.modPow(BigInteger.TWO, group.getP());
 		} while (member.compareTo(BigInteger.ZERO) <= 0 || member.compareTo(group.getP()) >= 0);
 		return member;
 	}

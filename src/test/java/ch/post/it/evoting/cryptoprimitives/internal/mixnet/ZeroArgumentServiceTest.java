@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,6 @@ import ch.post.it.evoting.cryptoprimitives.mixnet.ZeroStatement;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ZeroWitness;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.Generators;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
@@ -71,7 +70,7 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 
 	private static final BigInteger ZERO = BigInteger.valueOf(0);
 	private static final BigInteger ONE = BigInteger.ONE;
-	private static final BigInteger TWO = BigInteger.valueOf(2);
+	private static final BigInteger TWO = BigInteger.TWO;
 	private static final BigInteger THREE = BigInteger.valueOf(3);
 	private static final BigInteger FOUR = BigInteger.valueOf(4);
 	private static final BigInteger FIVE = BigInteger.valueOf(5);
@@ -91,12 +90,11 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 	private static HashService hashService;
 
 	@BeforeAll
-	static void setUpAll() {
+	static void setUpAll() throws Exception {
 		// Generate publicKey and commitmentKey.
 		final TestCommitmentKeyGenerator commitmentKeyGenerator = new TestCommitmentKeyGenerator(gqGroup);
 		commitmentKey = commitmentKeyGenerator.genCommitmentKey(KEY_ELEMENTS_NUMBER);
 
-		final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(gqGroup);
 		publicKey = elGamalGenerator.genRandomPublicKey(KEY_ELEMENTS_NUMBER);
 
 		// Init services.
@@ -134,7 +132,7 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 	@DisplayName("constructed with keys from different groups throws IllegalArgumentException")
 	void constructDiffGroupKeys() {
 		// Create public key from other group.
-		final ElGamalMultiRecipientPublicKey otherPublicKey = new ElGamalGenerator(otherGqGroup).genRandomPublicKey(KEY_ELEMENTS_NUMBER);
+		final ElGamalMultiRecipientPublicKey otherPublicKey = otherGroupElGamalGenerator.genRandomPublicKey(KEY_ELEMENTS_NUMBER);
 
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 				() -> new ZeroArgumentService(otherPublicKey, commitmentKey, randomService, hashService));

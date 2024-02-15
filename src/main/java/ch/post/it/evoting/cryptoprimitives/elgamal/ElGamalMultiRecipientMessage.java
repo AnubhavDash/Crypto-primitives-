@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import com.google.common.base.Preconditions;
+
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
-import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientObject;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
+import ch.post.it.evoting.cryptoprimitives.math.GroupVectorElement;
 
 /**
  * Represents an ElGamal message containing multiple elements.
@@ -35,7 +37,7 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
  * <p>Instances of this class are immutable.
  */
 @SuppressWarnings({ "java:S117" })
-public final class ElGamalMultiRecipientMessage implements ElGamalMultiRecipientObject<GqElement, GqGroup>, HashableList {
+public final class ElGamalMultiRecipientMessage implements GroupVectorElement<GqGroup>, HashableList {
 
 	private final GroupVector<GqElement, GqGroup> messageElements;
 
@@ -46,8 +48,8 @@ public final class ElGamalMultiRecipientMessage implements ElGamalMultiRecipient
 	 */
 	public ElGamalMultiRecipientMessage(final GroupVector<GqElement, GqGroup> messageElements) {
 		this.messageElements = checkNotNull(messageElements);
+		this.messageElements.forEach(Preconditions::checkNotNull);
 		checkArgument(!this.messageElements.isEmpty(), "An ElGamal message must not be empty.");
-		checkArgument(this.messageElements.stream().noneMatch(Objects::isNull), "An ElGamal message cannot contain null elements");
 	}
 
 	@Override
@@ -68,12 +70,10 @@ public final class ElGamalMultiRecipientMessage implements ElGamalMultiRecipient
 		return this.messageElements.size();
 	}
 
-	@Override
 	public GqElement get(final int i) {
 		return this.messageElements.get(i);
 	}
 
-	@Override
 	public Stream<GqElement> stream() {
 		return this.messageElements.stream();
 	}

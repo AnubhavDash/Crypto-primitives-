@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ShuffleArgument;
 import ch.post.it.evoting.cryptoprimitives.mixnet.VerifiableShuffle;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 
 @DisplayName("A VerifiableShuffle constructed with")
 class VerifiableShuffleTest extends TestGroupSetup {
@@ -42,7 +41,6 @@ class VerifiableShuffleTest extends TestGroupSetup {
 
 	private int numCiphertexts;
 	private int l;
-	private ElGamalGenerator elGamalGenerator;
 	private GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts;
 	private ShuffleArgument shuffleArgument;
 
@@ -53,8 +51,6 @@ class VerifiableShuffleTest extends TestGroupSetup {
 		final int m = matrixDimensions[0];
 		final int n = matrixDimensions[1];
 		l = random.nextInt(MAX_CIPHERTEXT_LENGTH) + 1;
-
-		elGamalGenerator = new ElGamalGenerator(gqGroup);
 
 		ciphertexts = elGamalGenerator.genRandomCiphertextVector(numCiphertexts, l);
 		shuffleArgument = new TestArgumentGenerator(gqGroup).genShuffleArgument(m, n, l);
@@ -98,7 +94,7 @@ class VerifiableShuffleTest extends TestGroupSetup {
 	@Test
 	@DisplayName("shuffled ciphertexts vector and shuffle argument from different group throws IllegalArgumentException")
 	void constructShuffleCiphertextsShuffleArgumentDifferentGroup() {
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> otherGroupCiphertextsVector = new ElGamalGenerator(otherGqGroup)
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> otherGroupCiphertextsVector = otherGroupElGamalGenerator
 				.genRandomCiphertextVector(numCiphertexts, l);
 
 		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,

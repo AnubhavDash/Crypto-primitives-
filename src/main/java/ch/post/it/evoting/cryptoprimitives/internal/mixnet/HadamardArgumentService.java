@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.Verifiable.create;
+import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,7 +37,6 @@ import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.Verifiable;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
-import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupMatrix;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;

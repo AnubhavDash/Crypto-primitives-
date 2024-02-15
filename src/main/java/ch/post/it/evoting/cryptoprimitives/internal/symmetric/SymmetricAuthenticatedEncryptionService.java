@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
-import java.util.Objects;
 
+import com.google.common.base.Preconditions;
 import com.google.common.primitives.Bytes;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
@@ -45,13 +45,12 @@ public class SymmetricAuthenticatedEncryptionService {
 	 * @see Symmetric#genCiphertextSymmetric(byte[], byte[], List)
 	 */
 	SymmetricCiphertext genCiphertextSymmetric(final byte[] encryptionKey, final byte[] plaintext, final List<String> associatedData) {
-
 		checkNotNull(encryptionKey);
 		checkNotNull(plaintext);
-		checkNotNull(associatedData);
-		checkArgument(associatedData.stream().allMatch(Objects::nonNull), "The associated data must not contain null objects.");
 
-		final List<String> associated_vector = List.copyOf(associatedData);
+		final List<String> associated_vector = checkNotNull(associatedData).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 		associated_vector.forEach(associated_i -> checkArgument(stringToByteArray(associated_i).length <= 255,
 				"The required length of each associated data must be smaller or equal to 255."));
 
@@ -78,14 +77,13 @@ public class SymmetricAuthenticatedEncryptionService {
 	 * @see Symmetric#getPlaintextSymmetric(byte[], byte[], byte[], List)
 	 */
 	byte[] getPlaintextSymmetric(final byte[] encryptionKey, final byte[] ciphertext, final byte[] nonce, final List<String> associatedData) {
-
 		checkNotNull(encryptionKey);
 		checkNotNull(ciphertext);
 		checkNotNull(nonce);
-		checkNotNull(associatedData);
-		checkArgument(associatedData.stream().allMatch(Objects::nonNull), "The associated data must not contain null objects.");
 
-		final List<String> associated_vector = List.copyOf(associatedData);
+		final List<String> associated_vector = checkNotNull(associatedData).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 		associated_vector.forEach(associated_i -> checkArgument(stringToByteArray(associated_i).length <= 255,
 				"The required length of each associated data must be smaller or equal to 255."));
 
@@ -105,7 +103,5 @@ public class SymmetricAuthenticatedEncryptionService {
 		// Compute P.
 		return aead.authenticatedDecryption(K, nonce, associated, C);
 	}
-
-
 
 }

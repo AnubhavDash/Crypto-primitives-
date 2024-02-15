@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,20 @@ package ch.post.it.evoting.cryptoprimitives.hashing;
 public interface Argon2 {
 
 	/**
-	 * Computes the Argon2id tag of the input keying material.
+	 * Computes the Argon2id tag and salt from the input keying material.
 	 *
-	 * @param inputKeyingMaterial k ∈ B<sup>*</sup>.
-	 * @return The tag and the salt represented as a {@link Argon2Hash} (t,s) ∈ B<sup>32</sup> × B<sup>16</sup>.
+	 * @param inputKeyingMaterial k ∈ &#8492;<sup>*</sup>.
+	 * @return The tag and the salt represented as a {@link Argon2Hash} (t,s) ∈ &#8492;<sup>32</sup> × &#8492;<sup>16</sup>.
 	 * @throws NullPointerException if the input keying material is null.
 	 */
 	Argon2Hash genArgon2id(byte[] inputKeyingMaterial);
 
 	/**
-	 * Computes the Argon2id tag of the input keying material and the given salt.
+	 * Computes the Argon2id tag from the input keying material and the given salt.
 	 *
-	 * @param inputKeyingMaterial k ∈ B<sup>*</sup>.
-	 * @param salt                s k ∈ B<sup>16</sup>.
-	 * @return The tag t ∈ B<sup>32</sup>.
+	 * @param inputKeyingMaterial k ∈ &#8492;<sup>*</sup>.
+	 * @param salt                s k ∈ &#8492;<sup>16</sup>.
+	 * @return The tag t ∈ &#8492;<sup>32</sup>.
 	 * @throws NullPointerException if any input is null.
 	 */
 	byte[] getArgon2id(byte[] inputKeyingMaterial, byte[] salt);

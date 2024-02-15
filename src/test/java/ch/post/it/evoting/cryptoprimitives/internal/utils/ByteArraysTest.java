@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ class ByteArraysTest {
 			final Integer bitLength = input.get("bit_length", Integer.class);
 			final byte[] value = input.get("value", byte[].class);
 
-			final JsonData output = testParameters.getOutput();
+			JsonData output = testParameters.getOutput();
 			final byte[] result = output.get("result", byte[].class);
 
 			return Arguments.of(value, bitLength, result, description);

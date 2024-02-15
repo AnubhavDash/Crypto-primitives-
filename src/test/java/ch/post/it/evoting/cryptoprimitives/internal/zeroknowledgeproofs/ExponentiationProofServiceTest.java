@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,12 +46,12 @@ import org.mockito.MockedStatic;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
@@ -97,7 +97,7 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		private final GroupVector<GqElement, GqGroup> exponentiations = GroupVector.of(gNine, gFive);
 		private final ZqGroup zqGroup = new ZqGroup(q);
 		private final ZqElement zOne = ZqElement.create(BigInteger.ONE, zqGroup);
-		private final ZqElement zTwo = ZqElement.create(BigInteger.valueOf(2), zqGroup);
+		private final ZqElement zTwo = ZqElement.create(BigInteger.TWO, zqGroup);
 		// Output:
 		// e = 2
 		// z = 3
@@ -106,7 +106,7 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		private final ZqElement exponent = zThree;
 		private final ZqElement z = zThree;
 		private final List<String> auxiliaryInformation = Arrays.asList("specific", "test", "values");
-		private final List<BigInteger> randomValues = Collections.singletonList(BigInteger.valueOf(2));
+		private final List<BigInteger> randomValues = Collections.singletonList(BigInteger.TWO);
 
 		private RandomService getSpecificRandomService() {
 			return new RandomService() {
@@ -227,9 +227,8 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		@Test
 		void auxiliaryInformationDoesNotContainNullCheck() {
 			final List<String> auxiliaryInformationWithNull = Arrays.asList("test", null);
-			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			assertThrows(NullPointerException.class,
 					() -> proofService.genExponentiationProof(bases, exponent, exponentiations, auxiliaryInformationWithNull));
-			assertEquals("The auxiliary information must not contain null objects.", exception.getMessage());
 		}
 
 		@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,6 @@ class DiagonalProductsTest extends TestGroupSetup {
 	private static final int KEY_SIZE = 10;
 
 	private static MultiExponentiationArgumentService multiExponentiationArgumentService;
-	private static ElGamalGenerator elGamalGenerator;
 
 	private int n;
 	private int m;
@@ -59,7 +58,6 @@ class DiagonalProductsTest extends TestGroupSetup {
 
 	@BeforeAll
 	static void setUpAll() {
-		elGamalGenerator = new ElGamalGenerator(gqGroup);
 		final ElGamalMultiRecipientPublicKey publicKey = elGamalGenerator.genRandomPublicKey(KEY_SIZE);
 
 		final TestCommitmentKeyGenerator ckGenerator = new TestCommitmentKeyGenerator(gqGroup);
@@ -144,9 +142,8 @@ class DiagonalProductsTest extends TestGroupSetup {
 				.limit(l)
 				.collect(GroupVector.toGroupVector());
 		final ElGamalMultiRecipientPublicKey differentGroupPublicKey = new ElGamalMultiRecipientPublicKey(pkElements);
-		final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(otherGqGroup);
 		final List<List<ElGamalMultiRecipientCiphertext>> otherGroupRandomCiphertexts = Stream.generate(
-						() -> elGamalGenerator.genRandomCiphertexts(differentGroupPublicKey, l, n))
+						() -> otherGroupElGamalGenerator.genRandomCiphertexts(differentGroupPublicKey, l, n))
 				.limit(m)
 				.collect(Collectors.toList());
 		final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> differentGroupCiphertexts = GroupMatrix
@@ -173,7 +170,7 @@ class DiagonalProductsTest extends TestGroupSetup {
 		// Create groups
 		final BigInteger p = BigInteger.valueOf(23);
 		final BigInteger q = BigInteger.valueOf(11);
-		final BigInteger g = BigInteger.valueOf(2);
+		final BigInteger g = BigInteger.TWO;
 
 		final GqGroup gqGroup = new GqGroup(p, q, g);
 		final ZqGroup zqGroup = new ZqGroup(q);

@@ -1,18 +1,17 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package ch.post.it.evoting.cryptoprimitives.internal.zeroknowledgeproofs;
 
@@ -22,10 +21,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.IntStream;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
@@ -85,11 +84,13 @@ public class ZeroKnowledgeProofService implements ZeroKnowledgeProof {
 			final ElGamalMultiRecipientKeyPair keyPair, final List<String> auxiliaryInformation) {
 		checkNotNull(ciphertexts);
 		checkNotNull(keyPair);
-		checkNotNull(auxiliaryInformation);
+		final List<String> auxiliaryInformationCopy = checkNotNull(auxiliaryInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 
 		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = ciphertexts;
 		final ElGamalMultiRecipientPrivateKey sk = keyPair.getPrivateKey();
-		final List<String> i_aux = auxiliaryInformation;
+		final List<String> i_aux = auxiliaryInformationCopy;
 		final int l = C.getElementSize();
 		final int k = sk.size();
 
@@ -121,11 +122,11 @@ public class ZeroKnowledgeProofService implements ZeroKnowledgeProof {
 		checkNotNull(ciphertexts);
 		checkNotNull(publicKey);
 		checkNotNull(verifiableDecryptions);
-		checkNotNull(auxiliaryInformation);
+		final List<String> auxiliaryInformationCopy = checkNotNull(auxiliaryInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 
-		checkArgument(auxiliaryInformation.stream().allMatch(Objects::nonNull), "Auxiliary information cannot contain null elements.");
-
-		final List<String> i_aux = List.copyOf(auxiliaryInformation);
+		final List<String> i_aux = auxiliaryInformationCopy;
 		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = ciphertexts;
 		final ElGamalMultiRecipientPublicKey pk = publicKey;
 		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C_prime = verifiableDecryptions.getCiphertexts();

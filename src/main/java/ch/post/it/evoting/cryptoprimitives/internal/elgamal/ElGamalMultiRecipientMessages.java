@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class ElGamalMultiRecipientMessages {
 			System.getProperty("enable.parallel.streams", Boolean.TRUE.toString()));
 
 	private ElGamalMultiRecipientMessages() {
-		//Intentionally left blank
+		// Intentionally left blank.
 	}
 
 	/**

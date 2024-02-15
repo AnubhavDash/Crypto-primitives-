@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,9 +44,13 @@ public class ElGamalMultiRecipientKeyPair implements HashableList {
 	private final int numElements;
 
 	private ElGamalMultiRecipientKeyPair(final ElGamalMultiRecipientPrivateKey privateKey, final ElGamalMultiRecipientPublicKey publicKey) {
-		this.publicKey = publicKey;
-		this.privateKey = privateKey;
+		this.publicKey = checkNotNull(publicKey);
+		this.privateKey = checkNotNull(privateKey);
 		this.numElements = publicKey.size();
+
+		checkArgument(publicKey.getGroup().hasSameOrderAs(privateKey.getGroup()),
+				"The public key and the private key must belong to groups of the same order.");
+		// The ElGamalMultiRecipientPublicKey constructor ensures the public key has at least one element.
 	}
 
 	/**
@@ -56,7 +60,7 @@ public class ElGamalMultiRecipientKeyPair implements HashableList {
 	public static ElGamalMultiRecipientKeyPair genKeyPair(final GqGroup group, final int numElements, final Random random) {
 		checkNotNull(random);
 		checkNotNull(group);
-		checkArgument(numElements > 0, "Cannot generate a ElGamalMultiRecipient key pair with %s elements.", numElements);
+		checkArgument(numElements > 0, "Cannot generate an ElGamalMultiRecipient key pair with %s elements.", numElements);
 
 		final int N = numElements;
 		final ZqGroup secretKeyGroup = ZqGroup.sameOrderAs(group);

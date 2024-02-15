@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.security.Security;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -66,7 +67,7 @@ class SignatureGenerationServiceTest {
 				.setState("")
 				.setOrganisation("")
 				.build();
-		final CertificateInfo certificateInfo = new CertificateInfo(authorityInformation);
+		CertificateInfo certificateInfo = new CertificateInfo(authorityInformation);
 		certificateInfo.setValidFrom(from);
 		certificateInfo.setValidUntil(until);
 		certificateInfo.setUsage(new KeyUsage(KeyUsage.keyCertSign | KeyUsage.digitalSignature));
@@ -105,8 +106,8 @@ class SignatureGenerationServiceTest {
 		final Hashable context = HashableString.from("tooEarly");
 		final KeyPair keyPair = SecurityLevelConfig.getSystemSecurityLevel().getSignatureAlgorithm().genKeyPair();
 		final LocalDate now = LocalDate.now();
-		final LocalDate from = now.minusDays(365);
-		final LocalDate until = now.minusDays(1);
+		final LocalDate from = now.minus(365, ChronoUnit.DAYS);
+		final LocalDate until = now.minus(1, ChronoUnit.DAYS);
 		final X509Certificate certificate = getCertificate(from, until, keyPair);
 		final SignatureGenerationService signatureGenerationServiceNotValidAnymore = new SignatureGenerationService(keyPair.getPrivate(), certificate,
 				hashService, SecurityLevelConfig.getSystemSecurityLevel().getSignatureAlgorithm());

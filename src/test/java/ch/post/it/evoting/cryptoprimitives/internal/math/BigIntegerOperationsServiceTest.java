@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package ch.post.it.evoting.cryptoprimitives.internal.math;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -233,21 +234,40 @@ class BigIntegerOperationsServiceTest {
 	}
 
 	@Test
-	void jacobiInvalidArguments() {
+	void legendreInvalidArguments() {
 		assertAll(
-				() -> assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.getJacobi(null, null)),
-				() -> assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.getJacobi(ZERO, null)),
-				() -> assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.getJacobi(null, ONE)),
-				() -> assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.getJacobi(ZERO, ZERO)),
-				() -> assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.getJacobi(MINUS_ONE, ONE))
+				() -> assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.getLegendre(null, null)),
+				() -> assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.getLegendre(null, THREE)),
+				() -> assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.getLegendre(ONE, null)),
+				() -> assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.getLegendre(ONE, TWO))
 		);
 	}
 
 	@Test
-	void jacobiValidArguments() {
-		assertEquals(1, BigIntegerOperationsService.getJacobi(ONE, FIVE));
-		assertEquals(1, BigIntegerOperationsService.getJacobi(FIVE, ONE));
-		assertEquals(-1, BigIntegerOperationsService.getJacobi(THREE, EIGHT));
-		assertEquals(0, BigIntegerOperationsService.getJacobi(TWENTY_ONE, SEVEN));
+	void legendreValidArguments() {
+		assertEquals(-1, BigIntegerOperationsService.getLegendre(EIGHT, THREE));
+		assertEquals(1, BigIntegerOperationsService.getLegendre(ONE, FIVE));
+		assertEquals(0, BigIntegerOperationsService.getLegendre(TWENTY_ONE, SEVEN));
+		assertEquals(1, BigIntegerOperationsService.getLegendre(FIVE, ELEVEN));
+	}
+
+	@Test
+	void millerRabinNullArgument() {
+		assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.millerRabin(null, 1));
+	}
+
+	@Test
+	void millerRabinInvalidArguments() {
+		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.millerRabin(BigInteger.ZERO, 1));
+		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.millerRabin(FIVE, 0));
+		assertThrows(IllegalArgumentException.class, () ->	BigIntegerOperationsService.millerRabin(ONE, 3));
+		assertThrows(IllegalArgumentException.class, () ->	BigIntegerOperationsService.millerRabin(EIGHT, 3));
+	}
+
+	@Test
+	void millerRabinValidArguments() {
+		assertTrue(BigIntegerOperationsService.millerRabin(THREE, 1));
+		assertTrue(BigIntegerOperationsService.millerRabin(FIVE, 3));
+		assertTrue(BigIntegerOperationsService.millerRabin(SEVEN, 3));
 	}
 }

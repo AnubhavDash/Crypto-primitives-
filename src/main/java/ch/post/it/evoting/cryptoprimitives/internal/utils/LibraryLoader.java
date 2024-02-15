@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public class LibraryLoader {
 	private static final String JAVA_LIBRARY_PATH_PROPERTY_NAME = "java.library.path";
 
 	private LibraryLoader() {
-		//Intentionally left blank
+		// Intentionally left blank.
 	}
 
 	public static void loadLibrary(final String libName, final String hashesResourceFileName) {
@@ -96,7 +96,8 @@ public class LibraryLoader {
 				}
 			}
 		} catch (IOException e) {
-			throw new UncheckedIOException(String.format("Unable to read the resource file. [hashesResourceFilename: %s]", hashesResourceFilename), e);
+			throw new UncheckedIOException(String.format("Unable to read the resource file. [hashesResourceFilename: %s]", hashesResourceFilename),
+					e);
 		}
 
 		return hashes;

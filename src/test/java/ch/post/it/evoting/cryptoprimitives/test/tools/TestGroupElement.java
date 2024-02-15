@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,11 @@ import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVectorElement;
 import ch.post.it.evoting.cryptoprimitives.test.tools.math.TestGroup;
 
-public class TestGroupElement implements GroupVectorElement<TestGroup>, HashableBigInteger {
-
-	private final TestGroup group;
-
-	public TestGroupElement(TestGroup group) {
-		this.group = group;
-	}
+public record TestGroupElement(TestGroup group) implements GroupVectorElement<TestGroup>, HashableBigInteger {
 
 	@Override
 	public TestGroup getGroup() {
-		return this.group;
+		return group;
 	}
 
 	@Override

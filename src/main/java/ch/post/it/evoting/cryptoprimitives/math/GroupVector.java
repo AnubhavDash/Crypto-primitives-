@@ -1,19 +1,17 @@
 /*
+ * Copyright 2024 Swiss Post Ltd
  *
- *  Copyright 2022 Post CH Ltd
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
@@ -31,6 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ForwardingList;
 
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
@@ -55,8 +54,10 @@ public class GroupVector<E extends GroupVectorElement<G> & Hashable, G extends M
 	private final G group;
 	private final int elementSize;
 
+	// Private constructor without input validation. Used only for operations that provide a guarantee that the elements belong to the same
+	// group and have the same size.
 	private GroupVector(final List<E> elements) {
-		this.elements = elements;
+		this.elements = checkNotNull(elements);
 		this.group = elements.isEmpty() ? null : elements.get(0).getGroup();
 		this.elementSize = elements.isEmpty() ? 0 : elements.get(0).size();
 	}
@@ -73,12 +74,10 @@ public class GroupVector<E extends GroupVectorElement<G> & Hashable, G extends M
 	 *                 </ul>
 	 */
 	public static <E extends GroupVectorElement<G> & Hashable, G extends MathematicalGroup<G>> GroupVector<E, G> from(final List<E> elements) {
-		//Check null values
-		checkNotNull(elements);
-		checkArgument(elements.stream().allMatch(Objects::nonNull), "Elements must not contain nulls");
-
-		//Immutable copy
-		final List<E> elementsCopy = List.copyOf(elements);
+		//Check null values and immutable copy
+		final List<E> elementsCopy = checkNotNull(elements).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 
 		//Check same group
 		checkArgument(Validations.allEqual(elementsCopy.stream(), GroupVectorElement::getGroup), "All elements must belong to the same group.");
@@ -100,7 +99,7 @@ public class GroupVector<E extends GroupVectorElement<G> & Hashable, G extends M
 	@SafeVarargs
 	public static <E extends GroupVectorElement<G> & Hashable, G extends MathematicalGroup<G>> GroupVector<E, G> of(final E... elements) {
 		checkNotNull(elements);
-		checkArgument(Arrays.stream(elements).allMatch(Objects::nonNull), "Elements must not contain nulls");
+		Arrays.stream(elements).forEach(Preconditions::checkNotNull);
 
 		return GroupVector.from(List.of(elements));
 	}

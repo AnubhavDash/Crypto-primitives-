@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Objects;
+
+import com.google.common.base.Preconditions;
 
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
@@ -76,8 +77,9 @@ public class SchnorrProofService {
 
 		checkNotNull(witness);
 		checkNotNull(statement);
-		checkNotNull(auxiliaryInformation);
-		checkArgument(auxiliaryInformation.stream().allMatch(Objects::nonNull), "The auxiliary information must not contain null objects.");
+		final List<String> auxiliaryInformationCopy = checkNotNull(auxiliaryInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 		checkArgument(statement.equals(statement.getGroup().getGenerator().exponentiate(witness)));
 
 		// Cross group checking.
@@ -92,7 +94,7 @@ public class SchnorrProofService {
 		final BigInteger p = gqGroup.getP();
 
 		// Variables.
-		final List<String> i_aux = List.copyOf(auxiliaryInformation);
+		final List<String> i_aux = auxiliaryInformationCopy;
 		final GqElement y = statement;
 		final ZqElement x = witness;
 
@@ -126,9 +128,9 @@ public class SchnorrProofService {
 
 		checkNotNull(proof);
 		checkNotNull(statement);
-		checkNotNull(auxiliaryInformation);
-
-		checkArgument(auxiliaryInformation.stream().allMatch(Objects::nonNull), "The auxiliary information must not contain null objects.");
+		final List<String> auxiliaryInformationCopy = checkNotNull(auxiliaryInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 
 		// Cross group checking.
 		checkArgument(proof.getGroup().hasSameOrderAs(statement.getGroup()),
@@ -141,7 +143,7 @@ public class SchnorrProofService {
 		final GqElement g = gqGroup.getGenerator();
 
 		// Variables.
-		final List<String> i_aux = List.copyOf(auxiliaryInformation);
+		final List<String> i_aux = auxiliaryInformationCopy;
 		final ZqElement e = proof.get_e();
 		final ZqElement z = proof.get_z();
 		final GqElement y = statement;

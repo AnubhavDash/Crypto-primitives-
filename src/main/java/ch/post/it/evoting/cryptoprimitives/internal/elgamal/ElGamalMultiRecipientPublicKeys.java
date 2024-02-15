@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 public class ElGamalMultiRecipientPublicKeys {
 
 	private ElGamalMultiRecipientPublicKeys() {
-		//Intentionally left blank
+		// Intentionally left blank.
 	}
 
 	/**

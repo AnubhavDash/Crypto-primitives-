@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ public final class ZqGroup implements MathematicalGroup<ZqGroup> {
 
 	public ZqGroup(final BigInteger q) {
 		checkNotNull(q);
-		checkArgument(q.compareTo(BigInteger.valueOf(2)) >= 0);
+		checkArgument(q.compareTo(BigInteger.TWO) >= 0);
 
 		this.q = q;
 		this.identity = ZqElement.create(BigInteger.ZERO, this);

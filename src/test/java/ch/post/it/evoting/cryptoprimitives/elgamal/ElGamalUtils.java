@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,16 @@ import java.util.stream.Stream;
 
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
+import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 
 public class ElGamalUtils {
 
 	//Convert a matrix of values to ciphertexts
-	public static List<ElGamalMultiRecipientCiphertext> valuesToCiphertext(final Stream<List<Integer>> ciphertextValues, final GqGroup group) {
+	public static GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> valuesToCiphertext(final Stream<List<Integer>> ciphertextValues, final GqGroup group) {
 		return ciphertextValues
 				.map(values -> values.stream().map(BigInteger::valueOf).map(value -> GqElement.GqElementFactory.fromValue(value, group))
 						.collect(Collectors.toList()))
 				.map(values -> ElGamalMultiRecipientCiphertext.create(values.get(0), values.subList(1, values.size())))
-				.collect(Collectors.toList());
+				.collect(GroupVector.toGroupVector());
 	}
 }

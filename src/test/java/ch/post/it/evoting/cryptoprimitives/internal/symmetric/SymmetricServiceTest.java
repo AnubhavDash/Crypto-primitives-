@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.google.common.base.Throwables;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.math.Base16Alphabet;
+import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
 import ch.post.it.evoting.cryptoprimitives.symmetric.SymmetricCiphertext;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
@@ -79,9 +81,10 @@ class SymmetricServiceTest extends TestGroupSetup {
 
 	@BeforeEach
 	void setUp() {
-		associatedData = Arrays.asList(randomService.genRandomBase16String(ASSOCIATED_LENGTH), randomService.genRandomBase64String(
-				ASSOCIATED_LENGTH));
-		plainText = randomService.genRandomBase64String(PLAINTEXT_LENGTH);
+		associatedData = Arrays.asList(
+				randomService.genRandomString(ASSOCIATED_LENGTH, Base16Alphabet.getInstance()),
+				randomService.genRandomString(ASSOCIATED_LENGTH, Base64Alphabet.getInstance()));
+		plainText = randomService.genRandomString(PLAINTEXT_LENGTH, Base64Alphabet.getInstance());
 		nonce = randomService.randomBytes(NONCE_LENGTH);
 	}
 
@@ -126,6 +129,12 @@ class SymmetricServiceTest extends TestGroupSetup {
 		assertEquals("The key must be 32 bytes", Throwables.getRootCause(illegalArgumentException).getMessage());
 	}
 
+	@Test
+	@DisplayName("call default constructor")
+	void defaultConstructor() {
+		assertDoesNotThrow(() -> new SymmetricService());
+	}
+
 	@Nested
 	@DisplayName("genCiphertextSymmetric with")
 	class GenCiphertextSymmetric {
@@ -151,11 +160,8 @@ class SymmetricServiceTest extends TestGroupSetup {
 		void associatedDataWithNull() {
 			associatedData.set(0, null);
 			final byte[] plainTextBytes = plainText.getBytes(StandardCharsets.UTF_8);
-
-			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> symmetricEncryptionService
-					.genCiphertextSymmetric(encryptionKey, plainTextBytes,
-							associatedData));
-			assertEquals("The associated data must not contain null objects.", exception.getMessage());
+			assertThrows(NullPointerException.class,
+					() -> symmetricEncryptionService.genCiphertextSymmetric(encryptionKey, plainTextBytes, associatedData));
 		}
 
 		static Stream<Arguments> genCiphertextSymmetricProvider() {
@@ -219,11 +225,8 @@ class SymmetricServiceTest extends TestGroupSetup {
 		@DisplayName("Associated data containing null throws IllegalArgumentException")
 		void associatedDataWithNull() {
 			associatedData.set(0, null);
-
-			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			assertThrows(NullPointerException.class,
 					() -> symmetricEncryptionService.getPlaintextSymmetric(encryptionKey, new byte[] {}, new byte[] {}, associatedData));
-
-			assertEquals("The associated data must not contain null objects.", exception.getMessage());
 		}
 
 		static Stream<Arguments> getPlaintextSymmetricProvider() {
@@ -247,16 +250,11 @@ class SymmetricServiceTest extends TestGroupSetup {
 		@ParameterizedTest()
 		@MethodSource("getPlaintextSymmetricProvider")
 		@DisplayName("getPlaintextSymmetric returns expected output")
-		void testGetPlaintextSymmetricWithRealValues(final byte[] encryptionKey, final byte[] ciphertext, final byte[] nonce, final List<String> associatedData,
+		void testGetPlaintextSymmetricWithRealValues(final byte[] encryptionKey, final byte[] ciphertext, final byte[] nonce,
+				final List<String> associatedData,
 				final byte[] expectedResult, final String description) {
 			final byte[] actualResult = symmetricEncryptionService.getPlaintextSymmetric(encryptionKey, ciphertext, nonce, associatedData);
 			assertArrayEquals(expectedResult, actualResult, String.format("assertion failed for: %s", description));
 		}
-	}
-
-	@Test
-	@DisplayName("call default constructor")
-	void defaultConstructor() {
-		assertDoesNotThrow(() -> new SymmetricService());
 	}
 }

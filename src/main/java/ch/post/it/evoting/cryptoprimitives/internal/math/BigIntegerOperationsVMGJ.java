@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.math.BigInteger;
 import java.util.HexFormat;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
@@ -113,14 +113,16 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 
 	@Override
 	public BigInteger multiModExp(final List<BigInteger> bases, final List<BigInteger> exponents, final BigInteger modulus) {
-		checkNotNull(bases);
-		checkArgument(bases.stream().allMatch(Objects::nonNull), "Elements must not contain nulls");
-		final BigInteger[] basesArray = List.copyOf(bases).toArray(new BigInteger[0]);
+		final BigInteger[] basesArray = checkNotNull(bases).stream()
+				.map(Preconditions::checkNotNull)
+				.toArray(BigInteger[]::new);
 		checkArgument(basesArray.length != 0, "Bases must be non empty.");
 
-		checkNotNull(exponents);
-		checkArgument(exponents.stream().allMatch(exponent -> checkNotNull(exponent).signum() >= 0), "Elements must be positive");
-		final BigInteger[] exponentsArray = List.copyOf(exponents).toArray(new BigInteger[0]);
+		final int exponentsSize = exponents.size();
+		final BigInteger[] exponentsArray = checkNotNull(exponents).stream()
+				.filter(exponent -> checkNotNull(exponent).signum() >= 0)
+				.toArray(BigInteger[]::new);
+		checkArgument(exponentsSize == exponentsArray.length, "Exponents must be positive");
 
 		// The next check assures also that exponentsArray is not empty
 		checkArgument(basesArray.length == exponentsArray.length, "Bases and exponents must have the same size");
@@ -142,12 +144,12 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 	}
 
 	@Override
-	public int getJacobi(final BigInteger a, final BigInteger n) {
+	public int getLegendre(final BigInteger a, final BigInteger p) {
 		checkNotNull(a);
-		checkNotNull(n);
-		checkArgument(a.compareTo(BigInteger.ZERO) > 0, "a must be positive");
+		checkNotNull(p);
+		checkArgument(p.compareTo(BigInteger.TWO) > 0 && p.mod(BigInteger.TWO).equals(BigInteger.ONE),
+				"p must be an odd integer greater than 2");
 
-		// The Legendre symbol includes the Jacobi symbol as a special case.
-		return VMG.legendre(a, n);
+		return VMG.legendre(a, p);
 	}
 }

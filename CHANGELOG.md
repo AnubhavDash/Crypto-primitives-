@@ -1,10 +1,36 @@
 # Changelog
 
-## Release 1.3.4
+## Release 1.4.0
 
-Release 1.3.4 is a minor maintenance patch containing the following changes:
+Release 1.4.0 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
+We want to thank the experts for their high-quality, constructive remarks:
 
-* [Code] Minor improvements in unit tests.
+* Thomas Edmund Haines (Australian National University), Olivier Pereira (Université catholique Louvain), Vanessa Teague (Thinking Cybersecurity)
+* Aleksander Essex (Western University Canada)
+* Rolf Haenni, Reto Koenig, Philipp Locher, Eric Dubuis (Bern University of Applied Sciences)
+
+The following functionalities and improvements are included in release 1.4.0:
+
+* [Code, Specification] Legacy security level removed, extended security level renamed to standard.
+* [Specification] Changes in the section about security level: The overview of the primitives and parametrization used was improved.
+* [Specification] Removed the ambiguous "uniformly safe" description in the Argon2 section (feedback from Aleksander Essex).
+* [Code] Removed the confusing Argon2 profiles (feedback from Rolf Haenni, Reto Koenig, Philipp Locher, and Eric Dubuis).
+* [Code, Specification] Removed unused algorithm LeftPad.
+* [Code, Specification] Made algorithm Truncate more flexible.
+* [Specification] Added a section about alphabets, including a user-friendly alphabet for codes and an extended Latin alphabet.
+* [Code] Added several alphabets from the e-voting source code.
+* [Code] Replaced the legacy BouncyCastle Jacobi with the Legendre symbol (feedback from Rolf Haenni, Reto Koenig, Philipp Locher, and Eric Dubuis).
+* [Code] Improved object-oriented design of the GqElement class (feedback from Rolf Haenni, Reto Koenig, Philipp Locher, and Eric Dubuis).
+* [Code] Improved the encapsulation and consistency of internal methods (feedback from Rolf Haenni, Reto Koenig, Philipp Locher, and Eric Dubuis).
+* [Code] Defined a GenRandomInteger method working with the Java Integer type.
+* [Code, Specification] Added new algorithm GenRandomString and removed the old GenRandomBaseXXString algorithms (feedback from Rolf Haenni, Reto Koenig, Philipp Locher, and Eric Dubuis).
+* [Code, Specification] Simplified algorithm GenUniqueDecimalStrings by using GenRandomString.
+* [Code, Specification] Removed magic numbers in RecursiveHashToZq and KDFToZq.
+* [Code, Specification] Improvements to algorithm GetEncryptionParameters including using only MillerRabin instead of isProbablePrime, and using SHAKE256 instead of SHAKE128 (feedback from Aleksander Essex, Thomas Haines, Olivier Pereira, Vanessa Teague, Rolf Haenni, Reto Koenig, Philipp Locher, and Eric Dubuis).
+* [Code] Removed the legacy isProbablePrime method.
+* [Code] Implemented a mechanism to check the integrity of the native VMGJ library.
+* [Specification] Improved the description of the encryption parameters generation in sections Primality Testing and Parameters Generation accordingly (feedback from Aleksander Essex, Thomas Haines, Olivier Pereira, and Vanessa Teague).
+* [Code, Specification] Fixed minor errors and inconsistencies.
 * [Code] Updated dependencies and third-party libraries.
 
 ## Release 1.3.3
@@ -21,12 +47,7 @@ Release 1.3.2 is a minor maintenance patch containing the following changes:
 
 ## Release 1.3.1
 
-Release 1.3.1 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
-We want to thank the experts for their high-quality, constructive remarks:
-
-* Thomas Edmund Haines (Australian National University), Olivier Pereira (Université catholique Louvain), Vanessa Teague (Thinking Cybersecurity)
-* Aleksander Essex (Western University Canada)
-* Rolf Haenni, Reto Koenig, Philipp Locher, Eric Dubuis (Bern University of Applied Sciences)
+Release 1.3.1 includes some feedback from the Federal Chancellery's mandated experts (see above) and other experts of the community.
 
 The following functionalities and improvements are included in release 1.3.1:
 

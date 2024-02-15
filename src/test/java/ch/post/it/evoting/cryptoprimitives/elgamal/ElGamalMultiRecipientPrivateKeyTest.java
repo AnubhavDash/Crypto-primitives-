@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -36,17 +35,9 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 
 @DisplayName("A multi-recipient secret key")
 class ElGamalMultiRecipientPrivateKeyTest extends TestGroupSetup {
-
-	private static ElGamalGenerator elGamalGenerator;
-
-	@BeforeAll
-	static void setUp() {
-		elGamalGenerator = new ElGamalGenerator(gqGroup);
-	}
 
 	// Provides parameters for the withInvalidParameters test.
 	static Stream<Arguments> createInvalidArgumentsProvider() {

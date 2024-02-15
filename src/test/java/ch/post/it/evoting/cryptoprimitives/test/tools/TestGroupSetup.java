@@ -1,6 +1,5 @@
 /*
- *
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 package ch.post.it.evoting.cryptoprimitives.test.tools;
 
@@ -24,15 +22,21 @@ import org.junit.jupiter.api.BeforeAll;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
+import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.GqGroupGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator;
 
+/**
+ * Provides {@link GqGroup}s and {@link ZqGroup}s as well as generators that rely on them.
+ */
 public class TestGroupSetup {
 	protected static final SecureRandom secureRandom = new SecureRandom();
 	protected static GqGroup gqGroup;
 	protected static GqGroupGenerator gqGroupGenerator;
+	protected static ElGamalGenerator elGamalGenerator;
 	protected static GqGroup otherGqGroup;
 	protected static GqGroupGenerator otherGqGroupGenerator;
+	protected static ElGamalGenerator otherGroupElGamalGenerator;
 	protected static ZqGroup zqGroup;
 	protected static ZqGroupGenerator zqGroupGenerator;
 	protected static ZqGroup otherZqGroup;
@@ -43,8 +47,10 @@ public class TestGroupSetup {
 		// GqGroup and corresponding ZqGroup set up.
 		gqGroup = GroupTestData.getGqGroup();
 		gqGroupGenerator = new GqGroupGenerator(gqGroup);
+		elGamalGenerator = new ElGamalGenerator(gqGroup);
 		otherGqGroup = GroupTestData.getDifferentGqGroup(gqGroup);
 		otherGqGroupGenerator = new GqGroupGenerator(otherGqGroup);
+		otherGroupElGamalGenerator = new ElGamalGenerator(otherGqGroup);
 		zqGroup = ZqGroup.sameOrderAs(gqGroup);
 		zqGroupGenerator = new ZqGroupGenerator(zqGroup);
 		otherZqGroup = ZqGroup.sameOrderAs(otherGqGroup);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
+import static ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsService.millerRabin;
 import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -71,19 +72,20 @@ public final class GqGroup implements MathematicalGroup<GqGroup>, HashableList {
 		checkNotNull(g, "Group Gq parameter g should not be null");
 
 		final SecurityLevelInternal securityLevel = SecurityLevelConfig.getSystemSecurityLevel();
+		final int lambda = securityLevel.getSecurityStrength();
 		checkArgument(securityLevel == SecurityLevelInternal.TESTING_ONLY || securityLevel.getPBitLength() == p.bitLength(),
 				"The given p bit length does not correspond to the given security level. [|p|: got %s, expected %s]", p.bitLength(),
 				securityLevel.getPBitLength());
 
 		//Validate p
-		checkArgument(p.isProbablePrime(securityLevel.getSecurityLevelBits()), "Group Gq parameter p must be prime");
+		checkArgument(millerRabin(p, lambda / 2), "Group Gq parameter p must be prime");
 		this.p = p;
 
 		//Validate q
-		checkArgument(q.isProbablePrime(securityLevel.getSecurityLevelBits()), "Group Gq parameter q must be prime");
+		checkArgument(millerRabin(q, lambda / 2), "Group Gq parameter q must be prime");
 		checkArgument(q.compareTo(BigInteger.ZERO) > 0);
 		checkArgument(q.compareTo(p) < 0);
-		final BigInteger computedP = q.multiply(BigInteger.valueOf(2)).add(BigInteger.ONE);
+		final BigInteger computedP = q.multiply(BigInteger.TWO).add(BigInteger.ONE);
 		checkArgument(computedP.equals(p), "Group Gq parameter p must be equal to 2q + 1");
 		this.q = q;
 
@@ -102,17 +104,10 @@ public final class GqGroup implements MathematicalGroup<GqGroup>, HashableList {
 	 */
 	@Override
 	public boolean isGroupMember(final BigInteger value) {
-		return isGroupMember(value, this.p);
-	}
-
-	/**
-	 * Checks if a value is a member of a GqGroup defined by p.
-	 */
-	public static boolean isGroupMember(final BigInteger value, final BigInteger p) {
 		return value != null &&
 				value.compareTo(BigInteger.ZERO) > 0 &&
-				value.compareTo(p) < 0 &&
-				BigIntegerOperationsService.getJacobi(value, p) == 1;
+				value.compareTo(this.p) < 0 &&
+				BigIntegerOperationsService.getLegendre(value, this.p) == 1;
 	}
 
 	public BigInteger getP() {

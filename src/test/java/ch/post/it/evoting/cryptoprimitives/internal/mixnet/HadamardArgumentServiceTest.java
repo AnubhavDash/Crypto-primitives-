@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,6 @@ import ch.post.it.evoting.cryptoprimitives.mixnet.HadamardStatement;
 import ch.post.it.evoting.cryptoprimitives.mixnet.HadamardWitness;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ZeroArgument;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
@@ -92,7 +91,6 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 	static void setupAll() {
 		n = secureRandom.nextInt(MATRIX_BOUNDS) + 1;
 		m = secureRandom.nextInt(MATRIX_BOUNDS - 1) + 2; // The Hadamard argument only works with 2 or more columns
-		ElGamalGenerator elGamalGenerator = new ElGamalGenerator(gqGroup);
 		publicKey = elGamalGenerator.genRandomPublicKey(n);
 		commitmentKeyGenerator = new TestCommitmentKeyGenerator(gqGroup);
 		commitmentKey = commitmentKeyGenerator.genCommitmentKey(n);
@@ -129,7 +127,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 	@Test
 	@DisplayName("Instantiating a Hadamard argument provider with a public key and a commitment key from a different group throws")
 	void constructHadamardArgumentServiceWithKeysDifferentGroup() {
-		ElGamalMultiRecipientPublicKey otherPublicKey = new ElGamalGenerator(otherGqGroup).genRandomPublicKey(n);
+		ElGamalMultiRecipientPublicKey otherPublicKey = otherGroupElGamalGenerator.genRandomPublicKey(n);
 		Exception exception = assertThrows(IllegalArgumentException.class,
 				() -> new HadamardArgumentService(randomService, hashService, otherPublicKey, commitmentKey));
 		assertEquals("The public key and the commitment key must belong to the same group.", exception.getMessage());
@@ -284,7 +282,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 
 			ZqElement zqZero = ZqElement.create(BigInteger.ZERO, zqGroup);
 			ZqElement zqOne = ZqElement.create(BigInteger.ONE, zqGroup);
-			ZqElement zqTwo = ZqElement.create(BigInteger.valueOf(2), zqGroup);
+			ZqElement zqTwo = ZqElement.create(BigInteger.TWO, zqGroup);
 			ZqElement zqThree = ZqElement.create(BigInteger.valueOf(3), zqGroup);
 			ZqElement zqFour = ZqElement.create(BigInteger.valueOf(4), zqGroup);
 
@@ -297,7 +295,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 
 			BigInteger zero = BigInteger.ZERO;
 			BigInteger one = BigInteger.ONE;
-			BigInteger two = BigInteger.valueOf(2);
+			BigInteger two = BigInteger.TWO;
 			BigInteger three = BigInteger.valueOf(3);
 			BigInteger four = BigInteger.valueOf(4);
 
@@ -501,7 +499,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 			// Column1 = [1, 2]
 			List<ZqElement> column1 = new ArrayList<>(2);
 			column1.add(ZqElement.create(BigInteger.ONE, group));
-			column1.add(ZqElement.create(BigInteger.valueOf(2), group));
+			column1.add(ZqElement.create(BigInteger.TWO, group));
 			columns.add(column1);
 			// Column2 = [3, 4]
 			List<ZqElement> column2 = new ArrayList<>(2);

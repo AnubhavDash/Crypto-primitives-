@@ -1,18 +1,17 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package ch.post.it.evoting.cryptoprimitives.mixnet;
 
@@ -58,19 +57,34 @@ public class MultiExponentiationArgument implements HashableList {
 
 	private MultiExponentiationArgument(final GqElement c_A_0, final GroupVector<GqElement, GqGroup> c_B,
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> E, final GroupVector<ZqElement, ZqGroup> a, final ZqElement r,
-			final ZqElement b, final ZqElement s, final ZqElement tau, final int m, final int n, final int l, final GqGroup group) {
-		this.c_A_0 = c_A_0;
-		this.c_B = c_B;
-		this.E = E;
-		this.a = a;
-		this.r = r;
-		this.b = b;
-		this.s = s;
-		this.tau = tau;
-		this.m = m;
-		this.n = n;
-		this.l = l;
-		this.group = group;
+			final ZqElement b, final ZqElement s, final ZqElement tau) {
+		// Null checking.
+		this.c_A_0 = checkNotNull(c_A_0);
+		this.c_B = checkNotNull(c_B);
+		this.E = checkNotNull(E);
+		this.a = checkNotNull(a);
+		this.r = checkNotNull(r);
+		this.b = checkNotNull(b);
+		this.s = checkNotNull(s);
+		this.tau = checkNotNull(tau);
+
+		// Cross group checking.
+		final List<GroupVectorElement<GqGroup>> gqGroups = Arrays.asList(c_A_0, c_B, E);
+		final List<GroupVectorElement<ZqGroup>> zqGroups = Arrays.asList(a, r, b, s, tau);
+		checkArgument(allEqual(gqGroups.stream(), GroupVectorElement::getGroup),
+				"cA0, cBVector, EVector must belong to the same group.");
+		checkArgument(allEqual(zqGroups.stream(), GroupVectorElement::getGroup), "aVector, r, b, s, tau, must belong to the same group.");
+		checkArgument(c_A_0.getGroup().hasSameOrderAs(a.getGroup()), "GqGroup and ZqGroup of argument inputs are not compatible.");
+		this.group = c_A_0.getGroup();
+
+		// Cross dimensions checking.
+		checkArgument(c_B.size() == E.size(), "The vectors cB and E must have the same size.");
+		this.n = a.size();
+		this.l = E.getElementSize();
+
+		// Dimensions checking.
+		checkArgument(c_B.size() % 2 == 0, "cB and E must be of size 2 * m.");
+		this.m = c_B.size() / 2;
 	}
 
 	public GqElement getc_A_0() {
@@ -157,7 +171,7 @@ public class MultiExponentiationArgument implements HashableList {
 		private ZqElement tau;
 
 		public Builder() {
-			//Intentionally left blank
+			// Intentionally left blank.
 		}
 
 		public Builder with_c_A_0(final GqElement c_A_0) {
@@ -214,33 +228,7 @@ public class MultiExponentiationArgument implements HashableList {
 		 * @return A valid Multi Exponentiation Argument.
 		 */
 		public MultiExponentiationArgument build() {
-			// Null checking.
-			checkNotNull(this.c_A_0);
-			checkNotNull(this.c_B);
-			checkNotNull(this.E);
-			checkNotNull(this.a);
-			checkNotNull(this.r);
-			checkNotNull(this.b);
-			checkNotNull(this.s);
-			checkNotNull(this.tau);
-
-			// Cross group checking.
-			final List<GroupVectorElement<GqGroup>> gqGroups = Arrays.asList(c_A_0, c_B, E);
-			final List<GroupVectorElement<ZqGroup>> zqGroups = Arrays.asList(a, r, b, s, tau);
-			checkArgument(allEqual(gqGroups.stream(), GroupVectorElement::getGroup),
-					"cA0, cBVector, EVector must belong to the same group.");
-			checkArgument(allEqual(zqGroups.stream(), GroupVectorElement::getGroup), "aVector, r, b, s, tau, must belong to the same group.");
-			checkArgument(c_A_0.getGroup().hasSameOrderAs(a.getGroup()), "GqGroup and ZqGroup of argument inputs are not compatible.");
-
-			// Cross dimensions checking.
-			checkArgument(c_B.size() == E.size(), "The vectors cB and E must have the same size.");
-
-			// Dimensions checking.
-			checkArgument(this.c_B.size() % 2 == 0, "cB and E must be of size 2 * m.");
-
-			// Build the argument.
-			return new MultiExponentiationArgument(this.c_A_0, this.c_B, this.E, this.a, this.r, this.b, this.s,
-					this.tau, this.c_B.size() / 2, this.a.size(), this.E.getElementSize(), c_A_0.getGroup());
+			return new MultiExponentiationArgument(this.c_A_0, this.c_B, this.E, this.a, this.r, this.b, this.s, this.tau);
 
 		}
 	}

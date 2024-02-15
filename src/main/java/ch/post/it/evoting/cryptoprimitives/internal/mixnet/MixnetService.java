@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,9 +108,9 @@ public final class MixnetService implements Mixnet {
 
 		//Algorithm
 		final Shuffle shuffle = shuffleService.genShuffle(C, pk);
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C_prime = GroupVector.from(shuffle.getCiphertexts());
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C_prime = shuffle.getCiphertexts();
 		final Permutation pi = shuffle.getPermutation();
-		final GroupVector<ZqElement, ZqGroup> r = GroupVector.from(shuffle.getReEncryptionExponents());
+		final GroupVector<ZqElement, ZqGroup> r = shuffle.getReEncryptionExponents();
 
 		final int[] matrixDimensions = MatrixUtils.getMatrixDimensions(N);
 		final int m = matrixDimensions[0];

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -163,13 +163,13 @@ class CommitmentServiceTest {
 			final ZqGroup specificZqGroup = ZqGroup.sameOrderAs(specificGqGroup);
 			// a = (2, 10)
 			final List<ZqElement> a = new ArrayList<>();
-			a.add(ZqElement.create(BigInteger.valueOf(2), specificZqGroup));
+			a.add(ZqElement.create(BigInteger.TWO, specificZqGroup));
 			a.add(ZqElement.create(BigInteger.TEN, specificZqGroup));
 			// r = 5
 			final ZqElement r = ZqElement.create(BigInteger.valueOf(5), specificZqGroup);
 			// ck = (2, 3, 4)
 			final List<GqElement> gElements = new ArrayList<>(2);
-			final GqElement h = GqElementFactory.fromValue(BigInteger.valueOf(2), specificGqGroup);
+			final GqElement h = GqElementFactory.fromValue(BigInteger.TWO, specificGqGroup);
 			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup));
 			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(4), specificGqGroup));
 			final CommitmentKey ck = new CommitmentKey(h, GroupVector.from(gElements));
@@ -270,7 +270,7 @@ class CommitmentServiceTest {
 			final ZqGroup specificZqGroup = ZqGroup.sameOrderAs(specificGqGroup);
 			// a0 = (2, 10)
 			final List<ZqElement> a0 = new ArrayList<>(2);
-			a0.add(ZqElement.create(BigInteger.valueOf(2), specificZqGroup));
+			a0.add(ZqElement.create(BigInteger.TWO, specificZqGroup));
 			a0.add(ZqElement.create(BigInteger.TEN, specificZqGroup));
 			// a1 = (3, 4)
 			final List<ZqElement> a1 = new ArrayList<>(2);
@@ -285,7 +285,7 @@ class CommitmentServiceTest {
 			final GroupVector<ZqElement, ZqGroup> r = GroupVector.from(rValues);
 			// ck = (2, 3, 4)
 			final List<GqElement> gElements = new ArrayList<>();
-			final GqElement h = GqElementFactory.fromValue(BigInteger.valueOf(2), specificGqGroup);
+			final GqElement h = GqElementFactory.fromValue(BigInteger.TWO, specificGqGroup);
 			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup));
 			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(4), specificGqGroup));
 			final CommitmentKey ck = new CommitmentKey(h, GroupVector.from(gElements));
@@ -387,7 +387,7 @@ class CommitmentServiceTest {
 			final ZqGroup specificZqGroup = ZqGroup.sameOrderAs(specificGqGroup);
 			// a = (2, 10, 8)
 			final List<ZqElement> a = new ArrayList<>(3);
-			a.add(ZqElement.create(BigInteger.valueOf(2), specificZqGroup));
+			a.add(ZqElement.create(BigInteger.TWO, specificZqGroup));
 			a.add(ZqElement.create(BigInteger.TEN, specificZqGroup));
 			a.add(ZqElement.create(BigInteger.valueOf(8), specificZqGroup));
 			// r = (5, 8, 3)
@@ -397,7 +397,7 @@ class CommitmentServiceTest {
 			r.add(ZqElement.create(BigInteger.valueOf(3), specificZqGroup));
 			// ck = (2, 3, 8)
 			final List<GqElement> gElements = new ArrayList<>(3);
-			final GqElement h = GqElementFactory.fromValue(BigInteger.valueOf(2), specificGqGroup);
+			final GqElement h = GqElementFactory.fromValue(BigInteger.TWO, specificGqGroup);
 			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup));
 			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(8), specificGqGroup));
 			final CommitmentKey ck = new CommitmentKey(h, GroupVector.from(gElements));
@@ -405,7 +405,7 @@ class CommitmentServiceTest {
 			final List<GqElement> expected = new ArrayList<>(3);
 			expected.add(GqElementFactory.fromValue(BigInteger.valueOf(12), specificGqGroup));
 			expected.add(GqElementFactory.fromValue(BigInteger.ONE, specificGqGroup));
-			expected.add(GqElementFactory.fromValue(BigInteger.valueOf(2), specificGqGroup));
+			expected.add(GqElementFactory.fromValue(BigInteger.TWO, specificGqGroup));
 
 			assertEquals(GroupVector.from(expected),
 					CommitmentService.getCommitmentVector(GroupVector.from(a), GroupVector.from(r), ck));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,11 +74,10 @@ public final class TestParameters {
 		final String size = this.description.substring(0, 4);
 		final int bitlength = Integer.parseInt(size);
 
-		return switch (bitlength) {
-			case 3072 -> SecurityLevelInternal.EXTENDED;
-			case 2048 -> SecurityLevelInternal.LEGACY;
-			default -> throw new IllegalArgumentException("Unexpected bit length of p");
-		};
+		if (bitlength == 3072) {
+			return SecurityLevelInternal.STANDARD;
+		}
+		throw new IllegalArgumentException("Unexpected bit length of p");
 	}
 
 	public JsonData getContext() {

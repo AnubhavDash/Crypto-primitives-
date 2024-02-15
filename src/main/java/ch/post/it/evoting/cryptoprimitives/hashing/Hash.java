@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,21 +40,21 @@ public interface Hash {
 	byte[] recursiveHash(Hashable... values);
 
 	/**
-	 * Hashes and squares a BigInteger to return a GqElement.
+	 * Hashes a value and squares the result.
 	 *
 	 * @param x     The BigInteger to be hashed. Must be non-null.
 	 * @param group The group to which the returned GqElement has to belong. Must be non-null.
-	 * @return the squared hash of x as GqElement.
+	 * @return the squared hash of x as {@link GqElement}.
 	 * @throws NullPointerException     if any argument is null
 	 * @throws IllegalArgumentException if the bit length of the group's q is smaller than the hash length in bits
 	 */
 	GqElement hashAndSquare(BigInteger x, GqGroup group);
 
 	/**
-	 * Computes the hash in Z<sub>q</sub> of multiple (potentially) recursive inputs.
+	 * Computes the hash of multiple (potentially) recursive inputs uniformly into Z<sub>q</sub>.
 	 *
-	 * @param exclusiveUpperBound the exclusive upper bound for the hash to be returned. Must be strictly positive.
-	 * @param values              the objects to be hashed. Must be non-null.
+	 * @param exclusiveUpperBound q &#8712; &#8469;<sup>+</sup>, the exclusive upper bound for the hash to be returned. Must be strictly positive.
+	 * @param values              v = (v<sub>0</sub>,...,v<sub>k-1</sub>), the objects to be hashed. Must be non-null.
 	 * @return the result of the hashing as a {@link ZqElement} smaller than q
 	 * @throws NullPointerException     if any of the arguments is null
 	 * @throws IllegalArgumentException if

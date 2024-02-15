@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -211,7 +211,7 @@ class SingleValueProductArgumentServiceTest extends TestGroupSetup {
 			final ZqElement product = ZqElement.create(BigInteger.valueOf(9), specificZqGroup);
 			// a = (2, 10)
 			final List<ZqElement> a = new ArrayList<>();
-			a.add(ZqElement.create(BigInteger.valueOf(2), specificZqGroup));
+			a.add(ZqElement.create(BigInteger.TWO, specificZqGroup));
 			a.add(ZqElement.create(BigInteger.TEN, specificZqGroup));
 			// r = 5
 			final ZqElement r = ZqElement.create(BigInteger.valueOf(5), specificZqGroup);
@@ -222,20 +222,20 @@ class SingleValueProductArgumentServiceTest extends TestGroupSetup {
 			final ElGamalMultiRecipientPublicKey pk = new ElGamalMultiRecipientPublicKey(GroupVector.from(pkElements));
 			// ck = (2, 3, 4)
 			final List<GqElement> gElements = new ArrayList<>(2);
-			final GqElement h = GqElementFactory.fromValue(BigInteger.valueOf(2), specificGqGroup);
+			final GqElement h = GqElementFactory.fromValue(BigInteger.TWO, specificGqGroup);
 			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup));
 			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(4), specificGqGroup));
 			final CommitmentKey ck = new CommitmentKey(h, GroupVector.from(gElements));
 			// expected = (16, 2, 3, (1, 8), (1, 2), 5, 7)
 			final GqElement cd = GqElementFactory.fromValue(BigInteger.valueOf(16), specificGqGroup);
-			final GqElement cdelta = GqElementFactory.fromValue(BigInteger.valueOf(2), specificGqGroup);
+			final GqElement cdelta = GqElementFactory.fromValue(BigInteger.TWO, specificGqGroup);
 			final GqElement cDelta = GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup);
 			final List<ZqElement> aTilde = new ArrayList<>(2);
 			aTilde.add(ZqElement.create(BigInteger.ONE, specificZqGroup));
 			aTilde.add(ZqElement.create(BigInteger.valueOf(8), specificZqGroup));
 			final List<ZqElement> bTilde = new ArrayList<>(2);
 			bTilde.add(ZqElement.create(BigInteger.ONE, specificZqGroup));
-			bTilde.add(ZqElement.create(BigInteger.valueOf(2), specificZqGroup));
+			bTilde.add(ZqElement.create(BigInteger.TWO, specificZqGroup));
 			final ZqElement rTilde = ZqElement.create(BigInteger.valueOf(5), specificZqGroup);
 			final ZqElement sTilde = ZqElement.create(BigInteger.valueOf(7), specificZqGroup);
 			final SingleValueProductArgument expected = new SingleValueProductArgument.Builder()

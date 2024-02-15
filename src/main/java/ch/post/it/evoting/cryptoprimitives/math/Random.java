@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,36 +24,20 @@ import java.util.List;
 public interface Random {
 
 	/**
-	 * Generates a random string using the Base16 alphabet (RFC 4648).
-	 *
-	 * @param length l, the length of the string to be generated, in number of chars.
-	 * @return a random Base16-encoded string of {@code length} characters. Must be greater than or equal to 1.
-	 */
-	String genRandomBase16String(final int length);
-
-	/**
-	 * Generates a random string using the Base32 alphabet (RFC 4648). The method does not expect to produce Base32 decodable output.
-	 *
-	 * @param length l, the length of the string to be generated, in number of chars.
-	 * @return a random Base32-encoded string of {@code length} characters. Must be greater than or equal to 1.
-	 */
-	String genRandomBase32String(final int length);
-
-	/**
-	 * Generates a random string using the Base64 alphabet (RFC 4648). The method does not expect to produce Base64 decodable output.
-	 *
-	 * @param length l, the length of the string to be generated, in number of chars.
-	 * @return a random Base64-encoded string of {@code length} characters. Must be greater than or equal to 1.
-	 */
-	String genRandomBase64String(final int length);
-
-	/**
 	 * Generates a random BigInteger between 0 (incl.) and {@code upperBound} (excl.).
 	 *
 	 * @param upperBound m, the upper bound. Must be non null and strictly positive.
 	 * @return A random BigInteger <code>r s.t. 0 &le; r &lt; m</code>.
 	 */
 	BigInteger genRandomInteger(final BigInteger upperBound);
+
+	/**
+	 * Generates a random int between 0 (incl.) and {@code upperBound} (excl.).
+	 *
+	 * @param upperBound m, the upper bound. Must be strictly positive.
+	 * @return A random int <code>r s.t. 0 &le; r &lt; m</code>.
+	 */
+	int genRandomInteger(final int upperBound);
 
 	/**
 	 * Generates a list of unique decimal strings.
@@ -64,7 +48,20 @@ public interface Random {
 	 *
 	 * @param desiredCodeLength   l, the desired length of each code. Must be strictly positive.
 	 * @param numberOfUniqueCodes n, the number of unique codes. Must be strictly positive.
-	 * @return a list of unique decimal strings.
+	 * @return codes &#8712; (&#120120;<sub>10</sub>)<sup>l &times; n</sup> a list of unique decimal strings.
 	 */
 	List<String> genUniqueDecimalStrings(final int desiredCodeLength, final int numberOfUniqueCodes);
+
+	/**
+	 * Generates a random string of length &#119897; of the given alphabet.
+	 *
+	 * @param length   &#119897; &#8712; &#8469;<sup>+</sup>, the desired length of string. Must be strictly positive.
+	 * @param alphabet &#120120;=(&#119878;<sub>0</sub>,...,&#119878;<sub>&#119896;-1</sub>), the alphabet from which to choose the string. Must be
+	 *                 non-null.
+	 * @return &#119878;' &#8712; (&#120120;)<sup>&#119897;</sup>, a random string of length &#119897; of the given alphabet.
+	 * @throws NullPointerException     if &#120120; is null.
+	 * @throws IllegalArgumentException if &#119897; is not strictly positive.
+	 */
+	@SuppressWarnings("java:S117")
+	String genRandomString(final int length, final Alphabet alphabet);
 }

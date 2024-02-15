@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+
+import com.google.common.base.Preconditions;
 
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
@@ -105,8 +106,9 @@ public class PlaintextEqualityProofService {
 		checkNotNull(firstPublicKey);
 		checkNotNull(secondPublicKey);
 		checkNotNull(randomness);
-		checkNotNull(auxiliaryInformation);
-		checkArgument(auxiliaryInformation.stream().allMatch(Objects::nonNull), "The auxiliary information must not contain null objects.");
+		final List<String> auxiliaryInformationCopy = checkNotNull(auxiliaryInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 
 		// Dimensions checking.
 		checkArgument(firstCiphertext.size() == 1, "The first ciphertext must have exactly one phi.");
@@ -135,7 +137,7 @@ public class PlaintextEqualityProofService {
 		final GqElement c_1 = firstCiphertext.get(0);
 		final GqElement c_0_prime = secondCiphertext.getGamma();
 		final GqElement c_1_prime = secondCiphertext.get(0);
-		final List<String> i_aux = List.copyOf(auxiliaryInformation);
+		final List<String> i_aux = auxiliaryInformationCopy;
 
 		// Operation.
 		final GroupVector<ZqElement, ZqGroup> b = randomService.genRandomVector(q, 2);
@@ -175,9 +177,9 @@ public class PlaintextEqualityProofService {
 		checkNotNull(firstPublicKey);
 		checkNotNull(secondPublicKey);
 		checkNotNull(plaintextEqualityProof);
-		checkNotNull(auxiliaryInformation);
-
-		checkArgument(auxiliaryInformation.stream().allMatch(Objects::nonNull), "The auxiliary information must not contain null objects.");
+		final List<String> auxiliaryInformationCopy = checkNotNull(auxiliaryInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 
 		// Dimensions checking.
 		checkArgument(firstCiphertext.size() == 1, "The first ciphertext must have exactly one phi.");
@@ -204,7 +206,7 @@ public class PlaintextEqualityProofService {
 		final GqElement h = firstPublicKey;
 		final GqElement h_prime = secondPublicKey;
 		final PlaintextEqualityProof ez = plaintextEqualityProof;
-		final List<String> i_aux = List.copyOf(auxiliaryInformation);
+		final List<String> i_aux = auxiliaryInformationCopy;
 		final GroupVector<ZqElement, ZqGroup> z = ez.get_z();
 		final ZqElement e = ez.get_e();
 

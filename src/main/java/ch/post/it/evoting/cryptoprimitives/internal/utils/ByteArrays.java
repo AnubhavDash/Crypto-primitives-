@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,20 +24,14 @@ import java.math.BigInteger;
 /**
  * Byte array utilities.
  */
-public class ByteArrays {
+public final class ByteArrays {
 
 	private ByteArrays() {
-		//Intentional
+		// Intentionally left blank.
 	}
 
 	/**
-	 * Cuts the given byte array to the requested bit length
-	 *
-	 * @param byteArray       the byte array to be cut
-	 * @param requestedLength the length in bits to which the array is to be cut. Greater than 0 and not greater than the byte array's bit length.
-	 * @return the byte array cut to the requested length
-	 * @throws NullPointerException     if the given byte array is null
-	 * @throws IllegalArgumentException if the requested length is not within the required range
+	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.ByteArrays#cutToBitLength}
 	 */
 	@SuppressWarnings("java:S117")
 	public static byte[] cutToBitLength(final byte[] byteArray, final int requestedLength) {

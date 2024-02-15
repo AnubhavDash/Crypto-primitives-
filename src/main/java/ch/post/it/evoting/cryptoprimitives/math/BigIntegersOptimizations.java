@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,18 @@
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.math.BigInteger;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsService;
 
 public class BigIntegersOptimizations {
 	private BigIntegersOptimizations() {
-		// Intentionally left blank
+		// Intentionally left blank.
 	}
 
 	public static void prepareFixedBaseOptimizations(final BigInteger basis, final BigInteger modulus) {
-		BigIntegerOperationsService.generateCache(basis, modulus);
+		BigIntegerOperationsService.generateCache(checkNotNull(basis), checkNotNull(modulus));
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,8 @@ public final class ZqElement extends GroupElement<ZqGroup> {
 	 * @return a new ZqElement.
 	 */
 	public static ZqElement create(final int value, final ZqGroup group) {
+		checkNotNull(group);
+
 		return create(BigInteger.valueOf(value), group);
 	}
 

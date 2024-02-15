@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,13 +89,13 @@ public class ShuffleService {
 		final Permutation pi = this.permutationService.genPermutation(N);
 		final ElGamalMultiRecipientMessage one = ElGamalMultiRecipientMessages.ones(group, l);
 
-		final List<ZqElement> r =
+		final GroupVector<ZqElement, ZqGroup> r =
 				Stream.generate(() -> randomService.genRandomInteger(q))
 						.map(value -> ZqElement.create(value, exponentGroup))
 						.limit(N)
-						.toList();
+						.collect(GroupVector.toGroupVector());
 
-		final List<ElGamalMultiRecipientCiphertext> C_prime =
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C_prime =
 				IntStream.range(0, N)
 						.parallel()
 						.mapToObj(i -> {
@@ -106,7 +106,7 @@ public class ShuffleService {
 							final int pi_i = pi.get(i);
 							final ElGamalMultiRecipientCiphertext C_pi_i = C.get(pi_i);
 							return e.getCiphertextProduct(C_pi_i);
-						}).toList();
+						}).collect(GroupVector.toGroupVector());
 
 		return new Shuffle(C_prime, pi, r);
 	}

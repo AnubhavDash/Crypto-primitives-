@@ -40,27 +40,7 @@ We strive for excellent code quality to minimize the risk of bugs and vulnerabil
 |-----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
 | [SonarQube](https://www.sonarqube.org/)                                                 | Code quality and code security                                                                     |
 | [Fortify](https://www.microfocus.com/de-de/products/static-code-analysis-sast/overview) | Static Application Security Testing                                                                |
-| [JFrog X-Ray](https://jfrog.com/xray/)                                                  | Common vulnerabilities and exposures (CVE) analysis, Open-source software (OSS) license compliance | |
-
-### SonarQube Analysis
-
-We parametrize SonarQube with the built-in Sonar way quality profile. The SonarQube analysis of the crypto-primitives code reveals 0 bugs, 0
-vulnerabilities, 0 security hotspots, and 0 code smells.
-
-![SonarQube](SonarQube.jpg)
-
-Moreover, a high test coverage illustrates the fact that we extensively test the crypto-primitives library.
-
-### Fortify Analysis
-
-The Fortify analysis showed 0 critical, 7 high, 0 medium, and 65 low criticality issues. We manually reviewed all 72 issues and assessed them as false
-positives.
-
-### JFrog X-Ray Analysis
-
-The X-Ray analysis indicates that none of the crypto-primitives' 3rd party dependencies contains known vulnerabilities or non-compliant open source
-software licenses. As a general principle, we try to minimize external dependencies in cryptographic libraries and only rely on well-tested and widely
-used 3rd party components.
+| [JFrog X-Ray](https://jfrog.com/xray/)                                                  | Common vulnerabilities and exposures (CVE) analysis, Open-source software (OSS) license compliance |
 
 ## Native Library Support
 

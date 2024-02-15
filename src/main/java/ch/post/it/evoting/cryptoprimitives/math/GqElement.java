@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,19 +29,21 @@ import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsSer
  * <p>Instances of this class are immutable.
  */
 @SuppressWarnings("java:S117")
-public final class GqElement extends MultiplicativeGroupElement {
+public sealed class GqElement extends GroupElement<GqGroup> permits PrimeGqElement {
 
-	// Private constructor without input validation. Used only for operations that provide a mathematical guarantee that the element is within the
+	// Package private constructor without input validation. Used only for operations that provide a mathematical guarantee that the element is within the
 	// group (such as multiplying two elements of the same group).
-	private GqElement(final BigInteger value, final GqGroup group) {
+	GqElement(final BigInteger value, final GqGroup group) {
 		super(value, group);
 	}
 
 	/**
-	 * @see MultiplicativeGroupElement#multiply(MultiplicativeGroupElement)
+	 * Returns a {@code GqElement} whose value is {@code (this * element)}.
+	 *
+	 * @param other the element to be multiplied by this. It must be from the same group and non-null.
+	 * @return (this * element).
 	 */
-	@Override
-	public GqElement multiply(final MultiplicativeGroupElement other) {
+	public GqElement multiply(final GqElement other) {
 		checkNotNull(other);
 		checkArgument(this.group.equals(other.group));
 
@@ -50,9 +52,12 @@ public final class GqElement extends MultiplicativeGroupElement {
 	}
 
 	/**
-	 * @see MultiplicativeGroupElement#exponentiate(ZqElement)
+	 * Returns a {@code GqElement} whose value is (this<sup>exponent</sup>).
+	 *
+	 * @param exponent the exponent to which this {@code GqElement} is to be raised. It must be a member of a group of the same order and be
+	 *                 non-null.
+	 * @return this<sup>exponent</sup>.
 	 */
-	@Override
 	public GqElement exponentiate(final ZqElement exponent) {
 		checkNotNull(exponent);
 		checkArgument(isOfSameOrderGroup(exponent));
@@ -100,7 +105,7 @@ public final class GqElement extends MultiplicativeGroupElement {
 	public static class GqElementFactory {
 
 		private GqElementFactory() {
-			// empty on purpose
+			// Intentionally left blank.
 		}
 
 		/**
@@ -113,7 +118,7 @@ public final class GqElement extends MultiplicativeGroupElement {
 		public static GqElement fromValue(final BigInteger value, final GqGroup group) {
 			checkNotNull(value);
 			checkNotNull(group);
-			checkArgument(group.isGroupMember(value), "Cannot create a GroupElement with value %s as it is not an element of group %s", value, group);
+			checkArgument(group.isGroupMember(value), "Cannot create a GqElement with value %s as it is not an element of group %s", value, group);
 
 			return new GqElement(value, group);
 		}
@@ -134,7 +139,7 @@ public final class GqElement extends MultiplicativeGroupElement {
 			checkArgument(element.compareTo(BigInteger.ZERO) > 0, "The element must be strictly greater than 0");
 			checkArgument(element.compareTo(group.getQ()) < 0, "The element must be smaller than the group's order");
 
-			final BigInteger y = BigIntegerOperationsService.modExponentiate(element, BigInteger.valueOf(2), group.getP());
+			final BigInteger y = BigIntegerOperationsService.modExponentiate(element, BigInteger.TWO, group.getP());
 			return new GqElement(y, group);
 		}
 
@@ -153,7 +158,7 @@ public final class GqElement extends MultiplicativeGroupElement {
 			// the GroupVector constructor ensures all bases belong to the same group.
 			checkArgument(exponents.getGroup().hasSameOrderAs(bases.getGroup()));
 
-			final List<BigInteger> basesList = bases.stream().parallel().map(MultiplicativeGroupElement::getValue).toList();
+			final List<BigInteger> basesList = bases.stream().parallel().map(GqElement::getValue).toList();
 			final List<BigInteger> exponentsList = exponents.stream().parallel().map(ZqElement::getValue).toList();
 
 			return new GqElement(BigIntegerOperationsService.multiModExp(basesList, exponentsList, bases.getGroup().getP()), bases.getGroup());

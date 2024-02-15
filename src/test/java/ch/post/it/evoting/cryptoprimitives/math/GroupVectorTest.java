@@ -1,19 +1,17 @@
 /*
+ * Copyright 2024 Swiss Post Ltd
  *
- *  Copyright 2022 Post CH Ltd
- * 
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
@@ -67,9 +65,7 @@ class GroupVectorTest {
 		// With null elem.
 		TestGroup group = new TestGroup();
 		TestGroupElement e1 = new TestGroupElement(group);
-		final IllegalArgumentException nullIllegalArgumentException = assertThrows(IllegalArgumentException.class,
-				() -> GroupVector.of(e1, null));
-		assertEquals("Elements must not contain nulls", nullIllegalArgumentException.getMessage());
+		assertThrows(NullPointerException.class, () -> GroupVector.of(e1, null));
 
 		// Different group elems.
 		TestGroupElement e2 = new TestGroupElement(new TestGroup());
@@ -99,7 +95,7 @@ class GroupVectorTest {
 	void testElementsWithNullThrows() {
 		List<TestGroupElement> elements = new ArrayList<>(Collections.emptyList());
 		elements.add(null);
-		assertThrows(IllegalArgumentException.class, () -> GroupVector.from(elements));
+		assertThrows(NullPointerException.class, () -> GroupVector.from(elements));
 	}
 
 	@Test
@@ -107,7 +103,7 @@ class GroupVectorTest {
 		TestGroup group = new TestGroup();
 		TestGroupElement validElement = new TestGroupElement(group);
 		List<TestGroupElement> elements = Arrays.asList(validElement, null);
-		assertThrows(IllegalArgumentException.class, () -> GroupVector.from(elements));
+		assertThrows(NullPointerException.class, () -> GroupVector.from(elements));
 	}
 
 	@Test
@@ -198,7 +194,7 @@ class GroupVectorTest {
 	void threeElementsWithTheSamePropertyAreAllEqualAndDifferentPropertiesNotEqual() {
 		TestGroup group = new TestGroup();
 		TestValuedElement first = new TestValuedElement(BigInteger.ONE, group);
-		TestValuedElement second = new TestValuedElement(BigInteger.valueOf(2), group);
+		TestValuedElement second = new TestValuedElement(BigInteger.TWO, group);
 		TestValuedElement third = new TestValuedElement(BigInteger.valueOf(3), group);
 		List<TestValuedElement> elements = Arrays.asList(first, second, third);
 		GroupVector<TestValuedElement, TestGroup> vector = GroupVector.from(elements);

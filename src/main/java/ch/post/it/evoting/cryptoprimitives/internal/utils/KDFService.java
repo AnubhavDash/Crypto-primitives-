@@ -1,18 +1,17 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package ch.post.it.evoting.cryptoprimitives.internal.utils;
@@ -24,7 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.bouncycastle.crypto.Digest;
@@ -32,11 +30,12 @@ import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
 import org.bouncycastle.crypto.params.HKDFParameters;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.google.common.primitives.Bytes;
 
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.utils.Conversions;
 import ch.post.it.evoting.cryptoprimitives.utils.KeyDerivation;
 
@@ -49,7 +48,7 @@ public class KDFService implements KeyDerivation {
 
 	@VisibleForTesting
 	KDFService(final Supplier<Digest> hashSupplier) {
-		this.hashSupplier = hashSupplier;
+		this.hashSupplier = checkNotNull(hashSupplier);
 	}
 
 	public static KDFService getInstance() {
@@ -62,13 +61,13 @@ public class KDFService implements KeyDerivation {
 	@SuppressWarnings({ "java:S117", "java:S100" })
 	public byte[] KDF(final byte[] pseudoRandomKey, final List<String> contextInformation, final int requiredByteLength) {
 		checkNotNull(pseudoRandomKey);
-		checkNotNull(contextInformation);
-		checkArgument(contextInformation.stream().allMatch(Objects::nonNull), "Info contains a null.");
 
 		final int L = this.hashSupplier.get().getDigestSize();
 		final byte[] PRK = pseudoRandomKey;
 		final int l_straight = PRK.length;
-		final List<String> info_vector = List.copyOf(contextInformation);
+		final List<String> info_vector = checkNotNull(contextInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 		final int l_curved = requiredByteLength;
 
 		checkArgument(l_curved > 0, "Requested byte length must be greater than 0. ");
@@ -109,22 +108,25 @@ public class KDFService implements KeyDerivation {
 	@SuppressWarnings({ "java:S117", "java:S100" })
 	public ZqElement KDFToZq(final byte[] pseudoRandomKey, final List<String> contextInformation, final BigInteger exclusiveUpperBound) {
 		checkNotNull(pseudoRandomKey);
-		checkNotNull(contextInformation);
-		checkArgument(contextInformation.stream().allMatch(Objects::nonNull), "Info contains a null.");
 		checkNotNull(exclusiveUpperBound);
+
+		final int lambda = SecurityLevelConfig.getSystemSecurityLevel().getSecurityStrength();
 
 		final int L = this.hashSupplier.get().getDigestSize();
 		final byte[] PRK = pseudoRandomKey;
 		final int l_straight = PRK.length;
-		final List<String> info = List.copyOf(contextInformation);
+		final List<String> info = checkNotNull(contextInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 		final BigInteger q = exclusiveUpperBound;
 
 		checkArgument(l_straight >= L, "The pseudo random key length must be greater than the hash function output length.");
-		checkArgument(ByteArrays.byteLength(q) >= L);
+		checkArgument(ByteArrays.byteLength(q) >= L,
+				"The byte length of the exclusive upper bound must be greater than the hash function output length.");
 
-		final int l_curved = ByteArrays.byteLength(q) + 32;
-		byte[] h = KDF(PRK, info, l_curved);
-		BigInteger u = byteArrayToInteger(h).mod(q);
+		final int l_curved = ByteArrays.byteLength(q) + lambda / 4;
+		final byte[] h = KDF(PRK, info, l_curved);
+		final BigInteger u = byteArrayToInteger(h).mod(q);
 
 		return ZqElement.create(u, new ZqGroup(q));
 	}

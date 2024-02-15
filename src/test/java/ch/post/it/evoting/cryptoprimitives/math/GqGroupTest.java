@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,9 @@ import java.math.BigInteger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.GqGroupGenerator;
 
 class GqGroupTest {
-	private static final SecurityLevelInternal SECURITY_LEVEL_CONFIG = SecurityLevelInternal.TESTING_ONLY;
 
 	private static BigInteger p;
 	private static BigInteger q;
@@ -44,7 +42,7 @@ class GqGroupTest {
 
 		p = BigInteger.valueOf(23);
 		q = BigInteger.valueOf(11);
-		g = BigInteger.valueOf(2);
+		g = BigInteger.TWO;
 		smallGroup = new GqGroup(p, q, g);
 		smallGroupGenerator = new GqGroupGenerator(smallGroup);
 	}

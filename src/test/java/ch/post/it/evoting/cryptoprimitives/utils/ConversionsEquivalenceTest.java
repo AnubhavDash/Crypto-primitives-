@@ -1,6 +1,5 @@
 /*
- *
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 package ch.post.it.evoting.cryptoprimitives.utils;
 
@@ -42,7 +40,7 @@ class ConversionsEquivalenceTest {
 
 	@RepeatedTest(100)
 	void randomBigIntegerConversionIsEquivalentWithTwoMethods() {
-		final int BIT_LENGTH = 2048;
+		final int BIT_LENGTH = 3072;
 		final BigInteger random = new BigInteger(BIT_LENGTH, secureRandom);
 		final byte[] expected = integerToByteArraySpec(random);
 		final byte[] result = ConversionsInternal.integerToByteArray(random);

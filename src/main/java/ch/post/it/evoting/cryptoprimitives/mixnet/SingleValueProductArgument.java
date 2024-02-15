@@ -1,18 +1,17 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package ch.post.it.evoting.cryptoprimitives.mixnet;
 
@@ -53,17 +52,32 @@ public class SingleValueProductArgument implements HashableList {
 
 	private SingleValueProductArgument(final GqElement c_d, final GqElement c_delta, final GqElement c_Delta,
 			final GroupVector<ZqElement, ZqGroup> a_tilde, final GroupVector<ZqElement, ZqGroup> b_tilde, final ZqElement r_tilde,
-			final ZqElement s_tilde, final int n, final GqGroup group) {
-		this.c_d = c_d;
-		this.c_delta = c_delta;
-		this.c_Delta = c_Delta;
-		this.a_tilde = a_tilde;
-		this.b_tilde = b_tilde;
-		this.r_tilde = r_tilde;
-		this.s_tilde = s_tilde;
+			final ZqElement s_tilde) {
+		// Null checking.
+		this.c_d = checkNotNull(c_d);
+		this.c_delta = checkNotNull(c_delta);
+		this.c_Delta = checkNotNull(c_Delta);
+		this.a_tilde = checkNotNull(a_tilde);
+		this.b_tilde = checkNotNull(b_tilde);
+		this.r_tilde = checkNotNull(r_tilde);
+		this.s_tilde = checkNotNull(s_tilde);
 
-		this.n = n;
-		this.group = group;
+		// Cross group checking.
+		final List<GqElement> gqGroupMembers = List.of(c_d, c_delta, c_Delta);
+		final List<GroupVectorElement<ZqGroup>> zqGroupMembers = List.of(a_tilde, b_tilde, r_tilde, s_tilde);
+		checkArgument(allEqual(gqGroupMembers.stream(), GroupVectorElement::getGroup),
+				"cd, cLowerDelta, cUpperDelta must belong to the same group.");
+		checkArgument(allEqual(zqGroupMembers.stream(), GroupVectorElement::getGroup),
+				"aTilde, bTilde, rTilde, sTilde must belong to the same group.");
+		checkArgument(c_d.getGroup().hasSameOrderAs(a_tilde.getGroup()), "GqGroup and ZqGroup of argument inputs are not compatible.");
+		this.group = c_d.getGroup();
+
+		// Cross dimensions checking.
+		checkArgument(a_tilde.size() == b_tilde.size(), "The vectors aTilde and bTilde must have the same size.");
+
+		// Dimensions checking.
+		checkArgument(a_tilde.size() >= 2, "The size of vectors aTilde and bTilde must be greater than or equal to 2.");
+		this.n = a_tilde.size();
 	}
 
 	public GqElement get_c_d() {
@@ -192,32 +206,7 @@ public class SingleValueProductArgument implements HashableList {
 		 * @return A valid Single Value Product Argument.
 		 */
 		public SingleValueProductArgument build() {
-			// Null checking.
-			checkNotNull(this.c_d);
-			checkNotNull(this.c_delta);
-			checkNotNull(this.c_Delta);
-			checkNotNull(this.a_tilde);
-			checkNotNull(this.b_tilde);
-			checkNotNull(this.r_tilde);
-			checkNotNull(this.s_tilde);
-
-			// Cross group checking.
-			final List<GqElement> gqGroupMembers = List.of(c_d, c_delta, c_Delta);
-			final List<GroupVectorElement<ZqGroup>> zqGroupMembers = List.of(a_tilde, b_tilde, r_tilde, s_tilde);
-			checkArgument(allEqual(gqGroupMembers.stream(), GroupVectorElement::getGroup),
-					"cd, cLowerDelta, cUpperDelta must belong to the same group.");
-			checkArgument(allEqual(zqGroupMembers.stream(), GroupVectorElement::getGroup),
-					"aTilde, bTilde, rTilde, sTilde must belong to the same group.");
-			checkArgument(c_d.getGroup().hasSameOrderAs(a_tilde.getGroup()), "GqGroup and ZqGroup of argument inputs are not compatible.");
-
-			// Cross dimensions checking.
-			checkArgument(a_tilde.size() == b_tilde.size(), "The vectors aTilde and bTilde must have the same size.");
-
-			// Dimensions checking.
-			checkArgument(this.a_tilde.size() >= 2, "The size of vectors aTilde and bTilde must be greater than or equal to 2.");
-
-			// Build the argument.
-			return new SingleValueProductArgument(c_d, c_delta, c_Delta, a_tilde, b_tilde, r_tilde, s_tilde, a_tilde.size(), c_d.getGroup());
+			return new SingleValueProductArgument(c_d, c_delta, c_Delta, a_tilde, b_tilde, r_tilde, s_tilde);
 
 		}
 	}

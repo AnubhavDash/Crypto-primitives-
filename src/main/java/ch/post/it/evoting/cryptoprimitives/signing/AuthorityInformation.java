@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,11 +40,11 @@ public class AuthorityInformation {
 			final String state,
 			final String locality,
 			final String organisation) {
-		this.commonName = commonName;
-		this.country = country;
-		this.state = state;
-		this.locality = locality;
-		this.organisation = organisation;
+		this.commonName = checkNotNull(commonName);
+		this.country = checkNotNull(country);
+		this.state = checkNotNull(state);
+		this.locality = checkNotNull(locality);
+		this.organisation = checkNotNull(organisation);
 	}
 
 	public String getCommonName() {
@@ -104,12 +104,6 @@ public class AuthorityInformation {
 		}
 
 		public AuthorityInformation build() {
-			checkNotNull(commonName);
-			checkNotNull(country);
-			checkNotNull(state);
-			checkNotNull(locality);
-			checkNotNull(organisation);
-
 			return new AuthorityInformation(commonName, country, state, locality, organisation);
 		}
 	}

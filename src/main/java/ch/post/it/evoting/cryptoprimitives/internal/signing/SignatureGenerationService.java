@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,12 +37,12 @@ public class SignatureGenerationService implements SignatureGeneration {
 	private final Hash hash;
 	private final SignatureSupportingAlgorithm signatureSupportingAlgorithm;
 
-	public SignatureGenerationService(final PrivateKey privateKey, final X509Certificate certificate, final Hash hash, 
+	public SignatureGenerationService(final PrivateKey privateKey, final X509Certificate certificate, final Hash hash,
 			final SignatureSupportingAlgorithm signatureSupportingAlgorithm) {
-		this.privKey = privateKey;
-		this.certificate = certificate;
-		this.hash = hash;
-		this.signatureSupportingAlgorithm = signatureSupportingAlgorithm;
+		this.privKey = checkNotNull(privateKey);
+		this.certificate = checkNotNull(certificate);
+		this.hash = checkNotNull(hash);
+		this.signatureSupportingAlgorithm = checkNotNull(signatureSupportingAlgorithm);
 	}
 
 	/**

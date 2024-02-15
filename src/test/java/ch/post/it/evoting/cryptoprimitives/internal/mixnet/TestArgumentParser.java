@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -172,7 +172,7 @@ class TestArgumentParser {
 
 		final ProductArgument productArgument;
 		final JsonData cbJsonData = argumentData.getJsonData("c_b");
-		if (!cbJsonData.getJsonNode().isMissingNode()) {
+		if (!cbJsonData.jsonNode().isMissingNode()) {
 			final BigInteger cbValue = argumentData.get("c_b", BigInteger.class);
 			final GqElement cb = GqElementFactory.fromValue(cbValue, gqGroup);
 			final HadamardArgument hadamardArgument = this.parseHadamardArgument(argumentData.getJsonData("hadamard_argument"));
@@ -197,21 +197,21 @@ class TestArgumentParser {
 	}
 
 	GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> parseCiphertextVector(final JsonData ciphertextsDataVector) {
-		if (!ciphertextsDataVector.getJsonNode().isArray()) {
+		if (!ciphertextsDataVector.jsonNode().isArray()) {
 			throw new IllegalArgumentException("Provided jsonData does not wrap an array.");
 		}
 
-		return StreamSupport.stream(ciphertextsDataVector.getJsonNode().spliterator(), false)
+		return StreamSupport.stream(ciphertextsDataVector.jsonNode().spliterator(), false)
 				.map(node -> parseCiphertext(new JsonData(node)))
 				.collect(toGroupVector());
 	}
 
 	GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> parseCiphertextMatrix(final JsonData ciphertextDataMatrix) {
-		if (!ciphertextDataMatrix.getJsonNode().isArray()) {
+		if (!ciphertextDataMatrix.jsonNode().isArray()) {
 			throw new IllegalArgumentException("Provided jsonData does not wrap an array.");
 		}
 
-		return StreamSupport.stream(ciphertextDataMatrix.getJsonNode().spliterator(), false)
+		return StreamSupport.stream(ciphertextDataMatrix.jsonNode().spliterator(), false)
 				.map(node -> parseCiphertextVector(new JsonData(node)))
 				.collect(collectingAndThen(toList(), GroupMatrix::fromRows));
 	}

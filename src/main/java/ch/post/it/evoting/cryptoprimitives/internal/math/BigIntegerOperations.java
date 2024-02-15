@@ -1,18 +1,17 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
@@ -82,11 +81,18 @@ public interface BigIntegerOperations {
 	BigInteger modInvert(BigInteger n, BigInteger modulus);
 
 	/**
-	 * Calculates the Jacobi symbol(a|n). The Jacobi symbol allows us determining group membership efficiently.
+	 * Calculates the Legendre symbol (a|p).
+	 * <p>
+	 *     The Legendre symbol allows us determining group membership efficiently.
+	 *     An integer a is a quadratic residue modulo p if and only if (a|p) = 1.
+	 *     The caller of this method needs to ensure that p is an odd prime number.
+	 * </p>
 	 *
 	 * @param a positive integer
-	 * @param n modulus
-	 * @return (a | n) Possible values -1,0,1
+	 * @param p odd prime.
+	 * @return (a | p) Possible values -1,0,1
+	 * @throws NullPointerException if any of the arguments is null
+	 * @throws IllegalArgumentException if p is not an odd integer strictly greater than 2.
 	 */
-	int getJacobi(BigInteger a, BigInteger n);
+	int getLegendre(BigInteger a, BigInteger p);
 }

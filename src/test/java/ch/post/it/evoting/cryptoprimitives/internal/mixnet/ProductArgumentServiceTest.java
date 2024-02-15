@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,6 @@ import ch.post.it.evoting.cryptoprimitives.mixnet.SingleValueProductArgument;
 import ch.post.it.evoting.cryptoprimitives.mixnet.SingleValueProductStatement;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ZeroArgument;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
 import ch.post.it.evoting.cryptoprimitives.utils.VerificationResult;
@@ -93,7 +92,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 		nu = secureRandom.nextInt(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2;
 
 		hashService = TestHashService.create(gqGroup.getQ());
-		publicKey = new ElGamalGenerator(gqGroup).genRandomPublicKey(k);
+		publicKey = elGamalGenerator.genRandomPublicKey(k);
 
 		commitmentKey = new TestCommitmentKeyGenerator(gqGroup).genCommitmentKey(nu);
 	}
@@ -125,7 +124,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with public key from different group than commitment key throws an IllegalArgumentException")
 		void constructProductArgumentWithPublicKeyGroupDifferentCommitmentKeyGroup() {
-			final ElGamalMultiRecipientPublicKey otherPublicKey = new ElGamalGenerator(otherGqGroup).genRandomPublicKey(k);
+			final ElGamalMultiRecipientPublicKey otherPublicKey = otherGroupElGamalGenerator.genRandomPublicKey(k);
 			final Exception exception = assertThrows(IllegalArgumentException.class,
 					() -> new ProductArgumentService(randomService, hashService, otherPublicKey, commitmentKey));
 			assertEquals("The public key and the commitment key must have the same group.", exception.getMessage());
@@ -292,7 +291,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 
 			final ZqElement zqZero = ZqElement.create(BigInteger.ZERO, zqGroup);
 			final ZqElement zqOne = ZqElement.create(BigInteger.ONE, zqGroup);
-			final ZqElement zqTwo = ZqElement.create(BigInteger.valueOf(2), zqGroup);
+			final ZqElement zqTwo = ZqElement.create(BigInteger.TWO, zqGroup);
 			final ZqElement zqThree = ZqElement.create(BigInteger.valueOf(3), zqGroup);
 			final ZqElement zqFour = ZqElement.create(BigInteger.valueOf(4), zqGroup);
 
@@ -307,7 +306,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 
 			final BigInteger zero = BigInteger.ZERO;
 			final BigInteger one = BigInteger.ONE;
-			final BigInteger two = BigInteger.valueOf(2);
+			final BigInteger two = BigInteger.TWO;
 			final BigInteger three = BigInteger.valueOf(3);
 			final BigInteger four = BigInteger.valueOf(4);
 

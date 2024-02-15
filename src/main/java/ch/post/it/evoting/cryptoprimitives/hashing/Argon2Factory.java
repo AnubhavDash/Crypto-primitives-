@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ public class Argon2Factory {
 		randomService = new RandomService();
 	}
 
-	public static Argon2 createArgon2(Argon2Context config) {
+	public static Argon2 createArgon2(Argon2Profile config) {
 		return new Argon2Service(INSTANCE.randomService, config);
 	}
 }

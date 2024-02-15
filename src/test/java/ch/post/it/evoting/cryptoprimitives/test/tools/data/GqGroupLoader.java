@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ public class GqGroupLoader {
 	private final GqGroup group;
 
 	GqGroupLoader(final String fileName) throws IOException {
-		final ObjectMapper mapper = new ObjectMapper();
+		ObjectMapper mapper = new ObjectMapper();
 		final JsonNode jsonNode = mapper.readTree(GqGroupLoader.class.getResource(fileName));
 
 		final BigInteger p = new BigInteger(jsonNode.get("p").asText(), 10);

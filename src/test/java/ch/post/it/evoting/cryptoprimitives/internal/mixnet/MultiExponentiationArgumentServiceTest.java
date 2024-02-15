@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,6 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 	private static TestMultiExponentiationStatementGenerator statementGenerator;
 	private static TestMultiExponentiationWitnessGenerator witnessGenerator;
 	private static ElGamalMultiRecipientPublicKey publicKey;
-	private static ElGamalGenerator elGamalGenerator;
 	private static CommitmentKey commitmentKey;
 	private static TestMultiExponentiationStatementWitnessPairGenerator statementWitnessPairGenerator;
 	private static RandomService randomService;
@@ -88,7 +87,6 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 
 	@BeforeAll
 	static void setUpAll() {
-		elGamalGenerator = new ElGamalGenerator(gqGroup);
 		publicKeySize = secureRandom.nextInt(10) + 1;
 		publicKey = elGamalGenerator.genRandomPublicKey(publicKeySize);
 
@@ -213,8 +211,8 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 		@Test
 		void testCIsNotMultiExponentiationProductThrows() {
 			StatementWitnessPair statementWitnessPair = statementWitnessPairGenerator.genPair(n, m, l);
-			MultiExponentiationStatement statement = statementWitnessPair.getStatement();
-			MultiExponentiationWitness witness = statementWitnessPair.getWitness();
+			MultiExponentiationStatement statement = statementWitnessPair.statement();
+			MultiExponentiationWitness witness = statementWitnessPair.witness();
 
 			ElGamalMultiRecipientCiphertext computedC = statement.get_C();
 			ElGamalMultiRecipientCiphertext differentC = Generators.genWhile(
@@ -230,8 +228,8 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 		@Test
 		void testCommitmentCAIsNotCommitmentOfMatrixAThrows() {
 			StatementWitnessPair statementWitnessPair = statementWitnessPairGenerator.genPair(n, m, l);
-			MultiExponentiationStatement statement = statementWitnessPair.getStatement();
-			MultiExponentiationWitness witness = statementWitnessPair.getWitness();
+			MultiExponentiationStatement statement = statementWitnessPair.statement();
+			MultiExponentiationWitness witness = statementWitnessPair.witness();
 
 			GroupVector<GqElement, GqGroup> computeCommitmentToA = statement.get_c_A();
 			GqElement firstElement = computeCommitmentToA.get(0);
@@ -256,8 +254,8 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 			MultiExponentiationArgumentService argumentService = new MultiExponentiationArgumentService(
 					publicKey, commitmentKey, randomService, hashService);
 			StatementWitnessPair pair = statementWitnessPairGenerator.genPair(n, m, l);
-			MultiExponentiationStatement statement = pair.getStatement();
-			MultiExponentiationWitness witness = pair.getWitness();
+			MultiExponentiationStatement statement = pair.statement();
+			MultiExponentiationWitness witness = pair.witness();
 			assertDoesNotThrow(() -> argumentService.getMultiExponentiationArgument(statement, witness));
 		}
 
@@ -284,8 +282,8 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 		void setup() {
 			randomArgument = argumentGenerator.genRandomArgument(n, m, l);
 			final StatementWitnessPair statementWitnessPair = statementWitnessPairGenerator.genPair(n, m, l);
-			validStatement = statementWitnessPair.getStatement();
-			validArgument = argumentService.getMultiExponentiationArgument(validStatement, statementWitnessPair.getWitness());
+			validStatement = statementWitnessPair.statement();
+			validArgument = argumentService.getMultiExponentiationArgument(validStatement, statementWitnessPair.witness());
 			argumentBuilder = new MultiExponentiationArgument.Builder()
 					.with_c_A_0(validArgument.getc_A_0())
 					.with_c_B(validArgument.get_c_B())
@@ -342,8 +340,8 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 		@Test
 		void testArgumentGenerationAndVerificationIsVerified() {
 			StatementWitnessPair pair = statementWitnessPairGenerator.genPair(n, m, l);
-			MultiExponentiationStatement statement = pair.getStatement();
-			MultiExponentiationWitness witness = pair.getWitness();
+			MultiExponentiationStatement statement = pair.statement();
+			MultiExponentiationWitness witness = pair.witness();
 			MultiExponentiationArgument argument = argumentService.getMultiExponentiationArgument(statement, witness);
 			assertTrue(argumentService.verifyMultiExponentiationArgument(statement, argument).verify().isVerified());
 		}
@@ -400,9 +398,9 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 					largeGqGroup, multiExponentiationArgumentService, localCommitmentKey);
 
 			final StatementWitnessPair localStatementWitnessPair = localStatementWitnessPairGenerator.genPair(n, m, l);
-			final MultiExponentiationStatement localValidStatement = localStatementWitnessPair.getStatement();
+			final MultiExponentiationStatement localValidStatement = localStatementWitnessPair.statement();
 			final MultiExponentiationArgument localValidArgument = localArgumentService.getMultiExponentiationArgument(localValidStatement,
-					localStatementWitnessPair.getWitness());
+					localStatementWitnessPair.witness());
 
 			final GroupVector<GqElement, GqGroup> modifiedC_a = localValidStatement.get_c_A().stream()
 					.map(localGqGroupGenerator::otherElement)

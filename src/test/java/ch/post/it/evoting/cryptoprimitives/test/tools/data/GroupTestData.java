@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,8 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.Generators;
 
 /**
@@ -41,30 +36,27 @@ public class GroupTestData {
 
 	static {
 		// More groups can be added to this class as needed.
-		try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = Mockito.mockStatic(SecurityLevelConfig.class)) {
-			mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(SecurityLevelInternal.TESTING_ONLY);
-			final BigInteger p1 = BigInteger.valueOf(11);
-			final BigInteger q1 = BigInteger.valueOf(5);
-			final BigInteger g1 = BigInteger.valueOf(3);
-			final GqGroup group1 = new GqGroup(p1, q1, g1);
+		final BigInteger p1 = BigInteger.valueOf(11);
+		final BigInteger q1 = BigInteger.valueOf(5);
+		final BigInteger g1 = BigInteger.valueOf(3);
+		final GqGroup group1 = new GqGroup(p1, q1, g1);
 
-			final BigInteger p2 = BigInteger.valueOf(23);
-			final BigInteger q2 = BigInteger.valueOf(11);
-			final BigInteger g2 = BigInteger.valueOf(2);
-			final GqGroup group2 = new GqGroup(p2, q2, g2);
+		final BigInteger p2 = BigInteger.valueOf(23);
+		final BigInteger q2 = BigInteger.valueOf(11);
+		final BigInteger g2 = BigInteger.TWO;
+		final GqGroup group2 = new GqGroup(p2, q2, g2);
 
-			final BigInteger p3 = BigInteger.valueOf(47);
-			final BigInteger q3 = BigInteger.valueOf(23);
-			final BigInteger g3 = BigInteger.valueOf(2);
-			final GqGroup group3 = new GqGroup(p3, q3, g3);
+		final BigInteger p3 = BigInteger.valueOf(47);
+		final BigInteger q3 = BigInteger.valueOf(23);
+		final BigInteger g3 = BigInteger.TWO;
+		final GqGroup group3 = new GqGroup(p3, q3, g3);
 
-			final BigInteger p4 = BigInteger.valueOf(59);
-			final BigInteger q4 = BigInteger.valueOf(29);
-			final BigInteger g4 = BigInteger.valueOf(3);
-			final GqGroup group4 = new GqGroup(p4, q4, g4);
+		final BigInteger p4 = BigInteger.valueOf(59);
+		final BigInteger q4 = BigInteger.valueOf(29);
+		final BigInteger g4 = BigInteger.valueOf(3);
+		final GqGroup group4 = new GqGroup(p4, q4, g4);
 
-			smallTestGroups = List.of(group1, group2, group3, group4);
-		}
+		smallTestGroups = List.of(group1, group2, group3, group4);
 	}
 
 	private GroupTestData() {
@@ -109,7 +101,7 @@ public class GroupTestData {
 	}
 
 	/**
-	 * Get a {@link GqGroup} large group with 2048 bits p and q.
+	 * Get a {@link GqGroup} large group with 3072 bits p and q.
 	 *
 	 * @return a {@link GqGroup}.
 	 */
@@ -130,10 +122,7 @@ public class GroupTestData {
 		final BigInteger q = BigInteger.valueOf(29);
 		final BigInteger g = BigInteger.valueOf(3);
 
-		try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = Mockito.mockStatic(SecurityLevelConfig.class)) {
-			mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(SecurityLevelInternal.TESTING_ONLY);
-			return new GqGroup(p, q, g);
-		}
+		return new GqGroup(p, q, g);
 	}
 
 }

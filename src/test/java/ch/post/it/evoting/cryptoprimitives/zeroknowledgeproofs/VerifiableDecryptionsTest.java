@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 
 class VerifiableDecryptionsTest extends TestGroupSetup {
 
@@ -41,7 +40,6 @@ class VerifiableDecryptionsTest extends TestGroupSetup {
 
 	private int numCiphertexts;
 	private int numPhis;
-	private ElGamalGenerator elGamalGenerator;
 	private GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts;
 	private GroupVector<DecryptionProof, ZqGroup> decryptionProofs;
 
@@ -49,7 +47,6 @@ class VerifiableDecryptionsTest extends TestGroupSetup {
 	void setup() {
 		numCiphertexts = random.nextInt(MAX_NUMBER_CIPHERTEXTS) + 1;
 		numPhis = random.nextInt(MAX_CIPHERTEXT_LENGTH) + 1;
-		elGamalGenerator = new ElGamalGenerator(gqGroup);
 		ciphertexts = elGamalGenerator.genRandomCiphertextVector(numCiphertexts, numPhis);
 		decryptionProofs = IntStream.range(0, numCiphertexts)
 				.mapToObj(i -> {
@@ -98,7 +95,7 @@ class VerifiableDecryptionsTest extends TestGroupSetup {
 	@Test
 	@DisplayName("Constructing a VerifiableDecryptions with DecryptionProofs from group of different order throws an IllegalArgumentException")
 	void constructVerifiableDecryptionsWithCiphertextVectorDifferentGroupOrderThanDecryptionProofList() {
-		ciphertexts = new ElGamalGenerator(otherGqGroup).genRandomCiphertextVector(numCiphertexts, numPhis);
+		ciphertexts = otherGroupElGamalGenerator.genRandomCiphertextVector(numCiphertexts, numPhis);
 
 		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
 				() -> new VerifiableDecryptions(ciphertexts, decryptionProofs));

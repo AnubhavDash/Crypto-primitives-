@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Post CH Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,13 +67,11 @@ class ElGamalMultiRecipientCiphertextTest extends TestGroupSetup {
 
 	private static List<GqElement> validPhis;
 	private static GqElement validGamma;
-	private static ElGamalGenerator elGamalGenerator;
 
 	private static RandomService randomService;
 
 	@BeforeAll
 	static void setUpAll() {
-		elGamalGenerator = new ElGamalGenerator(gqGroup);
 		randomService = new RandomService();
 	}
 
@@ -116,7 +114,7 @@ class ElGamalMultiRecipientCiphertextTest extends TestGroupSetup {
 				Arguments.of(null, validPhis, NullPointerException.class),
 				Arguments.of(validGamma, null, NullPointerException.class),
 				Arguments.of(validGamma, Collections.emptyList(), IllegalArgumentException.class),
-				Arguments.of(validGamma, invalidPhis, IllegalArgumentException.class),
+				Arguments.of(validGamma, invalidPhis, NullPointerException.class),
 				Arguments.of(validGamma, differentGroupPhis, IllegalArgumentException.class),
 				Arguments.of(otherGroupGamma, validPhis, IllegalArgumentException.class)
 		);
@@ -350,7 +348,7 @@ class ElGamalMultiRecipientCiphertextTest extends TestGroupSetup {
 	void multiplyWithDifferentGroupOtherShouldThrow() {
 		final ElGamalMultiRecipientCiphertext ciphertext = ElGamalMultiRecipientCiphertext.create(validGamma, validPhis);
 
-		final GqGroup otherGroup = new GqGroup(BigInteger.valueOf(7), BigInteger.valueOf(3), BigInteger.valueOf(2));
+		final GqGroup otherGroup = new GqGroup(BigInteger.valueOf(7), BigInteger.valueOf(3), BigInteger.TWO);
 		final GqElement otherGroupGamma = genOtherGroupGamma(otherGroup);
 		final List<GqElement> otherGroupPhis = genOtherGroupPhis(otherGroup);
 		final ElGamalMultiRecipientCiphertext other = ElGamalMultiRecipientCiphertext.create(otherGroupGamma, otherGroupPhis);
@@ -379,7 +377,6 @@ class ElGamalMultiRecipientCiphertextTest extends TestGroupSetup {
 		ElGamalMultiRecipientMessage originalMessage = elGamalGenerator.genRandomMessage(noOfMessageElements);
 		ElGamalMultiRecipientKeyPair keyPair = ElGamalMultiRecipientKeyPair.genKeyPair(gqGroup, noOfMessageElements, randomService);
 		ElGamalMultiRecipientCiphertext ciphertext = ElGamalGenerator.encryptMessage(originalMessage, keyPair, zqGroup);
-
 		ElGamalMultiRecipientCiphertext exponentiatedCiphertext = ciphertext.getCiphertextExponentiation(exponent);
 		ElGamalMultiRecipientMessage decryptedExponentiatedCipherText = ElGamalMultiRecipientMessages
 				.getMessage(exponentiatedCiphertext, keyPair.getPrivateKey());
@@ -516,8 +513,7 @@ class ElGamalMultiRecipientCiphertextTest extends TestGroupSetup {
 		@DisplayName("a ciphertext and a secret key with different order throws an IllegalArgumentException.")
 		void getPartialDecryptionCiphertextAndSecretKeyShouldBePartOfSameGroup() {
 
-			final ElGamalMultiRecipientPrivateKey secretKey =
-					new ElGamalGenerator(GroupTestData.getDifferentGqGroup(gqGroup)).genRandomPrivateKey(secretKeySize);
+			final ElGamalMultiRecipientPrivateKey secretKey = otherGroupElGamalGenerator.genRandomPrivateKey(secretKeySize);
 
 			final IllegalArgumentException illegalArgumentException =
 					assertThrows(IllegalArgumentException.class, () -> getPartialDecryption(ciphertext, secretKey));
