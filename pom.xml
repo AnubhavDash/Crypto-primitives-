@@ -19,7 +19,7 @@
 
 	<groupId>ch.post.it.evoting.cryptoprimitives</groupId>
 	<artifactId>crypto-primitives</artifactId>
-	<version>1.4.0.12-SNAPSHOT</version>
+	<version>1.4.1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Crypto Primitives</name>
