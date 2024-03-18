@@ -47,8 +47,6 @@ import ch.post.it.evoting.cryptoprimitives.signing.SignatureVerification;
  */
 public class SignatureKeystoreService<T extends Supplier<String>> implements SignatureKeystore<T> {
 
-	private static final String EMPTY_KEY_ENTRY_PASSWORD = "";
-
 	private final SignatureGeneration signatureGenerationService;
 	private final SignatureVerification signatureVerificationService;
 	private final T signingAlias;
@@ -75,17 +73,18 @@ public class SignatureKeystoreService<T extends Supplier<String>> implements Sig
 		try {
 			final KeyStore keyStore = KeyStore.getInstance(keystoreType);
 			keyStore.load(keyStoreStream, password);
-			Arrays.fill(password, '0');
 			if (!keystoreValidator.test(keyStore)) {
 				throw new IllegalArgumentException("The validation of keystore failed");
 			}
-			final PrivateKey key = (PrivateKey) keyStore.getKey(signingAlias.get(), EMPTY_KEY_ENTRY_PASSWORD.toCharArray());
+			final PrivateKey key = (PrivateKey) keyStore.getKey(signingAlias.get(), password);
 			final X509Certificate certificate = (X509Certificate) keyStore.getCertificate(signingAlias.get());
 			this.signatureGenerationService = SignatureFactory.getInstance().createSignatureGeneration(key, certificate);
 			this.signatureVerificationService = SignatureFactory.getInstance().createSignatureVerification(keyStore);
 
 		} catch (final UnrecoverableKeyException | CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
 			throw new IllegalStateException("Impossible to initialize the KeystoreService. See nested exception.", e);
+		} finally {
+			Arrays.fill(password, '0');
 		}
 	}
 

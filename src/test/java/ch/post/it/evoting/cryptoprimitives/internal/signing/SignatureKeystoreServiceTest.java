@@ -42,16 +42,12 @@ import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.TestSignatureSupportingAlgorithm;
 import ch.post.it.evoting.cryptoprimitives.signing.AuthorityInformation;
 import ch.post.it.evoting.cryptoprimitives.signing.KeysAndCert;
 
 class SignatureKeystoreServiceTest {
 
-	private static final SecurityLevelInternal securityLevel = SecurityLevelConfig.getSystemSecurityLevel();
-	private static final String EMPTY_KEY_ENTRY_PASSWORD = "";
 	private static final Hashable EMPTY_CONTEXT_DATA = HashableString.from("");
 	private static final String KEYSTORE_TYPE = "JKS";
 
@@ -61,7 +57,8 @@ class SignatureKeystoreServiceTest {
 
 	@BeforeAll
 	static void beforeAll() {
-		genKeysAndCertService = new GenKeysAndCertService(AuthorityInformation.builder().setCountry("dummy-C").setCommonName("dummy-Cn").setOrganisation("dummy-O").setLocality("dummy-L")
+		genKeysAndCertService = new GenKeysAndCertService(
+				AuthorityInformation.builder().setCountry("dummy-C").setCommonName("dummy-Cn").setOrganisation("dummy-O").setLocality("dummy-L")
 						.setState("dummy-St").build(), new TestSignatureSupportingAlgorithm());
 
 		randomService = new RandomService();
@@ -78,8 +75,8 @@ class SignatureKeystoreServiceTest {
 		final char[] password1 = "password_1".toCharArray();
 		final char[] password2 = "password_2".toCharArray();
 
-		final KeyStore store1 = generateNewKeyStore(alias1);
-		final KeyStore store2 = generateNewKeyStore(alias2);
+		final KeyStore store1 = generateNewKeyStore(alias1, password1);
+		final KeyStore store2 = generateNewKeyStore(alias2, password2);
 
 		store2.setCertificateEntry(alias1, store1.getCertificate(alias1));
 		store1.setCertificateEntry(alias2, store2.getCertificate(alias2));
@@ -108,8 +105,8 @@ class SignatureKeystoreServiceTest {
 		final char[] password1 = "password_1".toCharArray();
 		final char[] password2 = "password_2".toCharArray();
 
-		final KeyStore store1 = generateNewKeyStore(alias1);
-		final KeyStore store2 = generateNewKeyStore(alias2);
+		final KeyStore store1 = generateNewKeyStore(alias1, password1);
+		final KeyStore store2 = generateNewKeyStore(alias2, password2);
 
 		final SignatureKeystoreService<Supplier<String>> service1 = new SignatureKeystoreService<>(keyStoreToStream(store1, password1), KEYSTORE_TYPE,
 				password1, (keystore) -> true, () -> alias1, hashService);
@@ -131,7 +128,7 @@ class SignatureKeystoreServiceTest {
 		// given
 		final String alias = "test";
 		final char[] password = "password".toCharArray();
-		final KeyStore keyStore = generateNewKeyStore(alias);
+		final KeyStore keyStore = generateNewKeyStore(alias, password);
 		final SignatureKeystoreService<Supplier<String>> service = new SignatureKeystoreService<>(keyStoreToStream(keyStore, password), KEYSTORE_TYPE,
 				password, (keystore) -> true, () -> alias, hashService);
 
@@ -147,7 +144,7 @@ class SignatureKeystoreServiceTest {
 		// given
 		final String alias = "test";
 		final char[] password = "password".toCharArray();
-		final KeyStore keyStore = generateNewKeyStore(alias);
+		final KeyStore keyStore = generateNewKeyStore(alias, password);
 
 		// when / then
 		assertDoesNotThrow(
@@ -160,7 +157,7 @@ class SignatureKeystoreServiceTest {
 		// given
 		final String alias = "test";
 		final char[] password = "password".toCharArray();
-		final KeyStore keyStore = generateNewKeyStore(alias);
+		final KeyStore keyStore = generateNewKeyStore(alias, password);
 
 		// when / then
 		try (final InputStream inputStream = keyStoreToStream(keyStore, password)) {
@@ -169,14 +166,15 @@ class SignatureKeystoreServiceTest {
 		}
 	}
 
-	private KeyStore generateNewKeyStore(final String alias) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
+	private KeyStore generateNewKeyStore(final String alias, final char[] password)
+			throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
 		final KeysAndCert keysAndCert = genKeysAndCertService.genKeysAndCert(now(), now().plusDays(1));
 
 		final KeyStore keyStore = KeyStore.getInstance("JKS");
-		keyStore.load(null, EMPTY_KEY_ENTRY_PASSWORD.toCharArray());
+		keyStore.load(null, password);
 		final KeyStore.PrivateKeyEntry privateKeyEntry = new KeyStore.PrivateKeyEntry(keysAndCert.privateKey(),
 				new X509Certificate[] { keysAndCert.certificate() });
-		keyStore.setEntry(alias, privateKeyEntry, new KeyStore.PasswordProtection("".toCharArray()));
+		keyStore.setEntry(alias, privateKeyEntry, new KeyStore.PasswordProtection(password));
 
 		return keyStore;
 	}
