@@ -1,5 +1,12 @@
 # Changelog
 
+## Release 1.4.1
+
+Release 1.4.1 is a minor maintenance patch containing the following changes:
+
+* [Code] Align the generation of PKCS12 keystores to common standards.
+* [Code] Updated dependencies and third-party libraries.
+
 ## Release 1.4.0
 
 Release 1.4.0 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
