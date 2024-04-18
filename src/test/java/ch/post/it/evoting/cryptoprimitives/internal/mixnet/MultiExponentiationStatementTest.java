@@ -42,12 +42,12 @@ class MultiExponentiationStatementTest extends TestGroupSetup {
 
 	@BeforeEach
 	void setUp() {
-		n = secureRandom.nextInt(UPPER_BOUND_TEST_SIZE) + 1;
-		m = secureRandom.nextInt(UPPER_BOUND_TEST_SIZE) + 1;
-		l = secureRandom.nextInt(UPPER_BOUND_TEST_SIZE) + 1;
+		n = randomService.genRandomInteger(UPPER_BOUND_TEST_SIZE) + 1;
+		m = randomService.genRandomInteger(UPPER_BOUND_TEST_SIZE) + 1;
+		l = randomService.genRandomInteger(UPPER_BOUND_TEST_SIZE) + 1;
 
-		TestMultiExponentiationStatementGenerator statementGenerator = new TestMultiExponentiationStatementGenerator(gqGroup);
-		MultiExponentiationStatement statement = statementGenerator.genRandomStatement(n, m, l);
+		final TestMultiExponentiationStatementGenerator statementGenerator = new TestMultiExponentiationStatementGenerator(gqGroup);
+		final MultiExponentiationStatement statement = statementGenerator.genRandomStatement(n, m, l);
 		this.CMatrix = statement.get_C_matrix();
 		this.C = statement.get_C();
 		this.cA = statement.get_c_A();
@@ -64,29 +64,30 @@ class MultiExponentiationStatementTest extends TestGroupSetup {
 
 	@Test
 	void ciphertextAndCiphertextMatrixAreNotFromSameGroupThrows() {
-		GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> otherMatrix = otherGroupElGamalGenerator.genRandomCiphertextMatrix(m, n, l);
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> new MultiExponentiationStatement(otherMatrix, C, cA));
+		final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> otherMatrix = otherGroupElGamalGenerator.genRandomCiphertextMatrix(m, n, l);
+		final Exception exception = assertThrows(IllegalArgumentException.class, () -> new MultiExponentiationStatement(otherMatrix, C, cA));
 		assertEquals("The ciphertext matrix and the ciphertext C must be from the same group.", exception.getMessage());
 	}
 
 	@Test
 	void ciphertextAndCommitmentVectorAreNotFromSameGroupThrows() {
-		ElGamalMultiRecipientCiphertext otherC = otherGroupElGamalGenerator.genRandomCiphertext(l);
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> new MultiExponentiationStatement(CMatrix, otherC, cA));
+		final ElGamalMultiRecipientCiphertext otherC = otherGroupElGamalGenerator.genRandomCiphertext(l);
+		final Exception exception = assertThrows(IllegalArgumentException.class, () -> new MultiExponentiationStatement(CMatrix, otherC, cA));
 		assertEquals("The ciphertext matrix and the ciphertext C must be from the same group.", exception.getMessage());
 	}
 
 	@Test
 	void ciphertextMatrixAndCommitmentVectorAreNotFromSameGroupThrows() {
-		GroupVector<GqElement, GqGroup> otherCommitmentVector = otherGqGroupGenerator.genRandomGqElementVector(m);
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> new MultiExponentiationStatement(CMatrix, C, otherCommitmentVector));
+		final GroupVector<GqElement, GqGroup> otherCommitmentVector = otherGqGroupGenerator.genRandomGqElementVector(m);
+		final Exception exception = assertThrows(IllegalArgumentException.class,
+				() -> new MultiExponentiationStatement(CMatrix, C, otherCommitmentVector));
 		assertEquals("The ciphertext matrix and the commitment must be from the same group.", exception.getMessage());
 	}
 
 	@Test
 	void ciphertextMatrixRowSizeIsNotCommitmentVectorSizeThrows() {
-		GroupVector<GqElement, GqGroup> longerCommitmentVector = gqGroupGenerator.genRandomGqElementVector(m + 1);
-		Exception exception = assertThrows(IllegalArgumentException.class,
+		final GroupVector<GqElement, GqGroup> longerCommitmentVector = gqGroupGenerator.genRandomGqElementVector(m + 1);
+		final Exception exception = assertThrows(IllegalArgumentException.class,
 				() -> new MultiExponentiationStatement(CMatrix, C, longerCommitmentVector));
 		assertEquals("The commitment must be the same size as the number of rows of the ciphertext matrix.", exception.getMessage());
 	}

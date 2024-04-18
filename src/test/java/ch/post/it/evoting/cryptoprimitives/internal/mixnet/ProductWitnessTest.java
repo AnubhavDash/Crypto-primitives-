@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,29 +35,25 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ProductWitness;
+import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator;
 
-class ProductWitnessTest {
+class ProductWitnessTest extends TestGroupSetup {
 
 	private static final int MATRIX_BOUND = 10;
-	private static final SecureRandom secureRandom = new SecureRandom();
 
-	private ZqGroupGenerator generator;
 	private int n;
 	private int m;
-	private ZqGroup zqGroup;
 	private GroupMatrix<ZqElement, ZqGroup> matrix;
 	private GroupVector<ZqElement, ZqGroup> exponents;
 
 	@BeforeEach
 	void setup() {
-		n = secureRandom.nextInt(MATRIX_BOUND) + 1;
-		m = secureRandom.nextInt(MATRIX_BOUND) + 1;
-		zqGroup = GroupTestData.getZqGroup();
-		generator = new ZqGroupGenerator(zqGroup);
-		matrix = generator.genRandomZqElementMatrix(n, m);
-		exponents = generator.genRandomZqElementVector(m);
+		n = randomService.genRandomInteger(MATRIX_BOUND) + 1;
+		m = randomService.genRandomInteger(MATRIX_BOUND) + 1;
+		matrix = zqGroupGenerator.genRandomZqElementMatrix(n, m);
+		exponents = zqGroupGenerator.genRandomZqElementVector(m);
 	}
 
 	@Test
@@ -71,7 +66,7 @@ class ProductWitnessTest {
 	@Test
 	@DisplayName("Instantiating a ProductWitness with exponents longer than the number of matrix columns throws an IllegalArgumentException")
 	void constructProductWitnessWithTooLongExponents() {
-		final GroupVector<ZqElement, ZqGroup> tooLongExponents = generator.genRandomZqElementVector(m + 1);
+		final GroupVector<ZqElement, ZqGroup> tooLongExponents = zqGroupGenerator.genRandomZqElementVector(m + 1);
 		final Exception exception = assertThrows(IllegalArgumentException.class, () -> new ProductWitness(matrix, tooLongExponents));
 		assertEquals("The number of columns in the matrix must be equal to the number of exponents.", exception.getMessage());
 	}

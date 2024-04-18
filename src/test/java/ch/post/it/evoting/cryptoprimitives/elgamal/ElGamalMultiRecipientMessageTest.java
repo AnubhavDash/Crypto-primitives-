@@ -19,12 +19,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
@@ -35,39 +33,24 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientCiphertexts;
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientMessages;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
-import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
+import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.GqGroupGenerator;
 
-class ElGamalMultiRecipientMessageTest {
+class ElGamalMultiRecipientMessageTest extends TestGroupSetup {
 
 	private static final int NUM_ELEMENTS = 2;
-
-	private static RandomService randomService;
-	private static GqGroup gqGroup;
-	private static GqGroupGenerator generator;
-	private static ZqGroup zqGroup;
 
 	private static GroupVector<GqElement, GqGroup> validMessageElements;
 	private static ElGamalMultiRecipientMessage message;
 
-	@BeforeAll
-	static void setUpAll() {
-		randomService = new RandomService();
-		gqGroup = GroupTestData.getGqGroup();
-		zqGroup = ZqGroup.sameOrderAs(gqGroup);
-		generator = new GqGroupGenerator(gqGroup);
-	}
-
 	@BeforeEach
 	void setUp() {
-		GqElement m1 = generator.genMember();
-		GqElement m2 = generator.genMember();
+		final GqElement m1 = gqGroupGenerator.genMember();
+		final GqElement m2 = gqGroupGenerator.genMember();
 
 		validMessageElements = GroupVector.of(m1, m2);
 		message = new ElGamalMultiRecipientMessage(validMessageElements);
@@ -76,7 +59,7 @@ class ElGamalMultiRecipientMessageTest {
 	@Test
 	@DisplayName("contains the correct message")
 	void constructionTest() {
-		ElGamalMultiRecipientMessage message = new ElGamalMultiRecipientMessage(validMessageElements);
+		final ElGamalMultiRecipientMessage message = new ElGamalMultiRecipientMessage(validMessageElements);
 
 		assertEquals(validMessageElements, message.stream().collect(GroupVector.toGroupVector()));
 	}
@@ -93,18 +76,18 @@ class ElGamalMultiRecipientMessageTest {
 	@MethodSource("createInvalidArgumentsProvider")
 	@DisplayName("created with invalid parameters")
 	void constructionWithInvalidParametersTest(
-			final GroupVector<GqElement, GqGroup> messageElements, final Class<? extends RuntimeException> exceptionClass, String errorMsg) {
-		Exception exception = assertThrows(exceptionClass, () -> new ElGamalMultiRecipientMessage(messageElements));
+			final GroupVector<GqElement, GqGroup> messageElements, final Class<? extends RuntimeException> exceptionClass, final String errorMsg) {
+		final Exception exception = assertThrows(exceptionClass, () -> new ElGamalMultiRecipientMessage(messageElements));
 		assertEquals(errorMsg, exception.getMessage());
 	}
 
 	@Test
 	@DisplayName("create from ones contains only 1s")
 	void onesTest() {
-		int n = new SecureRandom().nextInt(10) + 1;
-		ElGamalMultiRecipientMessage ones = ElGamalMultiRecipientMessages.ones(gqGroup, n);
+		final int n = randomService.genRandomInteger(10) + 1;
+		final ElGamalMultiRecipientMessage ones = ElGamalMultiRecipientMessages.ones(gqGroup, n);
 
-		List<GqElement> onesList = Stream.generate(gqGroup::getIdentity).limit(n).collect(Collectors.toList());
+		final List<GqElement> onesList = Stream.generate(gqGroup::getIdentity).limit(n).collect(Collectors.toList());
 
 		assertEquals(onesList, ones.stream().collect(Collectors.toList()));
 		assertEquals(n, ones.size());
@@ -114,18 +97,18 @@ class ElGamalMultiRecipientMessageTest {
 	@DisplayName("create from ones with bad input throws")
 	void onesWithBadInputTest() {
 		assertThrows(NullPointerException.class, () -> ElGamalMultiRecipientMessages.ones(null, 1));
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> ElGamalMultiRecipientMessages.ones(gqGroup, 0));
+		final Exception exception = assertThrows(IllegalArgumentException.class, () -> ElGamalMultiRecipientMessages.ones(gqGroup, 0));
 		assertEquals("Cannot generate a message of constants of non positive length.", exception.getMessage());
 	}
 
 	@Test
 	@DisplayName("create from constant contains only constant")
 	void constantsTest() {
-		int n = new SecureRandom().nextInt(10) + 1;
-		GqElement constant = generator.genMember();
-		ElGamalMultiRecipientMessage constants = ElGamalMultiRecipientMessages.constantMessage(constant, n);
+		final int n = randomService.genRandomInteger(10) + 1;
+		final GqElement constant = gqGroupGenerator.genMember();
+		final ElGamalMultiRecipientMessage constants = ElGamalMultiRecipientMessages.constantMessage(constant, n);
 
-		List<GqElement> constantsList = Stream.generate(() -> constant).limit(n).collect(Collectors.toList());
+		final List<GqElement> constantsList = Stream.generate(() -> constant).limit(n).collect(Collectors.toList());
 
 		assertEquals(constantsList, constants.stream().collect(Collectors.toList()));
 		assertEquals(n, constants.size());
@@ -135,23 +118,24 @@ class ElGamalMultiRecipientMessageTest {
 	@DisplayName("create from constant with bad input throws")
 	void constantsWithBadInputTest() {
 		assertThrows(NullPointerException.class, () -> ElGamalMultiRecipientMessages.constantMessage(null, 1));
-		GqElement constant = generator.genMember();
-		Exception exception =
+		final GqElement constant = gqGroupGenerator.genMember();
+		final Exception exception =
 				assertThrows(IllegalArgumentException.class, () -> ElGamalMultiRecipientMessages.constantMessage(constant, 0));
 		assertEquals("Cannot generate a message of constants of non positive length.", exception.getMessage());
 	}
 
 	// Provides parameters for the invalid decryption parameters test.
 	static Stream<Arguments> createInvalidDecryptionArgumentsProvider() {
-		ElGamalMultiRecipientKeyPair keyPair = ElGamalMultiRecipientKeyPair.genKeyPair(gqGroup, NUM_ELEMENTS, randomService);
-		ElGamalMultiRecipientPrivateKey secretKey = keyPair.getPrivateKey();
-		ElGamalMultiRecipientPrivateKey tooShortSecretKey = new ElGamalMultiRecipientPrivateKey(GroupVector.of(secretKey.get(0)));
-		ZqElement exponent = ZqElement.create(randomService.genRandomInteger(zqGroup.getQ()), zqGroup);
-		ElGamalMultiRecipientCiphertext ciphertext = ElGamalMultiRecipientCiphertexts.getCiphertext(message, exponent, keyPair.getPublicKey());
+		final ElGamalMultiRecipientKeyPair keyPair = ElGamalMultiRecipientKeyPair.genKeyPair(gqGroup, NUM_ELEMENTS, randomService);
+		final ElGamalMultiRecipientPrivateKey secretKey = keyPair.getPrivateKey();
+		final ElGamalMultiRecipientPrivateKey tooShortSecretKey = new ElGamalMultiRecipientPrivateKey(GroupVector.of(secretKey.get(0)));
+		final ZqElement exponent = ZqElement.create(randomService.genRandomInteger(zqGroup.getQ()), zqGroup);
+		final ElGamalMultiRecipientCiphertext ciphertext = ElGamalMultiRecipientCiphertexts.getCiphertext(message, exponent, keyPair.getPublicKey());
 
-		GqGroup differentGroup = GroupTestData.getDifferentGqGroup(gqGroup);
-		ElGamalMultiRecipientKeyPair differentGroupKeyPair = ElGamalMultiRecipientKeyPair.genKeyPair(differentGroup, NUM_ELEMENTS, randomService);
-		ElGamalMultiRecipientPrivateKey differentGroupSecretKey = differentGroupKeyPair.getPrivateKey();
+		final GqGroup differentGroup = GroupTestData.getDifferentGqGroup(gqGroup);
+		final ElGamalMultiRecipientKeyPair differentGroupKeyPair = ElGamalMultiRecipientKeyPair.genKeyPair(differentGroup, NUM_ELEMENTS,
+				randomService);
+		final ElGamalMultiRecipientPrivateKey differentGroupSecretKey = differentGroupKeyPair.getPrivateKey();
 
 		return Stream.of(
 				Arguments.of(null, secretKey, NullPointerException.class),
@@ -164,27 +148,28 @@ class ElGamalMultiRecipientMessageTest {
 	@ParameterizedTest(name = "ciphertext = {0} and secret key = {1} throws {2}")
 	@MethodSource("createInvalidDecryptionArgumentsProvider")
 	@DisplayName("get message with invalid parameters")
-	void whenGetMessageWithInvalidParametersTest(ElGamalMultiRecipientCiphertext c, ElGamalMultiRecipientPrivateKey sk,
+	void whenGetMessageWithInvalidParametersTest(final ElGamalMultiRecipientCiphertext c, final ElGamalMultiRecipientPrivateKey sk,
 			final Class<? extends RuntimeException> exceptionClass) {
 		assertThrows(exceptionClass, () -> ElGamalMultiRecipientMessages.getMessage(c, sk));
 	}
 
 	@RepeatedTest(10)
 	void testMessageDifferentFromCiphertext() {
-		ElGamalMultiRecipientKeyPair keyPair = ElGamalMultiRecipientKeyPair.genKeyPair(gqGroup, NUM_ELEMENTS, randomService);
-		ZqElement exponent = ZqElement.create(randomService.genRandomInteger(zqGroup.getQ()), zqGroup);
-		ElGamalMultiRecipientCiphertext ciphertext = ElGamalMultiRecipientCiphertexts.getCiphertext(message, exponent, keyPair.getPublicKey());
-		ElGamalMultiRecipientMessage newMessage = ElGamalMultiRecipientMessages.getMessage(ciphertext, keyPair.getPrivateKey());
+		final ElGamalMultiRecipientKeyPair keyPair = ElGamalMultiRecipientKeyPair.genKeyPair(gqGroup, NUM_ELEMENTS, randomService);
+		final ZqElement exponent = ZqElement.create(randomService.genRandomInteger(zqGroup.getQ()), zqGroup);
+		final ElGamalMultiRecipientCiphertext ciphertext = ElGamalMultiRecipientCiphertexts.getCiphertext(message, exponent, keyPair.getPublicKey());
+		final ElGamalMultiRecipientMessage newMessage = ElGamalMultiRecipientMessages.getMessage(ciphertext, keyPair.getPrivateKey());
 
 		assertNotEquals(ciphertext.stream(), newMessage.stream());
 	}
 
 	@Test
 	void whenGetMessageFromUnityCiphertextTest() {
-		ElGamalMultiRecipientMessage onesMessage = ElGamalMultiRecipientMessages.ones(gqGroup, 2);
-		ElGamalMultiRecipientKeyPair keyPair = ElGamalMultiRecipientKeyPair.genKeyPair(gqGroup, NUM_ELEMENTS, randomService);
-		ZqElement zero = zqGroup.getIdentity();
-		ElGamalMultiRecipientCiphertext unityCiphertext = ElGamalMultiRecipientCiphertexts.getCiphertext(onesMessage, zero, keyPair.getPublicKey());
+		final ElGamalMultiRecipientMessage onesMessage = ElGamalMultiRecipientMessages.ones(gqGroup, 2);
+		final ElGamalMultiRecipientKeyPair keyPair = ElGamalMultiRecipientKeyPair.genKeyPair(gqGroup, NUM_ELEMENTS, randomService);
+		final ZqElement zero = zqGroup.getIdentity();
+		final ElGamalMultiRecipientCiphertext unityCiphertext = ElGamalMultiRecipientCiphertexts.getCiphertext(onesMessage, zero,
+				keyPair.getPublicKey());
 		assertEquals(onesMessage, ElGamalMultiRecipientMessages.getMessage(unityCiphertext, keyPair.getPrivateKey()));
 	}
 }

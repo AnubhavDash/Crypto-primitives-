@@ -42,6 +42,7 @@ import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.TestSignatureSupportingAlgorithm;
 import ch.post.it.evoting.cryptoprimitives.signing.AuthorityInformation;
 import ch.post.it.evoting.cryptoprimitives.signing.KeysAndCert;
@@ -61,7 +62,7 @@ class SignatureKeystoreServiceTest {
 				AuthorityInformation.builder().setCountry("dummy-C").setCommonName("dummy-Cn").setOrganisation("dummy-O").setLocality("dummy-L")
 						.setState("dummy-St").build(), new TestSignatureSupportingAlgorithm());
 
-		randomService = new RandomService();
+		randomService = new TestRandomService();
 		hashService = HashService.getInstance();
 	}
 

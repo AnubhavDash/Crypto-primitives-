@@ -34,6 +34,7 @@ import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCipherte
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalUtils;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -47,7 +48,7 @@ class ShuffleServiceTest extends TestGroupSetup {
 
 	static int NUM_ELEMENTS = 10;
 	static int NUM_CIPHERTEXTS = 10;
-	static RandomService randomService = new RandomService();
+	static TestRandomService randomService = new TestRandomService();
 	static PermutationService permutationService = new PermutationService(randomService);
 	static ShuffleService shuffleService = new ShuffleService(randomService, permutationService);
 

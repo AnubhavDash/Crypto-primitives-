@@ -35,7 +35,7 @@ class Base64ServiceTest {
 
 	@BeforeAll
 	static void setupAll() {
-		randomService = new RandomService();
+		randomService = new TestRandomService();
 		base64Service = new Base64Service();
 	}
 

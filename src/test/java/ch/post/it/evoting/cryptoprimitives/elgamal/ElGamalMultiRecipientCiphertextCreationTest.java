@@ -38,27 +38,22 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientCiphertexts;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
+import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.GqGroupGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
 
-class ElGamalMultiRecipientCiphertextCreationTest {
+class ElGamalMultiRecipientCiphertextCreationTest extends TestGroupSetup {
 
-	static private final int NUM_RECIPIENTS = 10;
+	private static final int NUM_RECIPIENTS = 10;
 
-	static private GqGroup gqGroup;
-	static private GqElement gqIdentity;
-	static private RandomService randomService;
-	static private ZqGroup zqGroup;
-	static private GqGroupGenerator gqGroupGenerator;
+	private static GqElement gqIdentity;
 	private static ElGamalMultiRecipientMessage onesMessage;
 
 	private ElGamalMultiRecipientMessage validMessage;
@@ -67,11 +62,7 @@ class ElGamalMultiRecipientCiphertextCreationTest {
 
 	@BeforeAll
 	static void setUp() {
-		gqGroup = GroupTestData.getGqGroup();
 		gqIdentity = gqGroup.getIdentity();
-		gqGroupGenerator = new GqGroupGenerator(gqGroup);
-		zqGroup = ZqGroup.sameOrderAs(gqGroup);
-		randomService = new RandomService();
 		final GroupVector<GqElement, GqGroup> ones = Stream.generate(() -> gqGroup.getIdentity())
 				.limit(NUM_RECIPIENTS)
 				.collect(GroupVector.toGroupVector());
@@ -107,16 +98,16 @@ class ElGamalMultiRecipientCiphertextCreationTest {
 
 	@Test
 	void testExponentFromDifferentQThrows() {
-		ZqGroup otherGroup = GroupTestData.getDifferentZqGroup(zqGroup);
-		ZqElement otherGroupExponent = ZqElement.create(randomService.genRandomInteger(otherGroup.getQ()), otherGroup);
+		final ZqGroup otherGroup = GroupTestData.getDifferentZqGroup(zqGroup);
+		final ZqElement otherGroupExponent = ZqElement.create(randomService.genRandomInteger(otherGroup.getQ()), otherGroup);
 
 		assertThrows(IllegalArgumentException.class, () -> getCiphertext(validMessage, otherGroupExponent, validPK));
 	}
 
 	@Test
 	void testMessageAndPublicKeyFromDifferentGroupsThrows() {
-		GqGroup otherGroup = GroupTestData.getDifferentGqGroup(gqGroup);
-		ElGamalMultiRecipientPublicKey otherGroupPublicKey =
+		final GqGroup otherGroup = GroupTestData.getDifferentGqGroup(gqGroup);
+		final ElGamalMultiRecipientPublicKey otherGroupPublicKey =
 				ElGamalMultiRecipientKeyPair.genKeyPair(otherGroup, 1, randomService).getPublicKey();
 
 		assertThrows(IllegalArgumentException.class, () -> getCiphertext(validMessage, validExponent, otherGroupPublicKey));
@@ -124,15 +115,15 @@ class ElGamalMultiRecipientCiphertextCreationTest {
 
 	@Test
 	void testPublicKeyAndExponentFromDifferentGroupsThrows() {
-		ZqGroup otherGroup = GroupTestData.getDifferentZqGroup(zqGroup);
-		ZqElement otherGroupExponent = ZqElement.create(randomService.genRandomInteger(otherGroup.getQ()), otherGroup);
+		final ZqGroup otherGroup = GroupTestData.getDifferentZqGroup(zqGroup);
+		final ZqElement otherGroupExponent = ZqElement.create(randomService.genRandomInteger(otherGroup.getQ()), otherGroup);
 
 		assertThrows(IllegalArgumentException.class, () -> getCiphertext(validMessage, otherGroupExponent, validPK));
 	}
 
 	@Test
 	void testMoreMessageElementsThenPublicKeyElementsThrows() {
-		ElGamalMultiRecipientPublicKey tooShortPK =
+		final ElGamalMultiRecipientPublicKey tooShortPK =
 				ElGamalMultiRecipientKeyPair.genKeyPair(gqGroup, NUM_RECIPIENTS - 1, randomService).getPublicKey();
 
 		assertThrows(IllegalArgumentException.class, () -> getCiphertext(validMessage, validExponent, tooShortPK));
@@ -140,8 +131,8 @@ class ElGamalMultiRecipientCiphertextCreationTest {
 
 	@Test
 	void testIdentityRandomnessWithNoCompressionAndIdentityMessageElementsThenGammaIsGeneratorAndCiphertextIsPrivateKey() {
-		ZqElement one = ZqElement.create(BigInteger.ONE, zqGroup);
-		ElGamalMultiRecipientCiphertext ciphertext = getCiphertext(onesMessage, one, validPK);
+		final ZqElement one = ZqElement.create(BigInteger.ONE, zqGroup);
+		final ElGamalMultiRecipientCiphertext ciphertext = getCiphertext(onesMessage, one, validPK);
 
 		assertEquals(gqGroup.getGenerator(), ciphertext.getGamma());
 		assertEquals(validPK.stream().collect(Collectors.toList()), ciphertext.stream().skip(1).collect(Collectors.toList()));
@@ -149,13 +140,13 @@ class ElGamalMultiRecipientCiphertextCreationTest {
 
 	@Test
 	void testFewerMessagesThanKeysWithIdentityRandomnessAndIdentityMessageElementsThenCut() {
-		int nMessages = NUM_RECIPIENTS / 2;
+		final int nMessages = NUM_RECIPIENTS / 2;
 		final GroupVector<GqElement, GqGroup> oneElements = Stream.generate(() -> GqElementFactory.fromValue(BigInteger.ONE, gqGroup))
 				.limit(nMessages)
 				.collect(GroupVector.toGroupVector());
-		ElGamalMultiRecipientMessage smallOneMessage = new ElGamalMultiRecipientMessage(oneElements);
-		ZqElement oneExponent = ZqElement.create(BigInteger.ONE, zqGroup);
-		ElGamalMultiRecipientCiphertext ciphertext = getCiphertext(smallOneMessage, oneExponent, validPK);
+		final ElGamalMultiRecipientMessage smallOneMessage = new ElGamalMultiRecipientMessage(oneElements);
+		final ZqElement oneExponent = ZqElement.create(BigInteger.ONE, zqGroup);
+		final ElGamalMultiRecipientCiphertext ciphertext = getCiphertext(smallOneMessage, oneExponent, validPK);
 
 		//With a exponent of one and message of ones, the ciphertext phis is just the public key
 		assertEquals(validPK.stream().limit(nMessages).collect(Collectors.toList()),
@@ -164,31 +155,31 @@ class ElGamalMultiRecipientCiphertextCreationTest {
 
 	@Test
 	void testZeroExponentGivesMessage() {
-		ZqElement zeroExponent = ZqElement.create(BigInteger.ZERO, zqGroup);
-		ElGamalMultiRecipientCiphertext ciphertext = getCiphertext(validMessage, zeroExponent, validPK);
+		final ZqElement zeroExponent = ZqElement.create(BigInteger.ZERO, zqGroup);
+		final ElGamalMultiRecipientCiphertext ciphertext = getCiphertext(validMessage, zeroExponent, validPK);
 		assertEquals(validMessage.stream().collect(Collectors.toList()), ciphertext.stream().skip(1).collect(Collectors.toList()));
 		assertEquals(gqIdentity, ciphertext.getGamma());
 	}
 
 	@Test
 	void testSpecificValues() {
-		GqGroup group = new GqGroup(BigInteger.valueOf(11), BigInteger.valueOf(5), BigInteger.valueOf(3));
-		ElGamalMultiRecipientMessage message =
+		final GqGroup group = new GqGroup(BigInteger.valueOf(11), BigInteger.valueOf(5), BigInteger.valueOf(3));
+		final ElGamalMultiRecipientMessage message =
 				new ElGamalMultiRecipientMessage(
 						GroupVector.of(
 								GqElementFactory.fromValue(BigInteger.valueOf(4), group),
 								GqElementFactory.fromValue(BigInteger.valueOf(5), group)
 						)
 				);
-		ZqElement exponent = ZqElement.create(BigInteger.TWO, ZqGroup.sameOrderAs(group));
-		ElGamalMultiRecipientPublicKey publicKey =
+		final ZqElement exponent = ZqElement.create(BigInteger.TWO, ZqGroup.sameOrderAs(group));
+		final ElGamalMultiRecipientPublicKey publicKey =
 				new ElGamalMultiRecipientPublicKey(
 						GroupVector.of(
 								GqElementFactory.fromValue(BigInteger.valueOf(5), group),
 								GqElementFactory.fromValue(BigInteger.valueOf(9), group)
 						)
 				);
-		ElGamalMultiRecipientCiphertext ciphertext =
+		final ElGamalMultiRecipientCiphertext ciphertext =
 				ElGamalMultiRecipientCiphertext.create(
 						GqElementFactory.fromValue(BigInteger.valueOf(9), group),
 						Arrays.asList(
@@ -212,7 +203,7 @@ class ElGamalMultiRecipientCiphertextCreationTest {
 			final BigInteger q = context.get("q", BigInteger.class);
 			final BigInteger g = context.get("g", BigInteger.class);
 
-			try (MockedStatic<SecurityLevelConfig> mockedSecurityLevel = Mockito.mockStatic(SecurityLevelConfig.class)) {
+			try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = Mockito.mockStatic(SecurityLevelConfig.class)) {
 				mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(testParameters.getSecurityLevel());
 				final GqGroup gqGroup = new GqGroup(p, q, g);
 				final ZqGroup zqGroup = new ZqGroup(q);
@@ -227,7 +218,7 @@ class ElGamalMultiRecipientCiphertextCreationTest {
 
 				// Parse random exponent.
 				final BigInteger r = input.get("r", BigInteger.class);
-				ZqElement exponent = ZqElement.create(r, zqGroup);
+				final ZqElement exponent = ZqElement.create(r, zqGroup);
 
 				// Parse public key.
 				final BigInteger[] boldPk = input.get("bold_pk", BigInteger[].class);
@@ -253,7 +244,7 @@ class ElGamalMultiRecipientCiphertextCreationTest {
 	@MethodSource("jsonFileArgumentProvider")
 	@DisplayName("with a valid other ciphertext gives expected result")
 	void testGetCiphertextWithRealValues(final GroupVector<GqElement, GqGroup> messageVector, final ZqElement exponent,
-			GroupVector<GqElement, GqGroup> publicKeyVector,
+			final GroupVector<GqElement, GqGroup> publicKeyVector,
 			final GqElement gammaRes, final List<GqElement> phisRes, final String description) {
 
 		// Create first ciphertext.

@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.security.SecureRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -33,12 +32,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.google.common.base.Throwables;
 
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 
 class StringsTest {
 
-	private static final SecureRandom secureRandom = new SecureRandom();
-	private static final RandomService randomService = new RandomService();
+	private static final TestRandomService randomService = new TestRandomService();
 
 	@Test
 	@DisplayName("truncate with a null input String throws a NullPointerException.")
@@ -98,9 +96,9 @@ class StringsTest {
 	@RepeatedTest(1000)
 	@DisplayName("truncate implementation is equivalent to specification.")
 	void truncateEnsureEqualityOfImplementation() {
-		final int stringLength = secureRandom.nextInt(1, 10000);
+		final int stringLength = randomService.genRandomInteger(1, 10000);
 		final String string = new String(randomService.randomBytes(stringLength));
-		final int length = secureRandom.nextInt(1, 10000);
+		final int length = randomService.genRandomInteger(1, 10000);
 
 		assertEquals(truncateFromSpecification(string, length), Strings.truncate(string, length));
 	}

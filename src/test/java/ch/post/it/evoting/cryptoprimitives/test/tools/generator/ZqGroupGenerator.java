@@ -21,7 +21,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import java.math.BigInteger;
 
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GroupMatrix;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
@@ -30,11 +30,11 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 public class ZqGroupGenerator {
 
 	private final ZqGroup group;
-	private final RandomService randomService;
+	private final TestRandomService randomService;
 
 	public ZqGroupGenerator(final ZqGroup group) {
 		this.group = group;
-		this.randomService = new RandomService();
+		this.randomService = new TestRandomService();
 	}
 
 	/**

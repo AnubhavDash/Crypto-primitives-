@@ -16,8 +16,6 @@
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.HexFormat;
 
 import org.junit.jupiter.api.Assertions;
@@ -27,22 +25,16 @@ import org.junit.jupiter.api.Test;
 import com.verificatum.vmgj.VMG;
 
 class BigIntegerOperationsVMGJTest {
-	private static final SecureRandom secureRandom;
+
+	private static final TestRandomService randomService = new TestRandomService();
 	private static final BigIntegerOperations ops;
+
 	private static BigInteger p;
 	private static BigInteger knownBase;
 	private static BigInteger exponent;
 
 	static {
 		ops = VMG.checkLoaded() ? new BigIntegerOperationsVMGJ() : new BigIntegerOperationsJava();
-	}
-
-	static {
-		try {
-			secureRandom = SecureRandom.getInstance("SHA1PRNG");
-		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	@BeforeAll
@@ -72,7 +64,7 @@ class BigIntegerOperationsVMGJTest {
 						"0557393BED3DD0DA578A446C741B578A432F361BD5B43B7F3485AB88909C1579A0D7F4" +
 						"A7BBDE783641DC7FAB3AF84BC83A56CD3C3DE2DCDEA5862C9BE9F6F261D3C9CB20CE6B"));
 
-		exponent = new BigInteger(q.bitLength() + 256, secureRandom).mod(q);
+		exponent = randomService.genRandomIntegerOfLength(q.bitLength() + 256).mod(q);
 		knownBase = BigInteger.TWO;
 	}
 

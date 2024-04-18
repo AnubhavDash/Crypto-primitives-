@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +47,6 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 class VectorsTest extends TestGroupSetup {
 
 	private static final int MAX_LENGTH = 10;
-	private static final SecureRandom random = new SecureRandom();
 
 	@Nested
 	@DisplayName("vector addition with")
@@ -61,7 +59,7 @@ class VectorsTest extends TestGroupSetup {
 
 		@BeforeEach
 		void setUp() {
-			vectorSize = random.nextInt(MAX_LENGTH) + 1;
+			vectorSize = randomService.genRandomInteger(MAX_LENGTH) + 1;
 			firstVector = zqGroupGenerator.genRandomZqElementVector(vectorSize);
 			secondVector = zqGroupGenerator.genRandomZqElementVector(vectorSize);
 		}
@@ -146,7 +144,7 @@ class VectorsTest extends TestGroupSetup {
 
 		@BeforeEach
 		void setUp() {
-			vectorSize = random.nextInt(MAX_LENGTH) + 1;
+			vectorSize = randomService.genRandomInteger(MAX_LENGTH) + 1;
 			firstVector = gqGroupGenerator.genRandomGqElementVector(vectorSize);
 			secondVector = gqGroupGenerator.genRandomGqElementVector(vectorSize);
 		}
@@ -234,7 +232,7 @@ class VectorsTest extends TestGroupSetup {
 
 		@BeforeEach
 		void setUp() {
-			vectorSize = random.nextInt(MAX_LENGTH) + 1;
+			vectorSize = randomService.genRandomInteger(MAX_LENGTH) + 1;
 			vector = gqGroupGenerator.genRandomGqElementVector(vectorSize);
 			exponent = zqGroupGenerator.genRandomZqElementMember();
 		}
@@ -305,7 +303,7 @@ class VectorsTest extends TestGroupSetup {
 
 		@BeforeEach
 		void setUp() {
-			vectorSize = random.nextInt(MAX_LENGTH) + 1;
+			vectorSize = randomService.genRandomInteger(MAX_LENGTH) + 1;
 			scalar = zqGroupGenerator.genRandomZqElementMember();
 			vector = zqGroupGenerator.genRandomZqElementVector(vectorSize);
 		}

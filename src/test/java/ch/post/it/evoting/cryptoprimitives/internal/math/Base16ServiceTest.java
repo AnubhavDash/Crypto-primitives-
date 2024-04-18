@@ -34,7 +34,7 @@ class Base16ServiceTest {
 
 	@BeforeAll
 	static void setupAll() {
-		randomService = new RandomService();
+		randomService = new TestRandomService();
 		base16Service = new Base16Service();
 	}
 

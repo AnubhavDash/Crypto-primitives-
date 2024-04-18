@@ -33,11 +33,10 @@ import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
-import ch.post.it.evoting.cryptoprimitives.math.Random;
-import ch.post.it.evoting.cryptoprimitives.math.RandomFactory;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 
@@ -79,17 +78,17 @@ public class CiphertextExponentiationBenchmark {
 
 		@Setup(Level.Trial)
 		public void setup() {
-			Random random = RandomFactory.createRandom();
+			final TestRandomService randomService = new TestRandomService();
 
 			final ZqGroup zqGroup = new ZqGroup(q);
-			exponents = Stream.generate(() -> random.genRandomInteger(q))
+			exponents = Stream.generate(() -> randomService.genRandomInteger(q))
 					.map(v -> ZqElement.create(v, zqGroup))
 					.limit(ciphertextCount)
 					.collect(GroupVector.toGroupVector());
 
 			ciphertexts = Stream.generate(() -> ElGamalMultiRecipientCiphertext.create(
-							GqElement.GqElementFactory.fromSquareRoot(random.genRandomInteger(q), group),
-							Stream.generate(() -> random.genRandomInteger(q))
+							GqElement.GqElementFactory.fromSquareRoot(randomService.genRandomInteger(q), group),
+							Stream.generate(() -> randomService.genRandomInteger(q))
 									.map(v -> GqElement.GqElementFactory.fromSquareRoot(v, group))
 									.limit(ciphertextSize)
 									.toList()))

@@ -18,7 +18,6 @@ package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
@@ -28,15 +27,14 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.mixnet.Permutation;
 
 class PermutationTest {
 
 	private static final int MAX_PERMUTATION_TEST_SIZE = 1000;
 
-	private static final SecureRandom random = new SecureRandom();
-	private static final RandomService randomService = new RandomService();
+	private static final TestRandomService randomService = new TestRandomService();
 	private static final PermutationService permutationService = new PermutationService(randomService);
 
 	@Test
@@ -46,59 +44,59 @@ class PermutationTest {
 
 	@Test
 	void genPermutationThrowsForNonPositiveSize() {
-		int size = -Math.abs(random.nextInt());
+		final int size = -randomService.genRandomInteger(Integer.MAX_VALUE);
 		assertThrows(IllegalArgumentException.class, () -> permutationService.genPermutation(size));
 	}
 
 	@RepeatedTest(10)
 	void genPermutationContainsAllValuesInInputRange() {
-		int size = random.nextInt(MAX_PERMUTATION_TEST_SIZE) + 1;
-		Permutation permutation = permutationService.genPermutation(size);
-		TreeSet<Integer> values = computePermutationValues(permutation);
+		final int size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE) + 1;
+		final Permutation permutation = permutationService.genPermutation(size);
+		final TreeSet<Integer> values = computePermutationValues(permutation);
 
 		assertEquals(size, values.size());
 		assertEquals(0, values.first());
 		assertEquals(size - 1, values.last());
 	}
 
-	private TreeSet<Integer> computePermutationValues(Permutation permutation) {
+	private TreeSet<Integer> computePermutationValues(final Permutation permutation) {
 		return IntStream.range(0, permutation.size()).map(permutation::get).boxed().collect(Collectors.toCollection(TreeSet::new));
 	}
 
 	@Test
 	void getThrowsForNegativeValue() {
-		int size = random.nextInt(MAX_PERMUTATION_TEST_SIZE) + 1;
-		int value = -random.nextInt();
-		Permutation permutation = permutationService.genPermutation(size);
+		final int size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE) + 1;
+		final int value = -randomService.genRandomInteger(Integer.MAX_VALUE);
+		final Permutation permutation = permutationService.genPermutation(size);
 		assertThrows(IllegalArgumentException.class, () -> permutation.get(value));
 	}
 
 	@Test
 	void getThrowsForValueAboveSize() {
-		int size = random.nextInt(MAX_PERMUTATION_TEST_SIZE) + 1;
-		int value = random.nextInt(Integer.MAX_VALUE - size) + size;
-		Permutation permutation = permutationService.genPermutation(size);
+		final int size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE) + 1;
+		final int value = randomService.genRandomInteger(Integer.MAX_VALUE - size) + size;
+		final Permutation permutation = permutationService.genPermutation(size);
 		assertThrows(IllegalArgumentException.class, () -> permutation.get(value));
 	}
 
 	@Test
 	void getThrowsForValueOfSize() {
-		int size = random.nextInt(MAX_PERMUTATION_TEST_SIZE) + 1;
-		Permutation permutation = permutationService.genPermutation(size);
+		final int size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE) + 1;
+		final Permutation permutation = permutationService.genPermutation(size);
 		assertThrows(IllegalArgumentException.class, () -> permutation.get(size));
 	}
 
 	@Test
 	void getSizeReturnsSize() {
-		int size = random.nextInt(MAX_PERMUTATION_TEST_SIZE) + 1;
-		Permutation permutation = permutationService.genPermutation(size);
+		final int size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE) + 1;
+		final Permutation permutation = permutationService.genPermutation(size);
 		assertEquals(size, permutation.size());
 	}
 
 	@Test
 	void streamReturnsCorrectElements() {
-		int size = random.nextInt(MAX_PERMUTATION_TEST_SIZE) + 1;
-		Permutation permutation = permutationService.genPermutation(size);
+		final int size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE) + 1;
+		final Permutation permutation = permutationService.genPermutation(size);
 
 		final List<Integer> expectedMapping = IntStream.range(0, permutation.size())
 				.map(permutation::get)

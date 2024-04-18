@@ -19,8 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.security.SecureRandom;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +33,6 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 @DisplayName("A VerifiableShuffle constructed with")
 class VerifiableShuffleTest extends TestGroupSetup {
 
-	private static final SecureRandom random = new SecureRandom();
 	private static final int MAX_NUMBER_CIPHERTEXTS = 10;
 	private static final int MAX_CIPHERTEXT_LENGTH = 5;
 
@@ -46,11 +43,11 @@ class VerifiableShuffleTest extends TestGroupSetup {
 
 	@BeforeEach
 	void setUp() {
-		numCiphertexts = random.nextInt(MAX_NUMBER_CIPHERTEXTS) + 2;
+		numCiphertexts = randomService.genRandomInteger(MAX_NUMBER_CIPHERTEXTS) + 2;
 		final int[] matrixDimensions = MatrixUtils.getMatrixDimensions(numCiphertexts);
 		final int m = matrixDimensions[0];
 		final int n = matrixDimensions[1];
-		l = random.nextInt(MAX_CIPHERTEXT_LENGTH) + 1;
+		l = randomService.genRandomInteger(MAX_CIPHERTEXT_LENGTH) + 1;
 
 		ciphertexts = elGamalGenerator.genRandomCiphertextVector(numCiphertexts, l);
 		shuffleArgument = new TestArgumentGenerator(gqGroup).genShuffleArgument(m, n, l);

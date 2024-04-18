@@ -21,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.security.SecureRandom;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,15 +32,13 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 
 class DecryptionProofTest extends TestGroupSetup {
 
-	private static final SecureRandom secureRandom = new SecureRandom();
-
 	private int l;
 	private ZqElement e;
 	private GroupVector<ZqElement, ZqGroup> z;
 
 	@BeforeEach
 	void setup() {
-		l = secureRandom.nextInt(10) + 1;
+		l = randomService.genRandomInteger(10) + 1;
 		e = zqGroupGenerator.genRandomZqElementMember();
 		z = zqGroupGenerator.genRandomZqElementVector(l);
 	}
@@ -59,8 +55,8 @@ class DecryptionProofTest extends TestGroupSetup {
 	@Test
 	@DisplayName("Constructing a DecryptionProof with e and z from different groups throws an IllegalArgumentException")
 	void constructDecryptionProofWithEAndZDifferentGroups() {
-		GroupVector<ZqElement, ZqGroup> z = otherZqGroupGenerator.genRandomZqElementVector(l);
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new DecryptionProof(e, z));
+		final GroupVector<ZqElement, ZqGroup> z = otherZqGroupGenerator.genRandomZqElementVector(l);
+		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new DecryptionProof(e, z));
 		assertEquals("e and z must have the same group.", exception.getMessage());
 	}
 
@@ -72,12 +68,12 @@ class DecryptionProofTest extends TestGroupSetup {
 
 	@Test
 	void equalsTest() {
-		DecryptionProof proof1 = new DecryptionProof(e, z);
-		GroupVector<ZqElement, ZqGroup> z2 = zqGroupGenerator.genRandomZqElementVector(l + 1);
-		DecryptionProof proof2 = new DecryptionProof(e, z2);
-		ZqElement e3 = zqGroupGenerator.genOtherElement(e);
-		DecryptionProof proof3 = new DecryptionProof(e3, z);
-		DecryptionProof proof4 = new DecryptionProof(e, z);
+		final DecryptionProof proof1 = new DecryptionProof(e, z);
+		final GroupVector<ZqElement, ZqGroup> z2 = zqGroupGenerator.genRandomZqElementVector(l + 1);
+		final DecryptionProof proof2 = new DecryptionProof(e, z2);
+		final ZqElement e3 = zqGroupGenerator.genOtherElement(e);
+		final DecryptionProof proof3 = new DecryptionProof(e3, z);
+		final DecryptionProof proof4 = new DecryptionProof(e, z);
 
 		assertNotEquals(null, proof1);
 		assertEquals(proof1, proof1);

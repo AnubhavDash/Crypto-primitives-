@@ -25,21 +25,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.mixnet.SingleValueProductStatement;
+import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.GqGroupGenerator;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator;
 
 @DisplayName("Instantiating a SingleValueProductStatement should...")
-class SingleValueProductStatementTest {
+class SingleValueProductStatementTest extends TestGroupSetup {
 
-	private static final RandomService randomService = new RandomService();
 	private static final int NUM_ELEMENTS = 5;
 
 	private GqElement commitment;
@@ -47,15 +45,11 @@ class SingleValueProductStatementTest {
 
 	@BeforeEach
 	void setup() {
-		GqGroup gqGroup = GroupTestData.getGqGroup();
-		ZqGroup zqGroup = ZqGroup.sameOrderAs(gqGroup);
-		ZqGroupGenerator zqGroupGenerator = new ZqGroupGenerator(zqGroup);
+		final TestCommitmentKeyGenerator ckGenerator = new TestCommitmentKeyGenerator(gqGroup);
+		final CommitmentKey commitmentKey = ckGenerator.genCommitmentKey(NUM_ELEMENTS);
 
-		TestCommitmentKeyGenerator ckGenerator = new TestCommitmentKeyGenerator(gqGroup);
-		CommitmentKey commitmentKey = ckGenerator.genCommitmentKey(NUM_ELEMENTS);
-
-		GroupVector<ZqElement, ZqGroup> elements = zqGroupGenerator.genRandomZqElementVector(NUM_ELEMENTS);
-		ZqElement randomness = ZqElement.create(randomService.genRandomInteger(zqGroup.getQ()), zqGroup);
+		final GroupVector<ZqElement, ZqGroup> elements = zqGroupGenerator.genRandomZqElementVector(NUM_ELEMENTS);
+		final ZqElement randomness = ZqElement.create(randomService.genRandomInteger(zqGroup.getQ()), zqGroup);
 		product = elements.stream().reduce(ZqElement.create(BigInteger.ONE, zqGroup), ZqElement::multiply);
 		commitment = CommitmentService.getCommitment(elements, randomness, commitmentKey);
 	}
@@ -70,18 +64,18 @@ class SingleValueProductStatementTest {
 	@Test
 	@DisplayName("throw an IllegalArgumentException when the commitment and the product have different orders")
 	void constructSingleValueProductStatementWithCommitmentAndProductDifferentQThrows() {
-		GqGroup differentGqGroup = GroupTestData.getDifferentGqGroup(commitment.getGroup());
-		GqGroupGenerator generator = new GqGroupGenerator(differentGqGroup);
-		GqElement differentCommitment = generator.genMember();
+		final GqGroup differentGqGroup = GroupTestData.getDifferentGqGroup(commitment.getGroup());
+		final GqGroupGenerator generator = new GqGroupGenerator(differentGqGroup);
+		final GqElement differentCommitment = generator.genMember();
 		assertThrows(IllegalArgumentException.class, () -> new SingleValueProductStatement(differentCommitment, product));
 	}
 
 	@Test
 	void testEquals() {
-		SingleValueProductStatement singleValueProdStatement1 = new SingleValueProductStatement(commitment, product);
-		SingleValueProductStatement singleValueProdStatement2 = new SingleValueProductStatement(commitment, product);
-		ZqElement otherProduct = product.add(ZqElement.create(BigInteger.ONE, product.getGroup()));
-		SingleValueProductStatement singleValueProdStatement3 = new SingleValueProductStatement(commitment, otherProduct);
+		final SingleValueProductStatement singleValueProdStatement1 = new SingleValueProductStatement(commitment, product);
+		final SingleValueProductStatement singleValueProdStatement2 = new SingleValueProductStatement(commitment, product);
+		final ZqElement otherProduct = product.add(ZqElement.create(BigInteger.ONE, product.getGroup()));
+		final SingleValueProductStatement singleValueProdStatement3 = new SingleValueProductStatement(commitment, otherProduct);
 
 		assertEquals(singleValueProdStatement1, singleValueProdStatement1);
 		assertEquals(singleValueProdStatement1, singleValueProdStatement2);

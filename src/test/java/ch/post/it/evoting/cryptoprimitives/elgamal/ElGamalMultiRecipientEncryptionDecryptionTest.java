@@ -23,44 +23,28 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientCiphertexts;
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientMessages;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
-import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.GqGroupGenerator;
+import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 
-class ElGamalMultiRecipientEncryptionDecryptionTest {
+class ElGamalMultiRecipientEncryptionDecryptionTest extends TestGroupSetup {
 
 	private static final int NUM_ELEMENTS = 10;
 
-	private static RandomService randomService;
-	private static GqGroup gqGroup;
-	private static GqGroupGenerator generator;
-	private static ZqGroup zqGroup;
-
 	private static ElGamalMultiRecipientMessage message;
-
-	@BeforeAll
-	static void setUpAll() {
-		randomService = new RandomService();
-		gqGroup = GroupTestData.getGqGroup();
-		zqGroup = ZqGroup.sameOrderAs(gqGroup);
-		generator = new GqGroupGenerator(gqGroup);
-	}
 
 	@BeforeEach
 	void setUp() {
-		final GroupVector<GqElement, GqGroup> validMessageElements = Stream.generate(generator::genMember)
+		final GroupVector<GqElement, GqGroup> validMessageElements = Stream.generate(gqGroupGenerator::genMember)
 				.limit(NUM_ELEMENTS)
 				.collect(GroupVector.toGroupVector());
 		message = new ElGamalMultiRecipientMessage(validMessageElements);
@@ -128,7 +112,7 @@ class ElGamalMultiRecipientEncryptionDecryptionTest {
 		assertEquals(message, otherMessage);
 	}
 
-	private ZqElement genNonZeroExponent(BigInteger q) {
+	private ZqElement genNonZeroExponent(final BigInteger q) {
 		final ZqGroup group = new ZqGroup(q);
 		final BigInteger qMinusOne = q.subtract(BigInteger.ONE);
 		final BigInteger random = randomService.genRandomInteger(qMinusOne).add(BigInteger.ONE);

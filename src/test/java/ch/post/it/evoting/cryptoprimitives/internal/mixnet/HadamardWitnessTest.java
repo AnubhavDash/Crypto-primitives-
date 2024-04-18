@@ -20,8 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.security.SecureRandom;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +34,6 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 class HadamardWitnessTest extends TestGroupSetup {
 
 	private static final int MATRIX_BOUNDS = 10;
-	private static final SecureRandom secureRandom = new SecureRandom();
 
 	private int n;
 	private int m;
@@ -47,8 +44,8 @@ class HadamardWitnessTest extends TestGroupSetup {
 
 	@BeforeEach
 	void setup() {
-		n = secureRandom.nextInt(MATRIX_BOUNDS) + 1;
-		m = secureRandom.nextInt(MATRIX_BOUNDS) + 1;
+		n = randomService.genRandomInteger(MATRIX_BOUNDS) + 1;
+		m = randomService.genRandomInteger(MATRIX_BOUNDS) + 1;
 
 		matrix = zqGroupGenerator.genRandomZqElementMatrix(n, m);
 		vector = zqGroupGenerator.genRandomZqElementVector(n);

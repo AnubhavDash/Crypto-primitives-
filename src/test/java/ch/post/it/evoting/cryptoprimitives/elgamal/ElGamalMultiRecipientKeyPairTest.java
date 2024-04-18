@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import com.google.common.collect.Streams;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 
@@ -42,15 +43,15 @@ class ElGamalMultiRecipientKeyPairTest {
 
 	@BeforeAll
 	static void setUp() {
-		BigInteger p = BigInteger.valueOf(23);
-		BigInteger q = BigInteger.valueOf(11);
-		BigInteger g = BigInteger.TWO;
+		final BigInteger p = BigInteger.valueOf(23);
+		final BigInteger q = BigInteger.valueOf(11);
+		final BigInteger g = BigInteger.TWO;
 
 		
 		publicKeyGroup = new GqGroup(p, q, g);
 		privateKeyGroup = ZqGroup.sameOrderAs(publicKeyGroup);
 
-		randomSer = new RandomService();
+		randomSer = new TestRandomService();
 
 		numKeys = 10;
 		keyPair = ElGamalMultiRecipientKeyPair.genKeyPair(publicKeyGroup, numKeys, randomSer);
@@ -73,8 +74,8 @@ class ElGamalMultiRecipientKeyPairTest {
 
 	@Test
 	void testThatGeneratedKeysSizesAreTheExpectedValues() {
-		int numGeneratedPrivateKeys = keyPair.getPrivateKey().size();
-		int numGeneratedPublicKeys = keyPair.getPublicKey().size();
+		final int numGeneratedPrivateKeys = keyPair.getPrivateKey().size();
+		final int numGeneratedPublicKeys = keyPair.getPublicKey().size();
 
 		assertEquals(numKeys, numGeneratedPrivateKeys);
 		assertEquals(numKeys, numGeneratedPublicKeys);
@@ -100,12 +101,12 @@ class ElGamalMultiRecipientKeyPairTest {
 	 */
 	@Test
 	void testThatPrivateKeyExponentsWithinBounds() {
-		BigInteger p = BigInteger.valueOf(11);
-		BigInteger q = BigInteger.valueOf(5);
-		BigInteger g = BigInteger.valueOf(3);
-		
-		GqGroup smallGroup = new GqGroup(p, q, g);
-		ElGamalMultiRecipientKeyPair keyPair = ElGamalMultiRecipientKeyPair.genKeyPair(smallGroup, 10 * q.intValue(), randomSer);
+		final BigInteger p = BigInteger.valueOf(11);
+		final BigInteger q = BigInteger.valueOf(5);
+		final BigInteger g = BigInteger.valueOf(3);
+
+		final GqGroup smallGroup = new GqGroup(p, q, g);
+		final ElGamalMultiRecipientKeyPair keyPair = ElGamalMultiRecipientKeyPair.genKeyPair(smallGroup, 10 * q.intValue(), randomSer);
 		keyPair.getPrivateKey().stream().forEach(sk -> {
 			assertTrue(sk.getValue().compareTo(BigInteger.ZERO) >= 0);
 			assertTrue(sk.getValue().compareTo(q) < 0);

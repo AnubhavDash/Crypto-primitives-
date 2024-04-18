@@ -21,7 +21,6 @@ import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TWO;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -37,7 +36,7 @@ public class BigIntegerOperationsService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BigIntegerOperationsService.class);
 	private static final BigIntegerOperations bigIntegerOperations;
-	private static final SecureRandom secureRandom;
+	private static final RandomService randomService;
 
 	static {
 		if (VMG.checkLoaded()) {
@@ -48,7 +47,7 @@ public class BigIntegerOperationsService {
 					+ "integer operations will now take longer. Verify that the libraries GMP, GMPMEE and VMGJ are installed and referenced in the java.library.path");
 			bigIntegerOperations = new BigIntegerOperationsJava();
 		}
-		secureRandom = new SecureRandom();
+		randomService = new RandomService();
 	}
 
 	private BigIntegerOperationsService() {
@@ -111,7 +110,7 @@ public class BigIntegerOperationsService {
 			// Choose a random integer a, 2 <= a <= n - 2
 			BigInteger a;
 			do {
-				a = new BigInteger(n.bitLength(), secureRandom);
+				a = randomService.genRandomInteger(BigInteger.valueOf(n.bitLength()));
 			} while (a.compareTo(ONE) <= 0 || a.compareTo(n_minus_one) >= 0);
 
 			BigInteger y = bigIntegerOperations.modExponentiate(a, r, n);

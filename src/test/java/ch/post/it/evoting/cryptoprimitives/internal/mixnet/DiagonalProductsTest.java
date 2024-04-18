@@ -33,7 +33,7 @@ import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCipherte
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
@@ -63,15 +63,15 @@ class DiagonalProductsTest extends TestGroupSetup {
 		final TestCommitmentKeyGenerator ckGenerator = new TestCommitmentKeyGenerator(gqGroup);
 		final CommitmentKey commitmentKey = ckGenerator.genCommitmentKey(KEY_SIZE);
 		final HashService hashService = TestHashService.create(gqGroup.getQ());
-		multiExponentiationArgumentService = new MultiExponentiationArgumentService(publicKey, commitmentKey, new RandomService(), hashService);
+		multiExponentiationArgumentService = new MultiExponentiationArgumentService(publicKey, commitmentKey, new TestRandomService(), hashService);
 
 	}
 
 	@BeforeEach
 	void setUp() {
-		n = secureRandom.nextInt(KEY_SIZE) + 1;
-		m = secureRandom.nextInt(KEY_SIZE) + 1;
-		l = secureRandom.nextInt(KEY_SIZE) + 1;
+		n = randomService.genRandomInteger(KEY_SIZE) + 1;
+		m = randomService.genRandomInteger(KEY_SIZE) + 1;
+		l = randomService.genRandomInteger(KEY_SIZE) + 1;
 
 		// The ciphertexts matrix is a m x n matrix.
 		ciphertexts = elGamalGenerator.genRandomCiphertextMatrix(m, n, l);
@@ -236,7 +236,7 @@ class DiagonalProductsTest extends TestGroupSetup {
 		final TestCommitmentKeyGenerator ckGenerator = new TestCommitmentKeyGenerator(gqGroup);
 		final CommitmentKey commitmentKey = ckGenerator.genCommitmentKey(3);
 		final HashService hashService = TestHashService.create(q);
-		final MultiExponentiationArgumentService service = new MultiExponentiationArgumentService(publicKey, commitmentKey, new RandomService(),
+		final MultiExponentiationArgumentService service = new MultiExponentiationArgumentService(publicKey, commitmentKey, new TestRandomService(),
 				hashService);
 
 		assertEquals(expected, service.getDiagonalProducts(ciphertextMatrix, matrixA));

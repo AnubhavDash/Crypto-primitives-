@@ -24,7 +24,7 @@ import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCipherte
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientMessages;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
@@ -49,7 +49,7 @@ class TestShuffleArgumentGenerator {
 		this.zqGroupGenerator = new ZqGroupGenerator(zqGroup);
 		this.elGamalGenerator = new ElGamalGenerator(gqGroup);
 
-		this.permutationService = new PermutationService(new RandomService());
+		this.permutationService = new PermutationService(new TestRandomService());
 	}
 
 	/**

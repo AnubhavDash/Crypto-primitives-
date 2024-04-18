@@ -42,7 +42,6 @@ import org.mockito.MockedStatic;
 
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.math.Base16Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
@@ -57,13 +56,11 @@ import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.SchnorrProof;
 
 @DisplayName("SchnorrProofService calling")
 class SchnorrProofServiceTest extends TestGroupSetup {
-	private static RandomService randomService;
+
 	private static SchnorrProofService schnorrProofService;
 
 	@BeforeAll
 	static void setUpAll() {
-		randomService = new RandomService();
-
 		final HashService hashService = TestHashService.create(gqGroup.getQ());
 		schnorrProofService = new SchnorrProofService(randomService, hashService);
 	}

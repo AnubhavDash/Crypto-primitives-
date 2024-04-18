@@ -20,9 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,16 +30,12 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ZeroWitness;
+import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator;
 
 @DisplayName("A ZeroWitness")
-class ZeroWitnessTest {
-
-	private static final SecureRandom secureRandom = new SecureRandom();
-
-	private static ZqGroup zqGroup;
-	private static ZqGroupGenerator zqGroupGenerator;
+class ZeroWitnessTest extends TestGroupSetup {
 
 	private int n;
 	private int m;
@@ -50,16 +44,10 @@ class ZeroWitnessTest {
 	private GroupVector<ZqElement, ZqGroup> exponentsR;
 	private GroupVector<ZqElement, ZqGroup> exponentsS;
 
-	@BeforeAll
-	static void setUpAll() {
-		zqGroup = GroupTestData.getZqGroup();
-		zqGroupGenerator = new ZqGroupGenerator(zqGroup);
-	}
-
 	@BeforeEach
 	void setUp() {
-		n = secureRandom.nextInt(10) + 1;
-		m = secureRandom.nextInt(10) + 1;
+		n = randomService.genRandomInteger(10) + 1;
+		m = randomService.genRandomInteger(10) + 1;
 
 		matrixA = zqGroupGenerator.genRandomZqElementMatrix(n, m);
 		matrixB = zqGroupGenerator.genRandomZqElementMatrix(n, m);
@@ -81,9 +69,6 @@ class ZeroWitnessTest {
 	@Test
 	@DisplayName("constructed with any null parameter throws IllegalArgumentException")
 	void constructNullParams() {
-		final GroupVector<ZqElement, ZqGroup> emptyExponentsR = GroupVector.of();
-		final GroupVector<ZqElement, ZqGroup> emptyExponentsS = GroupVector.of();
-
 		assertAll(
 				() -> assertThrows(NullPointerException.class, () -> new ZeroWitness(null, matrixB, exponentsR, exponentsS)),
 				() -> assertThrows(NullPointerException.class, () -> new ZeroWitness(matrixA, null, exponentsR, exponentsS)),

@@ -20,7 +20,6 @@ import static ch.post.it.evoting.cryptoprimitives.test.tools.generator.GroupVect
 import static ch.post.it.evoting.cryptoprimitives.test.tools.generator.GroupVectorElementGenerator.generateElementMatrix;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,6 +27,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupMatrix;
@@ -42,11 +42,11 @@ public class GqGroupGenerator {
 	private static final BigInteger MAX_GROUP_SIZE = BigInteger.valueOf(1000);
 
 	private final GqGroup group;
-	private final SecureRandom random;
+	private final TestRandomService randomService;
 
 	public GqGroupGenerator(final GqGroup group) {
 		this.group = group;
-		this.random = new SecureRandom();
+		this.randomService = new TestRandomService();
 	}
 
 	/**
@@ -158,7 +158,7 @@ public class GqGroupGenerator {
 	}
 
 	private BigInteger randomBigInteger(final int bitLength) {
-		return new BigInteger(bitLength, random);
+		return randomService.genRandomIntegerOfLength(bitLength);
 	}
 
 	private Stream<BigInteger> integersModP() {

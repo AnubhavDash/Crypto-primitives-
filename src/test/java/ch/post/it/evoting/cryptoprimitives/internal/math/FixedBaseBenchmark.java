@@ -16,8 +16,6 @@
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -35,54 +33,47 @@ import org.openjdk.jmh.infra.Blackhole;
 @Warmup(iterations = 0)
 public class FixedBaseBenchmark {
 	@Benchmark
-	public void knownBaseBeforeCache(MyState state, Blackhole bh) {
-		BigIntegerOperations operations = state.bigIntegerOperationsWithoutTable;
+	public void knownBaseBeforeCache(final MyState state, final Blackhole bh) {
+		final BigIntegerOperations operations = state.bigIntegerOperationsWithoutTable;
 
-		BigInteger result = operations.modExponentiate(state.knownBase, state.exponent, state.p);
+		final BigInteger result = operations.modExponentiate(state.knownBase, state.exponent, state.p);
 		bh.consume(result);
 	}
 
 	@Benchmark
-	public void randomBaseBeforeCache(MyState state, Blackhole bh) {
-		BigIntegerOperations operations = state.bigIntegerOperationsWithoutTable;
+	public void randomBaseBeforeCache(final MyState state, final Blackhole bh) {
+		final BigIntegerOperations operations = state.bigIntegerOperationsWithoutTable;
 
-		BigInteger result = operations.modExponentiate(state.randomBase, state.exponent, state.p);
+		final BigInteger result = operations.modExponentiate(state.randomBase, state.exponent, state.p);
 		bh.consume(result);
 	}
 
 	@Benchmark
-	public void generateCache(MyState state) {
-		BigIntegerOperations operations = new BigIntegerOperationsVMGJ();
+	public void generateCache(final MyState state) {
+		final BigIntegerOperations operations = new BigIntegerOperationsVMGJ();
 		operations.generateCache(state.knownBase, state.p);
 	}
 
 	@Benchmark
-	public void knownBaseAfterCache(MyState state, Blackhole bh) {
-		BigIntegerOperations operations = state.bigIntegerOperationsWithTable;
+	public void knownBaseAfterCache(final MyState state, final Blackhole bh) {
+		final BigIntegerOperations operations = state.bigIntegerOperationsWithTable;
 
-		BigInteger result = operations.modExponentiate(state.knownBase, state.exponent, state.p);
+		final BigInteger result = operations.modExponentiate(state.knownBase, state.exponent, state.p);
 		bh.consume(result);
 	}
 
 	@Benchmark
-	public void randomBaseAfterCache(MyState state, Blackhole bh) {
-		BigIntegerOperations operations = state.bigIntegerOperationsWithTable;
+	public void randomBaseAfterCache(final MyState state, final Blackhole bh) {
+		final BigIntegerOperations operations = state.bigIntegerOperationsWithTable;
 
-		BigInteger result = operations.modExponentiate(state.randomBase, state.exponent, state.p);
+		final BigInteger result = operations.modExponentiate(state.randomBase, state.exponent, state.p);
 		bh.consume(result);
 	}
 
 	@State(Scope.Benchmark)
 	public static class MyState {
-		private static final SecureRandom secureRandom;
 
-		static {
-			try {
-				secureRandom = SecureRandom.getInstance("SHA1PRNG");
-			} catch (NoSuchAlgorithmException e) {
-				throw new RuntimeException(e);
-			}
-		}
+		private static final TestRandomService randomService = new TestRandomService();
 
 		private final BigInteger p;
 		private final BigInteger knownBase;
@@ -103,7 +94,7 @@ public class FixedBaseBenchmark {
 					"72BBF84C26144E49C2D04C324EF10DE513D3F5114B8B5D374D93CB8879C7D52FFD72BA" +
 					"0AAE7277DA7BA1B4AF1488D8E836AF14865E6C37AB6876FE690B571121382AF341AFE9" +
 					"4F77BCF06C83B8FF5675F0979074AD9A787BC5B9BD4B0C5937D3EDE4C3A79396419CD7", 16);
-			BigInteger q = new BigInteger("5BF0A8B1457695355FB8AC404E7A79E3B1738B079C5A6D2B53C26C8228C867F79927" +
+			final BigInteger q = new BigInteger("5BF0A8B1457695355FB8AC404E7A79E3B1738B079C5A6D2B53C26C8228C867F79927" +
 					"3B9C49367DF2FA5FC6C6C618EBB1ED0364055D88C2F5A7BE3DABABFACAC24867EA3EBE" +
 					"0CDDA10AC6CAAA7BDA35E76AAE26BCFEAF926B309E18E1C1CD16EFC54D13B5E7DFD0E4" +
 					"3BE2B1426D5BCE6A6159949E9074F2F5781563056649F6C3A21152976591C7F772D5B5" +
@@ -115,9 +106,9 @@ public class FixedBaseBenchmark {
 					"0557393BED3DD0DA578A446C741B578A432F361BD5B43B7F3485AB88909C1579A0D7F4" +
 					"A7BBDE783641DC7FAB3AF84BC83A56CD3C3DE2DCDEA5862C9BE9F6F261D3C9CB20CE6B", 16);
 
-			exponent = new BigInteger(q.bitLength() + 256, MyState.secureRandom).mod(q);
+			exponent = randomService.genRandomIntegerOfLength(q.bitLength() + 256).mod(q);
 			knownBase = BigInteger.TWO;
-			BigInteger random = new BigInteger(q.bitLength(), secureRandom);
+			final BigInteger random = randomService.genRandomIntegerOfLength(q.bitLength());
 			randomBase = random.multiply(random).mod(p);
 
 			bigIntegerOperationsWithTable.generateCache(knownBase, p);

@@ -15,13 +15,16 @@
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
-import com.google.common.base.Throwables;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import com.google.common.base.Throwables;
 
 @DisplayName("A UsabilityBase32Alphabet calling")
 class UsabilityBase32AlphabetTest {

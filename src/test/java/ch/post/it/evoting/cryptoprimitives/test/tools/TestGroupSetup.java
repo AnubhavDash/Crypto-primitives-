@@ -15,10 +15,9 @@
  */
 package ch.post.it.evoting.cryptoprimitives.test.tools;
 
-import java.security.SecureRandom;
-
 import org.junit.jupiter.api.BeforeAll;
 
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
@@ -30,7 +29,9 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator
  * Provides {@link GqGroup}s and {@link ZqGroup}s as well as generators that rely on them.
  */
 public class TestGroupSetup {
-	protected static final SecureRandom secureRandom = new SecureRandom();
+
+	protected static final TestRandomService randomService = new TestRandomService();
+
 	protected static GqGroup gqGroup;
 	protected static GqGroupGenerator gqGroupGenerator;
 	protected static ElGamalGenerator elGamalGenerator;

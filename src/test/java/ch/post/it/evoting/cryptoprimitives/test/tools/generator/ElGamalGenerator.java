@@ -28,7 +28,7 @@ import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPrivateKey;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalService;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupMatrix;
@@ -40,7 +40,7 @@ public class ElGamalGenerator {
 
 	private static final ElGamal elGamal = new ElGamalService();
 
-	private static final RandomService randomService = new RandomService();
+	private static final TestRandomService randomService = new TestRandomService();
 
 	private final GqGroup group;
 	private final GqGroupGenerator groupGenerator;
@@ -104,7 +104,7 @@ public class ElGamalGenerator {
 	public static ElGamalMultiRecipientCiphertext encryptMessage(
 			final ElGamalMultiRecipientMessage originalMessage, final ElGamalMultiRecipientKeyPair keyPair,
 			final ZqGroup zqGroup) {
-		final RandomService randomService = new RandomService();
+		final TestRandomService randomService = new TestRandomService();
 		final ZqElement exponent = ZqElement.create(randomService.genRandomInteger(zqGroup.getQ()), zqGroup);
 		return elGamal.getCiphertext(originalMessage, exponent, keyPair.getPublicKey());
 	}

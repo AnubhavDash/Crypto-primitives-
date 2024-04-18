@@ -19,8 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.security.SecureRandom;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,7 +35,6 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 class ShuffleStatementTest extends TestGroupSetup {
 
 	private static final int KEY_ELEMENTS_NUMBER = 11;
-	private static final SecureRandom secureRandom = new SecureRandom();
 
 	private static ElGamalMultiRecipientPublicKey publicKey;
 
@@ -53,8 +50,8 @@ class ShuffleStatementTest extends TestGroupSetup {
 
 	@BeforeEach
 	void setUp() {
-		n = secureRandom.nextInt(KEY_ELEMENTS_NUMBER - 1) + 1;
-		l = secureRandom.nextInt(KEY_ELEMENTS_NUMBER - 1) + 1;
+		n = randomService.genRandomInteger(KEY_ELEMENTS_NUMBER - 1) + 1;
+		l = randomService.genRandomInteger(KEY_ELEMENTS_NUMBER - 1) + 1;
 
 		ciphertexts = GroupVector.from(elGamalGenerator.genRandomCiphertexts(publicKey, l, n));
 		shuffledCiphertexts = GroupVector.from(elGamalGenerator.genRandomCiphertexts(publicKey, l, n));

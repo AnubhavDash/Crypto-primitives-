@@ -25,7 +25,6 @@ import static org.mockito.Mockito.mockStatic;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Random;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -41,6 +40,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
@@ -50,8 +50,8 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParamete
 
 class KDFServiceTest {
 
-	public static final int DEFAULT_HASH_LENGTH_BYTES = 32;
-	private static final Random random = new Random();
+	private static final int DEFAULT_HASH_LENGTH_BYTES = 32;
+	private static final TestRandomService randomService = new TestRandomService();
 	private static final List<String> emptyInfo = List.of();
 	private KDFService kdfService;
 	private byte[] PRK;
@@ -61,10 +61,9 @@ class KDFServiceTest {
 	@BeforeEach
 	void setup() {
 		kdfService = KDFService.getInstance();
-		PRK = new byte[DEFAULT_HASH_LENGTH_BYTES * 8];
-		random.nextBytes(PRK);
-		requiredLength = random.nextInt(255 * DEFAULT_HASH_LENGTH_BYTES);
-		requestedUpperBound = new BigInteger(DEFAULT_HASH_LENGTH_BYTES * 8 + 3, random);
+		PRK = randomService.randomBytes(DEFAULT_HASH_LENGTH_BYTES * 8);
+		requiredLength = randomService.genRandomInteger(255 * DEFAULT_HASH_LENGTH_BYTES);
+		requestedUpperBound = randomService.genRandomIntegerOfLength(DEFAULT_HASH_LENGTH_BYTES * 8 + 3);
 	}
 
 	@Test
@@ -87,7 +86,7 @@ class KDFServiceTest {
 
 	@Test
 	void testPRKLengthSmallerThanHashLengthThrows() {
-		byte[] tooSmallPRK = new byte[DEFAULT_HASH_LENGTH_BYTES - 1];
+		final byte[] tooSmallPRK = new byte[DEFAULT_HASH_LENGTH_BYTES - 1];
 		assertThrows(IllegalArgumentException.class, () -> kdfService.KDF(tooSmallPRK, emptyInfo, requiredLength));
 	}
 
@@ -103,7 +102,7 @@ class KDFServiceTest {
 			// Context.
 			final JsonData context = testParameters.getContext();
 			final String hash = context.get("hash", String.class);
-			Supplier<Digest> hashSupplier = getDigestSupplier(hash);
+			final Supplier<Digest> hashSupplier = getDigestSupplier(hash);
 
 			// Inputs.
 			final JsonData input = testParameters.getInput();
@@ -124,7 +123,7 @@ class KDFServiceTest {
 	@DisplayName("KeyDerivation returns expected output")
 	void testKDFWithRealValues(final Supplier<Digest> hashSupplier, final byte[] PRK, final List<String> infos, final int requiredByteLength,
 			final byte[] OKM, final String description) {
-		KDFService kdfService = new KDFService(hashSupplier);
+		final KDFService kdfService = new KDFService(hashSupplier);
 		final byte[] actualResult = kdfService.KDF(PRK, infos, requiredByteLength);
 		assertArrayEquals(OKM, actualResult, String.format("assertion failed for: %s", description));
 	}
@@ -145,13 +144,13 @@ class KDFServiceTest {
 
 	@Test
 	void testtKDFToZqTooSmallRequiredUpperBoundThrows() {
-		final BigInteger tooSmallRequestedUpperbound = new BigInteger((DEFAULT_HASH_LENGTH_BYTES - 1) * 8, random);
+		final BigInteger tooSmallRequestedUpperbound = randomService.genRandomIntegerOfLength((DEFAULT_HASH_LENGTH_BYTES - 1) * 8);
 		assertThrows(IllegalArgumentException.class, () -> kdfService.KDFToZq(PRK, emptyInfo, tooSmallRequestedUpperbound));
 	}
 
 	@Test
 	void testKDFToZqPRKLengthSmallerThanHashLengthThrows() {
-		byte[] tooSmallPRK = new byte[DEFAULT_HASH_LENGTH_BYTES - 1];
+		final byte[] tooSmallPRK = new byte[DEFAULT_HASH_LENGTH_BYTES - 1];
 		assertThrows(IllegalArgumentException.class, () -> kdfService.KDFToZq(tooSmallPRK, emptyInfo, requestedUpperBound));
 	}
 
@@ -162,7 +161,7 @@ class KDFServiceTest {
 			// Context.
 			final JsonData context = testParameters.getContext();
 			final String hash = context.get("hash", String.class);
-			Supplier<Digest> hashSupplier = getDigestSupplier(hash);
+			final Supplier<Digest> hashSupplier = getDigestSupplier(hash);
 
 			// Inputs.
 			final JsonData input = testParameters.getInput();
@@ -186,13 +185,13 @@ class KDFServiceTest {
 		try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = mockStatic(SecurityLevelConfig.class)) {
 			mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(securityLevel);
 
-			KDFService kdfService = new KDFService(hashSupplier);
+			final KDFService kdfService = new KDFService(hashSupplier);
 			final ZqElement actualResult = kdfService.KDFToZq(PRK, infos, q);
 			assertEquals(u, actualResult, String.format("assertion failed for: %s", description));
 		}
 	}
 
-	private static Supplier<Digest> getDigestSupplier(String hash) {
+	private static Supplier<Digest> getDigestSupplier(final String hash) {
 		return switch (hash) {
 			case "SHA-256" -> SHA256Digest::new;
 			case "SHA-1" -> SHA1Digest::new;
