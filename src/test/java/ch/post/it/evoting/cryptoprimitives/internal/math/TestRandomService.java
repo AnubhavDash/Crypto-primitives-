@@ -29,9 +29,9 @@ public class TestRandomService extends RandomService {
 	}
 
 	public BigInteger genRandomIntegerOfLength(final int bitLength) {
-		checkArgument(bitLength > 0, "The bit length must be strictly positive.");
+		checkArgument(bitLength >= 0, "The bit length must be positive.");
 
-		return super.genRandomInteger(BigInteger.TWO.pow(bitLength).subtract(BigInteger.ONE));
+		return super.genRandomInteger(BigInteger.TWO.pow(bitLength));
 	}
 
 }
