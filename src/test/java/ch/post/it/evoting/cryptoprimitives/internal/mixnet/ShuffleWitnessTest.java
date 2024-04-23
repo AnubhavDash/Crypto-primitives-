@@ -24,7 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
@@ -36,7 +36,7 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 class ShuffleWitnessTest extends TestGroupSetup {
 
 	private static final int PERMUTATION_SIZE = 10;
-	private static final RandomService randomService = new RandomService();
+	private static final TestRandomService randomService = new TestRandomService();
 
 	private static PermutationService permutationService;
 

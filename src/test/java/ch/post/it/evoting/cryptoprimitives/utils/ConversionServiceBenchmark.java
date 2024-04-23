@@ -16,7 +16,6 @@
 package ch.post.it.evoting.cryptoprimitives.utils;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
@@ -28,12 +27,13 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal;
 
 @State(Scope.Benchmark)
 public class ConversionServiceBenchmark {
 
-	private static final SecureRandom secureRandom = new SecureRandom();
+	private static final TestRandomService randomService = new TestRandomService();
 
 	@Param({ "3072" })
 	static int bitLength;
@@ -61,7 +61,7 @@ public class ConversionServiceBenchmark {
 
 		@Setup(Level.Invocation)
 		public void genRandomBigInteger() {
-			randomBigInteger = new BigInteger(bitLength, secureRandom);
+			randomBigInteger = randomService.genRandomIntegerOfLength(bitLength);
 		}
 	}
 }

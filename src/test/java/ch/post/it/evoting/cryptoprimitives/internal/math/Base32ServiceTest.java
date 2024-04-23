@@ -35,7 +35,7 @@ class Base32ServiceTest {
 
 	@BeforeAll
 	static void setupAll() {
-		randomService = new RandomService();
+		randomService = new TestRandomService();
 		base32Service = new Base32Service();
 	}
 

@@ -41,11 +41,11 @@ class MultiExponentiationWitnessTest extends TestGroupSetup {
 
 	@BeforeEach
 	void setUp() {
-		n = secureRandom.nextInt(UPPER_BOUND_TEST_SIZE) + 1;
-		m = secureRandom.nextInt(UPPER_BOUND_TEST_SIZE) + 1;
+		n = randomService.genRandomInteger(UPPER_BOUND_TEST_SIZE) + 1;
+		m = randomService.genRandomInteger(UPPER_BOUND_TEST_SIZE) + 1;
 
-		TestMultiExponentiationWitnessGenerator witnessGenerator = new TestMultiExponentiationWitnessGenerator(zqGroup);
-		MultiExponentiationWitness witness = witnessGenerator.genRandomWitness(n, m);
+		final TestMultiExponentiationWitnessGenerator witnessGenerator = new TestMultiExponentiationWitnessGenerator(zqGroup);
+		final MultiExponentiationWitness witness = witnessGenerator.genRandomWitness(n, m);
 		matrixA = witness.get_A();
 		exponentsR = witness.get_r();
 		exponentsRho = witness.get_rho();
@@ -62,32 +62,32 @@ class MultiExponentiationWitnessTest extends TestGroupSetup {
 
 	@Test
 	void testThatExponentsOfDifferentSizeThanMatrixColumnsThrows() {
-		GroupVector<ZqElement, ZqGroup> differentSizeExponents = zqGroupGenerator.genRandomZqElementVector(m + 1);
-		Exception exception =
+		final GroupVector<ZqElement, ZqGroup> differentSizeExponents = zqGroupGenerator.genRandomZqElementVector(m + 1);
+		final Exception exception =
 				assertThrows(IllegalArgumentException.class, () -> new MultiExponentiationWitness(matrixA, differentSizeExponents, exponentsRho));
 		assertEquals("The matrix A number of columns must equals the number of exponents.", exception.getMessage());
 	}
 
 	@Test
 	void testThatMatrixAndExponentsOfDifferentGroupsThrows() {
-		GroupMatrix<ZqElement, ZqGroup> otherMatrix = otherZqGroupGenerator.genRandomZqElementMatrix(n, m);
-		Exception exception = assertThrows(IllegalArgumentException.class,
+		final GroupMatrix<ZqElement, ZqGroup> otherMatrix = otherZqGroupGenerator.genRandomZqElementMatrix(n, m);
+		final Exception exception = assertThrows(IllegalArgumentException.class,
 				() -> new MultiExponentiationWitness(otherMatrix, exponentsR, exponentsRho));
 		assertEquals("The matrix A and the exponents r must belong to the same group.", exception.getMessage());
 	}
 
 	@Test
 	void testThatMatrixAndExponentRhoOfDifferentGroupsThrows(){
-		ZqElement otherRho = otherZqGroupGenerator.genRandomZqElementMember();
-		Exception exception =
+		final ZqElement otherRho = otherZqGroupGenerator.genRandomZqElementMember();
+		final Exception exception =
 				assertThrows(IllegalArgumentException.class, () -> new MultiExponentiationWitness(matrixA, exponentsR, otherRho));
 		assertEquals("The matrix A and the exponent ρ must belong to the same group", exception.getMessage());
 	}
 
 	@Test
 	void testThatExponentsAndRhoOfDifferentGroupsThrows() {
-		GroupVector<ZqElement, ZqGroup> otherR = otherZqGroupGenerator.genRandomZqElementVector(m);
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> new MultiExponentiationWitness(matrixA, otherR, exponentsRho));
+		final GroupVector<ZqElement, ZqGroup> otherR = otherZqGroupGenerator.genRandomZqElementVector(m);
+		final Exception exception = assertThrows(IllegalArgumentException.class, () -> new MultiExponentiationWitness(matrixA, otherR, exponentsRho));
 		assertEquals("The matrix A and the exponents r must belong to the same group.", exception.getMessage());
 	}
 }

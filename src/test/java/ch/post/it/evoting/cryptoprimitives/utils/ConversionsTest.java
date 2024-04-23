@@ -27,11 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.Random;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.RepeatedTest;
@@ -41,17 +38,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
 
 class ConversionsTest {
 
-	private static Random random;
-
-	@BeforeAll
-	static void setUp() {
-		random = new SecureRandom();
-	}
+	private static final TestRandomService randomService = new TestRandomService();
 
 	@Nested
 	@DisplayName("Test BigInteger to byte array conversion")
@@ -63,31 +55,31 @@ class ConversionsTest {
 
 		@Test
 		void testConversionOfZeroBigIntegerIsOneZeroByte() {
-			BigInteger zero = BigInteger.ZERO;
-			byte[] expected = new byte[] { 0 };
-			byte[] converted = integerToByteArray(zero);
+			final BigInteger zero = BigInteger.ZERO;
+			final byte[] expected = new byte[] { 0 };
+			final byte[] converted = integerToByteArray(zero);
 			assertArrayEquals(expected, converted);
 		}
 
 		@Test
 		void testConversionOf256BigIntegerIsTwoBytes() {
-			BigInteger value = BigInteger.valueOf(256);
-			byte[] expected = new byte[] { 1, 0 };
-			byte[] converted = integerToByteArray(value);
+			final BigInteger value = BigInteger.valueOf(256);
+			final byte[] expected = new byte[] { 1, 0 };
+			final byte[] converted = integerToByteArray(value);
 			assertArrayEquals(expected, converted);
 		}
 
 		@Test
 		void testConversionOfIntegerMaxValuePlusOneIsCorrect() {
-			BigInteger value = BigInteger.valueOf(Integer.MAX_VALUE).add(BigInteger.ONE);
-			byte[] expected = new byte[] { (byte) 0b10000000, 0, 0, 0 };
-			byte[] converted = integerToByteArray(value);
+			final BigInteger value = BigInteger.valueOf(Integer.MAX_VALUE).add(BigInteger.ONE);
+			final byte[] expected = new byte[] { (byte) 0b10000000, 0, 0, 0 };
+			final byte[] converted = integerToByteArray(value);
 			assertArrayEquals(expected, converted);
 		}
 
 		@Test
 		void testOfNegativeIntegerThrows() {
-			BigInteger value = BigInteger.valueOf(-1);
+			final BigInteger value = BigInteger.valueOf(-1);
 			assertThrows(IllegalArgumentException.class, () -> integerToByteArray(value));
 		}
 	}
@@ -110,24 +102,24 @@ class ConversionsTest {
 
 		@Test
 		void testConversionOfByteArrayWithLeading1ToBigIntegerIsPositive() {
-			byte[] bytes = new byte[] { (byte) 0x80 };
-			BigInteger converted = byteArrayToInteger(bytes);
+			final byte[] bytes = new byte[] { (byte) 0x80 };
+			final BigInteger converted = byteArrayToInteger(bytes);
 			assertTrue(converted.compareTo(BigInteger.ZERO) > 0);
 		}
 
 		@Test
 		void testConversionOf256ByteArrayRepresentationIs256() {
-			byte[] bytes = new byte[] { 1, 0 };
-			BigInteger converted = byteArrayToInteger(bytes);
+			final byte[] bytes = new byte[] { 1, 0 };
+			final BigInteger converted = byteArrayToInteger(bytes);
 			assertEquals(0, converted.compareTo(BigInteger.valueOf(256)));
 		}
 
 		//Cyclic test BigInteger to byte array and back
 		@RepeatedTest(10)
 		void testRandomBigIntegerToByteArrayAndBackIsOriginalValue() {
-			int size = random.nextInt(32);
-			BigInteger value = new BigInteger(size, random);
-			BigInteger cycledValue = byteArrayToInteger(integerToByteArray(value));
+			final int size = randomService.genRandomInteger(32) + 1;
+			final BigInteger value = randomService.genRandomIntegerOfLength(size);
+			final BigInteger cycledValue = byteArrayToInteger(integerToByteArray(value));
 			assertEquals(value, cycledValue);
 		}
 	}
@@ -192,10 +184,10 @@ class ConversionsTest {
 
 		@Test
 		void testIntegerToStringWithNegativeInputThrowsIllegalArgumentException() {
-			BigInteger x = BigInteger.valueOf(-1L);
+			final BigInteger x = BigInteger.valueOf(-1L);
 			assertThrows(IllegalArgumentException.class, () -> integerToString(x));
 
-			Integer y = -1;
+			final Integer y = -1;
 			assertThrows(IllegalArgumentException.class, () -> integerToString(y));
 		}
 	}
@@ -205,31 +197,31 @@ class ConversionsTest {
 	class CyclicIntegerToStringTest {
 		@Test
 		void testZeroBigIntegerToStringAndBackIsOriginalValue() {
-			BigInteger value = BigInteger.ZERO;
-			BigInteger cycledValue = stringToInteger(integerToString(value));
+			final BigInteger value = BigInteger.ZERO;
+			final BigInteger cycledValue = stringToInteger(integerToString(value));
 			assertEquals(value, cycledValue);
 		}
 
 		//Cyclic test BigInteger to String and back
 		@RepeatedTest(10)
 		void testRandomBigIntegerToStringAndBackIsOriginalValue() {
-			int size = random.nextInt(32);
-			BigInteger value = new BigInteger(size, random);
-			BigInteger cycledValue = stringToInteger(integerToString(value));
+			final int size = randomService.genRandomInteger(32);
+			final BigInteger value = randomService.genRandomIntegerOfLength(size);
+			final BigInteger cycledValue = stringToInteger(integerToString(value));
 			assertEquals(value, cycledValue);
 		}
 
 		@Test
 		void testZeroIntegerToStringAndBackIsOriginalValue() {
-			Integer value = 0;
-			Integer cycledValue = stringToInteger(integerToString(value)).intValue();
+			final Integer value = 0;
+			final Integer cycledValue = stringToInteger(integerToString(value)).intValue();
 			assertEquals(value, cycledValue);
 		}
 
 		@RepeatedTest(10)
 		void testRandomIntegerToStringAndBackIsOriginalValue() {
-			Integer value = random.nextInt(32);
-			Integer cycledValue = stringToInteger(integerToString(value)).intValue();
+			final Integer value = randomService.genRandomInteger(32);
+			final Integer cycledValue = stringToInteger(integerToString(value)).intValue();
 			assertEquals(value, cycledValue);
 		}
 	}
@@ -290,7 +282,7 @@ class ConversionsTest {
 
 		@ParameterizedTest(name = "byteArray = \"{0}\"")
 		@MethodSource("invalidUTF8ByteArrays")
-		void testConversionOfInvalidUTF8ByteArrayToStringThrows(byte[] byteArray) {
+		void testConversionOfInvalidUTF8ByteArrayToStringThrows(final byte[] byteArray) {
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> byteArrayToString(byteArray));
 			assertEquals("The byte array does not correspond to a valid sequence of UTF-8 encoding.", exception.getMessage());
 		}
@@ -306,12 +298,12 @@ class ConversionsTest {
 	@Nested
 	@DisplayName("Cyclic test String to byte array conversion and back")
 	class CyclicStringToByteArrayTest {
-		RandomService randomService = new RandomService();
+		TestRandomService randomService = new TestRandomService();
 
 		@RepeatedTest(10)
 		void testRandomStringToByteArrayAndBackIsOriginalValue() {
-			String value = randomService.genRandomString(random.nextInt(10) + 1, Base64Alphabet.getInstance());
-			byte[] bytes = stringToByteArray(value);
+			final String value = randomService.genRandomString(randomService.genRandomInteger(10) + 1, Base64Alphabet.getInstance());
+			final byte[] bytes = stringToByteArray(value);
 			final String cycledValue = byteArrayToString(bytes);
 			assertEquals(value, cycledValue);
 		}

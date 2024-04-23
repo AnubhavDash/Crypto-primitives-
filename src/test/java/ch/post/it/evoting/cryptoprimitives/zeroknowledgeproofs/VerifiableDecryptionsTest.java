@@ -18,7 +18,6 @@ package ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.security.SecureRandom;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +33,6 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 
 class VerifiableDecryptionsTest extends TestGroupSetup {
 
-	private static final SecureRandom random = new SecureRandom();
 	private static final int MAX_NUMBER_CIPHERTEXTS = 10;
 	private static final int MAX_CIPHERTEXT_LENGTH = 5;
 
@@ -45,13 +43,13 @@ class VerifiableDecryptionsTest extends TestGroupSetup {
 
 	@BeforeEach
 	void setup() {
-		numCiphertexts = random.nextInt(MAX_NUMBER_CIPHERTEXTS) + 1;
-		numPhis = random.nextInt(MAX_CIPHERTEXT_LENGTH) + 1;
+		numCiphertexts = randomService.genRandomInteger(MAX_NUMBER_CIPHERTEXTS) + 1;
+		numPhis = randomService.genRandomInteger(MAX_CIPHERTEXT_LENGTH) + 1;
 		ciphertexts = elGamalGenerator.genRandomCiphertextVector(numCiphertexts, numPhis);
 		decryptionProofs = IntStream.range(0, numCiphertexts)
 				.mapToObj(i -> {
-					ZqElement e = zqGroupGenerator.genRandomZqElementMember();
-					GroupVector<ZqElement, ZqGroup> z = zqGroupGenerator.genRandomZqElementVector(numPhis);
+					final ZqElement e = zqGroupGenerator.genRandomZqElementMember();
+					final GroupVector<ZqElement, ZqGroup> z = zqGroupGenerator.genRandomZqElementVector(numPhis);
 					return new DecryptionProof(e, z);
 				}).collect(GroupVector.toGroupVector());
 	}

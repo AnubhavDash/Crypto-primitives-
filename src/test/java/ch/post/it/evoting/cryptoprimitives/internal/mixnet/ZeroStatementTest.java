@@ -21,50 +21,34 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ZeroStatement;
+import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.GqGroupGenerator;
 
 @DisplayName("A ZeroStatement")
-class ZeroStatementTest {
+class ZeroStatementTest extends TestGroupSetup {
 
 	private static final int RANDOM_UPPER_BOUND = 10;
-	private static final SecureRandom secureRandom = new SecureRandom();
-	private static final RandomService randomService = new RandomService();
-
-	private static GqGroup gqGroup;
-	private static ZqGroup zqGroup;
-	private static GqGroupGenerator gqGroupGenerator;
 
 	private int m;
 	private GroupVector<GqElement, GqGroup> commitmentsA;
 	private GroupVector<GqElement, GqGroup> commitmentsB;
 	private ZqElement y;
 
-	@BeforeAll
-	static void setUpAll() {
-		// GqGroup and corresponding ZqGroup set up.
-		gqGroup = GroupTestData.getGqGroup();
-		zqGroup = ZqGroup.sameOrderAs(gqGroup);
-		gqGroupGenerator = new GqGroupGenerator(gqGroup);
-	}
-
 	@BeforeEach
 	void setUp() {
-		m = secureRandom.nextInt(RANDOM_UPPER_BOUND) + 1;
+		m = randomService.genRandomInteger(RANDOM_UPPER_BOUND) + 1;
 		commitmentsA = gqGroupGenerator.genRandomGqElementVector(m);
 		commitmentsB = gqGroupGenerator.genRandomGqElementVector(m);
 		y = ZqElement.create(randomService.genRandomInteger(zqGroup.getQ()), zqGroup);

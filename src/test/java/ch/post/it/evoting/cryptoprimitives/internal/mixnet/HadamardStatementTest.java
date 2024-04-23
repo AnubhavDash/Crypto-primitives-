@@ -20,8 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.security.SecureRandom;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,25 +28,19 @@ import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.mixnet.HadamardStatement;
-import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
+import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.GqGroupGenerator;
 
-class HadamardStatementTest {
+class HadamardStatementTest extends TestGroupSetup {
 
-	private static final SecureRandom secureRandom = new SecureRandom();
-
-	private GqGroup group;
-	private GqGroupGenerator generator;
 	private GroupVector<GqElement, GqGroup> commitmentsA;
 	private GqElement commitmentB;
 
 	@BeforeEach
 	void setup() {
-		final int n = secureRandom.nextInt(10) + 1;
-		group = GroupTestData.getGqGroup();
-		generator = new GqGroupGenerator(group);
-		commitmentsA = generator.genRandomGqElementVector(n);
-		commitmentB = generator.genMember();
+		final int n = randomService.genRandomInteger(10) + 1;
+		commitmentsA = gqGroupGenerator.genRandomGqElementVector(n);
+		commitmentB = gqGroupGenerator.genMember();
 	}
 
 	@Test
@@ -69,8 +61,7 @@ class HadamardStatementTest {
 	@Test
 	@DisplayName("Constructing a Hadamard statement with commitments A and commitment b of different groups should throw")
 	void constructStatementWithCommitmentsFromDifferentGroups() {
-		final GqGroup differentGroup = GroupTestData.getDifferentGqGroup(group);
-		commitmentB = new GqGroupGenerator(differentGroup).genMember();
+		commitmentB = new GqGroupGenerator(otherGqGroup).genMember();
 		final Exception exception = assertThrows(IllegalArgumentException.class, () -> new HadamardStatement(commitmentsA, commitmentB));
 		assertEquals("The commitments A and commitment b must have the same group.", exception.getMessage());
 	}

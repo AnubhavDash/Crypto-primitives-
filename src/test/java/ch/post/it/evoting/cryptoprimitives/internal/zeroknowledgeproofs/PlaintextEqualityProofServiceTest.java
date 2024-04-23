@@ -48,7 +48,6 @@ import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKe
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.math.Base16Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
@@ -66,13 +65,10 @@ import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.PlaintextEquality
 class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 
 	private static final ElGamal elGamal = new ElGamalService();
-	private static RandomService randomService;
 	private static PlaintextEqualityProofService plaintextEqualityProofService;
 
 	@BeforeAll
 	static void setUpAll() {
-		randomService = new RandomService();
-
 		final HashService hashService = TestHashService.create(gqGroup.getQ());
 		plaintextEqualityProofService = new PlaintextEqualityProofService(randomService, hashService);
 	}

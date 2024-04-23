@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
@@ -45,11 +44,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.TestSignatureSupportingAlgorithm;
 import ch.post.it.evoting.cryptoprimitives.signing.AuthorityInformation;
 import ch.post.it.evoting.cryptoprimitives.signing.KeysAndCert;
 
 class GenKeysAndCertServiceTest {
+
+	private static final TestRandomService randomService = new TestRandomService();
 
 	private static GenKeysAndCertService keysAndCertService;
 	private static AuthorityInformation authorityInformation;
@@ -193,8 +195,6 @@ class GenKeysAndCertServiceTest {
 	}
 
 	private static byte[] createRandomPayload() {
-		final byte[] payload = new byte[10];
-		new SecureRandom().nextBytes(payload);
-		return payload;
+		return randomService.randomBytes(10);
 	}
 }

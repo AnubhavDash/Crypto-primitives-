@@ -20,28 +20,22 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal;
 
 class ConversionsEquivalenceTest {
 
-	private static SecureRandom secureRandom;
-
-	@BeforeAll
-	static void setUp() {
-		secureRandom = new SecureRandom();
-	}
+	private static final TestRandomService randomService = new TestRandomService();
 
 	@RepeatedTest(100)
 	void randomBigIntegerConversionIsEquivalentWithTwoMethods() {
 		final int BIT_LENGTH = 3072;
-		final BigInteger random = new BigInteger(BIT_LENGTH, secureRandom);
+		final BigInteger random = randomService.genRandomIntegerOfLength(BIT_LENGTH);
 		final byte[] expected = integerToByteArraySpec(random);
 		final byte[] result = ConversionsInternal.integerToByteArray(random);
 		assertArrayEquals(expected, result);
@@ -49,8 +43,7 @@ class ConversionsEquivalenceTest {
 
 	@RepeatedTest(1000)
 	void testByteArrayToIntegerIsEquivalentToSpec() {
-		byte[] byteArray = new byte[32];
-		secureRandom.nextBytes(byteArray);
+		final byte[] byteArray = randomService.randomBytes(32);
 
 		assertEquals(byteArrayToIntegerSpec(byteArray), byteArrayToInteger(byteArray));
 	}
@@ -97,7 +90,7 @@ class ConversionsEquivalenceTest {
 		n = Math.max(n, 1);
 		final byte[] B = new byte[n];
 		for (int i = 0; i < n; i++) {
-			B[n-i-1] = x.mod(TWOHUNDRED_FIFTY_SIX).byteValue();
+			B[n - i - 1] = x.mod(TWOHUNDRED_FIFTY_SIX).byteValue();
 			x = x.divide(TWOHUNDRED_FIFTY_SIX);
 		}
 		return B;

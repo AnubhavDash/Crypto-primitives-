@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,15 +32,12 @@ import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
-import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ProductStatement;
+import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.GqGroupGenerator;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator;
 
-class ProductStatementTest {
-
-	private static final SecureRandom secureRandom = new SecureRandom();
+class ProductStatementTest extends TestGroupSetup {
 
 	private int numElements;
 	private GroupVector<GqElement, GqGroup> commitments;
@@ -49,11 +45,7 @@ class ProductStatementTest {
 
 	@BeforeEach
 	void setup() {
-		numElements = secureRandom.nextInt(10) + 1;
-		final GqGroup gqGroup = GroupTestData.getGqGroup();
-		final ZqGroup zqGroup = ZqGroup.sameOrderAs(gqGroup);
-		final GqGroupGenerator gqGroupGenerator = new GqGroupGenerator(gqGroup);
-		final ZqGroupGenerator zqGroupGenerator = new ZqGroupGenerator(zqGroup);
+		numElements = randomService.genRandomInteger(10) + 1;
 		commitments = gqGroupGenerator.genRandomGqElementVector(numElements);
 		product = zqGroupGenerator.genRandomZqElementMember();
 	}

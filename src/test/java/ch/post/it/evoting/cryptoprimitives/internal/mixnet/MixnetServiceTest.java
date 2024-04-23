@@ -46,7 +46,7 @@ class MixnetServiceTest extends TestGroupSetup {
 
 	@BeforeEach
 	void setUpAll() {
-		keySize = secureRandom.nextInt(10) + 1;
+		keySize = randomService.genRandomInteger(10) + 1;
 		publicKey = elGamalGenerator.genRandomPublicKey(keySize);
 	}
 
@@ -68,8 +68,8 @@ class MixnetServiceTest extends TestGroupSetup {
 			final MixnetService mixnetService = new MixnetService();
 			final int minNumberOfVotes = 2;
 			final int maxGroupCommitmentKeySize = gqGroup.getQ().intValueExact() - 3;
-			final int Nc = secureRandom.nextInt(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
-			final int l = secureRandom.nextInt(keySize) + 1;
+			final int Nc = randomService.genRandomInteger(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
+			final int l = randomService.genRandomInteger(keySize) + 1;
 
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator.genRandomCiphertextVector(Nc, l);
 			final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
@@ -116,8 +116,8 @@ class MixnetServiceTest extends TestGroupSetup {
 
 			final int minNumberOfVotes = 2;
 			final int maxGroupCommitmentKeySize = otherGqGroup.getQ().intValueExact() - 3;
-			final int Nc = secureRandom.nextInt(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
-			final int l = secureRandom.nextInt(keySize) + 1;
+			final int Nc = randomService.genRandomInteger(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
+			final int l = randomService.genRandomInteger(keySize) + 1;
 
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> inputCiphertextList = otherGroupElGamalGenerator.genRandomCiphertextVector(Nc,
 					l);
@@ -137,8 +137,8 @@ class MixnetServiceTest extends TestGroupSetup {
 			final HashService hashService = TestHashService.create(gqGroup.getQ());
 			final Mixnet mixnet = new MixnetService(hashService);
 
-			final int Nc = secureRandom.nextInt(10) + 2;
-			final int l = secureRandom.nextInt(keySize) + 1;
+			final int Nc = randomService.genRandomInteger(10) + 2;
+			final int l = randomService.genRandomInteger(keySize) + 1;
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> inputCiphertextList = elGamalGenerator.genRandomCiphertextVector(Nc, l);
 
 			final VerifiableShuffle verifiableShuffle = mixnet.genVerifiableShuffle(inputCiphertextList, publicKey);
@@ -154,7 +154,7 @@ class MixnetServiceTest extends TestGroupSetup {
 			final HashService hashService = TestHashService.create(gqGroup.getQ());
 			final Mixnet mixnet = new MixnetService(hashService);
 
-			final int Nc = secureRandom.nextInt(gqGroup.getQ().intValueExact() - 4) + 2;
+			final int Nc = randomService.genRandomInteger(gqGroup.getQ().intValueExact() - 4) + 2;
 			final int l = keySize + 1;
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> inputCiphertextList = elGamalGenerator.genRandomCiphertextVector(Nc, l);
 
@@ -194,8 +194,8 @@ class MixnetServiceTest extends TestGroupSetup {
 			final MixnetService mixnetService = new MixnetService();
 			final int minNumberOfVotes = 2;
 			final int maxGroupCommitmentKeySize = gqGroup.getQ().intValueExact() - 3;
-			final int Nc = secureRandom.nextInt(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
-			final int l = secureRandom.nextInt(keySize) + 1;
+			final int Nc = randomService.genRandomInteger(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
+			final int l = randomService.genRandomInteger(keySize) + 1;
 
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator.genRandomCiphertextVector(Nc, l);
 			final ShuffleArgument shuffleArgument = mock(ShuffleArgument.class);
@@ -261,8 +261,8 @@ class MixnetServiceTest extends TestGroupSetup {
 
 			final int minNumberOfVotes = 2;
 			final int maxGroupCommitmentKeySize = gqGroup.getQ().intValueExact() - 3;
-			final int Nc = secureRandom.nextInt(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
-			final int l = secureRandom.nextInt(keySize) + 1;
+			final int Nc = randomService.genRandomInteger(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
+			final int l = randomService.genRandomInteger(keySize) + 1;
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator.genRandomCiphertextVector(Nc, l);
 			final ShuffleArgument shuffleArgument = mock(ShuffleArgument.class);
 			when(shuffleArgument.getGroup()).thenReturn(gqGroup);
@@ -282,8 +282,8 @@ class MixnetServiceTest extends TestGroupSetup {
 
 			final int minNumberOfVotes = 2;
 			final int maxGroupCommitmentKeySize = gqGroup.getQ().intValueExact() - 3;
-			final int Nc = secureRandom.nextInt(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
-			final int l = secureRandom.nextInt(keySize) + 1;
+			final int Nc = randomService.genRandomInteger(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
+			final int l = randomService.genRandomInteger(keySize) + 1;
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator.genRandomCiphertextVector(Nc, l);
 			final ShuffleArgument shuffleArgument = mock(ShuffleArgument.class);
 			when(shuffleArgument.getGroup()).thenReturn(otherGqGroup);
@@ -299,7 +299,7 @@ class MixnetServiceTest extends TestGroupSetup {
 			final HashService hashService = mock(HashService.class);
 			final Mixnet mixnet = new MixnetService(hashService);
 
-			final int l = secureRandom.nextInt(keySize) + 1;
+			final int l = randomService.genRandomInteger(keySize) + 1;
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = otherGroupElGamalGenerator.genRandomCiphertextVector(2, l);
 			final ShuffleArgument shuffleArgument = mock(ShuffleArgument.class);
 			when(shuffleArgument.getGroup()).thenReturn(otherGqGroup);
@@ -318,8 +318,8 @@ class MixnetServiceTest extends TestGroupSetup {
 
 			final int minNumberOfVotes = 2;
 			final int maxGroupCommitmentKeySize = gqGroup.getQ().intValueExact() - 3;
-			final int Nc = secureRandom.nextInt(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
-			final int l = secureRandom.nextInt(keySize) + 1;
+			final int Nc = randomService.genRandomInteger(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
+			final int l = randomService.genRandomInteger(keySize) + 1;
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator.genRandomCiphertextVector(Nc, l);
 			final ShuffleArgument shuffleArgument = mock(ShuffleArgument.class);
 			when(shuffleArgument.getGroup()).thenReturn(gqGroup);
@@ -338,8 +338,8 @@ class MixnetServiceTest extends TestGroupSetup {
 
 			final int minNumberOfVotes = 2;
 			final int maxGroupCommitmentKeySize = gqGroup.getQ().intValueExact() - 3;
-			final int Nc = secureRandom.nextInt(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
-			final int l = secureRandom.nextInt(keySize) + 1;
+			final int Nc = randomService.genRandomInteger(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
+			final int l = randomService.genRandomInteger(keySize) + 1;
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator.genRandomCiphertextVector(Nc, l);
 			final ShuffleArgument shuffleArgument = mock(ShuffleArgument.class);
 			when(shuffleArgument.getGroup()).thenReturn(gqGroup);
@@ -358,8 +358,8 @@ class MixnetServiceTest extends TestGroupSetup {
 
 			final int minNumberOfVotes = 2;
 			final int maxGroupCommitmentKeySize = 5;
-			final int Nc = secureRandom.nextInt(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
-			final int l = secureRandom.nextInt(keySize) + 1;
+			final int Nc = randomService.genRandomInteger(maxGroupCommitmentKeySize - minNumberOfVotes + 1) + minNumberOfVotes;
+			final int l = randomService.genRandomInteger(keySize) + 1;
 
 			final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(gqGroup);
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator.genRandomCiphertextVector(Nc, l);

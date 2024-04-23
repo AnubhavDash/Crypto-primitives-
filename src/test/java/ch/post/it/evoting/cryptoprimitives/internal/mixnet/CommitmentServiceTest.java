@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +34,7 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsService;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupMatrix;
@@ -48,8 +47,7 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator
 class CommitmentServiceTest {
 
 	private static final int KEY_LENGTH = 5; // This must be >= 2
-	private static final RandomService randomService = new RandomService();
-	private static final SecureRandom secureRandom = new SecureRandom();
+	private static final TestRandomService randomService = new TestRandomService();
 
 	private static ZqGroupGenerator zqGroupGenerator;
 
@@ -192,7 +190,7 @@ class CommitmentServiceTest {
 
 		@BeforeEach
 		void setup() {
-			m = secureRandom.nextInt(10) + 1;
+			m = randomService.genRandomInteger(10) + 1;
 			n = KEY_LENGTH;
 			validMatrix = zqGroupGenerator.genRandomZqElementMatrix(n, m);
 			validRandomValues = zqGroupGenerator.genRandomZqElementVector(m);

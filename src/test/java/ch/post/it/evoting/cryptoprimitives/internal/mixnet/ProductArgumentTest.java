@@ -45,8 +45,8 @@ class ProductArgumentTest extends TestGroupSetup {
 	@BeforeAll
 	static void setUpAll() {
 		// Exclude m = 1 because we want to test the constructor with an Hadamard Argument.
-		m = secureRandom.nextInt(UPPER_BOUND - 1) + 2;
-		n = secureRandom.nextInt(UPPER_BOUND - 1) + 2;
+		m = randomService.genRandomInteger(UPPER_BOUND - 1) + 2;
+		n = randomService.genRandomInteger(UPPER_BOUND - 1) + 2;
 		argumentGenerator = new TestArgumentGenerator(gqGroup);
 
 		final ProductArgument productArgument = argumentGenerator.genProductArgument(m, n);

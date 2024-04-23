@@ -52,7 +52,7 @@ import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -73,7 +73,7 @@ class SingleValueProductArgumentServiceTest extends TestGroupSetup {
 
 	private static final ElGamal elGamal = new ElGamalService();
 	private static final int NUM_ELEMENTS = 10;
-	private static final RandomService randomService = new RandomService();
+	private static final TestRandomService randomService = new TestRandomService();
 
 	private static HashService hashService;
 	private static ElGamalMultiRecipientPublicKey publicKey;
@@ -249,7 +249,7 @@ class SingleValueProductArgumentServiceTest extends TestGroupSetup {
 					.build();
 
 			//Mock random integers
-			final RandomService randomService = spy(new RandomService());
+			final TestRandomService randomService = spy(new TestRandomService());
 			doReturn(BigInteger.valueOf(3), BigInteger.valueOf(7), // d_0, d_1
 					BigInteger.TEN,                        // r_d
 					BigInteger.valueOf(4), BigInteger.valueOf(8))  // s_0, s_x

@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
 
@@ -34,14 +33,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.signing.CertificateInfo;
 import ch.post.it.evoting.cryptoprimitives.signing.AuthorityInformation;
 
 @DisplayName("RSASSA_PSS")
 class RSASSA_PSSTest {
 
-	private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 	private static final RSASSA_PSS rsassa_pss = RSASSA_PSS.getInstance();
+	private static final TestRandomService randomService = new TestRandomService();
 
 	@Test
 	@DisplayName("calling genKeyPair returns key pair")
@@ -110,8 +110,7 @@ class RSASSA_PSSTest {
 		@BeforeEach
 		void setup() {
 			privateKey = rsassa_pss.genKeyPair().getPrivate();
-			message = new byte[10];
-			SECURE_RANDOM.nextBytes(message);
+			message = randomService.randomBytes(10);
 		}
 
 		@Test
@@ -141,10 +140,8 @@ class RSASSA_PSSTest {
 		@BeforeEach
 		void setup() {
 			publicKey = rsassa_pss.genKeyPair().getPublic();
-			message = new byte[10];
-			SECURE_RANDOM.nextBytes(message);
-			signature = new byte[384];
-			SECURE_RANDOM.nextBytes(signature);
+			message = randomService.randomBytes(10);
+			signature = randomService.randomBytes(384);
 		}
 
 		@Test
@@ -158,14 +155,12 @@ class RSASSA_PSSTest {
 		@Test
 		@DisplayName("with signature bytes of incorrect size throws an IllegalArgumentException")
 		void verifyWithSignatureBytesIncorrectSizeThrows() {
-			byte[] tooShortSignature = new byte[383];
-			SECURE_RANDOM.nextBytes(tooShortSignature);
+			final byte[] tooShortSignature = randomService.randomBytes(383);
 			final IllegalArgumentException exceptionTooShortSignature = assertThrows(IllegalArgumentException.class,
 					() -> rsassa_pss.verify(publicKey, message, tooShortSignature));
 			assertEquals("The signature must have the expected size. [found: 383, expected: 384]", exceptionTooShortSignature.getMessage());
 
-			byte[] tooLongSignature = new byte[385];
-			SECURE_RANDOM.nextBytes(tooLongSignature);
+			final byte[] tooLongSignature = randomService.randomBytes(385);
 			final IllegalArgumentException exceptionTooLongSignature = assertThrows(IllegalArgumentException.class,
 					() -> rsassa_pss.verify(publicKey, message, tooLongSignature));
 			assertEquals("The signature must have the expected size. [found: 385, expected: 384]", exceptionTooLongSignature.getMessage());
@@ -181,8 +176,7 @@ class RSASSA_PSSTest {
 		@DisplayName("with correct signature verifies")
 		void verifyWithCorrectSignatureReturnsTrue() {
 			final KeyPair keyPair = rsassa_pss.genKeyPair();
-			byte[] message = new byte[10];
-			SECURE_RANDOM.nextBytes(message);
+			final byte[] message = randomService.randomBytes(10);
 			final byte[] signature = rsassa_pss.sign(keyPair.getPrivate(), message);
 
 			assertTrue(rsassa_pss.verify(keyPair.getPublic(), message, signature));

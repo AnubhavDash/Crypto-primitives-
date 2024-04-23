@@ -58,9 +58,9 @@ class ShuffleArgumentTest extends TestGroupSetup {
 
 	@BeforeAll
 	static void setUp() {
-		m = secureRandom.nextInt(UPPER_BOUND) + 1;
-		n = secureRandom.nextInt(UPPER_BOUND - 1) + 2;
-		l = secureRandom.nextInt(UPPER_BOUND) + 1;
+		m = randomService.genRandomInteger(UPPER_BOUND) + 1;
+		n = randomService.genRandomInteger(UPPER_BOUND - 1) + 2;
+		l = randomService.genRandomInteger(UPPER_BOUND) + 1;
 		argumentGenerator = new TestArgumentGenerator(gqGroup);
 
 		cA = gqGroupGenerator.genRandomGqElementVector(m);

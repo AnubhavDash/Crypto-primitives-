@@ -55,9 +55,9 @@ class MultiExponentiationArgumentTest extends TestGroupSetup {
 
 	@BeforeAll
 	static void setUp() {
-		m = secureRandom.nextInt(DIMENSIONS_BOUND) + 1;
-		n = secureRandom.nextInt(DIMENSIONS_BOUND) + 1;
-		l = secureRandom.nextInt(DIMENSIONS_BOUND) + 1;
+		m = randomService.genRandomInteger(DIMENSIONS_BOUND) + 1;
+		n = randomService.genRandomInteger(DIMENSIONS_BOUND) + 1;
+		l = randomService.genRandomInteger(DIMENSIONS_BOUND) + 1;
 
 		final TestArgumentGenerator argumentGenerator = new TestArgumentGenerator(gqGroup);
 		final MultiExponentiationArgument multiExponentiationArgument = argumentGenerator.genMultiExponentiationArgument(m, n, l);

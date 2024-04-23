@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mockStatic;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,12 +38,11 @@ import org.mockito.MockedStatic;
 import com.google.common.base.Throwables;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
 import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
-import ch.post.it.evoting.cryptoprimitives.math.Random;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
 
@@ -54,11 +52,9 @@ class EncryptionParametersTest {
 	private static final String SEED = "Election_name";
 	private static final List<Integer> SMALL_PRIMES = PrimesInternal.getSmallPrimes();
 	private static final int NAME_MAX_LENGTH = 10;
+	private static final TestRandomService randomService = new TestRandomService();
 
 	private static EncryptionParameters encryptionParameters;
-
-	private final Random random = new RandomService();
-	private final SecureRandom secureRandom = new SecureRandom();
 
 	@BeforeAll
 	static void setUpAll() {
@@ -104,8 +100,8 @@ class EncryptionParametersTest {
 	@Test
 	@DisplayName("calling getEncryptionParameters twice with the same seed but different small primes gives the same result")
 	void getEncryptionParametersTwice() {
-		final int electionNameLength = secureRandom.nextInt(NAME_MAX_LENGTH) + 1;
-		final String randomSeed = random.genRandomString(electionNameLength, Base64Alphabet.getInstance());
+		final int electionNameLength = randomService.genRandomInteger(NAME_MAX_LENGTH) + 1;
+		final String randomSeed = randomService.genRandomString(electionNameLength, Base64Alphabet.getInstance());
 		final GqGroup gqGroup1 = encryptionParameters.getEncryptionParameters(randomSeed, SMALL_PRIMES);
 		final GqGroup gqGroup2 = encryptionParameters.getEncryptionParameters(randomSeed, Collections.emptyList());
 
@@ -115,8 +111,8 @@ class EncryptionParametersTest {
 	@RepeatedTest(100)
 	@DisplayName("calling getEncryptionParameters with random seed does not throw")
 	void getEncryptionParametersRandomSeed() {
-		final int electionNameLength = secureRandom.nextInt(NAME_MAX_LENGTH) + 1;
-		final String randomSeed = random.genRandomString(electionNameLength, Base64Alphabet.getInstance());
+		final int electionNameLength = randomService.genRandomInteger(NAME_MAX_LENGTH) + 1;
+		final String randomSeed = randomService.genRandomString(electionNameLength, Base64Alphabet.getInstance());
 
 		assertDoesNotThrow(() -> encryptionParameters.getEncryptionParameters(randomSeed, SMALL_PRIMES));
 	}

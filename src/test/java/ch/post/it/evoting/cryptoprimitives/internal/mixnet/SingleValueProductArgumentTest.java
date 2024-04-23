@@ -55,7 +55,7 @@ class SingleValueProductArgumentTest extends TestGroupSetup {
 
 	@BeforeAll
 	static void setUpAll() {
-		n = secureRandom.nextInt(UPPER_BOUND) + 2;
+		n = randomService.genRandomInteger(UPPER_BOUND) + 2;
 		final SingleValueProductArgument singleValueProductArgument = new TestArgumentGenerator(gqGroup).genSingleValueProductArgument(n);
 
 		cd = singleValueProductArgument.get_c_d();
@@ -70,7 +70,7 @@ class SingleValueProductArgumentTest extends TestGroupSetup {
 	@Test
 	void testEquals() {
 		// Create singleValueProdArgument 1 == singleValueProdArgument 2 != singleValueProdArgument 3
-		SingleValueProductArgument singleValueProdArgument1 = new SingleValueProductArgument.Builder()
+		final SingleValueProductArgument singleValueProdArgument1 = new SingleValueProductArgument.Builder()
 				.with_c_d(cd)
 				.with_c_delta(cLowerDelta)
 				.with_c_Delta(cUpperDelta)
@@ -80,7 +80,7 @@ class SingleValueProductArgumentTest extends TestGroupSetup {
 				.with_s_tilde(sTilde)
 				.build();
 
-		SingleValueProductArgument singleValueProdArgument2 = new SingleValueProductArgument.Builder()
+		final SingleValueProductArgument singleValueProdArgument2 = new SingleValueProductArgument.Builder()
 				.with_c_d(cd)
 				.with_c_delta(cLowerDelta)
 				.with_c_Delta(cUpperDelta)
@@ -90,7 +90,7 @@ class SingleValueProductArgumentTest extends TestGroupSetup {
 				.with_s_tilde(sTilde)
 				.build();
 
-		SingleValueProductArgument singleValueProdArgument3 = new SingleValueProductArgument.Builder()
+		final SingleValueProductArgument singleValueProdArgument3 = new SingleValueProductArgument.Builder()
 				.with_c_d(gqGroupGenerator.otherElement(cd))
 				.with_c_delta(cLowerDelta)
 				.with_c_Delta(cUpperDelta)

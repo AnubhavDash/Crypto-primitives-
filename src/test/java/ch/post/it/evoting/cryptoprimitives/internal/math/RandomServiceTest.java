@@ -28,7 +28,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -49,10 +48,6 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 
 class RandomServiceTest {
 
-	// RFC 4648 Table 1, Table 3 and Table 5.
-	private static final Pattern base64Alphabet = Pattern.compile("^[A-Za-z0-9+/=]+$");
-	private static final Pattern base32Alphabet = Pattern.compile("^[A-Z2-7=]+$");
-	private static final Pattern base16Alphabet = Pattern.compile("^[A-F0-9=]+$");
 	private final SecureRandom secureRandom = new SecureRandom();
 	private final RandomService randomService = new RandomService();
 
@@ -83,7 +78,7 @@ class RandomServiceTest {
 		for (int i = 0; i < 3; i++) {
 			randomBytesList.add(randomService.randomBytes(ByteArrays.byteLength(upperBound)));
 		}
-		try (MockedConstruction<SecureRandom> mockedSecureRandom = Mockito.mockConstruction(SecureRandom.class,
+		try (final MockedConstruction<SecureRandom> mockedSecureRandom = Mockito.mockConstruction(SecureRandom.class,
 				this.prepareSecureRandom(randomBytesList))) {
 			final SecureRandom secureRandom1 = new SecureRandom();
 			final RandomService randomService1 = new RandomService(secureRandom1);
@@ -105,7 +100,7 @@ class RandomServiceTest {
 		for (int i = 0; i < 3; i++) {
 			randomBytesList.add(randomService.randomBytes(ByteArrays.byteLength(upperBound)));
 		}
-		try (MockedConstruction<SecureRandom> mockedSecureRandom = Mockito.mockConstruction(SecureRandom.class,
+		try (final MockedConstruction<SecureRandom> mockedSecureRandom = Mockito.mockConstruction(SecureRandom.class,
 				this.prepareSecureRandom(randomBytesList))) {
 			final SecureRandom secureRandom1 = new SecureRandom();
 			final RandomService randomService1 = new RandomService(secureRandom1);
@@ -124,19 +119,19 @@ class RandomServiceTest {
 		checkArgument(randomBytesList.size() >= 3);
 		return (SecureRandom mockSecureRandom, MockedConstruction.Context context) ->
 				doAnswer(invocation -> {
-					byte[] byteArray = invocation.getArgument(0, byte[].class);
+					final byte[] byteArray = invocation.getArgument(0, byte[].class);
 					System.arraycopy(randomBytesList.get(0), 0, byteArray, 0, byteArray.length);
 					return null;
 				}).doAnswer(invocation -> {
-					byte[] byteArray = invocation.getArgument(0, byte[].class);
+					final byte[] byteArray = invocation.getArgument(0, byte[].class);
 					System.arraycopy(randomBytesList.get(1), 0, byteArray, 0, byteArray.length);
 					return null;
 				}).doAnswer(invocation -> {
-					byte[] byteArray = invocation.getArgument(0, byte[].class);
+					final byte[] byteArray = invocation.getArgument(0, byte[].class);
 					System.arraycopy(randomBytesList.get(2), 0, byteArray, 0, byteArray.length);
 					return null;
 				}).doAnswer(invocation -> {
-					byte[] byteArray = invocation.getArgument(0, byte[].class);
+					final byte[] byteArray = invocation.getArgument(0, byte[].class);
 					System.arraycopy(randomBytesList.get(0), 1, byteArray, 1, byteArray.length - 1);
 					return null;
 				}).when(mockSecureRandom).nextBytes(Mockito.any());
@@ -201,8 +196,8 @@ class RandomServiceTest {
 
 	@RepeatedTest(10)
 	void genUniqueDecimalStringsReturnsStringsOfCorrectSize() {
-		final int desiredCodesLength = secureRandom.nextInt(10) + 1;
-		final int numberOfCodes = secureRandom.nextInt(10) + 1;
+		final int desiredCodesLength = randomService.genRandomInteger(10) + 1;
+		final int numberOfCodes = randomService.genRandomInteger(10) + 1;
 		final List<String> uniqueStrings = assertDoesNotThrow(() -> randomService.genUniqueDecimalStrings(desiredCodesLength, numberOfCodes));
 		final boolean allHaveCorrectSize = uniqueStrings.stream().map(String::length).allMatch(codeSize -> codeSize == desiredCodesLength);
 		assertTrue(allHaveCorrectSize);
@@ -210,15 +205,15 @@ class RandomServiceTest {
 
 	@RepeatedTest(10)
 	void genUniqueDecimalStringsReturnsDesiredNumberOfStrings() {
-		final int desiredCodesLength = secureRandom.nextInt(10) + 1;
-		final int numberOfCodes = secureRandom.nextInt(10) + 1;
+		final int desiredCodesLength = randomService.genRandomInteger(10) + 1;
+		final int numberOfCodes = randomService.genRandomInteger(10) + 1;
 		final List<String> uniqueStrings = assertDoesNotThrow(() -> randomService.genUniqueDecimalStrings(desiredCodesLength, numberOfCodes));
 		assertEquals(numberOfCodes, uniqueStrings.size());
 	}
 
 	@RepeatedTest(10)
 	void genUniqueDecimalStringsGeneratesUniqueStrings() {
-		final int desiredCodesLength = secureRandom.nextInt(10) + 1;
+		final int desiredCodesLength = randomService.genRandomInteger(10) + 1;
 		final List<String> uniqueStrings = assertDoesNotThrow(() -> randomService.genUniqueDecimalStrings(desiredCodesLength, 3));
 		final String s1 = uniqueStrings.get(0);
 		final String s2 = uniqueStrings.get(1);
@@ -231,7 +226,7 @@ class RandomServiceTest {
 
 	@RepeatedTest(10)
 	void genUniqueDecimalStringsWithTooManyCodesThrows() {
-		final int desiredCodesLength = secureRandom.nextInt(9) + 1;
+		final int desiredCodesLength = randomService.genRandomInteger(9) + 1;
 		final int tooBigNumberOfUniqueCodes = (int) Math.pow(10, desiredCodesLength) + 1;
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 				() -> randomService.genUniqueDecimalStrings(desiredCodesLength, tooBigNumberOfUniqueCodes));
@@ -265,7 +260,7 @@ class RandomServiceTest {
 		@DisplayName("valid input behaves as expected")
 		void happyPath() {
 
-			int length = secureRandom.nextInt(1, 10000);
+			final int length = secureRandom.nextInt(1, 10000);
 
 			final String S_prime = assertDoesNotThrow(() -> randomService.genRandomString(length, alphabet));
 

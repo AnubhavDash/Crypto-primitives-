@@ -26,29 +26,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.mixnet.SingleValueProductWitness;
+import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
-import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator;
 
 @DisplayName("Instantiating a SingleValueProductWitness should...")
-class SingleValueProductWitnessTest {
+class SingleValueProductWitnessTest extends TestGroupSetup {
 
-	private static final RandomService randomService = new RandomService();
 	private static final int NUM_ELEMENTS = 5;
 
-	private ZqGroup zqGroup;
 	private GroupVector<ZqElement, ZqGroup> elements;
 	private ZqElement randomness;
 
 	@BeforeEach
 	void setup() {
-		zqGroup = GroupTestData.getZqGroup();
-		final ZqGroupGenerator zqGroupGenerator = new ZqGroupGenerator(zqGroup);
-
 		elements = zqGroupGenerator.genRandomZqElementVector(NUM_ELEMENTS);
 		randomness = ZqElement.create(randomService.genRandomInteger(zqGroup.getQ()), zqGroup);
 	}

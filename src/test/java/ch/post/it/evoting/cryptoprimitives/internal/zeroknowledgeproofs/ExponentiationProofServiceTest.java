@@ -45,7 +45,7 @@ import org.mockito.MockedStatic;
 
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
@@ -62,13 +62,11 @@ import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.ZeroKnowledgeProo
 class ExponentiationProofServiceTest extends TestGroupSetup {
 
 	private static final int MAX_NUMBER_EXPONENTIATIONS = 10;
-	private static RandomService randomService;
 	private static HashService hashService;
 	private static ZeroKnowledgeProof proofService;
 
 	@BeforeAll
 	static void setupAll() {
-		randomService = new RandomService();
 		hashService = TestHashService.create(gqGroup.getQ());
 		proofService = new ZeroKnowledgeProofService(randomService, hashService);
 	}
@@ -96,7 +94,6 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		private final GqElement gNine = GqElementFactory.fromValue(BigInteger.valueOf(9), gqGroup);
 		private final GroupVector<GqElement, GqGroup> exponentiations = GroupVector.of(gNine, gFive);
 		private final ZqGroup zqGroup = new ZqGroup(q);
-		private final ZqElement zOne = ZqElement.create(BigInteger.ONE, zqGroup);
 		private final ZqElement zTwo = ZqElement.create(BigInteger.TWO, zqGroup);
 		// Output:
 		// e = 2
@@ -108,8 +105,8 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		private final List<String> auxiliaryInformation = Arrays.asList("specific", "test", "values");
 		private final List<BigInteger> randomValues = Collections.singletonList(BigInteger.TWO);
 
-		private RandomService getSpecificRandomService() {
-			return new RandomService() {
+		private TestRandomService getSpecificRandomService() {
+			return new TestRandomService() {
 				final Iterator<BigInteger> values = randomValues.iterator();
 
 				@Override
@@ -120,7 +117,7 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		}
 
 		private ExponentiationProofService createExponentiationProofService() {
-			final RandomService randomService = getSpecificRandomService();
+			final TestRandomService randomService = getSpecificRandomService();
 			final HashService hashService = TestHashService.create(q);
 			return new ExponentiationProofService(randomService, hashService);
 		}
@@ -137,7 +134,7 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 
 		@BeforeEach
 		void setup() {
-			final int n = secureRandom.nextInt(10) + 1;
+			final int n = randomService.genRandomInteger(10) + 1;
 			preimage = zqGroupGenerator.genRandomZqElementMember();
 			bases = gqGroupGenerator.genRandomGqElementVector(n);
 		}
@@ -195,7 +192,7 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 
 		@BeforeEach
 		void setup() {
-			n = secureRandom.nextInt(MAX_NUMBER_EXPONENTIATIONS) + 1;
+			n = randomService.genRandomInteger(MAX_NUMBER_EXPONENTIATIONS) + 1;
 			bases = gqGroupGenerator.genRandomGqElementVector(n);
 			exponent = zqGroupGenerator.genRandomZqElementMember();
 			exponentiations = ExponentiationProofService.computePhiExponentiation(exponent, bases);
@@ -292,7 +289,7 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 
 		@BeforeEach
 		void setup() {
-			n = secureRandom.nextInt(MAX_NUMBER_EXPONENTIATIONS) + 1;
+			n = randomService.genRandomInteger(MAX_NUMBER_EXPONENTIATIONS) + 1;
 			bases = gqGroupGenerator.genRandomGqElementVector(n);
 			exponentiations = gqGroupGenerator.genRandomGqElementVector(n);
 			final ZqElement e = zqGroupGenerator.genRandomZqElementMember();

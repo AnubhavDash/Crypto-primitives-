@@ -34,7 +34,6 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,10 +59,10 @@ import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
-import ch.post.it.evoting.cryptoprimitives.math.Base32Alphabet;
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
+import ch.post.it.evoting.cryptoprimitives.math.Base32Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
@@ -75,11 +74,10 @@ class HashServiceTest {
 
 	private static final short TEST_INPUT_LENGTH = 5;
 
-	private static SecureRandom secureRandom;
 	private static HashService hashService;
 	private static MessageDigest messageDigest;
 	private static int hashLength;
-	private static RandomService randomService;
+	private static TestRandomService randomService;
 
 	@BeforeAll
 	static void setup() throws NoSuchAlgorithmException, NoSuchProviderException {
@@ -87,8 +85,7 @@ class HashServiceTest {
 		messageDigest = MessageDigest.getInstance("SHA3-256", BouncyCastleProvider.PROVIDER_NAME);
 		hashLength = 32;
 		hashService = HashService.getInstance();
-		secureRandom = new SecureRandom();
-		randomService = new RandomService();
+		randomService = new TestRandomService();
 	}
 
 	static Stream<Arguments> jsonFileRecursiveHashArgumentProvider() {
@@ -153,8 +150,7 @@ class HashServiceTest {
 
 	@Test
 	void testRecursiveHashOfByteArrayReturnsHashOfByteArray() {
-		final byte[] bytes = new byte[TEST_INPUT_LENGTH];
-		secureRandom.nextBytes(bytes);
+		final byte[] bytes = randomService.randomBytes(TEST_INPUT_LENGTH);
 		final byte[] recursiveHash = hashService.recursiveHash(HashableByteArray.from(bytes));
 		final byte[] regularHash = messageDigest.digest(concat(new byte[] { 0x00 }, bytes));
 		assertArrayEquals(regularHash, recursiveHash);
@@ -170,7 +166,7 @@ class HashServiceTest {
 
 	@Test
 	void testRecursiveHashOfBigIntegerValue10ReturnsSameHashOfInteger10() {
-		final BigInteger bigInteger = new BigInteger(3072, secureRandom);
+		final BigInteger bigInteger = randomService.genRandomIntegerOfLength(3072);
 		final byte[] recursiveHash = hashService.recursiveHash(HashableBigInteger.from(bigInteger));
 		final byte[] regularHash = messageDigest.digest(concat(new byte[] { 0x01 }, integerToByteArray(bigInteger)));
 		assertArrayEquals(regularHash, recursiveHash);
@@ -203,10 +199,8 @@ class HashServiceTest {
 
 	@Test
 	void testRecursiveHashOfTwoByteArraysReturnsHashOfConcatenatedIndividualHashes() {
-		final byte[] bytes1 = new byte[TEST_INPUT_LENGTH];
-		final byte[] bytes2 = new byte[TEST_INPUT_LENGTH];
-		secureRandom.nextBytes(bytes1);
-		secureRandom.nextBytes(bytes2);
+		final byte[] bytes1 = randomService.randomBytes(TEST_INPUT_LENGTH);
+		final byte[] bytes2 = randomService.randomBytes(TEST_INPUT_LENGTH);
 		final HashableByteArray hashableBytes1 = HashableByteArray.from(bytes1);
 		final HashableByteArray hashableBytes2 = HashableByteArray.from(bytes2);
 
@@ -225,12 +219,9 @@ class HashServiceTest {
 
 	@Test
 	void testRecursiveHashOfAByteArrayAndAListOfTwoByteArraysReturnsExpectedHash() {
-		final byte[] bytes1 = new byte[TEST_INPUT_LENGTH];
-		final byte[] bytes2 = new byte[TEST_INPUT_LENGTH];
-		final byte[] bytes3 = new byte[TEST_INPUT_LENGTH];
-		secureRandom.nextBytes(bytes1);
-		secureRandom.nextBytes(bytes2);
-		secureRandom.nextBytes(bytes3);
+		final byte[] bytes1 = randomService.randomBytes(TEST_INPUT_LENGTH);
+		final byte[] bytes2 = randomService.randomBytes(TEST_INPUT_LENGTH);
+		final byte[] bytes3 = randomService.randomBytes(TEST_INPUT_LENGTH);
 		final HashableByteArray hashableBytes1 = HashableByteArray.from(bytes1);
 		final HashableByteArray hashableBytes2 = HashableByteArray.from(bytes2);
 		final HashableByteArray hashableBytes3 = HashableByteArray.from(bytes3);
@@ -305,9 +296,8 @@ class HashServiceTest {
 	}
 
 	private HashableByteArray genRandomHashableByteArray() {
-		final int size = secureRandom.nextInt(500);
-		final byte[] bytes = new byte[size];
-		secureRandom.nextBytes(bytes);
+		final int size = randomService.genRandomInteger(500);
+		final byte[] bytes = randomService.randomBytes(size);
 		return HashableByteArray.from(bytes);
 	}
 
@@ -316,14 +306,13 @@ class HashServiceTest {
 	}
 
 	private HashableBigInteger genRandomHashableBigInteger() {
-		return HashableBigInteger.from(new BigInteger(50, secureRandom));
+		return HashableBigInteger.from(randomService.genRandomIntegerOfLength(50));
 	}
 
 	@RepeatedTest(10)
 	void testThatTwoInputsThatAreIdenticalWhenConcatenatedButDifferentWhenSplitDoNotCollide() {
-		final int size = secureRandom.nextInt(50) + 2;
-		final byte[] concatenated = new byte[size];
-		secureRandom.nextBytes(concatenated);
+		final int size = randomService.genRandomInteger(50) + 2;
+		final byte[] concatenated = randomService.randomBytes(size);
 
 		final Split first = split(concatenated);
 		Split second;
@@ -338,7 +327,7 @@ class HashServiceTest {
 	}
 
 	private Split split(final byte[] input) {
-		final int split = secureRandom.nextInt(input.length);
+		final int split = randomService.genRandomInteger(input.length);
 		final byte[] first = new byte[split];
 		final byte[] second = new byte[input.length - split];
 		System.arraycopy(input, 0, first, 0, split);
@@ -460,13 +449,9 @@ class HashServiceTest {
 	 */
 	@RepeatedTest(100)
 	void testAssumptionOnUnderlyingDigest() {
-		final byte[] a = new byte[secureRandom.nextInt(20) + 10];
-		final byte[] b = new byte[secureRandom.nextInt(20) + 10];
-		final byte[] c = new byte[secureRandom.nextInt(20) + 10];
-
-		secureRandom.nextBytes(a);
-		secureRandom.nextBytes(b);
-		secureRandom.nextBytes(c);
+		final byte[] a = randomService.randomBytes(randomService.genRandomInteger(20) + 10);
+		final byte[] b = randomService.randomBytes(randomService.genRandomInteger(20) + 10);
+		final byte[] c = randomService.randomBytes(randomService.genRandomInteger(20) + 10);
 
 		messageDigest.reset();
 		messageDigest.update(a);

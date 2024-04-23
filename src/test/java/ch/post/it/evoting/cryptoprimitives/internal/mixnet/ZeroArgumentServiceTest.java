@@ -27,7 +27,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +47,6 @@ import org.mockito.Mockito;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupMatrix;
@@ -77,16 +75,13 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 	private static final BigInteger SIX = BigInteger.valueOf(6);
 	private static final BigInteger SEVEN = BigInteger.valueOf(7);
 	private static final BigInteger EIGHT = BigInteger.valueOf(8);
-	private static final BigInteger NINE = BigInteger.valueOf(9);
 	private static final BigInteger TEN = BigInteger.TEN;
 	private static final BigInteger ELEVEN = BigInteger.valueOf(11);
 	private static final int KEY_ELEMENTS_NUMBER = 10;
-	private static final SecureRandom secureRandom = new SecureRandom();
 
 	private static ZeroArgumentService zeroArgumentService;
 	private static CommitmentKey commitmentKey;
 	private static ElGamalMultiRecipientPublicKey publicKey;
-	private static RandomService randomService;
 	private static HashService hashService;
 
 	@BeforeAll
@@ -98,7 +93,6 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 		publicKey = elGamalGenerator.genRandomPublicKey(KEY_ELEMENTS_NUMBER);
 
 		// Init services.
-		randomService = new RandomService();
 		hashService = TestHashService.create(gqGroup.getQ());
 
 		zeroArgumentService = new ZeroArgumentService(publicKey, commitmentKey, randomService, hashService);
@@ -153,8 +147,8 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 
 		@BeforeEach
 		void setUp() {
-			n = secureRandom.nextInt(RANDOM_UPPER_BOUND) + 1;
-			m = secureRandom.nextInt(RANDOM_UPPER_BOUND) + 1;
+			n = randomService.genRandomInteger(RANDOM_UPPER_BOUND) + 1;
+			m = randomService.genRandomInteger(RANDOM_UPPER_BOUND) + 1;
 			firstMatrix = zqGroupGenerator.genRandomZqElementMatrix(n, m + 1);
 			secondMatrix = zqGroupGenerator.genRandomZqElementMatrix(n, m + 1);
 			y = ZqElement.create(randomService.genRandomInteger(zqGroup.getQ()), zqGroup);
@@ -257,7 +251,7 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 
 		@BeforeEach
 		void setUp() {
-			n = secureRandom.nextInt(RANDOM_UPPER_BOUND) + 1;
+			n = randomService.genRandomInteger(RANDOM_UPPER_BOUND) + 1;
 			firstVector = zqGroupGenerator.genRandomZqElementVector(n);
 			secondVector = zqGroupGenerator.genRandomZqElementVector(n);
 			y = ZqElement.create(randomService.genRandomInteger(zqGroup.getQ()), zqGroup);

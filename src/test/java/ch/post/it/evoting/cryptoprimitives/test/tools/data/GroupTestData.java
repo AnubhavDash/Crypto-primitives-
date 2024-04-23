@@ -18,10 +18,10 @@ package ch.post.it.evoting.cryptoprimitives.test.tools.data;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.Generators;
@@ -31,8 +31,8 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.generator.Generators;
  */
 public class GroupTestData {
 
-	private static final SecureRandom random = new SecureRandom();
 	private static final List<GqGroup> smallTestGroups;
+	private static final TestRandomService randomService = new TestRandomService();
 
 	static {
 		// More groups can be added to this class as needed.
@@ -114,7 +114,7 @@ public class GroupTestData {
 	}
 
 	private static GqGroup getRandomGqGroupFrom(final List<GqGroup> groups) {
-		return groups.get(random.nextInt(groups.size()));
+		return groups.get(randomService.genRandomInteger(groups.size()));
 	}
 
 	public static GqGroup getGroupP59() {

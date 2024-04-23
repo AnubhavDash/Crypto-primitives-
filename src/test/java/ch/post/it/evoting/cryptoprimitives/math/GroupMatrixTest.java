@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,6 +35,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupElement;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestSizedElement;
 import ch.post.it.evoting.cryptoprimitives.test.tools.math.TestGroup;
@@ -43,9 +43,9 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.math.TestGroup;
 class GroupMatrixTest {
 
 	private static final int BOUND_MATRIX_SIZE = 10;
-	private static TestGroup group = new TestGroup();
+	private static final TestRandomService randomService = new TestRandomService();
 
-	private final SecureRandom secureRandom = new SecureRandom();
+	private static TestGroup group = new TestGroup();
 
 	private int numRows;
 	private int numColumns;
@@ -58,8 +58,8 @@ class GroupMatrixTest {
 
 	@BeforeEach
 	void setUp() {
-		numRows = secureRandom.nextInt(10) + 1;
-		numColumns = secureRandom.nextInt(10) + 1;
+		numRows = randomService.genRandomInteger(10) + 1;
+		numColumns = randomService.genRandomInteger(10) + 1;
 		matrixElements = generateElementMatrix(numRows + 1, numColumns, () -> new TestGroupElement(group));
 	}
 
@@ -71,7 +71,7 @@ class GroupMatrixTest {
 	@Test
 	void createGroupMatrixWithNullRows() {
 		final List<List<TestGroupElement>> nullRowMatrix = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
-		int nullIndex = secureRandom.nextInt(numRows);
+		final int nullIndex = randomService.genRandomInteger(numRows);
 		nullRowMatrix.set(nullIndex, null);
 
 		assertThrows(NullPointerException.class, () -> GroupMatrix.fromRows(nullRowMatrix));
@@ -80,8 +80,8 @@ class GroupMatrixTest {
 	@Test
 	void createGroupMatrixWithNullElement() {
 		final List<List<TestGroupElement>> nullElemMatrix = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
-		int nullRowIndex = secureRandom.nextInt(numRows);
-		int nullColumnIndex = secureRandom.nextInt(numColumns);
+		final int nullRowIndex = randomService.genRandomInteger(numRows);
+		final int nullColumnIndex = randomService.genRandomInteger(numColumns);
 		nullElemMatrix.get(nullRowIndex).set(nullColumnIndex, null);
 
 		assertThrows(NullPointerException.class, () -> GroupMatrix.fromRows(nullElemMatrix));
@@ -104,7 +104,7 @@ class GroupMatrixTest {
 	@Test
 	void createGroupMatrixWithDifferentColumnSize() {
 		// Add an additional line to the matrix with less elements in the column.
-		int numColumns = secureRandom.nextInt(this.numColumns);
+		final int numColumns = randomService.genRandomInteger(this.numColumns);
 		final List<TestGroupElement> lineWithSmallerColumn = generateElementList(numColumns, () -> new TestGroupElement(group));
 		matrixElements.add(lineWithSmallerColumn);
 
@@ -126,31 +126,31 @@ class GroupMatrixTest {
 
 	@Test
 	void createGroupMatrixWithDifferentSizes() {
-		TestGroup group = new TestGroup();
-		TestSizedElement first = new TestSizedElement(group, 1);
-		TestSizedElement second = new TestSizedElement(group, 2);
-		List<List<TestSizedElement>> elements = Collections.singletonList(Arrays.asList(first, second));
+		final TestGroup group = new TestGroup();
+		final TestSizedElement first = new TestSizedElement(group, 1);
+		final TestSizedElement second = new TestSizedElement(group, 2);
+		final List<List<TestSizedElement>> elements = Collections.singletonList(Arrays.asList(first, second));
 		assertThrows(IllegalArgumentException.class, () -> GroupMatrix.fromRows(elements));
 	}
 
 	@RepeatedTest(10)
 	void sizesAreCorrectForRandomMatrix() {
-		int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		TestGroup group = new TestGroup();
-		List<List<TestGroupElement>> matrixElements = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
-		GroupMatrix<TestGroupElement, TestGroup> matrix = GroupMatrix.fromRows(matrixElements);
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final TestGroup group = new TestGroup();
+		final List<List<TestGroupElement>> matrixElements = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
+		final GroupMatrix<TestGroupElement, TestGroup> matrix = GroupMatrix.fromRows(matrixElements);
 		assertEquals(numRows, matrix.numRows());
 		assertEquals(numColumns, matrix.numColumns());
 	}
 
 	@Test
 	void getThrowsForIndexOutOfBounds() {
-		int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		TestGroup group = new TestGroup();
-		List<List<TestGroupElement>> matrixElements = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
-		GroupMatrix<TestGroupElement, TestGroup> matrix = GroupMatrix.fromRows(matrixElements);
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final TestGroup group = new TestGroup();
+		final List<List<TestGroupElement>> matrixElements = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
+		final GroupMatrix<TestGroupElement, TestGroup> matrix = GroupMatrix.fromRows(matrixElements);
 		assertThrows(IllegalArgumentException.class, () -> matrix.get(-1, 0));
 		assertThrows(IllegalArgumentException.class, () -> matrix.get(numRows, 0));
 		assertThrows(IllegalArgumentException.class, () -> matrix.get(0, -1));
@@ -159,34 +159,34 @@ class GroupMatrixTest {
 
 	@RepeatedTest(10)
 	void getReturnsExpectedElement() {
-		int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		TestGroup group = new TestGroup();
-		GroupMatrix<TestValuedElement, TestGroup> matrix = generateIncrementingMatrix(numRows, numColumns, group);
-		int row = secureRandom.nextInt(numRows);
-		int column = secureRandom.nextInt(numColumns);
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final TestGroup group = new TestGroup();
+		final GroupMatrix<TestValuedElement, TestGroup> matrix = generateIncrementingMatrix(numRows, numColumns, group);
+		final int row = randomService.genRandomInteger(numRows);
+		final int column = randomService.genRandomInteger(numColumns);
 		assertEquals(numColumns * row + column, matrix.get(row, column).getValue().intValueExact());
 	}
 
 	@RepeatedTest(10)
 	void getRowReturnsExpectedRow() {
-		int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		TestGroup group = new TestGroup();
-		GroupMatrix<TestValuedElement, TestGroup> matrix = generateIncrementingMatrix(numRows, numColumns, group);
-		int row = secureRandom.nextInt(numRows);
-		List<TestValuedElement> expected = generateIncrementingRow(row * numColumns, numColumns, group);
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final TestGroup group = new TestGroup();
+		final GroupMatrix<TestValuedElement, TestGroup> matrix = generateIncrementingMatrix(numRows, numColumns, group);
+		final int row = randomService.genRandomInteger(numRows);
+		final List<TestValuedElement> expected = generateIncrementingRow(row * numColumns, numColumns, group);
 		assertEquals(GroupVector.from(expected), matrix.getRow(row));
 	}
 
 	@RepeatedTest(10)
 	void getColumnReturnsExpectedColumn() {
-		int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		TestGroup group = new TestGroup();
-		GroupMatrix<TestValuedElement, TestGroup> matrix = generateIncrementingMatrix(numRows, numColumns, group);
-		int column = secureRandom.nextInt(numColumns);
-		GroupVector<TestValuedElement, TestGroup> expected = IntStream.range(0, numRows)
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final TestGroup group = new TestGroup();
+		final GroupMatrix<TestValuedElement, TestGroup> matrix = generateIncrementingMatrix(numRows, numColumns, group);
+		final int column = randomService.genRandomInteger(numColumns);
+		final GroupVector<TestValuedElement, TestGroup> expected = IntStream.range(0, numRows)
 				.map(row -> row * numColumns + column)
 				.mapToObj(value -> new TestValuedElement(BigInteger.valueOf(value), group))
 				.collect(toGroupVector());
@@ -195,19 +195,19 @@ class GroupMatrixTest {
 
 	@RepeatedTest(10)
 	void matrixFromColumnsIsMatrixFromRowsTransposed() {
-		int n = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		int m = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		List<List<TestGroupElement>> rows = generateElementMatrix(n, m, () -> new TestGroupElement(group));
-		GroupMatrix<TestGroupElement, TestGroup> expected = GroupMatrix.fromRows(rows);
+		final int n = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int m = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final List<List<TestGroupElement>> rows = generateElementMatrix(n, m, () -> new TestGroupElement(group));
+		final GroupMatrix<TestGroupElement, TestGroup> expected = GroupMatrix.fromRows(rows);
 
-		List<List<TestGroupElement>> columns =
+		final List<List<TestGroupElement>> columns =
 				IntStream.range(0, m)
 						.mapToObj(column ->
 								rows.stream()
 										.map(row -> row.get(column))
 										.toList()
 						).toList();
-		GroupMatrix<TestGroupElement, TestGroup> actual = GroupMatrix.fromColumns(columns);
+		final GroupMatrix<TestGroupElement, TestGroup> actual = GroupMatrix.fromColumns(columns);
 
 		assertEquals(expected, actual);
 	}
@@ -234,10 +234,10 @@ class GroupMatrixTest {
 
 	@Test
 	void transposedMatrixContainsExpectedValues() {
-		List<List<TestValuedElement>> matrixElements = new ArrayList<>();
-		TestValuedElement zero = new TestValuedElement(BigInteger.ZERO, group);
-		TestValuedElement one = new TestValuedElement(BigInteger.ONE, group);
-		TestValuedElement ten = new TestValuedElement(BigInteger.TEN, group);
+		final List<List<TestValuedElement>> matrixElements = new ArrayList<>();
+		final TestValuedElement zero = new TestValuedElement(BigInteger.ZERO, group);
+		final TestValuedElement one = new TestValuedElement(BigInteger.ONE, group);
+		final TestValuedElement ten = new TestValuedElement(BigInteger.TEN, group);
 		matrixElements.add(Arrays.asList(zero, one, ten));
 		matrixElements.add(Arrays.asList(one, ten, zero));
 
@@ -256,8 +256,8 @@ class GroupMatrixTest {
 
 	@RepeatedTest(10)
 	void streamGivesElementsInCorrectOrder() {
-		final int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		final int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
 		final TestGroup group = new TestGroup();
 		final List<List<TestGroupElement>> matrixElements = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
 		final GroupMatrix<TestGroupElement, TestGroup> matrix = GroupMatrix.fromRows(matrixElements);
@@ -277,8 +277,8 @@ class GroupMatrixTest {
 
 	@RepeatedTest(10)
 	void rowStreamGivesRows() {
-		final int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		final int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
 		final TestGroup group = new TestGroup();
 		final List<List<TestGroupElement>> matrixElements = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
 		final GroupMatrix<TestGroupElement, TestGroup> matrix = GroupMatrix.fromRows(matrixElements);
@@ -289,8 +289,8 @@ class GroupMatrixTest {
 
 	@RepeatedTest(10)
 	void columnStreamGivesColumns() {
-		final int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		final int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
 		final TestGroup group = new TestGroup();
 		final List<List<TestGroupElement>> matrixElements = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
 		final GroupMatrix<TestGroupElement, TestGroup> matrix = GroupMatrix.fromRows(matrixElements);
@@ -305,8 +305,8 @@ class GroupMatrixTest {
 
 	@Test
 	void appendColumnWithInvalidParamsThrows() {
-		final int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		final int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
 		final TestGroup group = new TestGroup();
 		final List<List<TestGroupElement>> matrixElements = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
 		final GroupMatrix<TestGroupElement, TestGroup> matrix = GroupMatrix.fromRows(matrixElements);
@@ -322,14 +322,14 @@ class GroupMatrixTest {
 
 	@Test
 	void appendColumnWithDifferentElementSizeThrows() {
-		final int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		final int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
 		final TestGroup group = new TestGroup();
 		final List<List<TestSizedElement>> matrixElements =
 				generateElementMatrix(numRows, numColumns, () -> new TestSizedElement(group, 1));
 		final GroupMatrix<TestSizedElement, TestGroup> matrix = GroupMatrix.fromRows(matrixElements);
 
-		List<TestSizedElement> elements = generateElementList(numRows, () -> new TestSizedElement(group, 2));
+		final List<TestSizedElement> elements = generateElementList(numRows, () -> new TestSizedElement(group, 2));
 		final GroupVector<TestSizedElement, TestGroup> vector = GroupVector.from(elements);
 		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
 				() -> matrix.appendColumn(vector));
@@ -339,8 +339,8 @@ class GroupMatrixTest {
 
 	@Test
 	void appendColumnOfDifferentGroupThrows() {
-		final int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		final int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
 		final TestGroup group = new TestGroup();
 		final List<List<TestGroupElement>> matrixElements = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
 		final GroupMatrix<TestGroupElement, TestGroup> matrix = GroupMatrix.fromRows(matrixElements);
@@ -355,8 +355,8 @@ class GroupMatrixTest {
 
 	@RepeatedTest(10)
 	void appendColumnCorrectlyAppends() {
-		final int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		final int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
 		final TestGroup group = new TestGroup();
 		final List<List<TestGroupElement>> matrixElements = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
 		final GroupMatrix<TestGroupElement, TestGroup> matrix = GroupMatrix.fromRows(matrixElements);
@@ -371,8 +371,8 @@ class GroupMatrixTest {
 
 	@Test
 	void prependColumnWithInvalidParamsThrows() {
-		final int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		final int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
 		final TestGroup group = new TestGroup();
 		final List<List<TestGroupElement>> matrixElements = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
 		final GroupMatrix<TestGroupElement, TestGroup> matrix = GroupMatrix.fromRows(matrixElements);
@@ -388,14 +388,14 @@ class GroupMatrixTest {
 
 	@Test
 	void prependColumnWithDifferentElementSizeThrows() {
-		final int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		final int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
 		final TestGroup group = new TestGroup();
 		final List<List<TestSizedElement>> matrixElements =
 				generateElementMatrix(numRows, numColumns, () -> new TestSizedElement(group, 1));
 		final GroupMatrix<TestSizedElement, TestGroup> matrix = GroupMatrix.fromRows(matrixElements);
 
-		List<TestSizedElement> elements = generateElementList(numRows, () -> new TestSizedElement(group, 2));
+		final List<TestSizedElement> elements = generateElementList(numRows, () -> new TestSizedElement(group, 2));
 		final GroupVector<TestSizedElement, TestGroup> vector = GroupVector.from(elements);
 		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
 				() -> matrix.prependColumn(vector));
@@ -405,8 +405,8 @@ class GroupMatrixTest {
 
 	@Test
 	void prependColumnOfDifferentGroupThrows() {
-		final int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		final int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
 		final TestGroup group = new TestGroup();
 		final List<List<TestGroupElement>> matrixElements = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
 		final GroupMatrix<TestGroupElement, TestGroup> matrix = GroupMatrix.fromRows(matrixElements);
@@ -421,8 +421,8 @@ class GroupMatrixTest {
 
 	@RepeatedTest(10)
 	void prependColumnCorrectlyPrepends() {
-		final int numRows = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
-		final int numColumns = secureRandom.nextInt(BOUND_MATRIX_SIZE) + 1;
+		final int numRows = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
+		final int numColumns = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
 		final TestGroup group = new TestGroup();
 		final List<List<TestGroupElement>> matrixElements = generateElementMatrix(numRows, numColumns, () -> new TestGroupElement(group));
 		final GroupMatrix<TestGroupElement, TestGroup> matrix = GroupMatrix.fromRows(matrixElements);
@@ -440,8 +440,8 @@ class GroupMatrixTest {
 	//***************************//
 
 	//Generate a matrix with incrementing count.
-	private GroupMatrix<TestValuedElement, TestGroup> generateIncrementingMatrix(int numRows, int numColumns, TestGroup group) {
-		List<List<TestValuedElement>> matrixElements =
+	private GroupMatrix<TestValuedElement, TestGroup> generateIncrementingMatrix(final int numRows, final int numColumns, final TestGroup group) {
+		final List<List<TestValuedElement>> matrixElements =
 				IntStream.range(0, numRows)
 						.mapToObj(row -> generateIncrementingRow(numColumns * row, numColumns, group))
 						.collect(Collectors.toList());
@@ -449,7 +449,7 @@ class GroupMatrixTest {
 	}
 
 	//Generate a row with incrementing number starting at start.
-	private List<TestValuedElement> generateIncrementingRow(int start, int numColumns, TestGroup group) {
+	private List<TestValuedElement> generateIncrementingRow(final int start, final int numColumns, final TestGroup group) {
 		return IntStream.range(0, numColumns)
 				.map(column -> start + column)
 				.mapToObj(BigInteger::valueOf)
@@ -458,7 +458,7 @@ class GroupMatrixTest {
 	}
 
 	private static class TestValuedElement extends GroupElement<TestGroup> {
-		protected TestValuedElement(BigInteger value, TestGroup group) {
+		protected TestValuedElement(final BigInteger value, final TestGroup group) {
 			super(value, group);
 		}
 	}

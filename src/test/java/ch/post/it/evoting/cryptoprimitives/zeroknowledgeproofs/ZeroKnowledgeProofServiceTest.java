@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,7 +37,6 @@ import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKe
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.zeroknowledgeproofs.ZeroKnowledgeProofService;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -47,11 +45,8 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 
 	private static final ElGamal elGamal = new ElGamalService();
-	private static final SecureRandom random = new SecureRandom();
-	private static final RandomService randomService = new RandomService();
 
-	private ZeroKnowledgeProof zeroKnowledgeProofservice;
-
+	private ZeroKnowledgeProof zeroKnowledgeProofService;
 	private int numCiphertexts;
 	private int keyLength;
 	private int ciphertextLength;
@@ -61,13 +56,13 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 
 	@BeforeEach
 	void setup() {
-		HashService hashService = TestHashService.create(gqGroup.getQ());
-		zeroKnowledgeProofservice = new ZeroKnowledgeProofService(randomService, hashService);
+		final HashService hashService = TestHashService.create(gqGroup.getQ());
+		zeroKnowledgeProofService = new ZeroKnowledgeProofService(randomService, hashService);
 
 		final int maxLength = 10;
-		numCiphertexts = random.nextInt(maxLength) + 1;
-		keyLength = random.nextInt(maxLength) + 1;
-		ciphertextLength = random.nextInt(keyLength) + 1;
+		numCiphertexts = randomService.genRandomInteger(maxLength) + 1;
+		keyLength = randomService.genRandomInteger(maxLength) + 1;
+		ciphertextLength = randomService.genRandomInteger(keyLength) + 1;
 		ciphertexts = elGamalGenerator.genRandomCiphertextVector(numCiphertexts, ciphertextLength);
 		keyPair = elGamal.genKeyPair(gqGroup, keyLength, randomService);
 		auxiliaryInformation = Arrays.asList("a", "b");
@@ -78,25 +73,25 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("Generating verifiable decryptions with null arguments throws a NullPointerException")
 		void genVerifiableDecryptionsWithNullArguments() {
-			assertThrows(NullPointerException.class, () -> zeroKnowledgeProofservice.genVerifiableDecryptions(null, keyPair, auxiliaryInformation));
+			assertThrows(NullPointerException.class, () -> zeroKnowledgeProofService.genVerifiableDecryptions(null, keyPair, auxiliaryInformation));
 			assertThrows(NullPointerException.class,
-					() -> zeroKnowledgeProofservice.genVerifiableDecryptions(ciphertexts, null, auxiliaryInformation));
-			assertThrows(NullPointerException.class, () -> zeroKnowledgeProofservice.genVerifiableDecryptions(ciphertexts, keyPair, null));
+					() -> zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, null, auxiliaryInformation));
+			assertThrows(NullPointerException.class, () -> zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, keyPair, null));
 		}
 
 		@Test
 		@DisplayName("Generating verifiable decryptions with valid arguments does not throw")
 		void genVerifiableDecryptionsWithValidArguments() {
-			assertDoesNotThrow(() -> zeroKnowledgeProofservice.genVerifiableDecryptions(ciphertexts, keyPair, List.of()));
-			assertDoesNotThrow(() -> zeroKnowledgeProofservice.genVerifiableDecryptions(ciphertexts, keyPair, auxiliaryInformation));
+			assertDoesNotThrow(() -> zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, keyPair, List.of()));
+			assertDoesNotThrow(() -> zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, keyPair, auxiliaryInformation));
 		}
 
 		@Test
 		@DisplayName("Generating verifiable decryptions with an empty list ciphertexts throws an IllegalArgumentException")
 		void genVerifiableDecryptionsWithEmptyCiphertextList() {
 			ciphertexts = GroupVector.of();
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-					() -> zeroKnowledgeProofservice.genVerifiableDecryptions(ciphertexts, keyPair, auxiliaryInformation));
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+					() -> zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, keyPair, auxiliaryInformation));
 			assertEquals("There must be at least one ciphertext.", exception.getMessage());
 		}
 
@@ -104,8 +99,8 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 		@DisplayName("Generating verifiable decryptions with too long ciphertexts throws an IllegalArgumentException")
 		void genVerifiableDecryptionsWithTooLongCiphertexts() {
 			ciphertexts = elGamalGenerator.genRandomCiphertextVector(numCiphertexts, keyLength + 1);
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-					() -> zeroKnowledgeProofservice.genVerifiableDecryptions(ciphertexts, keyPair, auxiliaryInformation));
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+					() -> zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, keyPair, auxiliaryInformation));
 			assertEquals("The ciphertexts must be at most as long as the keys in the key pair.", exception.getMessage());
 		}
 
@@ -113,8 +108,8 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 		@DisplayName("Generating verifiable decryptions with ciphertexts and keys from different groups throws an IllegalArgumentException")
 		void genVerifiableDecryptionsWithIncompatibleGroups() {
 			ciphertexts = otherGroupElGamalGenerator.genRandomCiphertextVector(numCiphertexts, ciphertextLength);
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-					() -> zeroKnowledgeProofservice.genVerifiableDecryptions(ciphertexts, keyPair, auxiliaryInformation));
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+					() -> zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, keyPair, auxiliaryInformation));
 			assertEquals("The ciphertexts and the key pair must have the same group.", exception.getMessage());
 		}
 	}
@@ -129,33 +124,33 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 		@BeforeEach
 		void setup() {
 			publicKey = keyPair.getPublicKey();
-			verifiableDecryptions = zeroKnowledgeProofservice.genVerifiableDecryptions(ciphertexts, keyPair, auxiliaryInformation);
-			verifiableDecryptionsEmptyAux = zeroKnowledgeProofservice.genVerifiableDecryptions(ciphertexts, keyPair, List.of());
+			verifiableDecryptions = zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, keyPair, auxiliaryInformation);
+			verifiableDecryptionsEmptyAux = zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, keyPair, List.of());
 		}
 
 		@Test
 		@DisplayName("Verifying decryptions with null arguments throws a NullPointerException")
 		void verifyDecryptionsWithNullArguments() {
 			assertThrows(NullPointerException.class,
-					() -> zeroKnowledgeProofservice.verifyDecryptions(null, publicKey, verifiableDecryptions, auxiliaryInformation));
+					() -> zeroKnowledgeProofService.verifyDecryptions(null, publicKey, verifiableDecryptions, auxiliaryInformation));
 			assertThrows(NullPointerException.class,
-					() -> zeroKnowledgeProofservice.verifyDecryptions(ciphertexts, null, verifiableDecryptions, auxiliaryInformation));
+					() -> zeroKnowledgeProofService.verifyDecryptions(ciphertexts, null, verifiableDecryptions, auxiliaryInformation));
 			assertThrows(NullPointerException.class,
-					() -> zeroKnowledgeProofservice.verifyDecryptions(ciphertexts, publicKey, null, auxiliaryInformation));
+					() -> zeroKnowledgeProofService.verifyDecryptions(ciphertexts, publicKey, null, auxiliaryInformation));
 			assertThrows(NullPointerException.class,
-					() -> zeroKnowledgeProofservice.verifyDecryptions(ciphertexts, publicKey, verifiableDecryptions, null));
+					() -> zeroKnowledgeProofService.verifyDecryptions(ciphertexts, publicKey, verifiableDecryptions, null));
 		}
 
 		@Test
 		@DisplayName("Verifying decryptions with valid inputs does not throw")
 		void verifyDecryptionsWithValidInput() {
 			Boolean result = assertDoesNotThrow(
-					() -> zeroKnowledgeProofservice.verifyDecryptions(ciphertexts, publicKey, verifiableDecryptions, auxiliaryInformation)
+					() -> zeroKnowledgeProofService.verifyDecryptions(ciphertexts, publicKey, verifiableDecryptions, auxiliaryInformation)
 							.isVerified());
 			assertTrue(result);
 
 			result = assertDoesNotThrow(
-					() -> zeroKnowledgeProofservice.verifyDecryptions(ciphertexts, publicKey, verifiableDecryptionsEmptyAux, List.of())
+					() -> zeroKnowledgeProofService.verifyDecryptions(ciphertexts, publicKey, verifiableDecryptionsEmptyAux, List.of())
 							.isVerified());
 			assertTrue(result);
 		}
@@ -166,7 +161,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> otherCiphertexts = otherGroupElGamalGenerator
 					.genRandomCiphertextVector(numCiphertexts, ciphertextLength);
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-					() -> zeroKnowledgeProofservice.verifyDecryptions(otherCiphertexts, publicKey, verifiableDecryptions, auxiliaryInformation));
+					() -> zeroKnowledgeProofService.verifyDecryptions(otherCiphertexts, publicKey, verifiableDecryptions, auxiliaryInformation));
 			assertEquals("The verifiable decryptions must have the same group as the ciphertexts.", exception.getMessage());
 		}
 
@@ -176,7 +171,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 			final ElGamalMultiRecipientPublicKey otherPublicKey = otherGroupElGamalGenerator.genRandomPublicKey(keyLength);
 
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-					() -> zeroKnowledgeProofservice.verifyDecryptions(ciphertexts, otherPublicKey, verifiableDecryptions, auxiliaryInformation));
+					() -> zeroKnowledgeProofService.verifyDecryptions(ciphertexts, otherPublicKey, verifiableDecryptions, auxiliaryInformation));
 			assertEquals("The public key must have the same group as the ciphertexts.", exception.getMessage());
 		}
 
@@ -187,7 +182,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 					.genRandomCiphertextVector(numCiphertexts, ciphertextLength + 1);
 
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-					() -> zeroKnowledgeProofservice.verifyDecryptions(otherCiphertexts, publicKey, verifiableDecryptions, auxiliaryInformation));
+					() -> zeroKnowledgeProofService.verifyDecryptions(otherCiphertexts, publicKey, verifiableDecryptions, auxiliaryInformation));
 			assertEquals("The verifiable decryptions must have the same size l as the ciphertexts.", exception.getMessage());
 		}
 
@@ -197,11 +192,11 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> otherCiphertexts = elGamalGenerator
 					.genRandomCiphertextVector(numCiphertexts, keyLength + 1);
 			final ElGamalMultiRecipientKeyPair otherKeyPair = elGamal.genKeyPair(gqGroup, keyLength + 1, randomService);
-			final VerifiableDecryptions otherVerifiableDecryptions = zeroKnowledgeProofservice
+			final VerifiableDecryptions otherVerifiableDecryptions = zeroKnowledgeProofService
 					.genVerifiableDecryptions(otherCiphertexts, otherKeyPair, auxiliaryInformation);
 
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-					() -> zeroKnowledgeProofservice.verifyDecryptions(otherCiphertexts, publicKey, otherVerifiableDecryptions, auxiliaryInformation));
+					() -> zeroKnowledgeProofService.verifyDecryptions(otherCiphertexts, publicKey, otherVerifiableDecryptions, auxiliaryInformation));
 			assertEquals("The ciphertexts must have at most as many elements as the public key.", exception.getMessage());
 		}
 
@@ -212,7 +207,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 					.genRandomCiphertextVector(0, ciphertextLength);
 
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-					() -> zeroKnowledgeProofservice.verifyDecryptions(otherCiphertexts, publicKey, verifiableDecryptions, auxiliaryInformation));
+					() -> zeroKnowledgeProofService.verifyDecryptions(otherCiphertexts, publicKey, verifiableDecryptions, auxiliaryInformation));
 			assertEquals("There must be at least one ciphertext.", exception.getMessage());
 		}
 
@@ -223,7 +218,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 					.genRandomCiphertextVector(numCiphertexts + 1, ciphertextLength);
 
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-					() -> zeroKnowledgeProofservice.verifyDecryptions(otherCiphertexts, publicKey, verifiableDecryptions, auxiliaryInformation));
+					() -> zeroKnowledgeProofService.verifyDecryptions(otherCiphertexts, publicKey, verifiableDecryptions, auxiliaryInformation));
 			assertEquals("There must be as many verifiable decryptions as ciphertexts.", exception.getMessage());
 		}
 
@@ -241,7 +236,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 			final VerifiableDecryptions otherVerifiableDecryptions = new VerifiableDecryptions(GroupVector.of(noElementCiphertext),
 					GroupVector.of(otherDecryptionProof));
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-					() -> zeroKnowledgeProofservice.verifyDecryptions(otherCiphertexts, publicKey, otherVerifiableDecryptions, auxiliaryInformation));
+					() -> zeroKnowledgeProofService.verifyDecryptions(otherCiphertexts, publicKey, otherVerifiableDecryptions, auxiliaryInformation));
 			assertEquals("The ciphertexts must have at least 1 element.", exception.getMessage());
 		}
 	}

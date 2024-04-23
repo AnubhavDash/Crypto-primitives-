@@ -32,7 +32,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -77,8 +76,6 @@ import ch.post.it.evoting.cryptoprimitives.utils.VerificationResult;
 class ProductArgumentServiceTest extends TestGroupSetup {
 
 	private static final int BOUND_FOR_RANDOM_ELEMENTS = 10;
-	private static final RandomService randomService = new RandomService();
-	private static final SecureRandom secureRandom = new SecureRandom();
 
 	private static int k;
 	private static int nu;
@@ -88,8 +85,8 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 
 	@BeforeAll
 	static void setupAll() {
-		k = secureRandom.nextInt(BOUND_FOR_RANDOM_ELEMENTS - 1) + 1;
-		nu = secureRandom.nextInt(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2;
+		k = randomService.genRandomInteger(BOUND_FOR_RANDOM_ELEMENTS - 1) + 1;
+		nu = randomService.genRandomInteger(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2;
 
 		hashService = TestHashService.create(gqGroup.getQ());
 		publicKey = elGamalGenerator.genRandomPublicKey(k);
@@ -146,8 +143,8 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 
 		@BeforeEach
 		void setup() {
-			n = secureRandom.nextInt(nu - 1) + 2;
-			m = secureRandom.nextInt(BOUND_FOR_RANDOM_ELEMENTS) + 1;
+			n = randomService.genRandomInteger(nu - 1) + 2;
+			m = randomService.genRandomInteger(BOUND_FOR_RANDOM_ELEMENTS) + 1;
 
 			witness = genProductWitness(n, m, zqGroupGenerator);
 			exponentsR = witness.get_r();
@@ -387,14 +384,14 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 
 		@BeforeEach
 		void setup() {
-			n = secureRandom.nextInt(nu - 1) + 2;
+			n = randomService.genRandomInteger(nu - 1) + 2;
 		}
 
 		Stream<Arguments> statementArgumentProvider() {
-			final int n = secureRandom.nextInt(nu - 1) + 2;
+			final int n = randomService.genRandomInteger(nu - 1) + 2;
 
 			// Create ProductStatement and ProductArgument for testing with m > 1
-			final int m = secureRandom.nextInt(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2;
+			final int m = randomService.genRandomInteger(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2;
 			final ProductWitness longWitness = genProductWitness(n, m, zqGroupGenerator);
 			final ProductStatement longStatement = getProductStatement(longWitness, commitmentKey);
 			final ProductArgument longArgument = productArgumentService.getProductArgument(longStatement, longWitness);
@@ -421,7 +418,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with null cb when m > 1 throws a NullPointerException")
 		void verifyProductArgumentWithNullCb() {
-			final int m = secureRandom.nextInt(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2; // m > 1
+			final int m = randomService.genRandomInteger(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2; // m > 1
 			final ProductWitness longWitness = genProductWitness(n, m, zqGroupGenerator);
 			final ProductStatement longStatement = getProductStatement(longWitness, commitmentKey);
 			final ProductArgument longArgument = productArgumentService.getProductArgument(longStatement, longWitness);
@@ -436,7 +433,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with null HadamardArgument when m > 1 throws a NullPointerException")
 		void verifyProductArgumentWithNullHadamardArgument() {
-			final int m = secureRandom.nextInt(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2;
+			final int m = randomService.genRandomInteger(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2;
 			final ProductWitness longWitness = genProductWitness(n, m, zqGroupGenerator);
 			final ProductStatement longStatement = getProductStatement(longWitness, commitmentKey);
 			final ProductArgument longArgument = productArgumentService.getProductArgument(longStatement, longWitness);
@@ -486,7 +483,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with an incorrect c_b returns false")
 		void verifyProductArgumentWithBadCommitment() {
-			final int m = secureRandom.nextInt(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2;
+			final int m = randomService.genRandomInteger(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2;
 			final ProductWitness longWitness = genProductWitness(n, m, zqGroupGenerator);
 			final ProductStatement longStatement = getProductStatement(longWitness, commitmentKey);
 			final ProductArgument longArgument = productArgumentService.getProductArgument(longStatement, longWitness);
@@ -505,7 +502,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with an incorrect HadamardArgument returns false")
 		void verifyProductArgumentWithBadHadamardArgument() {
-			final int m = secureRandom.nextInt(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2; // m > 1
+			final int m = randomService.genRandomInteger(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2; // m > 1
 			final ProductWitness longWitness = genProductWitness(n, m, zqGroupGenerator);
 			final ProductStatement longStatement = getProductStatement(longWitness, commitmentKey);
 			final ProductArgument longArgument = productArgumentService.getProductArgument(longStatement, longWitness);

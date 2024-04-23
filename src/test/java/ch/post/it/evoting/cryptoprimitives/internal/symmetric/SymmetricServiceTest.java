@@ -63,13 +63,11 @@ class SymmetricServiceTest extends TestGroupSetup {
 	private static byte[] encryptionKey;
 	private static byte[] nonce;
 	private static String plainText;
-	private static RandomService randomService;
 	private static SymmetricService symmetricEncryptionService;
 	private static List<String> associatedData;
 
 	@BeforeAll
 	static void setUpAll() throws NoSuchAlgorithmException {
-		randomService = new RandomService();
 		symmetricEncryptionService = new SymmetricService(randomService);
 
 		final KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");

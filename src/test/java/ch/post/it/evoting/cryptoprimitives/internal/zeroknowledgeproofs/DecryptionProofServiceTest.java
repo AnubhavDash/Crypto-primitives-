@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mockStatic;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -51,7 +50,6 @@ import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKe
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
-import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
@@ -68,15 +66,13 @@ import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.DecryptionProof;
 class DecryptionProofServiceTest extends TestGroupSetup {
 
 	private static final ElGamal elGamal = new ElGamalService();
-	private static final SecureRandom random = new SecureRandom();
-	private static final RandomService randomService = new RandomService();
 	private static final List<String> auxiliaryInformation = Arrays.asList("aux", "1");
 
 	private static DecryptionProofService decryptionProofService;
 
 	@BeforeAll
 	static void setupAll() {
-		HashService hashService = TestHashService.create(gqGroup.getQ());
+		final HashService hashService = TestHashService.create(gqGroup.getQ());
 		decryptionProofService = new DecryptionProofService(randomService, hashService);
 	}
 
@@ -86,8 +82,8 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with null arguments throws a NullPointerException")
 		void notNullChecks() {
-			GroupVector<ZqElement, ZqGroup> preImage = GroupVector.of();
-			GqElement gamma = gqGroupGenerator.genMember();
+			final GroupVector<ZqElement, ZqGroup> preImage = GroupVector.of();
+			final GqElement gamma = gqGroupGenerator.genMember();
 
 			assertThrows(NullPointerException.class, () -> DecryptionProofService.computePhiDecryption(preImage, null));
 			assertThrows(NullPointerException.class, () -> DecryptionProofService.computePhiDecryption(null, gamma));
@@ -96,11 +92,11 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with the pre-image and base having different group orders throws an IllegalArgumentException")
 		void checkNotSameOrder() {
-			GqElement gamma = gqGroupGenerator.genMember();
-			int zqGroupVectorSize = 3;
-			GroupVector<ZqElement, ZqGroup> preImage = otherZqGroupGenerator.genRandomZqElementVector(zqGroupVectorSize);
+			final GqElement gamma = gqGroupGenerator.genMember();
+			final int zqGroupVectorSize = 3;
+			final GroupVector<ZqElement, ZqGroup> preImage = otherZqGroupGenerator.genRandomZqElementVector(zqGroupVectorSize);
 
-			IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
+			final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
 					() -> DecryptionProofService.computePhiDecryption(preImage, gamma));
 
 			assertEquals("The preImage and base should have the same group order.", illegalArgumentException.getMessage());
@@ -109,11 +105,11 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@RepeatedTest(10)
 		@DisplayName("with valid input arguments returns an image with the correct size")
 		void testPhiFunctionSizeAndCalculatingWithoutErrorOnRandomValues() {
-			GqElement gamma = gqGroupGenerator.genMember();
-			int zqGroupVectorSize = 3;
-			GroupVector<ZqElement, ZqGroup> preImage = zqGroupGenerator.genRandomZqElementVector(zqGroupVectorSize);
+			final GqElement gamma = gqGroupGenerator.genMember();
+			final int zqGroupVectorSize = 3;
+			final GroupVector<ZqElement, ZqGroup> preImage = zqGroupGenerator.genRandomZqElementVector(zqGroupVectorSize);
 
-			List<GqElement> phiFunction = DecryptionProofService.computePhiDecryption(preImage, gamma);
+			final List<GqElement> phiFunction = DecryptionProofService.computePhiDecryption(preImage, gamma);
 
 			assertEquals(2 * preImage.size(), phiFunction.size());
 		}
@@ -122,28 +118,28 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@DisplayName("with specific values returns the expected result")
 		void checkPhiFunctionAgainstHandCalculations() {
 
-			GqGroup groupP59 = GroupTestData.getGroupP59();
-			GqElement gamma = GqElementFactory.fromValue(BigInteger.valueOf(12), groupP59);
+			final GqGroup groupP59 = GroupTestData.getGroupP59();
+			final GqElement gamma = GqElementFactory.fromValue(BigInteger.valueOf(12), groupP59);
 
-			ZqGroup zqGroup = ZqGroup.sameOrderAs(groupP59);
-			ZqElement zqElement9 = ZqElement.create(BigInteger.valueOf(9), zqGroup);
-			ZqElement zqElement15 = ZqElement.create(BigInteger.valueOf(15), zqGroup);
-			ZqElement zqElement8 = ZqElement.create(BigInteger.valueOf(8), zqGroup);
+			final ZqGroup zqGroup = ZqGroup.sameOrderAs(groupP59);
+			final ZqElement zqElement9 = ZqElement.create(BigInteger.valueOf(9), zqGroup);
+			final ZqElement zqElement15 = ZqElement.create(BigInteger.valueOf(15), zqGroup);
+			final ZqElement zqElement8 = ZqElement.create(BigInteger.valueOf(8), zqGroup);
 
-			List<ZqElement> preImageZqElements = List.of(zqElement9, zqElement15, zqElement8);
+			final List<ZqElement> preImageZqElements = List.of(zqElement9, zqElement15, zqElement8);
 
-			GroupVector<ZqElement, ZqGroup> preImage = GroupVector.from(preImageZqElements);
+			final GroupVector<ZqElement, ZqGroup> preImage = GroupVector.from(preImageZqElements);
 
-			List<GqElement> computePhiFunction = DecryptionProofService.computePhiDecryption(preImage, gamma);
+			final List<GqElement> computePhiFunction = DecryptionProofService.computePhiDecryption(preImage, gamma);
 
-			GqElement gqElement36 = GqElementFactory.fromValue(BigInteger.valueOf(36), groupP59);
-			GqElement gqElement48 = GqElementFactory.fromValue(BigInteger.valueOf(48), groupP59);
-			GqElement gqElement12 = GqElementFactory.fromValue(BigInteger.valueOf(12), groupP59);
-			GqElement gqElement16 = GqElementFactory.fromValue(BigInteger.valueOf(16), groupP59);
-			GqElement gqElement22 = GqElementFactory.fromValue(BigInteger.valueOf(22), groupP59);
-			GqElement gqElement21 = GqElementFactory.fromValue(BigInteger.valueOf(21), groupP59);
+			final GqElement gqElement36 = GqElementFactory.fromValue(BigInteger.valueOf(36), groupP59);
+			final GqElement gqElement48 = GqElementFactory.fromValue(BigInteger.valueOf(48), groupP59);
+			final GqElement gqElement12 = GqElementFactory.fromValue(BigInteger.valueOf(12), groupP59);
+			final GqElement gqElement16 = GqElementFactory.fromValue(BigInteger.valueOf(16), groupP59);
+			final GqElement gqElement22 = GqElementFactory.fromValue(BigInteger.valueOf(22), groupP59);
+			final GqElement gqElement21 = GqElementFactory.fromValue(BigInteger.valueOf(21), groupP59);
 
-			List<GqElement> phiFunction = Arrays.asList(gqElement36, gqElement48, gqElement12, gqElement16, gqElement22, gqElement21);
+			final List<GqElement> phiFunction = Arrays.asList(gqElement36, gqElement48, gqElement12, gqElement16, gqElement22, gqElement21);
 
 			assertEquals(phiFunction, computePhiFunction);
 		}
@@ -162,15 +158,15 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 
 		@BeforeEach
 		void setup() {
-			int maxLength = 10;
-			keyLength = random.nextInt(maxLength - 1) + 2;
-			messageLength = random.nextInt(keyLength) + 1;
+			final int maxLength = 10;
+			keyLength = randomService.genRandomInteger(maxLength - 1) + 2;
+			messageLength = randomService.genRandomInteger(keyLength) + 1;
 			keyPair = elGamal.genKeyPair(gqGroup, keyLength, randomService);
-			GroupVector<GqElement, GqGroup> messageElements = gqGroupGenerator.genRandomGqElementVector(messageLength);
+			final GroupVector<GqElement, GqGroup> messageElements = gqGroupGenerator.genRandomGqElementVector(messageLength);
 			message = new ElGamalMultiRecipientMessage(messageElements);
 			ciphertext = elGamal.getCiphertext(message, zqGroupGenerator.genRandomZqElementMember(), keyPair.getPublicKey());
 
-			HashService hashService = TestHashService.create(gqGroup.getQ());
+			final HashService hashService = TestHashService.create(gqGroup.getQ());
 			decryptionProofService = new DecryptionProofService(randomService, hashService);
 		}
 
@@ -208,8 +204,8 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with a hashService that has a too long hash length throws an IllegalArgumentException")
 		void genDecryptionProofWithHashServiceWithTooLongHashLength() {
-			HashService otherHashService = HashService.getInstance();
-			DecryptionProofService otherProofService = new DecryptionProofService(randomService, otherHashService);
+			final HashService otherHashService = HashService.getInstance();
+			final DecryptionProofService otherProofService = new DecryptionProofService(randomService, otherHashService);
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> otherProofService.genDecryptionProof(ciphertext, keyPair, message, auxiliaryInformation));
 			assertEquals("The hash service's bit length must be smaller than the bit length of q.", exception.getMessage());
@@ -220,7 +216,7 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		void genDecryptionProofWithMessageNotFromCiphertext() {
 			final ElGamalMultiRecipientMessage differentMessage = Generators
 					.genWhile(() -> new ElGamalMultiRecipientMessage(gqGroupGenerator.genRandomGqElementVector(messageLength)), message::equals);
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> decryptionProofService.genDecryptionProof(ciphertext, keyPair, differentMessage, auxiliaryInformation));
 			assertEquals("The message must be equal to the decrypted ciphertext.", exception.getMessage());
 		}
@@ -228,9 +224,9 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with the ciphertext longer than the secret key throws an IllegalArgumentException")
 		void genDecryptionProofWithCiphertextTooLong() {
-			ElGamalMultiRecipientCiphertext tooLongCiphertext = elGamalGenerator.genRandomCiphertext(keyLength + 1);
-			ElGamalMultiRecipientMessage tooLongMessage = elGamalGenerator.genRandomMessage(keyLength + 1);
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			final ElGamalMultiRecipientCiphertext tooLongCiphertext = elGamalGenerator.genRandomCiphertext(keyLength + 1);
+			final ElGamalMultiRecipientMessage tooLongMessage = elGamalGenerator.genRandomMessage(keyLength + 1);
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> decryptionProofService.genDecryptionProof(tooLongCiphertext, keyPair, tooLongMessage, auxiliaryInformation));
 			assertEquals("The ciphertext length cannot be greater than the secret key length.", exception.getMessage());
 		}
@@ -238,8 +234,8 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with the ciphertext and secret key group orders being different throws an IllegalArgumentException")
 		void genDecryptionProofWithCiphertextAndSecretKeyDifferentGroupOrder() {
-			ElGamalMultiRecipientKeyPair keyPair = elGamal.genKeyPair(otherGqGroup, keyLength, randomService);
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			final ElGamalMultiRecipientKeyPair keyPair = elGamal.genKeyPair(otherGqGroup, keyLength, randomService);
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> decryptionProofService.genDecryptionProof(ciphertext, keyPair, message, auxiliaryInformation));
 			assertEquals("The ciphertext and the secret key group must have the same order.", exception.getMessage());
 		}
@@ -260,12 +256,12 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 
 		@BeforeEach
 		void setup() {
-			int maxLength = 10;
-			keyLength = random.nextInt(maxLength - 1) + 1;
-			messageLength = random.nextInt(keyLength) + 1;
-			ElGamalMultiRecipientKeyPair keyPair = elGamal.genKeyPair(gqGroup, keyLength, randomService);
+			final int maxLength = 10;
+			keyLength = randomService.genRandomInteger(maxLength - 1) + 1;
+			messageLength = randomService.genRandomInteger(keyLength) + 1;
+			final ElGamalMultiRecipientKeyPair keyPair = elGamal.genKeyPair(gqGroup, keyLength, randomService);
 			publicKey = keyPair.getPublicKey();
-			GroupVector<GqElement, GqGroup> messageElements = gqGroupGenerator.genRandomGqElementVector(messageLength);
+			final GroupVector<GqElement, GqGroup> messageElements = gqGroupGenerator.genRandomGqElementVector(messageLength);
 			message = new ElGamalMultiRecipientMessage(messageElements);
 			ciphertext = elGamal.getCiphertext(message, zqGroupGenerator.genRandomZqElementMember(), keyPair.getPublicKey());
 			decryptionProof = decryptionProofService.genDecryptionProof(ciphertext, keyPair, message, auxiliaryInformation);
@@ -307,9 +303,9 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with valid input and empty auxiliary information returns true")
 		void verifyDecryptionWithValidInputNoAux() {
-			ElGamalMultiRecipientKeyPair keyPair = elGamal.genKeyPair(gqGroup, keyLength, randomService);
+			final ElGamalMultiRecipientKeyPair keyPair = elGamal.genKeyPair(gqGroup, keyLength, randomService);
 			publicKey = keyPair.getPublicKey();
-			GroupVector<GqElement, GqGroup> messageElements = gqGroupGenerator.genRandomGqElementVector(messageLength);
+			final GroupVector<GqElement, GqGroup> messageElements = gqGroupGenerator.genRandomGqElementVector(messageLength);
 			message = new ElGamalMultiRecipientMessage(messageElements);
 			ciphertext = elGamal.getCiphertext(message, zqGroupGenerator.genRandomZqElementMember(), keyPair.getPublicKey());
 			decryptionProof = decryptionProofService.genDecryptionProof(ciphertext, keyPair, message, Collections.emptyList());
@@ -321,7 +317,7 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@DisplayName("with the ciphertext from a different group throws an IllegalArgumentException")
 		void verifyDecryptionWithCiphertextFromDifferentGroup() {
 			ciphertext = otherGroupElGamalGenerator.genRandomCiphertext(messageLength);
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> decryptionProofService.verifyDecryption(ciphertext, publicKey, message, decryptionProof, auxiliaryInformation));
 			assertEquals("The ciphertext, the public key and the message must have the same group.", exception.getMessage());
 		}
@@ -330,7 +326,7 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@DisplayName("with the public key from a different group throws an IllegalArgumentException")
 		void verifyDecryptionWithPublicKeyFromDifferentGroup() {
 			publicKey = elGamal.genKeyPair(otherGqGroup, keyLength, randomService).getPublicKey();
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> decryptionProofService.verifyDecryption(ciphertext, publicKey, message, decryptionProof, auxiliaryInformation));
 			assertEquals("The ciphertext, the public key and the message must have the same group.", exception.getMessage());
 		}
@@ -339,7 +335,7 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@DisplayName("with the message from a different group throws an IllegalArgumentException")
 		void verifyDecryptionWithMessageFromDifferentGroup() {
 			message = otherGroupElGamalGenerator.genRandomMessage(messageLength);
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> decryptionProofService.verifyDecryption(ciphertext, publicKey, message, decryptionProof, auxiliaryInformation));
 			assertEquals("The ciphertext, the public key and the message must have the same group.", exception.getMessage());
 		}
@@ -349,7 +345,7 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		void verifyDecryptionWithDecryptionProofFromDifferentGroup() {
 			decryptionProof = new DecryptionProof(otherZqGroupGenerator.genRandomZqElementMember(),
 					otherZqGroupGenerator.genRandomZqElementVector(messageLength));
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> decryptionProofService.verifyDecryption(ciphertext, publicKey, message, decryptionProof, auxiliaryInformation));
 			assertEquals("The decryption proof must have the same group order as the ciphertext, the message and the public key.",
 					exception.getMessage());
@@ -359,7 +355,7 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@DisplayName("with the ciphertext of a different size throws an IllegalArgumentException")
 		void verifyDecryptionWithCiphertextOfDifferentSize() {
 			ciphertext = elGamalGenerator.genRandomCiphertext(messageLength + 1);
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> decryptionProofService.verifyDecryption(ciphertext, publicKey, message, decryptionProof, auxiliaryInformation));
 			assertEquals("The ciphertext, the message and the decryption proof must have the same size.", exception.getMessage());
 		}
@@ -371,7 +367,7 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 			message = elGamalGenerator.genRandomMessage(keyLength + 1);
 			decryptionProof = new DecryptionProof(zqGroupGenerator.genRandomZqElementMember(),
 					zqGroupGenerator.genRandomZqElementVector(keyLength + 1));
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> decryptionProofService.verifyDecryption(ciphertext, publicKey, message, decryptionProof, auxiliaryInformation));
 			assertEquals("The ciphertext, the message and the decryption proof must be smaller than or equal to the public key.",
 					exception.getMessage());
@@ -382,7 +378,7 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		void verifyDecryptionWithTooShortDecryptionProofZ() {
 			decryptionProof = new DecryptionProof(zqGroupGenerator.genRandomZqElementMember(),
 					zqGroupGenerator.genRandomZqElementVector(messageLength + 1));
-			IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> decryptionProofService.verifyDecryption(ciphertext, publicKey, message, decryptionProof, auxiliaryInformation));
 			assertEquals("The ciphertext, the message and the decryption proof must have the same size.", exception.getMessage());
 		}
@@ -515,7 +511,7 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 				final BigInteger q = context.get("q", BigInteger.class);
 				final BigInteger g = context.get("g", BigInteger.class);
 
-				try (MockedStatic<SecurityLevelConfig> mockedSecurityLevel = mockStatic(SecurityLevelConfig.class)) {
+				try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = mockStatic(SecurityLevelConfig.class)) {
 					mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(testParameters.getSecurityLevel());
 					final GqGroup gqGroup = new GqGroup(p, q, g);
 					final ZqGroup zqGroup = new ZqGroup(q);
