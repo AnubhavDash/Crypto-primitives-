@@ -1,5 +1,21 @@
 # Changelog
 
+## Release 1.4.2
+
+Release 1.4.2 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
+We want to thank the experts for their high-quality, constructive remarks:
+
+* Thomas Edmund Haines (Australian National University), Olivier Pereira (Université catholique Louvain), Vanessa Teague (Thinking Cybersecurity)
+* Aleksander Essex (Western University Canada)
+* Rolf Haenni, Reto Koenig, Philipp Locher, Eric Dubuis (Bern University of Applied Sciences)
+
+The following functionalities and improvements are included in release 1.4.2:
+
+* [Code] Ensured that all crypto-primitives internal classes invoke the RandomService or TestRandomService instead of SecureRandom directly (feedback from Rolf Haenni, Reto Koenig, Philipp Locher, and Eric Dubuis).
+* [Code] Included the bound 0 in the method genRandomIntegerOfLength used in test classes.
+* [Code] Minor improvements in test classes.
+* [Code] Updated dependencies and third-party libraries.
+
 ## Release 1.4.1
 
 Release 1.4.1 is a minor maintenance patch containing the following changes:
@@ -9,12 +25,7 @@ Release 1.4.1 is a minor maintenance patch containing the following changes:
 
 ## Release 1.4.0
 
-Release 1.4.0 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
-We want to thank the experts for their high-quality, constructive remarks:
-
-* Thomas Edmund Haines (Australian National University), Olivier Pereira (Université catholique Louvain), Vanessa Teague (Thinking Cybersecurity)
-* Aleksander Essex (Western University Canada)
-* Rolf Haenni, Reto Koenig, Philipp Locher, Eric Dubuis (Bern University of Applied Sciences)
+Release 1.4.0 includes some feedback from the Federal Chancellery's mandated experts (see above) and other experts of the community.
 
 The following functionalities and improvements are included in release 1.4.0:
 
