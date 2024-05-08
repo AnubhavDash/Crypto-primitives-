@@ -24,6 +24,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
@@ -83,7 +84,10 @@ public final class ConversionsInternal {
 	public static byte[] stringToByteArray(final String s) {
 		checkNotNull(s);
 
-		final CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder();
+		final CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder()
+				// Explicitly set the error actions to REPORT to be sure no ignore nor replace action is performed.
+				.onMalformedInput(CodingErrorAction.REPORT)
+				.onUnmappableCharacter(CodingErrorAction.REPORT);
 
 		try {
 			// Check that s is a valid UTF-8 string
@@ -93,7 +97,7 @@ public final class ConversionsInternal {
 			buffer.get(result);
 
 			return result;
-		} catch (CharacterCodingException e) {
+		} catch (final CharacterCodingException e) {
 			throw new IllegalArgumentException("The string does not correspond to a valid sequence of UTF-8 encoding.");
 		}
 	}
@@ -105,12 +109,16 @@ public final class ConversionsInternal {
 		checkNotNull(b);
 		checkArgument(b.length > 0, "The length of the byte array must be strictly positive.");
 
-		final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
+		final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder()
+				// Explicitly set the error actions to REPORT to be sure no ignore nor replace action is performed.
+				.onMalformedInput(CodingErrorAction.REPORT)
+				.onUnmappableCharacter(CodingErrorAction.REPORT);
+
 		// The try-catch clause implements the pseudo-code's if statement
 		try {
 			// Corresponds to UTF-8^-1(B)
 			return decoder.decode(ByteBuffer.wrap(b)).toString();
-		} catch (CharacterCodingException ex) {
+		} catch (final CharacterCodingException e) {
 			throw new IllegalArgumentException("The byte array does not correspond to a valid sequence of UTF-8 encoding.");
 		}
 	}
