@@ -22,7 +22,7 @@ import java.util.List;
  */
 public final class LatinAlphabet extends Alphabet {
 
-	private static final int SIZE = 142;
+	private static final int SIZE = 141;
 	private static final List<String> ALPHABET = List.of(
 
 			Character.toString(0x0023), // # (U+0023)
@@ -103,7 +103,6 @@ public final class LatinAlphabet extends Alphabet {
 			Character.toString(0x0079), // y (U+0079)
 
 			Character.toString(0x007A), // z (U+007A)
-			Character.toString(0x00A0), //   (U+00A0)
 			Character.toString(0x00A2), // ¢ (U+00A2)
 			Character.toString(0x0160), // Š (U+0160)
 			Character.toString(0x0161), // š (U+0161)
@@ -112,8 +111,8 @@ public final class LatinAlphabet extends Alphabet {
 			Character.toString(0x0152), // Œ (U+0152)
 			Character.toString(0x0153), // œ (U+0153)
 			Character.toString(0x0178), // Ÿ (U+0178)
-
 			Character.toString(0x00C0), // À (U+00C0)
+
 			Character.toString(0x00C1), // Á (U+00C1)
 			Character.toString(0x00C2), // Â (U+00C2)
 			Character.toString(0x00C3), // Ã (U+00C3)
@@ -123,8 +122,8 @@ public final class LatinAlphabet extends Alphabet {
 			Character.toString(0x00C7), // Ç (U+00C7)
 			Character.toString(0x00C8), // È (U+00C8)
 			Character.toString(0x00C9), // É (U+00C9)
-
 			Character.toString(0x00CA), // Ê (U+00CA)
+
 			Character.toString(0x00CB), // Ë (U+00CB)
 			Character.toString(0x00CC), // Ì (U+00CC)
 			Character.toString(0x00CD), // Í (U+00CD)
@@ -134,8 +133,8 @@ public final class LatinAlphabet extends Alphabet {
 			Character.toString(0x00D1), // Ñ (U+00D1)
 			Character.toString(0x00D2), // Ò (U+00D2)
 			Character.toString(0x00D3), // Ó (U+00D3)
-
 			Character.toString(0x00D4), // Ô (U+00D4)
+
 			Character.toString(0x00D5), // Õ (U+00D5)
 			Character.toString(0x00D6), // Ö (U+00D6)
 			Character.toString(0x00D8), // Ø (U+00D8)
@@ -145,8 +144,8 @@ public final class LatinAlphabet extends Alphabet {
 			Character.toString(0x00DC), // Ü (U+00DC)
 			Character.toString(0x00DD), // Ý (U+00DD)
 			Character.toString(0x00DE), // Þ (U+00DE)
-
 			Character.toString(0x00DF), // ß (U+00DF)
+
 			Character.toString(0x00E0), // à (U+00E0)
 			Character.toString(0x00E1), // á (U+00E1)
 			Character.toString(0x00E2), // â (U+00E2)
@@ -178,8 +177,8 @@ public final class LatinAlphabet extends Alphabet {
 			Character.toString(0x00FB), // û (U+00FB)
 			Character.toString(0x00FC), // ü (U+00FC)
 			Character.toString(0x00FD), // ý (U+00FD)
-
 			Character.toString(0x00FE), // þ (U+00FE)
+
 			Character.toString(0x00FF)  // ÿ (U+00FF)
 	);
 
