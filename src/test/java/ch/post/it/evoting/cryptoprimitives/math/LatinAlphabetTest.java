@@ -70,7 +70,7 @@ class LatinAlphabetTest {
 	@DisplayName("size behaves as expected")
 	@Test
 	void sizeHappyPath() {
-		final int expected = 142;
+		final int expected = 141;
 
 		final int size = assertDoesNotThrow(latinAlphabet::size);
 
@@ -108,7 +108,7 @@ class LatinAlphabetTest {
 
 	@DisplayName("contains with a code point non-part of the alphabet behaves as expected")
 	@ParameterizedTest
-	@ValueSource(ints = { 0x0040, 0x003F, 0x002A, 0x0021 })
+	@ValueSource(ints = { 0x0040, 0x003F, 0x002A, 0x0021, 0x00A0 })
 	void containsWithNonCodePoint(final int codePoint) {
 		final boolean expected = false;
 

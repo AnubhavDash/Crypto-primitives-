@@ -35,6 +35,11 @@ public final class Base16Service implements Base16 {
 	@Override
 	public byte[] base16Decode(final String string) {
 		final String S = checkNotNull(string);
-		return BaseEncoding.base16().decode(S);
+		try {
+			// The method decode checks the given string is a valid Base16 string.
+			return BaseEncoding.base16().decode(S);
+		} catch (final IllegalArgumentException e) {
+			throw new IllegalArgumentException("The given string is not a valid Base16 string.", e);
+		}
 	}
 }
