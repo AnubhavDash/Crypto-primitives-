@@ -147,7 +147,7 @@ class ConversionsTest {
 
 		Stream<Arguments> stringToIntegerWithNonValidInputThrowsIllegalArgumentExceptionProvider() {
 			return Stream.of(
-					Arguments.of("", "The string to convert cannot be empty."),
+					Arguments.of("", "The string to convert \"\" is not a valid decimal representation of a BigInteger."),
 					Arguments.of("A", "The string to convert \"A\" is not a valid decimal representation of a BigInteger."),
 					Arguments.of("1A", "The string to convert \"1A\" is not a valid decimal representation of a BigInteger."),
 					Arguments.of("A1", "The string to convert \"A1\" is not a valid decimal representation of a BigInteger."),

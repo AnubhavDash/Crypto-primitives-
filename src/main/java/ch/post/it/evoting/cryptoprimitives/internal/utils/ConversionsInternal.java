@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  */
 public final class ConversionsInternal {
 
-	private static final Pattern DECIMAL_PATTERN = Pattern.compile("^\\d+");
+	private static final Pattern DECIMAL_PATTERN = Pattern.compile("^\\d+$");
 
 	private ConversionsInternal() {
 		// Intentionally left blank.
@@ -128,18 +128,13 @@ public final class ConversionsInternal {
 	 */
 	public static BigInteger stringToInteger(final String s) {
 		checkNotNull(s);
-		checkArgument(s.length() > 0, "The string to convert cannot be empty.");
+
+		// Checks that s is not empty and is a valid decimal representation.
 		checkArgument(DECIMAL_PATTERN.matcher(s).matches(),
 				String.format("The string to convert \"%s\" is not a valid decimal representation of a BigInteger.", s));
 
-		// The try-catch clause implements the pseudo-code's if statement
-		try {
-			// Corresponds to Decimal(S)
-			return new BigInteger(s, 10);
-		} catch (final NumberFormatException e) {
-			throw new IllegalArgumentException(
-					String.format("The string to convert \"%s\" is not a valid decimal representation of a BigInteger.", s));
-		}
+		// Corresponds to Decimal(S)
+		return new BigInteger(s, 10);
 	}
 
 	/**
