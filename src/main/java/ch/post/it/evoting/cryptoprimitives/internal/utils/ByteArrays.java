@@ -35,19 +35,25 @@ public final class ByteArrays {
 	 */
 	@SuppressWarnings("java:S117")
 	public static byte[] cutToBitLength(final byte[] byteArray, final int requestedLength) {
+		// Input.
 		checkNotNull(byteArray);
 
 		final byte[] B = byteArray;
+		final int N = B.length;
 		final int n = requestedLength;
 
-		checkArgument(0 < n, "The requested length must be strictly positive");
-		checkArgument(n <= (B.length * Byte.SIZE), "The requested length must not be greater than the bit length of the byte array");
+		checkArgument(N > 0, "The byte array length must be strictly positive.");
+		checkArgument(n > 0, "The requested length must be strictly positive.");
 
+		// Require.
+		checkArgument(n <= (N * Byte.SIZE), "The requested length must not be greater than the bit length of the byte array.");
+
+		// Operation.
 		final int length = (int) Math.ceil(n / (double) Byte.SIZE);
-		final int offset = B.length - length;
+		final int offset = N - length;
 		final byte[] B_prime = new byte[length];
-		if (n % 8 != 0) {
-			B_prime[0] = (byte) (B[offset] & (byte) (Math.pow(2, n % 8) - 1));
+		if (n % Byte.SIZE != 0) {
+			B_prime[0] = (byte) (B[offset] & (byte) (Math.pow(2, n % Byte.SIZE) - 1));
 		} else {
 			B_prime[0] = B[offset];
 		}
@@ -55,6 +61,8 @@ public final class ByteArrays {
 		for (int i = 1; i < length; i++) {
 			B_prime[i] = B[offset + i];
 		}
+
+		// Output.
 		return B_prime;
 	}
 
