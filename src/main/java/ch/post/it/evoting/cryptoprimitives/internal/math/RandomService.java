@@ -66,7 +66,7 @@ public class RandomService implements Random {
 	public BigInteger genRandomInteger(final BigInteger upperBound) {
 		// Input.
 		checkNotNull(upperBound);
-		checkArgument(upperBound.compareTo(BigInteger.ZERO) > 0, "The upper bound must be a positive integer greater than 0.");
+		checkArgument(upperBound.signum() > 0, "The upper bound must be a positive integer greater than 0.");
 		final BigInteger m = upperBound;
 
 		// Operation.
@@ -129,7 +129,7 @@ public class RandomService implements Random {
 	 */
 	public GroupVector<ZqElement, ZqGroup> genRandomVector(final BigInteger upperBound, final int length) {
 		checkNotNull(upperBound);
-		checkArgument(upperBound.compareTo(BigInteger.ZERO) > 0, "The upper bound should be greater than zero");
+		checkArgument(upperBound.signum() > 0, "The upper bound should be greater than zero");
 		checkArgument(length > 0, "The length should be greater than zero");
 
 		final BigInteger q = upperBound;

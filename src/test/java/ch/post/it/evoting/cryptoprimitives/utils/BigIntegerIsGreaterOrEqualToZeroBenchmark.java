@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.post.it.evoting.cryptoprimitives.internal.math;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+package ch.post.it.evoting.cryptoprimitives.utils;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.concurrent.TimeUnit;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -33,50 +29,31 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
+import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
 
 @Warmup(iterations = 1)
 @Measurement(iterations = 5)
 @Fork(value = 1)
 @BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
-public class GenRandomIntegerBenchmark {
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+public class BigIntegerIsGreaterOrEqualToZeroBenchmark {
 
 	@Benchmark
-	public void genRandomInteger(final MyState state, final Blackhole bh) {
-		final BigInteger randomInteger = state.randomService.genRandomInteger(state.upperBound);
-		bh.consume(randomInteger);
+	public void compareTo(final MyState state, final Blackhole bh) {
+		final boolean result = state.randomInteger.compareTo(BigInteger.ZERO) >= 0;
+		bh.consume(result);
 	}
 
 	@Benchmark
-	public void genRandomIntegerWithBigInteger(final MyState state, final Blackhole bh) {
-		final BigInteger randomInteger = MyState.genRandomIntegerWithBigInteger(state.upperBound, state.secureRandom);
-		bh.consume(randomInteger);
+	public void signum(final MyState state, final Blackhole bh) {
+		final boolean result = state.randomInteger.signum() >= 0;
+		bh.consume(result);
 	}
 
 	@State(Scope.Benchmark)
 	public static class MyState {
 		private final TestRandomService randomService = new TestRandomService();
-		private final SecureRandom secureRandom = new SecureRandom();
-
-		private final BigInteger upperBound = BigInteger.TWO.pow(SecurityLevelInternal.STANDARD.getPBitLength());
-
-		public static BigInteger genRandomIntegerWithBigInteger(final BigInteger upperBound, final SecureRandom secureRandom) {
-			// Input.
-			checkNotNull(upperBound);
-			checkArgument(upperBound.signum() > 0, "The upper bound must be a positive integer greater than 0.");
-			final BigInteger m = upperBound;
-
-			// Operation.
-			final int bitLength = m.bitLength();
-			BigInteger r;
-			do {
-				// This constructor internally masks the excess generated bits.
-				r = new BigInteger(bitLength, secureRandom);
-			} while (r.compareTo(m) >= 0);
-
-			// Output.
-			return r;
-		}
+		private final BigInteger randomInteger = randomService.genRandomInteger(BigInteger.TWO.pow(SecurityLevelInternal.STANDARD.getPBitLength()));
 	}
 }
