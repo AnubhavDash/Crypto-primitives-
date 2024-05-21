@@ -96,7 +96,7 @@ public final class PrimeGqElement extends GqElement {
 		 * The {@code gqGroup} and {@code desiredNumberOfPrimes} parameters must comply with the following:
 		 * <ul>
 		 *     <li>must be non-null.</li>
-		 *     <li>the group generator must be in the range [2, 4].</li>
+		 *     <li>the group generator must be in the range [2, 3].</li>
 		 *     <li>the desired number of primes must be smaller than q - 4, i.e. the number of elements in the group by at least 4.</li>
 		 *     <li>the desired number of primes must be in the range (0, 10000).</li>
 		 * </ul>
@@ -114,7 +114,7 @@ public final class PrimeGqElement extends GqElement {
 			final BigInteger g = gqGroup.getGenerator().value;
 
 			checkArgument(r > 0, "The desired number of primes must be strictly positive");
-			checkArgument(BigInteger.TWO.compareTo(g) <= 0 && g.compareTo(BigInteger.valueOf(4)) <= 0, "g must be 2, 3, or 4.");
+			checkArgument(BigInteger.TWO.compareTo(g) <= 0 && g.compareTo(BigInteger.valueOf(3)) <= 0, "g must be 2 or 3.");
 			checkArgument(BigInteger.valueOf(r).compareTo(gqGroup.getQ().subtract(BigInteger.valueOf(4))) <= 0,
 					"The desired number of primes must be smaller than the number of elements in the GqGroup by at least 4.");
 			checkArgument(r < 10000, "The desired number of primes must be strictly smaller than 10000.");
@@ -122,6 +122,7 @@ public final class PrimeGqElement extends GqElement {
 			BigInteger current = BigInteger.valueOf(5);
 			final ArrayList<PrimeGqElement> p_vector = new ArrayList<>(r);
 			int count = 0;
+			// The largest prime in the list is restricted to Integer.MAX_VALUE = 2^31 - 1.
 			while (count < r && current.compareTo(gqGroup.getP()) < 0 && current.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) < 0) {
 				if (gqGroup.isGroupMember(current) && PrimesInternal.isSmallPrime(current.intValueExact())) {
 					p_vector.add(new PrimeGqElement(current.intValueExact(), gqGroup));

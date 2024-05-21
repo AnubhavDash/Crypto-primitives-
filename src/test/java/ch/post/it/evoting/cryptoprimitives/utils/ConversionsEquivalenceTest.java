@@ -86,8 +86,7 @@ class ConversionsEquivalenceTest {
 		BigInteger x = integer;
 
 		// Operation
-		int n = ByteArrays.byteLength(x);
-		n = Math.max(n, 1);
+		final int n = ByteArrays.byteLength(x);
 		final byte[] B = new byte[n];
 		for (int i = 0; i < n; i++) {
 			B[n - i - 1] = x.mod(TWOHUNDRED_FIFTY_SIX).byteValue();

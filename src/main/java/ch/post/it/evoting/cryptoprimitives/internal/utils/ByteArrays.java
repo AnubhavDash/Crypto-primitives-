@@ -67,14 +67,17 @@ public final class ByteArrays {
 	}
 
 	/**
-	 * Calculates the byte length of an integer.
+	 * Computes the length of the byte representation of an integer.
 	 *
-	 * @param x the integer of which to calculate the byte length. Must be non-null.
-	 * @return the byte length of the given integer
+	 * @param x the integer of which to compute the byte length. Must be non-null.
+	 * @return the length of the byte representation of the given integer.
 	 * @throws NullPointerException if the given x is null.
 	 */
 	public static int byteLength(final BigInteger x) {
 		checkNotNull(x);
-		return (int) Math.ceil(x.bitLength() / (double) Byte.SIZE);
+
+		final int n = (int) Math.ceil(x.bitLength() / (double) Byte.SIZE);
+
+		return Math.max(n, 1);
 	}
 }
