@@ -24,8 +24,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -65,7 +66,7 @@ public class RandomService implements Random {
 	public BigInteger genRandomInteger(final BigInteger upperBound) {
 		// Input.
 		checkNotNull(upperBound);
-		checkArgument(upperBound.compareTo(BigInteger.ZERO) > 0, "The upper bound must be a positive integer greater than 0.");
+		checkArgument(upperBound.signum() > 0, "The upper bound must be a positive integer greater than 0.");
 		final BigInteger m = upperBound;
 
 		// Operation.
@@ -108,16 +109,15 @@ public class RandomService implements Random {
 
 		final Alphabet A_10 = Base10Alphabet.getInstance();
 
-		final List<String> codes = new ArrayList<>(n);
+		final Set<String> codes = HashSet.newHashSet(n);
 		while (codes.size() < n) {
 			final String c = genRandomString(l, A_10);
 
-			if (!codes.contains(c)) {
-				codes.add(c);
-			}
+			// The Set#add method is, in this context, equivalent to the if statement in the specification.
+			codes.add(c);
 		}
 
-		return codes;
+		return codes.stream().toList();
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class RandomService implements Random {
 	 */
 	public GroupVector<ZqElement, ZqGroup> genRandomVector(final BigInteger upperBound, final int length) {
 		checkNotNull(upperBound);
-		checkArgument(upperBound.compareTo(BigInteger.ZERO) > 0, "The upper bound should be greater than zero");
+		checkArgument(upperBound.signum() > 0, "The upper bound should be greater than zero");
 		checkArgument(length > 0, "The length should be greater than zero");
 
 		final BigInteger q = upperBound;
