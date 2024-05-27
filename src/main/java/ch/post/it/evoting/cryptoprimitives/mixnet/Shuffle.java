@@ -15,6 +15,9 @@
  */
 package ch.post.it.evoting.cryptoprimitives.mixnet;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -30,6 +33,22 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 public record Shuffle(GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts,
 					  Permutation permutation, GroupVector<ZqElement, ZqGroup> reEncryptionExponents) {
 	public static final Shuffle EMPTY = new Shuffle(GroupVector.of(), Permutation.EMPTY, GroupVector.of());
+
+	public Shuffle {
+		checkNotNull(ciphertexts);
+		checkNotNull(permutation);
+		checkNotNull(reEncryptionExponents);
+
+		final int N = permutation.size();
+
+		checkArgument(ciphertexts.size() == N, "Shuffle ciphertext vector's size must be equal to the permutation size. [size: %s, N: %s]", ciphertexts.size(), N);
+		checkArgument(reEncryptionExponents.size() == N, "Re-encryption exponents vector's size must be equal to the permutation size. [size: %s, N: %s]", reEncryptionExponents.size(), N);
+
+		if (!ciphertexts.isEmpty()) {
+			checkArgument(ciphertexts.getGroup().hasSameOrderAs(reEncryptionExponents.getGroup()),
+					"Ciphertexts and re-encryption exponents must have groups of same order.");
+		}
+	}
 
 	public GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> getCiphertexts() {
 		return this.ciphertexts;

@@ -15,8 +15,8 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
+import static ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays.byteLength;
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -40,8 +40,6 @@ import org.mockito.Mockito;
 
 import com.google.common.base.Throwables;
 
-import ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays;
-import ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal;
 import ch.post.it.evoting.cryptoprimitives.math.Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.UsabilityBase32Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
@@ -71,26 +69,12 @@ class RandomServiceTest {
 		assertThrows(IllegalArgumentException.class, () -> randomService.genRandomInteger(-1));
 	}
 
-	@RepeatedTest(1000)
-	void genRandomIntegerIsEquivalentToSpecification() {
-		final BigInteger upperBound = BigInteger.valueOf(1_000_000);
-		final List<byte[]> randomBytesList = new ArrayList<>(3);
-		for (int i = 0; i < 3; i++) {
-			randomBytesList.add(randomService.randomBytes(ByteArrays.byteLength(upperBound)));
-		}
-		try (final MockedConstruction<SecureRandom> mockedSecureRandom = Mockito.mockConstruction(SecureRandom.class,
-				this.prepareSecureRandom(randomBytesList))) {
-			final SecureRandom secureRandom1 = new SecureRandom();
-			final RandomService randomService1 = new RandomService(secureRandom1);
-			final BigInteger result = randomService1.genRandomInteger(upperBound);
+	@Test
+	void genRandomIntegerWithUpperBoundOne() {
+		final BigInteger upperBound = BigInteger.ONE;
+		final BigInteger expected = BigInteger.ZERO;
 
-			final SecureRandom secureRandom2 = new SecureRandom();
-			final RandomService randomService2 = new RandomService(secureRandom2);
-			final BigInteger expectedResult = genRandomIntegerSpec(upperBound, randomService2);
-
-			assertEquals(0, expectedResult.compareTo(result));
-			assertEquals(2, mockedSecureRandom.constructed().size());
-		}
+		assertEquals(expected, randomService.genRandomInteger(upperBound));
 	}
 
 	@Test
@@ -98,7 +82,7 @@ class RandomServiceTest {
 		final BigInteger upperBound = BigInteger.valueOf(1_000_000);
 		final List<byte[]> randomBytesList = new ArrayList<>(3);
 		for (int i = 0; i < 3; i++) {
-			randomBytesList.add(randomService.randomBytes(ByteArrays.byteLength(upperBound)));
+			randomBytesList.add(randomService.randomBytes(byteLength(upperBound)));
 		}
 		try (final MockedConstruction<SecureRandom> mockedSecureRandom = Mockito.mockConstruction(SecureRandom.class,
 				this.prepareSecureRandom(randomBytesList))) {
@@ -135,19 +119,6 @@ class RandomServiceTest {
 					System.arraycopy(randomBytesList.get(0), 1, byteArray, 1, byteArray.length - 1);
 					return null;
 				}).when(mockSecureRandom).nextBytes(Mockito.any());
-	}
-
-	private BigInteger genRandomIntegerSpec(final BigInteger upperBound, final RandomService randomService) {
-		final BigInteger m = checkNotNull(upperBound);
-		final BigInteger m_minus_one = upperBound.subtract(BigInteger.ONE);
-		final int length = ByteArrays.byteLength(m_minus_one);
-		final int bitLength = m_minus_one.bitLength();
-		BigInteger r;
-		do {
-			final byte[] rBytes = ByteArrays.cutToBitLength(randomService.randomBytes(length), bitLength);
-			r = ConversionsInternal.byteArrayToInteger(rBytes);
-		} while (r.compareTo(m) >= 0);
-		return r;
 	}
 
 	@Test

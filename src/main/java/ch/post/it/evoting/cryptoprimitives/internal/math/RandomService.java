@@ -15,6 +15,9 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
+import static ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays.byteLength;
+import static ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays.cutToBitLength;
+import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -56,24 +59,29 @@ public class RandomService implements Random {
 	}
 
 	/**
-	 * This implementation yields the same result as the specification's pseudocode, and we have a corresponding unit test that asserts the
-	 * equivalence of the two implementations.
-	 *
 	 * @see Random#genRandomInteger(BigInteger)
 	 */
+	@SuppressWarnings("java:S117")
 	public BigInteger genRandomInteger(final BigInteger upperBound) {
+		// Input.
 		checkNotNull(upperBound);
 		checkArgument(upperBound.compareTo(BigInteger.ZERO) > 0, "The upper bound must be a positive integer greater than 0.");
 		final BigInteger m = upperBound;
 
-		final int bitLength = m.bitLength();
-
+		// Operation.
+		if (m.compareTo(BigInteger.ONE) == 0) {
+			return BigInteger.ZERO;
+		}
+		final BigInteger m_minus_one = m.subtract(BigInteger.ONE);
+		final int length = byteLength(m_minus_one);
+		final int bitLength = m_minus_one.bitLength();
 		BigInteger r;
 		do {
-			// This constructor internally masks the excess generated bits.
-			r = new BigInteger(bitLength, secureRandom);
+			final byte[] rBytes = cutToBitLength(randomBytes(length), bitLength);
+			r = byteArrayToInteger(rBytes);
 		} while (r.compareTo(m) >= 0);
 
+		// Output.
 		return r;
 	}
 

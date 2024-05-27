@@ -48,11 +48,13 @@ public class SymmetricAuthenticatedEncryptionService {
 		checkNotNull(encryptionKey);
 		checkNotNull(plaintext);
 
-		final List<String> associated_vector = checkNotNull(associatedData).stream()
-				.map(Preconditions::checkNotNull)
-				.toList();
-		associated_vector.forEach(associated_i -> checkArgument(stringToByteArray(associated_i).length <= 255,
-				"The required length of each associated data must be smaller or equal to 255."));
+		final List<byte[]> associated_bytes = checkNotNull(associatedData).stream()
+				.map(associated_i -> {
+					checkNotNull(associated_i);
+					final byte[] associated_i_bytes = stringToByteArray(associated_i);
+					checkArgument(associated_i_bytes.length <= 255, "The required length of each associated data must be smaller or equal to 255.");
+					return associated_i_bytes;
+				}).toList();
 
 		// Context.
 		final byte[] K = encryptionKey;
@@ -62,8 +64,7 @@ public class SymmetricAuthenticatedEncryptionService {
 		final byte[] nonce = randomService.randomBytes(aead.getNonceLengthBytes());
 		final byte[] associated =
 				Bytes.concat(
-						associated_vector.stream()
-								.map(Conversions::stringToByteArray)
+						associated_bytes.stream()
 								.map(associated_i_bytes -> Bytes.concat(new byte[] { (byte) associated_i_bytes.length }, associated_i_bytes))
 								.toArray(byte[][]::new)
 				);
@@ -81,11 +82,13 @@ public class SymmetricAuthenticatedEncryptionService {
 		checkNotNull(ciphertext);
 		checkNotNull(nonce);
 
-		final List<String> associated_vector = checkNotNull(associatedData).stream()
-				.map(Preconditions::checkNotNull)
-				.toList();
-		associated_vector.forEach(associated_i -> checkArgument(stringToByteArray(associated_i).length <= 255,
-				"The required length of each associated data must be smaller or equal to 255."));
+		final List<byte[]> associated_bytes = checkNotNull(associatedData).stream()
+				.map(associated_i -> {
+					checkNotNull(associated_i);
+					final byte[] associated_i_bytes = stringToByteArray(associated_i);
+					checkArgument(associated_i_bytes.length <= 255, "The required length of each associated data must be smaller or equal to 255.");
+					return associated_i_bytes;
+				}).toList();
 
 		// Context.
 		final byte[] K = encryptionKey;
@@ -94,8 +97,7 @@ public class SymmetricAuthenticatedEncryptionService {
 		// Operation.
 		final byte[] associated =
 				Bytes.concat(
-						associatedData.stream()
-								.map(Conversions::stringToByteArray)
+						associated_bytes.stream()
 								.map(associated_i_bytes -> Bytes.concat(new byte[] { (byte) associated_i_bytes.length }, associated_i_bytes))
 								.toArray(byte[][]::new)
 				);

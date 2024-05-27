@@ -25,6 +25,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -117,7 +118,7 @@ class ShuffleServiceTest extends TestGroupSetup {
 		//Mock random exponents
 		final RandomService randomService = mock(RandomService.class);
 		final ZqGroup exponentGroup = ZqGroup.sameOrderAs(localGroup);
-		final List<BigInteger> randomIntegers = Arrays.asList(BigInteger.valueOf(7), BigInteger.valueOf(5), BigInteger.valueOf(3));
+		final List<BigInteger> randomIntegers = IntStream.range(0, permutation.size()).mapToObj(i -> BigInteger.valueOf(7)).toList();
 		when(randomService.genRandomInteger(exponentGroup.getQ()))
 				.thenReturn(randomIntegers.get(0), randomIntegers.subList(1, randomIntegers.size()).toArray(new BigInteger[] {}));
 
@@ -139,10 +140,11 @@ class ShuffleServiceTest extends TestGroupSetup {
 		//Expected ciphertexts
 		final Stream<List<Integer>> expectedCiphertextValues = Stream.of(
 				Arrays.asList(8, 3, 1, 8),
-				Arrays.asList(4, 6, 3, 9),
-				Arrays.asList(13, 1, 13, 8)
+				Arrays.asList(16, 9, 2, 12),
+				Arrays.asList(1, 8, 16, 4)
 		);
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> expectedCiphertexts = ElGamalUtils.valuesToCiphertext(expectedCiphertextValues, localGroup);
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> expectedCiphertexts = ElGamalUtils.valuesToCiphertext(expectedCiphertextValues,
+				localGroup);
 
 		//Create shuffle
 		final ShuffleService shuffleService = new ShuffleService(randomService, permutationService);
