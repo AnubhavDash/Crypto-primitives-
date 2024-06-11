@@ -57,7 +57,7 @@ class PermutationService {
 			pi.set(i + offset, tmp);
 		}
 
-		return new Permutation(pi);
+		return new Permutation(List.copyOf(pi));
 	}
 
 }

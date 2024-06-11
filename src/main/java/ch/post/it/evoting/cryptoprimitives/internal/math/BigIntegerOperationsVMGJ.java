@@ -90,7 +90,7 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 		checkNotNull(base);
 		checkNotNull(exponent);
 		checkNotNull(modulus);
-		checkArgument(exponent.signum() >= 0 || base.gcd(modulus).equals(BigInteger.ONE),
+		checkArgument(exponent.compareTo(BigInteger.ZERO) >= 0 || base.gcd(modulus).equals(BigInteger.ONE),
 				"When the exponent is negative, base and modulus must be relatively prime");
 		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
 		checkArgument(modulus.testBit(0), "The modulus must be odd");

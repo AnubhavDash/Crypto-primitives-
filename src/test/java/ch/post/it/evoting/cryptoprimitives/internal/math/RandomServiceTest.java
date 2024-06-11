@@ -55,7 +55,7 @@ class RandomServiceTest {
 		final BigInteger randomInteger = randomService.genRandomInteger(upperBound);
 
 		assertTrue(randomInteger.compareTo(upperBound) < 0);
-		assertTrue(randomInteger.signum() >= 0);
+		assertTrue(randomInteger.compareTo(BigInteger.ZERO) >= 0);
 	}
 
 	@Test

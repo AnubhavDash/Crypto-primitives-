@@ -104,7 +104,7 @@ class ConversionsTest {
 		void testConversionOfByteArrayWithLeading1ToBigIntegerIsPositive() {
 			final byte[] bytes = new byte[] { (byte) 0x80 };
 			final BigInteger converted = byteArrayToInteger(bytes);
-			assertTrue(converted.signum() > 0);
+			assertTrue(converted.compareTo(BigInteger.ZERO) > 0);
 		}
 
 		@Test

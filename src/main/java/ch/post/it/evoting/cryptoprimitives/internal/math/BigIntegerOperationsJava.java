@@ -48,7 +48,7 @@ public class BigIntegerOperationsJava implements BigIntegerOperations {
 		checkNotNull(base);
 		checkNotNull(exponent);
 		checkNotNull(modulus);
-		checkArgument(exponent.signum() >= 0 || base.gcd(modulus).equals(ONE),
+		checkArgument(exponent.compareTo(ZERO) >= 0 || base.gcd(modulus).equals(ONE),
 				"When the exponent is negative, base and modulus must be relatively prime");
 		checkArgument(modulus.compareTo(ONE) > 0, MODULUS_CHECK_MESSAGE);
 		checkArgument(modulus.testBit(0), "The modulus must be odd");

@@ -97,7 +97,7 @@ public class GqGroupGenerator {
 		do {
 			final BigInteger randomInteger = randomBigInteger(group.getP().bitLength());
 			member = randomInteger.modPow(BigInteger.TWO, group.getP());
-		} while (member.signum() <= 0 || member.compareTo(group.getP()) >= 0);
+		} while (member.compareTo(BigInteger.ZERO) <= 0 || member.compareTo(group.getP()) >= 0);
 		return member;
 	}
 
@@ -124,7 +124,7 @@ public class GqGroupGenerator {
 		BigInteger nonMember;
 		do {
 			nonMember = randomBigInteger(group.getP().bitLength());
-		} while (nonMember.signum() <= 0 || nonMember.compareTo(group.getP()) >= 0 || group.isGroupMember(nonMember));
+		} while (nonMember.compareTo(BigInteger.ZERO) <= 0 || nonMember.compareTo(group.getP()) >= 0 || group.isGroupMember(nonMember));
 		return nonMember;
 	}
 

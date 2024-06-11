@@ -62,7 +62,7 @@ public final class ConversionsInternal {
 	 */
 	public static byte[] integerToByteArray(final BigInteger x) {
 		checkNotNull(x);
-		checkArgument(x.signum() >= 0);
+		checkArgument(x.compareTo(BigInteger.ZERO) >= 0);
 
 		// BigInteger#toByteArray gives back a 2s complement representation of the value. Given that we work only with positive BigIntegers, this
 		// representation is equivalent to the binary representation, except for a potential extra leading zero byte. (The presence or not of the
@@ -142,7 +142,7 @@ public final class ConversionsInternal {
 	 */
 	public static String integerToString(final BigInteger x) {
 		checkNotNull(x);
-		checkArgument(x.signum() >= 0);
+		checkArgument(x.compareTo(BigInteger.ZERO) >= 0);
 
 		// Corresponds to Decimal^-1(x)
 		return x.toString(10);

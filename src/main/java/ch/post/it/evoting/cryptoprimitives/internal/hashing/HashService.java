@@ -102,7 +102,7 @@ public class HashService implements Hash {
 			}
 			case HashableBigInteger hashableBigInteger -> {
 				final BigInteger w = hashableBigInteger.toHashableForm();
-				checkArgument(w.signum() >= 0);
+				checkArgument(w.compareTo(BigInteger.ZERO) >= 0);
 				return hashFunction.hash(concat(BIG_INTEGER_PREFIX, integerToByteArray(w)));
 			}
 			case HashableString hashableString -> {
@@ -160,7 +160,7 @@ public class HashService implements Hash {
 		final BigInteger q = exclusiveUpperBound;
 		final Hashable[] v = values;
 		checkArgument(k > 0, NO_VALUES);
-		checkArgument(q.signum() > 0, "The upper bound must be strictly positive.");
+		checkArgument(q.compareTo(BigInteger.ZERO) > 0, "The upper bound must be strictly positive.");
 		checkArgument(q.bitLength() >= 512, "The exclusive upper bound must have a bit length of at least 512.");
 
 		final BigInteger h_prime = byteArrayToInteger(recursiveHashOfLength(q.bitLength() + 2 * lambda,
@@ -210,7 +210,7 @@ public class HashService implements Hash {
 			}
 			case HashableBigInteger hashableBigInteger -> {
 				final BigInteger w = hashableBigInteger.toHashableForm();
-				checkArgument(w.signum() >= 0);
+				checkArgument(w.compareTo(BigInteger.ZERO) >= 0);
 				return ByteArrays.cutToBitLength(shake256(L, concat(BIG_INTEGER_PREFIX, integerToByteArray(w))), l);
 			}
 			case HashableString hashableString -> {
