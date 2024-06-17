@@ -1,17 +1,33 @@
 # Changelog
 
-## Release 1.4.2
+## Release 1.4.3
 
-Release 1.4.2 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
+Release 1.4.3 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
 We want to thank the experts for their high-quality, constructive remarks:
 
 * Thomas Edmund Haines (Australian National University), Olivier Pereira (Université catholique Louvain), Vanessa Teague (Thinking Cybersecurity)
 * Aleksander Essex (Western University Canada)
-* Rolf Haenni, Reto Koenig, Philipp Locher, Eric Dubuis (Bern University of Applied Sciences)
+* Rolf Haenni, Reto Koenig, Philipp Locher (Bern University of Applied Sciences)
 
-The following functionalities and improvements are included in release 1.4.2:
+The following functionalities and improvements are included in release 1.4.3:
 
-* [Code] Ensured that all crypto-primitives internal classes invoke the RandomService or TestRandomService instead of SecureRandom directly (feedback from Rolf Haenni, Reto Koenig, Philipp Locher, and Eric Dubuis).
+* [Code] Avoid repeated calls of stringToByteArray in GenCiphertextSymmetric and GetPlaintextSymmetric (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Code, Specification] Small adjustments to ByteLength and ByteArrayToInteger (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Code] Improved the alignment of the GenShuffle implementation to the specification (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Specification, Code] Improved handling of edge cases in StringToInteger and GenRandomInteger (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Code] Add try/catch in Base16Decode (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Code] Minor improvement in CutToBitLength (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Code, Specification] Remove the letter U+00A0 (Non-Breaking Space) from the latin alphabet (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Code] Set the CodingErrorAction to REPORT explicitly for ConversionsInternal.stringToByteArray (feedback from Thomas Haines).
+* [Specification] Correction of the indexing in algorithm 9.12 VerifyShuffleArgument.
+* [Specification] Minor corrections and clarifications (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Code] Updated dependencies and third-party libraries.
+
+## Release 1.4.2
+
+Release 1.4.2 is a minor maintenance patch containing the following changes:
+
+* [Code] Ensured that all crypto-primitives internal classes invoke the RandomService or TestRandomService instead of SecureRandom directly (feedback from Rolf Haenni, Reto Koenig, and Philipp Locher).
 * [Code] Included the bound 0 in the method genRandomIntegerOfLength used in test classes.
 * [Code] Minor improvements in test classes.
 * [Code] Updated dependencies and third-party libraries.
