@@ -32,6 +32,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
@@ -67,7 +68,7 @@ class SignatureGenerationServiceTest {
 				.setState("")
 				.setOrganisation("")
 				.build();
-		CertificateInfo certificateInfo = new CertificateInfo(authorityInformation);
+		final CertificateInfo certificateInfo = new CertificateInfo(authorityInformation);
 		certificateInfo.setValidFrom(from);
 		certificateInfo.setValidUntil(until);
 		certificateInfo.setUsage(new KeyUsage(KeyUsage.keyCertSign | KeyUsage.digitalSignature));
@@ -78,7 +79,7 @@ class SignatureGenerationServiceTest {
 	@DisplayName("null parameters throws a NullPointerException")
 	void genSignatureWithNullParametersThrowsNullPointerException() {
 		assertThrows(NullPointerException.class, () -> signatureGenerationService.genSignature(null, emptyContextData));
-		final HashableByteArray message = HashableByteArray.from(new byte[] { 0b0000001 });
+		final HashableByteArray message = HashableByteArray.from(ImmutableByteArray.from(new byte[] { 0b0000001 }));
 		assertThrows(NullPointerException.class, () -> signatureGenerationService.genSignature(message, null));
 	}
 
@@ -106,8 +107,8 @@ class SignatureGenerationServiceTest {
 		final Hashable context = HashableString.from("tooEarly");
 		final KeyPair keyPair = SecurityLevelConfig.getSystemSecurityLevel().getSignatureAlgorithm().genKeyPair();
 		final LocalDate now = LocalDate.now();
-		final LocalDate from = now.minus(365, ChronoUnit.DAYS);
-		final LocalDate until = now.minus(1, ChronoUnit.DAYS);
+		final LocalDate from = now.minusDays(365);
+		final LocalDate until = now.minusDays(1);
 		final X509Certificate certificate = getCertificate(from, until, keyPair);
 		final SignatureGenerationService signatureGenerationServiceNotValidAnymore = new SignatureGenerationService(keyPair.getPrivate(), certificate,
 				hashService, SecurityLevelConfig.getSystemSecurityLevel().getSignatureAlgorithm());

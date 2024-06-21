@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
@@ -163,7 +164,7 @@ public class HadamardArgumentService {
 
 		// Calculate s_0, ..., s_(m-1)
 		final List<ZqElement> s_vector_mutable = new ArrayList<>(m);
-		s_vector_mutable.add(0, r.get(0));
+		s_vector_mutable.addFirst(r.getFirst());
 		if (m > 2) {
 			s_vector_mutable.addAll(1, randomService.genRandomVector(q, m - 2));
 		}
@@ -172,7 +173,7 @@ public class HadamardArgumentService {
 
 		// Calculate c_(B_0), ..., c_(B_(m-1))
 		final List<GqElement> c_B_mutable = new ArrayList<>(m);
-		c_B_mutable.add(0, c_A.get(0));
+		c_B_mutable.addFirst(c_A.getFirst());
 		c_B_mutable.addAll(1, IntStream.range(1, m - 1)
 				.parallel()
 				.mapToObj(j -> CommitmentService.getCommitment(b_vectors.get(j), s_vector.get(j), ck))
@@ -181,11 +182,11 @@ public class HadamardArgumentService {
 		final GroupVector<GqElement, GqGroup> c_B = GroupVector.from(c_B_mutable);
 
 		// Calculate x
-		final byte[] x_bytes = hashService.recursiveHash(HashableBigInteger.from(p), HashableBigInteger.from(q), pk, ck, c_A, c_b, c_B);
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(HashableBigInteger.from(p), HashableBigInteger.from(q), pk, ck, c_A, c_b, c_B);
 		final ZqElement x = ZqElement.create(ConversionsInternal.byteArrayToInteger(x_bytes), zqGroup);
 
 		// Calculate y
-		final byte[] y_bytes = hashService.recursiveHash(
+		final ImmutableByteArray y_bytes = hashService.recursiveHash(
 				HashableString.from("1"),
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
@@ -297,7 +298,7 @@ public class HadamardArgumentService {
 
 		// Algorithm
 		// Calculate x
-		final byte[] x_bytes = hashService.recursiveHash(
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,
@@ -309,7 +310,7 @@ public class HadamardArgumentService {
 		final ZqElement x = ZqElement.create(ConversionsInternal.byteArrayToInteger(x_bytes), zqGroup);
 
 		// Calculate y
-		final byte[] y_bytes = hashService.recursiveHash(
+		final ImmutableByteArray y_bytes = hashService.recursiveHash(
 				HashableString.from("1"),
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
@@ -347,7 +348,7 @@ public class HadamardArgumentService {
 		final ZeroStatement zeroStatement = new ZeroStatement(c_A_zero_argument, c_D_zero_argument, y);
 		final ZeroArgument zeroArgument = argument.get_zeroArgument();
 
-		return create(() -> c_B.get(0).equals(c_A.get(0)), "c_B_0 must equal c_A_0.")
+		return create(() -> c_B.getFirst().equals(c_A.getFirst()), "c_B_0 must equal c_A_0.")
 				.and(create(() -> c_B.get(m - 1).equals(c_b), "c_B_m_minus_1 must equal c_b."))
 				.and(zeroArgumentService.verifyZeroArgument(zeroStatement, zeroArgument).addErrorMessage("Failed to verify the ZeroArgument."));
 	}

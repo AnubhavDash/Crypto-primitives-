@@ -17,6 +17,7 @@
 package ch.post.it.evoting.cryptoprimitives.internal.securitylevel;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -30,6 +31,8 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 
 /**
  * This class is thread safe.
@@ -52,14 +55,19 @@ public class AES_GCM_256 implements AEAD {
 	}
 
 	@Override
-	public byte[] authenticatedEncryption(final byte[] secretKey, final byte[] nonce, final byte[] plaintext, final byte[] associatedData) {
-		checkArgument(nonce.length == getNonceLengthBytes(), String.format("Invalid nonce length, expected %s", getNonceLengthBytes()));
+	public ImmutableByteArray authenticatedEncryption(final ImmutableByteArray secretKey, final ImmutableByteArray nonce,
+			final ImmutableByteArray plaintext, final ImmutableByteArray associatedData) {
+		checkNotNull(secretKey);
+		checkNotNull(nonce);
+		checkNotNull(plaintext);
+		checkNotNull(associatedData);
+		checkArgument(nonce.length() == getNonceLengthBytes(), String.format("Invalid nonce length, expected %s", getNonceLengthBytes()));
 
 		final Cipher cipher = getCipher(secretKey, nonce, Cipher.ENCRYPT_MODE);
-		cipher.updateAAD(associatedData);
+		cipher.updateAAD(associatedData.elements());
 
 		try {
-			return cipher.doFinal(plaintext);
+			return ImmutableByteArray.from(cipher.doFinal(plaintext.elements()));
 		} catch (final BadPaddingException e) {
 			throw new IllegalStateException("We should never get this exception since it is only thrown in decryption mode.");
 		} catch (final IllegalBlockSizeException e) {
@@ -68,14 +76,19 @@ public class AES_GCM_256 implements AEAD {
 	}
 
 	@Override
-	public byte[] authenticatedDecryption(final byte[] secretKey, final byte[] nonce, final byte[] associatedData, final byte[] ciphertext) {
-		checkArgument(nonce.length == getNonceLengthBytes(), String.format("Invalid nonce length, expected %s", getNonceLengthBytes()));
+	public ImmutableByteArray authenticatedDecryption(final ImmutableByteArray secretKey, final ImmutableByteArray nonce,
+			final ImmutableByteArray associatedData, final ImmutableByteArray ciphertext) {
+		checkNotNull(secretKey);
+		checkNotNull(nonce);
+		checkNotNull(associatedData);
+		checkNotNull(ciphertext);
+		checkArgument(nonce.length() == getNonceLengthBytes(), String.format("Invalid nonce length, expected %s", getNonceLengthBytes()));
 
 		final Cipher cipher = getCipher(secretKey, nonce, Cipher.DECRYPT_MODE);
-		cipher.updateAAD(associatedData);
+		cipher.updateAAD(associatedData.elements());
 
 		try {
-			return cipher.doFinal(ciphertext);
+			return ImmutableByteArray.from(cipher.doFinal(ciphertext.elements()));
 		} catch (final BadPaddingException e) {
 			throw new IllegalStateException("We should never get this exception since no padding is needed for the configured algorithm.", e);
 		} catch (final IllegalBlockSizeException e) {
@@ -88,7 +101,7 @@ public class AES_GCM_256 implements AEAD {
 		return 12;
 	}
 
-	private Cipher getCipher(final byte[] encryptionKey, final byte[] nonce, final int opmode) {
+	private Cipher getCipher(final ImmutableByteArray encryptionKey, final ImmutableByteArray nonce, final int opmode) {
 		// Get Cipher Instance
 		final Cipher cipher;
 		try {
@@ -98,10 +111,10 @@ public class AES_GCM_256 implements AEAD {
 		}
 
 		// Create the encryptionKey
-		final Key key = new SecretKeySpec(encryptionKey, AES);
+		final Key key = new SecretKeySpec(encryptionKey.elements(), AES);
 
 		// Create the algorithm used for the authentication
-		final AlgorithmParameterSpec params = new GCMParameterSpec(AES_GCM_TAG_BYTE_LENGTH * 8, nonce);
+		final AlgorithmParameterSpec params = new GCMParameterSpec(AES_GCM_TAG_BYTE_LENGTH * 8, nonce.elements());
 
 		// Initialize Cipher for the authentication
 		try {

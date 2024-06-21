@@ -23,7 +23,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
  * sub-interfaces represent the types supported by the recursive hash, which is akin to a union type. These sub-interfaces map one to one to a Java
  * type. The supported types by the recursive hash and their respective Hashable form are:
  * <ul>
- *     <li>{@code byte[]}, see {@link HashableByteArray}</li>
+ *     <li>{@code ImmutableByteArray}, see {@link HashableByteArray}</li>
  *     <li>{@code String}, see {@link HashableString}</li>
  *     <li>{@code BigInteger}, see {@link HashableBigInteger}</li>
  *     <li>{@code List<Hashable>}, see {@link HashableList}</li>

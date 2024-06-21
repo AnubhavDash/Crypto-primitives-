@@ -26,9 +26,9 @@
 
 package com.verificatum.vmgj;
 
-import ch.post.it.evoting.cryptoprimitives.internal.utils.LibraryLoader;
-
 import java.math.BigInteger;
+
+import ch.post.it.evoting.cryptoprimitives.internal.utils.LibraryLoader;
 
 // We use C style to name things in this file, since it should
 // correspond to the native code.

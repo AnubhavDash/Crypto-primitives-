@@ -27,7 +27,7 @@ public class TestSizedElement implements GroupVectorElement<TestGroup>, Hashable
 	private final int size;
 	private final TestGroup group;
 
-	public TestSizedElement(TestGroup group, int size) {
+	public TestSizedElement(final TestGroup group, final int size) {
 		this.group = group;
 		this.size = size;
 	}

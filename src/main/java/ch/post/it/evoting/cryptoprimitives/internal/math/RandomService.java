@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.math.Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.Base10Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -65,9 +66,8 @@ public class RandomService implements Random {
 	@SuppressWarnings("java:S117")
 	public BigInteger genRandomInteger(final BigInteger upperBound) {
 		// Input.
-		checkNotNull(upperBound);
-		checkArgument(upperBound.signum() > 0, "The upper bound must be a positive integer greater than 0.");
-		final BigInteger m = upperBound;
+		final BigInteger m = checkNotNull(upperBound);
+		checkArgument(m.signum() > 0, "The upper bound must be a positive integer greater than 0.");
 
 		// Operation.
 		if (m.compareTo(BigInteger.ONE) == 0) {
@@ -78,7 +78,7 @@ public class RandomService implements Random {
 		final int bitLength = m_minus_one.bitLength();
 		BigInteger r;
 		do {
-			final byte[] rBytes = cutToBitLength(randomBytes(length), bitLength);
+			final ImmutableByteArray rBytes = cutToBitLength(randomBytes(length), bitLength);
 			r = byteArrayToInteger(rBytes);
 		} while (r.compareTo(m) >= 0);
 
@@ -128,11 +128,10 @@ public class RandomService implements Random {
 	 * @return {@code List<ZqElement>}
 	 */
 	public GroupVector<ZqElement, ZqGroup> genRandomVector(final BigInteger upperBound, final int length) {
-		checkNotNull(upperBound);
-		checkArgument(upperBound.signum() > 0, "The upper bound should be greater than zero");
+		final BigInteger q = checkNotNull(upperBound);
+		checkArgument(q.signum() > 0, "The upper bound should be greater than zero");
 		checkArgument(length > 0, "The length should be greater than zero");
 
-		final BigInteger q = upperBound;
 		final int n = length;
 
 		final ZqGroup zqGroup = new ZqGroup(q);
@@ -143,16 +142,16 @@ public class RandomService implements Random {
 	}
 
 	/**
-	 * Generates an array of {@code byteLength} random bytes.
+	 * Generates an immutable array of {@code byteLength} random bytes.
 	 *
 	 * @param byteLength The number of bytes to generate.
-	 * @return An array of {@code byteLength} random bytes.
+	 * @return An immutable array of {@code byteLength} random bytes.
 	 */
-	public byte[] randomBytes(final int byteLength) {
+	public ImmutableByteArray randomBytes(final int byteLength) {
 		final byte[] randomBytes = new byte[byteLength];
 		secureRandom.nextBytes(randomBytes);
 
-		return randomBytes;
+		return ImmutableByteArray.from(randomBytes);
 	}
 
 	/**
@@ -162,11 +161,10 @@ public class RandomService implements Random {
 	public String genRandomString(final int length, final Alphabet alphabet) {
 
 		checkArgument(length > 0, "The desired length of string must be strictly positive. [length: %s]", length);
-		checkNotNull(alphabet);
 
 		// Input
 		final int l = length;
-		final Alphabet A = alphabet;
+		final Alphabet A = checkNotNull(alphabet);
 		final int k = A.size();
 
 		// Operation

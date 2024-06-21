@@ -15,10 +15,12 @@
  */
 package ch.post.it.evoting.cryptoprimitives.hashing;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 
 @DisplayName("A HashableByteArray")
 class HashableByteArrayTest {
@@ -26,22 +28,22 @@ class HashableByteArrayTest {
 	@Test
 	@DisplayName("correctly makes a copy of the input byte array and toHashableForm array")
 	void hashableByteArrayFromMakesCopy() {
-		final byte[] bytes = { 0b01, 0b10, 0b11 };
-		final byte[] expected = { 0b01, 0b10, 0b11 };
+		final ImmutableByteArray bytes = ImmutableByteArray.from(new byte[] { 0b01, 0b10, 0b11 });
+		final ImmutableByteArray expected = ImmutableByteArray.from(new byte[] { 0b01, 0b10, 0b11 });
 
 		final HashableByteArray hashableByteArray = HashableByteArray.from(bytes);
 
-		assertArrayEquals(expected, hashableByteArray.toHashableForm());
+		assertEquals(expected, hashableByteArray.toHashableForm());
 
 		// Modify original byte array.
-		bytes[0] = 0b11;
+		bytes.elements()[0] = 0b11;
 
-		assertArrayEquals(expected, hashableByteArray.toHashableForm());
+		assertEquals(expected, hashableByteArray.toHashableForm());
 
 		// Modify toHashableForm array.
-		hashableByteArray.toHashableForm()[0] = 0b11;
+		hashableByteArray.toHashableForm().elements()[0] = 0b11;
 
-		assertArrayEquals(expected, hashableByteArray.toHashableForm());
+		assertEquals(expected, hashableByteArray.toHashableForm());
 	}
 
 }

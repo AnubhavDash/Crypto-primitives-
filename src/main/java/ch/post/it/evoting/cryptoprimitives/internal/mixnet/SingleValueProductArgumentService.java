@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
@@ -128,7 +129,7 @@ class SingleValueProductArgumentService {
 
 		// Calculate δ
 		final List<ZqElement> delta_mutable = new ArrayList<>(n);
-		delta_mutable.add(0, d.get(0));
+		delta_mutable.addFirst(d.getFirst());
 		if (n > 2) {
 			delta_mutable.addAll(1, randomService.genRandomVector(q, n - 2));
 		}
@@ -155,7 +156,7 @@ class SingleValueProductArgumentService {
 		final GqElement c_Delta = getCommitment(Delta, s_x, ck);
 
 		// Calculate x
-		final byte[] x_bytes = hashService.recursiveHash(
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,
@@ -223,7 +224,7 @@ class SingleValueProductArgumentService {
 		final ZqGroup zqGroup = b.getGroup();
 
 		// Calculate x
-		final byte[] x_bytes = hashService.recursiveHash(
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,
@@ -253,9 +254,9 @@ class SingleValueProductArgumentService {
 				String.format("prodDelta %s and commDelta %s are not equal", prodDelta, commDelta));
 
 		// Verify B
-		final Verifiable verifB = create(() -> b_tilde.get(0).equals(a_tilde.get(0)) && b_tilde.get(n - 1).equals(x.multiply(b)),
-				String.format("bTilde.get(0) %s must equal aTilde.get(0) %s and bTilde.get(n - 1) %s must equal x * b %s", b_tilde.get(0),
-						a_tilde.get(0), b_tilde.get(n - 1), x.multiply(b)));
+		final Verifiable verifB = create(() -> b_tilde.getFirst().equals(a_tilde.getFirst()) && b_tilde.get(n - 1).equals(x.multiply(b)),
+				String.format("bTilde.get(0) %s must equal aTilde.get(0) %s and bTilde.get(n - 1) %s must equal x * b %s", b_tilde.getFirst(),
+						a_tilde.getFirst(), b_tilde.get(n - 1), x.multiply(b)));
 
 		return verifA.and(verifDelta).and(verifB);
 	}

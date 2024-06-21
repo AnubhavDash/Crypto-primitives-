@@ -17,7 +17,7 @@ package ch.post.it.evoting.cryptoprimitives.hashing;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Arrays;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 
 /**
  * Interface to be implemented by classes whose hashable form is a byte array.
@@ -25,7 +25,7 @@ import java.util.Arrays;
 public interface HashableByteArray extends Hashable {
 
 	@Override
-	byte[] toHashableForm();
+	ImmutableByteArray toHashableForm();
 
 	/**
 	 * Utility function which creates an immutable HashableByteArray whose hashable form is the provided byte array.
@@ -33,12 +33,9 @@ public interface HashableByteArray extends Hashable {
 	 * @param byteArray the hashable form. Non-null.
 	 * @return A new HashableByteArray whose hashable form is {@code byteArray}
 	 */
-	static HashableByteArray from(final byte[] byteArray) {
+	static HashableByteArray from(final ImmutableByteArray byteArray) {
 		checkNotNull(byteArray);
 
-		// The first copy is done to avoid modification of the input affecting the HashableByteArray.
-		// The second copy is done to avoid modification of the returned value to affect the HashableByteArray.
-		final byte[] copy = Arrays.copyOf(byteArray, byteArray.length);
-		return () ->  Arrays.copyOf(copy, copy.length);
+		return () -> byteArray;
 	}
 }

@@ -33,6 +33,7 @@ import java.util.stream.IntStream;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
@@ -161,7 +162,7 @@ final class ZeroArgumentService {
 		final GroupVector<GqElement, GqGroup> c_d = getCommitmentVector(d, t, ck);
 
 		// Compute x, later used to compute a', b', r', s' and t'.
-		final byte[] x_bytes = hashService.recursiveHash(
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,
@@ -362,7 +363,7 @@ final class ZeroArgumentService {
 		final BigInteger q = group.getQ();
 
 		//Algorithm
-		final byte[] x_bytes = hashService.recursiveHash(
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,

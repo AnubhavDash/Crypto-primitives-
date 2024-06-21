@@ -47,6 +47,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
@@ -289,7 +290,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 		void getShuffleArgumentCiphertextsShuffledCiphertextsDiff() {
 			// Modify the shuffled ciphertexts by replacing its first element by a different ciphertext.
 			final List<ElGamalMultiRecipientCiphertext> shuffledCiphertexts = new ArrayList<>(shuffleStatement.get_C_prime());
-			final ElGamalMultiRecipientCiphertext first = shuffledCiphertexts.get(0);
+			final ElGamalMultiRecipientCiphertext first = shuffledCiphertexts.getFirst();
 			final ElGamalMultiRecipientCiphertext otherFirst = Generators.genWhile(() -> elGamalGenerator.genRandomCiphertext(l), first::equals);
 			shuffledCiphertexts.set(0, otherFirst);
 
@@ -341,7 +342,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 			// Necessary to return a constant value, otherwise some assertFalse tests can return true because of changes compensating each other (due
 			// to small test groups).
 			final HashService hashServiceMock = mock(HashService.class);
-			when(hashServiceMock.recursiveHash(any(Hashable[].class))).thenReturn(new byte[] { 0b10 });
+			when(hashServiceMock.recursiveHash(any(Hashable[].class))).thenReturn(ImmutableByteArray.from(new byte[] { 0b10 }));
 
 			shuffleArgumentService = new ShuffleArgumentService(publicKey, commitmentKey, randomService, hashServiceMock);
 		}
@@ -450,7 +451,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 		void verifyShuffleArgumentIncorrectCA() {
 			final GroupVector<GqElement, GqGroup> commitmentA = shuffleArgument.get_c_A();
 
-			final GqElement badCA0 = commitmentA.get(0).multiply(gqGroup.getGenerator());
+			final GqElement badCA0 = commitmentA.getFirst().multiply(gqGroup.getGenerator());
 			final GroupVector<GqElement, GqGroup> badCommitmentA = GroupVectors.set(commitmentA, 0, badCA0);
 			final ShuffleArgument badShuffleArgument = new ShuffleArgument.Builder()
 					.with_c_A(badCommitmentA)
@@ -469,7 +470,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 		void verifyShuffleArgumentIncorrectCB() {
 			final GroupVector<GqElement, GqGroup> commitmentB = shuffleArgument.get_c_B();
 
-			final GqElement badCBm = commitmentB.get(0).multiply(gqGroup.getGenerator());
+			final GqElement badCBm = commitmentB.getFirst().multiply(gqGroup.getGenerator());
 			final GroupVector<GqElement, GqGroup> badCommitmentB = GroupVectors.set(commitmentB, 0, badCBm);
 			final ShuffleArgument badShuffleArgument = new ShuffleArgument.Builder()
 					.with_c_A(shuffleArgument.get_c_A())

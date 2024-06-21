@@ -37,6 +37,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
@@ -90,7 +91,7 @@ class SignatureKeystoreServiceTest {
 		final HashableByteArray message = HashableByteArray.from(randomService.randomBytes(1000));
 
 		// when
-		final byte[] signature = service1.generateSignature(message, EMPTY_CONTEXT_DATA);
+		final ImmutableByteArray signature = service1.generateSignature(message, EMPTY_CONTEXT_DATA);
 
 		// then
 		assertTrue(service2.verifySignature(() -> alias1, message, EMPTY_CONTEXT_DATA, signature));
@@ -117,7 +118,7 @@ class SignatureKeystoreServiceTest {
 		final HashableByteArray message = HashableByteArray.from(randomService.randomBytes(1000));
 
 		// when
-		final byte[] signature = service1.generateSignature(message, EMPTY_CONTEXT_DATA);
+		final ImmutableByteArray signature = service1.generateSignature(message, EMPTY_CONTEXT_DATA);
 
 		// then
 		assertThrows(NullPointerException.class, () -> service2.verifySignature(() -> alias1, message, EMPTY_CONTEXT_DATA, signature),

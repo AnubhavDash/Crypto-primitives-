@@ -33,13 +33,13 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 public class ElGamalService implements ElGamal {
 
 	@Override
-	public ElGamalMultiRecipientCiphertext getCiphertext(ElGamalMultiRecipientMessage message, ZqElement exponent,
-			ElGamalMultiRecipientPublicKey publicKey) {
+	public ElGamalMultiRecipientCiphertext getCiphertext(final ElGamalMultiRecipientMessage message, final ZqElement exponent,
+			final ElGamalMultiRecipientPublicKey publicKey) {
 		return ElGamalMultiRecipientCiphertexts.getCiphertext(message, exponent, publicKey);
 	}
 
 	@Override
-	public ElGamalMultiRecipientCiphertext neutralElement(int numPhi, GqGroup group) {
+	public ElGamalMultiRecipientCiphertext neutralElement(final int numPhi, final GqGroup group) {
 		return ElGamalMultiRecipientCiphertexts.neutralElement(numPhi, group);
 	}
 
@@ -50,7 +50,7 @@ public class ElGamalService implements ElGamal {
 	}
 
 	@Override
-	public ElGamalMultiRecipientMessage ones(GqGroup group, int size) {
+	public ElGamalMultiRecipientMessage ones(final GqGroup group, final int size) {
 		return ElGamalMultiRecipientMessages.ones(group, size);
 	}
 
@@ -61,17 +61,17 @@ public class ElGamalService implements ElGamal {
 	}
 
 	@Override
-	public ElGamalMultiRecipientKeyPair genKeyPair(GqGroup group, int numElements, Random random) {
+	public ElGamalMultiRecipientKeyPair genKeyPair(final GqGroup group, final int numElements, final Random random) {
 		return ElGamalMultiRecipientKeyPair.genKeyPair(group, numElements, random);
 	}
 
 	@Override
-	public ElGamalMultiRecipientKeyPair from(ElGamalMultiRecipientPrivateKey privateKey, GqElement generator) {
+	public ElGamalMultiRecipientKeyPair from(final ElGamalMultiRecipientPrivateKey privateKey, final GqElement generator) {
 		return ElGamalMultiRecipientKeyPair.from(privateKey, generator);
 	}
 
 	@Override
-	public ElGamalMultiRecipientPublicKey combinePublicKeys(GroupVector<ElGamalMultiRecipientPublicKey, GqGroup> publicKeyList) {
+	public ElGamalMultiRecipientPublicKey combinePublicKeys(final GroupVector<ElGamalMultiRecipientPublicKey, GqGroup> publicKeyList) {
 		return ElGamalMultiRecipientPublicKeys.combinePublicKeys(publicKeyList);
 	}
 }

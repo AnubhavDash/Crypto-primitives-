@@ -28,8 +28,7 @@ import java.util.stream.Collectors;
 
 import org.bouncycastle.crypto.digests.SHAKEDigest;
 
-import com.google.common.primitives.Bytes;
-
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
@@ -83,8 +82,8 @@ public final class EncryptionParameters {
 		final int l = smallPrimes.size();
 		final int pBitLength = securityLevel.getPBitLength();
 
-		final byte[] q_b_hat = shake256(stringToByteArray(seed), pBitLength / 8);
-		final byte[] q_b = Bytes.concat(new byte[] { 0x02 }, q_b_hat);
+		final ImmutableByteArray q_b_hat = shake256(stringToByteArray(seed), pBitLength / 8);
+		final ImmutableByteArray q_b = ImmutableByteArray.concat(ImmutableByteArray.from(new byte[] { 0x02 }), q_b_hat);
 		final BigInteger q_prime = byteArrayToInteger(q_b).shiftRight(3);
 		BigInteger q = q_prime.subtract(q_prime.mod(SIX)).add(FIVE);
 		final ArrayList<BigInteger> r = new ArrayList<>(l);
@@ -119,14 +118,14 @@ public final class EncryptionParameters {
 		return new GqGroup(p, q, g);
 	}
 
-	private byte[] shake256(final byte[] message, final int outputLength) {
+	private ImmutableByteArray shake256(final ImmutableByteArray message, final int outputLength) {
 		final byte[] result = new byte[outputLength];
 		final SHAKEDigest shakeDigest = new SHAKEDigest(256);
 
-		shakeDigest.update(message, 0, message.length);
+		shakeDigest.update(message.elements(), 0, message.length());
 		shakeDigest.doFinal(result, 0, outputLength);
 
-		return result;
+		return ImmutableByteArray.from(result);
 	}
 
 	/**

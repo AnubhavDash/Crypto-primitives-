@@ -31,6 +31,7 @@ import com.google.common.cache.RemovalListener;
 import com.verificatum.vmgj.FpowmTab;
 import com.verificatum.vmgj.VMG;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
@@ -73,11 +74,11 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 
 	private static String deriveCacheKey(final BigInteger base, final BigInteger modulus) {
 		checkArgument(modulus.signum() >= 0);
-		final byte[] bytes = hashService.recursiveHash(
+		final ImmutableByteArray bytes = hashService.recursiveHash(
 				HashableString.from(Boolean.toString(base.signum() >= 0)),
 				HashableBigInteger.from(base.abs()),
 				HashableBigInteger.from(modulus));
-		return HexFormat.of().formatHex(bytes);
+		return HexFormat.of().formatHex(bytes.elements());
 	}
 
 	@Override

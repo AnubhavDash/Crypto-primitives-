@@ -97,7 +97,7 @@ class StringsTest {
 	@DisplayName("truncate implementation is equivalent to specification.")
 	void truncateEnsureEqualityOfImplementation() {
 		final int stringLength = randomService.genRandomInteger(1, 10000);
-		final String string = new String(randomService.randomBytes(stringLength));
+		final String string = new String(randomService.randomBytes(stringLength).elements());
 		final int length = randomService.genRandomInteger(1, 10000);
 
 		assertEquals(truncateFromSpecification(string, length), Strings.truncate(string, length));

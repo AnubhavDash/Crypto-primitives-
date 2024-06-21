@@ -66,7 +66,7 @@ public class PrimesInternal {
 					smallPrimes.add(scanner.nextInt());
 				}
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new UncheckedIOException("Unable to read small_primes.txt", e);
 		}
 

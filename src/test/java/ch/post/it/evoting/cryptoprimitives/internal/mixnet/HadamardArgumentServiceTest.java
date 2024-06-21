@@ -47,6 +47,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
@@ -197,7 +198,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 		@DisplayName("with too short commitments for A throws an IllegalArgumentException")
 		void getHadamardArgumentWithTooShortCommitmentsA() {
 			final List<GqElement> commitmentsAList = new ArrayList<>(commitmentsA);
-			commitmentsAList.remove(0);
+			commitmentsAList.removeFirst();
 			commitmentsA = GroupVector.from(commitmentsAList);
 			statement = new HadamardStatement(commitmentsA, commitmentB);
 			final Exception exception = assertThrows(IllegalArgumentException.class,
@@ -230,7 +231,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 		@DisplayName("with wrong commitments for b throws an IllegalArgumentException")
 		void getHadamardArgumentWithWrongCommitmentsA() {
 			final List<GqElement> commitmentsAList = new ArrayList<>(commitmentsA);
-			GqElement first = commitmentsAList.get(0);
+			GqElement first = commitmentsAList.getFirst();
 			first = first.multiply(gqGroup.getGenerator());
 			commitmentsAList.set(0, first);
 			commitmentsA = GroupVector.from(commitmentsAList);
@@ -256,7 +257,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 		@DisplayName("with a wrong product b throws an IllegalArgumentException")
 		void getHadamardArgumentWithWrongProduct() {
 			final List<ZqElement> vectorElements = new ArrayList<>(vector);
-			ZqElement first = vectorElements.get(0);
+			ZqElement first = vectorElements.getFirst();
 			first = first.add(ZqElement.create(BigInteger.ONE, zqGroup));
 			vectorElements.set(0, first);
 			vector = GroupVector.from(vectorElements);
@@ -313,7 +314,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 					zero, // s_m
 					zero, one, three, four, two, one, two // t
 			).when(hadamardRandomService).genRandomInteger(any());
-			when(hadamardHashService.recursiveHash(any(Hashable[].class))).thenReturn(new byte[] { 0b10 });
+			when(hadamardHashService.recursiveHash(any(Hashable[].class))).thenReturn(ImmutableByteArray.from(new byte[] { 0b10 }));
 			final HadamardArgumentService specificHadamardArgumentService = new HadamardArgumentService(hadamardRandomService, hadamardHashService,
 					hadamardPublicKey, hadamardCommitmentKey);
 
@@ -416,7 +417,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 		void verifyHadamardArgumentWithBad_cUpperB() {
 			final GroupVector<GqElement, GqGroup> cUpperB = argument.get_c_B();
 
-			final GqElement badcUpperB0 = cUpperB.get(0).multiply(gqGroup.getGenerator());
+			final GqElement badcUpperB0 = cUpperB.getFirst().multiply(gqGroup.getGenerator());
 			GroupVector<GqElement, GqGroup> badcUpperB = cUpperB.stream().skip(1).collect(toGroupVector()).prepend(badcUpperB0);
 			HadamardArgument badArgument = new HadamardArgument(badcUpperB, argument.get_zeroArgument());
 
