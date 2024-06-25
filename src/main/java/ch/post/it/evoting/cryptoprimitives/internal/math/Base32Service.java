@@ -17,28 +17,26 @@ package ch.post.it.evoting.cryptoprimitives.internal.math;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Arrays;
-
 import com.google.common.io.BaseEncoding;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.math.Base32;
 
 @SuppressWarnings("java:S117")
 public final class Base32Service implements Base32 {
 
 	@Override
-	public String base32Encode(final byte[] byteArray) {
-		checkNotNull(byteArray);
-		final byte[] B = Arrays.copyOf(byteArray, byteArray.length);
-		return BaseEncoding.base32().encode(B);
+	public String base32Encode(final ImmutableByteArray byteArray) {
+		final ImmutableByteArray B = checkNotNull(byteArray);
+		return BaseEncoding.base32().encode(B.elements());
 	}
 
 	@Override
-	public byte[] base32Decode(final String string) {
+	public ImmutableByteArray base32Decode(final String string) {
 		final String S = checkNotNull(string);
 		try {
 			// The method decode checks the given string is a valid Base32 string.
-			return BaseEncoding.base32().decode(S);
+			return new ImmutableByteArray(BaseEncoding.base32().decode(S));
 		} catch (final IllegalArgumentException e) {
 			throw new IllegalArgumentException("The given string is not a valid Base32 string.", e);
 		}

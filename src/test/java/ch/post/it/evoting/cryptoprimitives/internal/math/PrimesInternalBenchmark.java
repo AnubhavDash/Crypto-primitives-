@@ -39,7 +39,7 @@ public class PrimesInternalBenchmark {
 	@Fork(value = 1)
 	@Measurement(iterations = 5)
 	@Warmup(iterations = 0)
-	public boolean smallPrimeBenchmark(MyState myState) {
+	public boolean smallPrimeBenchmark(final MyState myState) {
 		return PrimesInternal.isSmallPrime(myState.prime);
 	}
 }

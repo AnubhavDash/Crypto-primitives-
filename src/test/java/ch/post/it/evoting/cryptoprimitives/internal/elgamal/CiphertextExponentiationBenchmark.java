@@ -46,7 +46,7 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 @Warmup(iterations = 0)
 public class CiphertextExponentiationBenchmark {
 	@Benchmark
-	public void ciphertextMultimodExp(CiphertextMultimodExpState state, Blackhole bh) {
+	public void ciphertextMultimodExp(final CiphertextMultimodExpState state, final Blackhole bh) {
 		bh.consume(ElGamalMultiRecipientCiphertexts.getCiphertextVectorExponentiation(state.ciphertexts, state.exponents));
 	}
 

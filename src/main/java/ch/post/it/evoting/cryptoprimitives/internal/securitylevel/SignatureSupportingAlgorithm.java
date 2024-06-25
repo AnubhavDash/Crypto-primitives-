@@ -21,6 +21,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.signing.CertificateInfo;
 
 /**
@@ -31,26 +32,29 @@ public interface SignatureSupportingAlgorithm {
 
 	/**
 	 * Creates a certificate for the public key, signed by the private key, as a self-signed x.509 certificate
+	 *
 	 * @param keyPair contains the public key to create a certificate for, and the private key with which to sign the certificate.
-	 * @param info Defines the additional properties of the certificate, including identity information, validity, and key usage
+	 * @param info    Defines the additional properties of the certificate, including identity information, validity, and key usage
 	 * @return an X509 certificate encoded according to DER
 	 */
 	X509Certificate getCertificate(final KeyPair keyPair, final CertificateInfo info);
 
 	/**
 	 * Signs a message with a private key.
+	 *
 	 * @param privateKey the private key with which to sign the message
-	 * @param message the message to sign
+	 * @param message    the message to sign
 	 * @return a byte array representing the signature
 	 */
-	byte[] sign(final PrivateKey privateKey, final byte[] message);
+	ImmutableByteArray sign(final PrivateKey privateKey, final ImmutableByteArray message);
 
 	/**
 	 * Verifies a message's signature.
+	 *
 	 * @param publicKey the public key with which to verify the signature
-	 * @param message the message to verify the signature of
+	 * @param message   the message to verify the signature of
 	 * @param signature the signature contents
 	 * @return true if the signature is valid, false otherwise
 	 */
-	boolean verify(final PublicKey publicKey, final byte[] message, final byte[] signature);
+	boolean verify(final PublicKey publicKey, final ImmutableByteArray message, final ImmutableByteArray signature);
 }

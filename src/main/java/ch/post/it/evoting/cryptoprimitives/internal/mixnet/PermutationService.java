@@ -19,7 +19,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.IntStream;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;

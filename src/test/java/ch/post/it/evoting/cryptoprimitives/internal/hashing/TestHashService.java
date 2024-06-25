@@ -20,6 +20,7 @@ import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInte
 
 import java.math.BigInteger;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 
@@ -68,7 +69,7 @@ public class TestHashService extends HashService {
 	 * @return the bounded hash of the {@code values}.
 	 */
 	@Override
-	public byte[] recursiveHash(final Hashable... values) {
+	public ImmutableByteArray recursiveHash(final Hashable... values) {
 		final BigInteger hashValue = byteArrayToInteger(DELEGATE_HASH_SERVICE.recursiveHash(values));
 		final BigInteger hashValueInBounds = hashValue.mod(upperBound.subtract(lowerBound)).add(lowerBound);
 

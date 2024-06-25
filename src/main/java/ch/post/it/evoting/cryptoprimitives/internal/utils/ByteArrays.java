@@ -21,6 +21,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+
 /**
  * Byte array utilities.
  */
@@ -34,12 +36,10 @@ public final class ByteArrays {
 	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.ByteArrays#cutToBitLength}
 	 */
 	@SuppressWarnings("java:S117")
-	public static byte[] cutToBitLength(final byte[] byteArray, final int requestedLength) {
+	public static ImmutableByteArray cutToBitLength(final ImmutableByteArray byteArray, final int requestedLength) {
 		// Input.
-		checkNotNull(byteArray);
-
-		final byte[] B = byteArray;
-		final int N = B.length;
+		final ImmutableByteArray B = checkNotNull(byteArray);
+		final int N = B.length();
 		final int n = requestedLength;
 
 		checkArgument(N > 0, "The byte array length must be strictly positive.");
@@ -53,17 +53,17 @@ public final class ByteArrays {
 		final int offset = N - length;
 		final byte[] B_prime = new byte[length];
 		if (n % Byte.SIZE != 0) {
-			B_prime[0] = (byte) (B[offset] & (byte) (Math.pow(2, n % Byte.SIZE) - 1));
+			B_prime[0] = (byte) (B.get(offset) & (byte) (Math.pow(2, n % Byte.SIZE) - 1));
 		} else {
-			B_prime[0] = B[offset];
+			B_prime[0] = B.get(offset);
 		}
 
 		for (int i = 1; i < length; i++) {
-			B_prime[i] = B[offset + i];
+			B_prime[i] = B.get(offset + i);
 		}
 
 		// Output.
-		return B_prime;
+		return new ImmutableByteArray(B_prime);
 	}
 
 	/**

@@ -40,6 +40,7 @@ import org.mockito.Mockito;
 
 import com.google.common.base.Throwables;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.math.Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.UsabilityBase32Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
@@ -80,7 +81,7 @@ class RandomServiceTest {
 	@Test
 	void genRandomIntegerAreEquivalent() {
 		final BigInteger upperBound = BigInteger.valueOf(1_000_000);
-		final List<byte[]> randomBytesList = new ArrayList<>(3);
+		final List<ImmutableByteArray> randomBytesList = new ArrayList<>(3);
 		for (int i = 0; i < 3; i++) {
 			randomBytesList.add(randomService.randomBytes(byteLength(upperBound)));
 		}
@@ -99,24 +100,24 @@ class RandomServiceTest {
 		}
 	}
 
-	private MockedConstruction.MockInitializer<SecureRandom> prepareSecureRandom(final List<byte[]> randomBytesList) {
+	private MockedConstruction.MockInitializer<SecureRandom> prepareSecureRandom(final List<ImmutableByteArray> randomBytesList) {
 		checkArgument(randomBytesList.size() >= 3);
 		return (SecureRandom mockSecureRandom, MockedConstruction.Context context) ->
 				doAnswer(invocation -> {
 					final byte[] byteArray = invocation.getArgument(0, byte[].class);
-					System.arraycopy(randomBytesList.get(0), 0, byteArray, 0, byteArray.length);
+					System.arraycopy(randomBytesList.getFirst().elements(), 0, byteArray, 0, byteArray.length);
 					return null;
 				}).doAnswer(invocation -> {
 					final byte[] byteArray = invocation.getArgument(0, byte[].class);
-					System.arraycopy(randomBytesList.get(1), 0, byteArray, 0, byteArray.length);
+					System.arraycopy(randomBytesList.get(1).elements(), 0, byteArray, 0, byteArray.length);
 					return null;
 				}).doAnswer(invocation -> {
 					final byte[] byteArray = invocation.getArgument(0, byte[].class);
-					System.arraycopy(randomBytesList.get(2), 0, byteArray, 0, byteArray.length);
+					System.arraycopy(randomBytesList.get(2).elements(), 0, byteArray, 0, byteArray.length);
 					return null;
 				}).doAnswer(invocation -> {
 					final byte[] byteArray = invocation.getArgument(0, byte[].class);
-					System.arraycopy(randomBytesList.get(0), 1, byteArray, 1, byteArray.length - 1);
+					System.arraycopy(randomBytesList.getFirst().elements(), 1, byteArray, 1, byteArray.length - 1);
 					return null;
 				}).when(mockSecureRandom).nextBytes(Mockito.any());
 	}
@@ -144,11 +145,11 @@ class RandomServiceTest {
 		final int RANDOM_BYTES_LENGTH_NINTY_SIX = 96;
 		final int RANDOM_BYTES_LENGTH_ZERO = 0;
 
-		byte[] randomBytes = randomService.randomBytes(RANDOM_BYTES_LENGTH_NINTY_SIX);
-		assertEquals(RANDOM_BYTES_LENGTH_NINTY_SIX, randomBytes.length);
+		ImmutableByteArray randomBytes = randomService.randomBytes(RANDOM_BYTES_LENGTH_NINTY_SIX);
+		assertEquals(RANDOM_BYTES_LENGTH_NINTY_SIX, randomBytes.length());
 
 		randomBytes = randomService.randomBytes(RANDOM_BYTES_LENGTH_ZERO);
-		assertEquals(RANDOM_BYTES_LENGTH_ZERO, randomBytes.length);
+		assertEquals(RANDOM_BYTES_LENGTH_ZERO, randomBytes.length());
 	}
 
 	@Test

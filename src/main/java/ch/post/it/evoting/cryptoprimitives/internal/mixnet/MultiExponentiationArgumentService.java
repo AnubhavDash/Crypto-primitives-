@@ -41,6 +41,7 @@ import java.util.stream.Stream;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
@@ -211,7 +212,7 @@ final class MultiExponentiationArgumentService {
 						.collect(toGroupVector());
 
 		//Compute challenge hash
-		final byte[] x_bytes = hashService.recursiveHash(
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(gqGroup.getP()),
 				HashableBigInteger.from(gqGroup.getQ()),
 				pk,
@@ -349,8 +350,8 @@ final class MultiExponentiationArgumentService {
 		return IntStream.range(0, 2 * m)
 				.parallel()
 				.mapToObj(k -> {
-					int lowerBound;
-					int upperBound;
+					final int lowerBound;
+					final int upperBound;
 					if (k < m) {
 						lowerBound = (m - k) - 1;
 						upperBound = m;
@@ -394,8 +395,8 @@ final class MultiExponentiationArgumentService {
 		checkArgument(argument.get_l() == statement.get_l(), "l dimension doesn't match.");
 
 		//Extract variables from statement and argument
-		int m = statement.get_m();
-		int l = statement.get_l();
+		final int m = statement.get_m();
+		final int l = statement.get_l();
 		final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> C_matrix = statement.get_C_matrix();
 		final ElGamalMultiRecipientCiphertext C = statement.get_C();
 		final GroupVector<GqElement, GqGroup> c_A = statement.get_c_A();
@@ -411,7 +412,7 @@ final class MultiExponentiationArgumentService {
 		final BigInteger q = this.gqGroup.getQ();
 
 		//Algorithm
-		final byte[] x_bytes = hashService.recursiveHash(
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,
@@ -495,7 +496,7 @@ final class MultiExponentiationArgumentService {
 		/**
 		 * @param function the function to memoize.
 		 */
-		Memoizer(Function<Integer, R> function) {
+		Memoizer(final Function<Integer, R> function) {
 			this.function = function;
 		}
 

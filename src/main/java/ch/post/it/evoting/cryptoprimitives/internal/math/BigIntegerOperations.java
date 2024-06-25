@@ -36,7 +36,7 @@ public interface BigIntegerOperations {
 	 * @param base    the base
 	 * @param modulus the modulus
 	 */
-	default void generateCache(BigInteger base, BigInteger modulus) {
+	default void generateCache(final BigInteger base, final BigInteger modulus) {
 		throw new UnsupportedOperationException("This implementation does not support fixed base optimizations");
 	}
 

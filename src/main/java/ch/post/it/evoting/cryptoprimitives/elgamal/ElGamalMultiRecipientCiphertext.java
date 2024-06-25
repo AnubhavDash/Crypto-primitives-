@@ -139,14 +139,14 @@ public final class ElGamalMultiRecipientCiphertext implements GroupVectorElement
 
 		final GqElement gamma = this.gamma.exponentiate(a);
 
-		Stream<GqElement> elementStream;
+		final Stream<GqElement> elementStream;
 
 		if (ENABLE_PARALLEL_STREAMS) {
 			elementStream = this.phis.parallelStream();
 		} else {
 			elementStream = this.phis.stream();
 		}
-		GroupVector<GqElement, GqGroup> phi = elementStream
+		final GroupVector<GqElement, GqGroup> phi = elementStream
 				.map(phi_i -> phi_i.exponentiate(a))
 				.collect(toGroupVector());
 

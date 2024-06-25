@@ -48,6 +48,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
@@ -234,7 +235,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 			assertFalse(argument.get_c_b().isPresent());
 			assertFalse(argument.getHadamardArgument().isPresent());
 
-			final SingleValueProductStatement sStatement = new SingleValueProductStatement(smallStatement.get_c_A().get(0),
+			final SingleValueProductStatement sStatement = new SingleValueProductStatement(smallStatement.get_c_A().getFirst(),
 					smallStatement.get_b());
 			assertTrue(new SingleValueProductArgumentService(randomService, hashService, publicKey, commitmentKey)
 					.verifySingleValueProductArgument(sStatement, argument.getSingleValueProductArgument()).verify().isVerified());
@@ -245,7 +246,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 		void getProductArgumentWithBadCommitment() {
 			final List<GqElement> commitmentList = new ArrayList<>(commitmentsA);
 			final GqElement g = commitmentsA.getGroup().getGenerator();
-			GqElement first = commitmentList.get(0);
+			GqElement first = commitmentList.getFirst();
 			first = first.multiply(g);
 			commitmentList.set(0, first);
 			commitmentsA = GroupVector.from(commitmentList);
@@ -317,8 +318,11 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 					four, one, zero, // d_0, d_1, r_d
 					one, two // s_0, s_x
 			).when(productRandomService).genRandomInteger(any());
-			when(productHashService.recursiveHash(any(Hashable[].class)))
-					.thenReturn(new byte[] { 0b10 }, new byte[] { 0b11 }, new byte[] { 0b01 }, new byte[] { 0b10 });
+			when(productHashService.recursiveHash(any(Hashable[].class))).thenReturn(
+					ImmutableByteArray.of((byte) 0b10 ),
+					ImmutableByteArray.of((byte) 0b11 ),
+					ImmutableByteArray.of((byte) 0b01 ),
+					ImmutableByteArray.of((byte) 0b10 ));
 			final ProductArgumentService specificProductArgumentService = new ProductArgumentService(productRandomService, productHashService,
 					productPublicKey, productCommitmentKey);
 
@@ -511,7 +515,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 					.orElseThrow(() -> new IllegalArgumentException("Missing HadamardArgument"));
 			final GroupVector<GqElement, GqGroup> cUpperB = hadamardArgument.get_c_B();
 
-			final GqElement badcUpperB0 = cUpperB.get(0).multiply(gqGroup.getGenerator());
+			final GqElement badcUpperB0 = cUpperB.getFirst().multiply(gqGroup.getGenerator());
 			final GroupVector<GqElement, GqGroup> badcUpperB = cUpperB.stream().skip(1).collect(toGroupVector()).prepend(badcUpperB0);
 			final HadamardArgument badHadamardArgument = new HadamardArgument(badcUpperB, hadamardArgument.get_zeroArgument());
 			final ProductArgument badArgument = new ProductArgument(

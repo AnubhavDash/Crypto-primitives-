@@ -56,7 +56,7 @@ final class CommitmentKey implements HashableList {
 	 * @param h         the h element of this commitment key
 	 * @param gElements the list of g elements contained by this commitment key
 	 */
-	CommitmentKey(GqElement h, GroupVector<GqElement, GqGroup> gElements) {
+	CommitmentKey(final GqElement h, final GroupVector<GqElement, GqGroup> gElements) {
 		//Validate h
 		checkNotNull(h);
 		checkArgument(!h.equals(h.getGroup().getIdentity()), "h cannot be 1");

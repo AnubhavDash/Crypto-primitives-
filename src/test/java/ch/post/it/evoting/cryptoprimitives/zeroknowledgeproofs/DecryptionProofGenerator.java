@@ -27,18 +27,18 @@ public class DecryptionProofGenerator {
 	private final ZqGroupGenerator generator;
 	private final ZqGroup group;
 
-	public DecryptionProofGenerator(ZqGroup group) {
+	public DecryptionProofGenerator(final ZqGroup group) {
 		this.group = group;
 		this.generator = new ZqGroupGenerator(group);
 	}
 
-	public DecryptionProof genDecryptionProof(int messageSize) {
-		ZqElement e = generator.genRandomZqElementMember();
-		GroupVector<ZqElement, ZqGroup> z = generator.genRandomZqElementVector(messageSize);
+	public DecryptionProof genDecryptionProof(final int messageSize) {
+		final ZqElement e = generator.genRandomZqElementMember();
+		final GroupVector<ZqElement, ZqGroup> z = generator.genRandomZqElementVector(messageSize);
 		return new DecryptionProof(e, z);
 	}
 
-	public GroupVector<DecryptionProof, ZqGroup> genDecryptionProofVector(int numMessages, int messageSize) {
+	public GroupVector<DecryptionProof, ZqGroup> genDecryptionProofVector(final int numMessages, final int messageSize) {
 		return GroupVector.from(generateElementList(numMessages,
 				() -> new DecryptionProofGenerator(group).genDecryptionProof(messageSize)));
 	}

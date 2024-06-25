@@ -25,14 +25,14 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator
 class TestMultiExponentiationWitnessGenerator {
 	private final ZqGroupGenerator zqGroupGenerator;
 
-	TestMultiExponentiationWitnessGenerator(ZqGroup group) {
+	TestMultiExponentiationWitnessGenerator(final ZqGroup group) {
 		this.zqGroupGenerator = new ZqGroupGenerator(group);
 	}
 
-	MultiExponentiationWitness genRandomWitness(int n, int m) {
-		GroupMatrix<ZqElement, ZqGroup> matrixA = zqGroupGenerator.genRandomZqElementMatrix(n, m);
-		GroupVector<ZqElement, ZqGroup> exponentsR = zqGroupGenerator.genRandomZqElementVector(m);
-		ZqElement exponentsRho = zqGroupGenerator.genRandomZqElementMember();
+	MultiExponentiationWitness genRandomWitness(final int n, final int m) {
+		final GroupMatrix<ZqElement, ZqGroup> matrixA = zqGroupGenerator.genRandomZqElementMatrix(n, m);
+		final GroupVector<ZqElement, ZqGroup> exponentsR = zqGroupGenerator.genRandomZqElementVector(m);
+		final ZqElement exponentsRho = zqGroupGenerator.genRandomZqElementMember();
 		return new MultiExponentiationWitness(matrixA, exponentsR, exponentsRho);
 	}
 }

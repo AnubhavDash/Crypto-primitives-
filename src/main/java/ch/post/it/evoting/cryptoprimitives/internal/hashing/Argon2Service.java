@@ -18,111 +18,77 @@ package ch.post.it.evoting.cryptoprimitives.internal.hashing;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.security.Security;
-import java.util.Arrays;
-import java.util.Objects;
 
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Argon2;
-import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Profile;
 import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Hash;
+import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Profile;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 
 public class Argon2Service implements Argon2 {
 
-	static {
-		Security.addProvider(new BouncyCastleProvider());
-	}
+    static {
+        Security.addProvider(new BouncyCastleProvider());
+    }
 
-	private final RandomService randomService;
-	private final Argon2Profile config;
+    private final RandomService randomService;
+    private final Argon2Profile config;
 
-	public Argon2Service(final RandomService randomService, final Argon2Profile config) {
-		this.randomService = randomService;
-		this.config = config;
-	}
+    public Argon2Service(final RandomService randomService, final Argon2Profile config) {
+        this.randomService = randomService;
+        this.config = config;
+    }
 
-	/**
-	 * See {@link Argon2#genArgon2id}
-	 */
-	@Override
-	public Argon2Hash genArgon2id(final byte[] inputKeyingMaterial) {
-		checkNotNull(inputKeyingMaterial);
-		final byte[] k = Arrays.copyOf(inputKeyingMaterial, inputKeyingMaterial.length);
+    /**
+     * See {@link Argon2#genArgon2id}
+     */
+    @Override
+    public Argon2Hash genArgon2id(final ImmutableByteArray inputKeyingMaterial) {
+        final ImmutableByteArray k = checkNotNull(inputKeyingMaterial);
 
-		final byte[] s = randomService.randomBytes(16);
-		final byte[] t = getArgon2id(k, s);
+        final ImmutableByteArray s = randomService.randomBytes(16);
+        final ImmutableByteArray t = getArgon2id(k, s);
 
-		return new Argon2Hash(t, s);
-	}
+        return new Argon2Hash(t, s);
+    }
 
-	/**
-	 * See {@link Argon2#getArgon2id}
-	 */
-	@Override
-	public byte[] getArgon2id(final byte[] inputKeyingMaterial, final byte[] salt) {
-		checkNotNull(inputKeyingMaterial);
-		checkNotNull(salt);
+    /**
+     * See {@link Argon2#getArgon2id}
+     */
+    @Override
+    public ImmutableByteArray getArgon2id(final ImmutableByteArray inputKeyingMaterial, final ImmutableByteArray salt) {
+        final ImmutableByteArray k = checkNotNull(inputKeyingMaterial);
+        final ImmutableByteArray s = checkNotNull(salt);
+        final int m = config.get_m();
+        final int p = config.get_p();
+        final int i = config.get_i();
 
-		final byte[] k = Arrays.copyOf(inputKeyingMaterial, inputKeyingMaterial.length);
-		final byte[] s = Arrays.copyOf(salt, salt.length);
-		final int m = config.get_m();
-		final int p = config.get_p();
-		final int i = config.get_i();
+        final Argon2Configuration c = new Argon2Configuration(32, s, m, p, i);
+        return argon2id(c, k);
+    }
 
-		final Argon2Configuration c = new Argon2Configuration(32, s, m, p, i);
-		return argon2id(c, k);
-	}
+    private ImmutableByteArray argon2id(final Argon2Configuration c, final ImmutableByteArray k) {
+        final Argon2Parameters parameters = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
+                .withSalt(c.salt().elements())
+                .withMemoryPowOfTwo(c.memory())
+                .withParallelism(c.parallelism())
+                .withIterations(c.iterations())
+                .build();
 
-	private byte[] argon2id(final Argon2Configuration c, final byte[] k) {
-		final Argon2Parameters parameters = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
-				.withSalt(c.salt())
-				.withMemoryPowOfTwo(c.memory())
-				.withParallelism(c.parallelism())
-				.withIterations(c.iterations())
-				.build();
+        final Argon2BytesGenerator generator = new Argon2BytesGenerator();
+        generator.init(parameters);
 
-		final Argon2BytesGenerator generator = new Argon2BytesGenerator();
-		generator.init(parameters);
+        final byte[] t = new byte[c.tagLength()];
+        generator.generateBytes(k.elements(), t);
 
-		byte[] t = new byte[c.tagLength()];
-		generator.generateBytes(k, t);
+        return new ImmutableByteArray(t);
+    }
 
-		return t;
-	}
-
-	private record Argon2Configuration(int tagLength, byte[] salt, int memory, int parallelism, int iterations) {
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) {
-				return true;
-			}
-			if (o == null || getClass() != o.getClass()) {
-				return false;
-			}
-			Argon2Configuration that = (Argon2Configuration) o;
-			return tagLength == that.tagLength && memory == that.memory && parallelism == that.parallelism && iterations == that.iterations
-					&& Arrays.equals(salt, that.salt);
-		}
-
-		@Override
-		public int hashCode() {
-			int result = Objects.hash(tagLength, memory, parallelism, iterations);
-			result = 31 * result + Arrays.hashCode(salt);
-			return result;
-		}
-
-		@Override
-		public String toString() {
-			return "Argon2Configuration{" +
-					"tagLength=" + tagLength +
-					", salt=" + Arrays.toString(salt) +
-					", memory=" + memory +
-					", parallelism=" + parallelism +
-					", iterations=" + iterations +
-					'}';
-		}
-	}
+    private record Argon2Configuration(int tagLength, ImmutableByteArray salt, int memory, int parallelism,
+                                       int iterations) {
+    }
 }

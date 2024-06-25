@@ -93,7 +93,7 @@ class BigIntegerOperationsServiceTest {
 	@ParameterizedTest(name = "n1 = {0}, n2 = {1} and modulus = {2} throws NullPointerException")
 	@MethodSource("createArgumentsProvider")
 	@DisplayName("modMultiply with null parameters")
-	void modMultiplyNullArguments(BigInteger n1, BigInteger n2, BigInteger modulus) {
+	void modMultiplyNullArguments(final BigInteger n1, final BigInteger n2, final BigInteger modulus) {
 		assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.modMultiply(n1, n2, modulus));
 	}
 
@@ -118,7 +118,7 @@ class BigIntegerOperationsServiceTest {
 	@ParameterizedTest(name = "base = {0}, exponent = {1} and modulus = {2} throws NullPointerException")
 	@MethodSource("createArgumentsProvider")
 	@DisplayName("modExponentiate with null parameters")
-	void modExponentiateNullArguments(BigInteger base, BigInteger exponent, BigInteger modulus) {
+	void modExponentiateNullArguments(final BigInteger base, final BigInteger exponent, final BigInteger modulus) {
 		assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.modExponentiate(base, exponent, modulus));
 	}
 

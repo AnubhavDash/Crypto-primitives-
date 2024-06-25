@@ -24,6 +24,7 @@ import java.util.List;
 
 import com.google.common.base.Preconditions;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
@@ -164,7 +165,7 @@ public class SchnorrProofService {
 			h_aux = HashableList.of(HashableString.from(GEN_SCHNORR_PROOF_SERVICE));
 		}
 
-		final byte[] h = hashService.recursiveHash(f, y, c_prime, h_aux);
+		final ImmutableByteArray h = hashService.recursiveHash(f, y, c_prime, h_aux);
 
 		final BigInteger e_prime_value = byteArrayToInteger(h);
 		final ZqElement e_prime = ZqElement.create(e_prime_value, ZqGroup.sameOrderAs(gqGroup));

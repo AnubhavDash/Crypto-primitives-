@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
@@ -187,7 +188,7 @@ class ShuffleArgumentService {
 		final GroupVector<GqElement, GqGroup> c_A = getCommitmentMatrix(A, r, ck);
 
 		// Compute x.
-		final byte[] x_bytes = hashService.recursiveHash(
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,
@@ -209,7 +210,7 @@ class ShuffleArgumentService {
 		final GroupVector<GqElement, GqGroup> c_B = getCommitmentMatrix(B, s, ck);
 
 		// Compute y and z.
-		final byte[] y_bytes = hashService.recursiveHash(
+		final ImmutableByteArray y_bytes = hashService.recursiveHash(
 				c_B,
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
@@ -221,7 +222,7 @@ class ShuffleArgumentService {
 		);
 		final ZqElement y = ZqElement.create(ConversionsInternal.byteArrayToInteger(y_bytes), zqGroup);
 
-		final byte[] z_bytes = hashService.recursiveHash(
+		final ImmutableByteArray z_bytes = hashService.recursiveHash(
 				HashableString.from("1"),
 				c_B,
 				HashableBigInteger.from(p),
@@ -355,7 +356,7 @@ class ShuffleArgumentService {
 		final int N = statement.get_N();
 
 		// Compute x, y and z.
-		final byte[] x_bytes = hashService.recursiveHash(
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,
@@ -366,7 +367,7 @@ class ShuffleArgumentService {
 		);
 		final ZqElement x = ZqElement.create(ConversionsInternal.byteArrayToInteger(x_bytes), zqGroup);
 
-		final byte[] y_bytes = hashService.recursiveHash(
+		final ImmutableByteArray y_bytes = hashService.recursiveHash(
 				c_B,
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
@@ -378,7 +379,7 @@ class ShuffleArgumentService {
 		);
 		final ZqElement y = ZqElement.create(ConversionsInternal.byteArrayToInteger(y_bytes), zqGroup);
 
-		final byte[] z_bytes = hashService.recursiveHash(
+		final ImmutableByteArray z_bytes = hashService.recursiveHash(
 				HashableString.from("1"),
 				c_B,
 				HashableBigInteger.from(p),

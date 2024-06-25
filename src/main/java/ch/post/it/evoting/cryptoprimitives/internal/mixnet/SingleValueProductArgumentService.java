@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
@@ -155,7 +156,7 @@ class SingleValueProductArgumentService {
 		final GqElement c_Delta = getCommitment(Delta, s_x, ck);
 
 		// Calculate x
-		final byte[] x_bytes = hashService.recursiveHash(
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,
@@ -223,7 +224,7 @@ class SingleValueProductArgumentService {
 		final ZqGroup zqGroup = b.getGroup();
 
 		// Calculate x
-		final byte[] x_bytes = hashService.recursiveHash(
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,

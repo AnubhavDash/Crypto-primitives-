@@ -34,6 +34,7 @@ import java.util.Scanner;
 
 import com.google.common.base.Preconditions;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.math.BaseEncodingFactory;
 
 public class LibraryLoader {
@@ -72,7 +73,7 @@ public class LibraryLoader {
 
 		try {
 			final byte[] digest = MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(filePath));
-			final String calculatedHash = BaseEncodingFactory.createBase16().base16Encode(digest);
+			final String calculatedHash = BaseEncodingFactory.createBase16().base16Encode(new ImmutableByteArray(digest));
 
 			if (expectedHashes.stream().noneMatch(hash -> hash.toUpperCase(Locale.ENGLISH).equals(calculatedHash))) {
 				throw new IllegalArgumentException(
@@ -95,7 +96,7 @@ public class LibraryLoader {
 					hashes.add(scanner.next());
 				}
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new UncheckedIOException(String.format("Unable to read the resource file. [hashesResourceFilename: %s]", hashesResourceFilename),
 					e);
 		}

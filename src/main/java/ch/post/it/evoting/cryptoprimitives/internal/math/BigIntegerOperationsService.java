@@ -123,9 +123,7 @@ public class BigIntegerOperationsService {
 					}
 					j = j + 1;
 				}
-				if (!y.equals(n_minus_one)) {
-					return false;
-				}
+				return y.equals(n_minus_one);
 			}
 			return true;
 		});
