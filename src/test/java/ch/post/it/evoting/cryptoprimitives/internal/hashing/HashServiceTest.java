@@ -56,7 +56,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
-import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
@@ -131,7 +130,7 @@ class HashServiceTest {
 		return switch (type) {
 			case "string" -> HashableString.from(data.get("value", String.class));
 			case "integer" -> HashableBigInteger.from(data.get("value", BigInteger.class));
-			case "bytes" -> HashableByteArray.from(data.get("value", ImmutableByteArray.class));
+			case "bytes" -> data.get("value", ImmutableByteArray.class);
 			default -> throw new IllegalArgumentException(String.format("Unknown type: %s", type));
 		};
 	}
@@ -152,7 +151,7 @@ class HashServiceTest {
 	@Test
 	void testRecursiveHashOfByteArrayReturnsHashOfByteArray() {
 		final ImmutableByteArray bytes = randomService.randomBytes(TEST_INPUT_LENGTH);
-		final ImmutableByteArray recursiveHash = hashService.recursiveHash(HashableByteArray.from(bytes));
+		final ImmutableByteArray recursiveHash = hashService.recursiveHash(bytes);
 		final ImmutableByteArray regularHash = new ImmutableByteArray(
 				messageDigest.digest(concat(ImmutableByteArray.of((byte) 0x00), bytes).elements()));
 		assertEquals(regularHash, recursiveHash);
@@ -205,10 +204,8 @@ class HashServiceTest {
 	void testRecursiveHashOfTwoByteArraysReturnsHashOfConcatenatedIndividualHashes() {
 		final ImmutableByteArray bytes1 = randomService.randomBytes(TEST_INPUT_LENGTH);
 		final ImmutableByteArray bytes2 = randomService.randomBytes(TEST_INPUT_LENGTH);
-		final HashableByteArray hashableBytes1 = HashableByteArray.from(bytes1);
-		final HashableByteArray hashableBytes2 = HashableByteArray.from(bytes2);
 
-		final HashableList list = HashableList.of(hashableBytes1, hashableBytes2);
+		final HashableList list = HashableList.of(bytes1, bytes2);
 
 		final ImmutableByteArray hash = hashService.recursiveHash(list);
 
@@ -228,11 +225,8 @@ class HashServiceTest {
 		final ImmutableByteArray bytes1 = randomService.randomBytes(TEST_INPUT_LENGTH);
 		final ImmutableByteArray bytes2 = randomService.randomBytes(TEST_INPUT_LENGTH);
 		final ImmutableByteArray bytes3 = randomService.randomBytes(TEST_INPUT_LENGTH);
-		final HashableByteArray hashableBytes1 = HashableByteArray.from(bytes1);
-		final HashableByteArray hashableBytes2 = HashableByteArray.from(bytes2);
-		final HashableByteArray hashableBytes3 = HashableByteArray.from(bytes3);
-		final HashableList list = HashableList.of(hashableBytes2, hashableBytes3);
-		final HashableList input = HashableList.of(hashableBytes1, list);
+		final HashableList list = HashableList.of(bytes2, bytes3);
+		final HashableList input = HashableList.of(bytes1, list);
 
 		final ImmutableByteArray hash = hashService.recursiveHash(input);
 
@@ -257,7 +251,7 @@ class HashServiceTest {
 	void testRecursiveHashWithVarargsGivesSameResultAsWithList() {
 		final HashableBigInteger first = genRandomHashableBigInteger();
 		final HashableString second = genRandomHashableString();
-		final HashableByteArray third = genRandomHashableByteArray();
+		final ImmutableByteArray third = genRandomHashableByteArray();
 		final HashableList list = HashableList.of(third);
 		final HashableList input = HashableList.of(list, first, second);
 		final ImmutableByteArray varargsHash = hashService.recursiveHash(list, first, second);
@@ -268,7 +262,7 @@ class HashServiceTest {
 	@Test
 	void testRecursiveHashWithNestedListAndSpecificValues() throws IOException {
 		final HashableBigInteger first = genRandomHashableBigInteger();
-		final HashableByteArray second = genRandomHashableByteArray();
+		final ImmutableByteArray second = genRandomHashableByteArray();
 		final HashableString third = genRandomHashableString();
 		final List<Hashable> subSubList = new LinkedList<>();
 		subSubList.add(first);
@@ -307,10 +301,9 @@ class HashServiceTest {
 		assertArrayEquals(expectedHash, hash.elements());
 	}
 
-	private HashableByteArray genRandomHashableByteArray() {
+	private ImmutableByteArray genRandomHashableByteArray() {
 		final int size = randomService.genRandomInteger(500);
-		final ImmutableByteArray bytes = randomService.randomBytes(size);
-		return HashableByteArray.from(bytes);
+		return randomService.randomBytes(size);
 	}
 
 	private HashableString genRandomHashableString() {
@@ -345,8 +338,8 @@ class HashServiceTest {
 		System.arraycopy(input.elements(), 0, first, 0, split);
 		System.arraycopy(input.elements(), split, second, 0, input.length() - split);
 		return new Split(
-				HashableByteArray.from(new ImmutableByteArray(first)),
-				HashableByteArray.from(new ImmutableByteArray(second)));
+				new ImmutableByteArray(first),
+				new ImmutableByteArray(second));
 	}
 
 	@Test
@@ -484,6 +477,6 @@ class HashServiceTest {
 	}
 
 	//Utilities
-	private record Split(HashableByteArray start, HashableByteArray end) {
+	private record Split(ImmutableByteArray start, ImmutableByteArray end) {
 	}
 }

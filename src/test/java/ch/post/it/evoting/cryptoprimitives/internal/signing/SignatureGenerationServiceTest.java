@@ -33,7 +33,6 @@ import org.junit.jupiter.api.Test;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
-import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
@@ -78,7 +77,7 @@ class SignatureGenerationServiceTest {
 	@DisplayName("null parameters throws a NullPointerException")
 	void genSignatureWithNullParametersThrowsNullPointerException() {
 		assertThrows(NullPointerException.class, () -> signatureGenerationService.genSignature(null, emptyContextData));
-		final HashableByteArray message = HashableByteArray.from(ImmutableByteArray.of((byte) 0b0000001));
+		final ImmutableByteArray message = ImmutableByteArray.of((byte) 0b0000001);
 		assertThrows(NullPointerException.class, () -> signatureGenerationService.genSignature(message, null));
 	}
 

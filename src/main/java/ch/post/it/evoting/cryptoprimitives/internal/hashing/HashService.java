@@ -37,7 +37,6 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hash;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
-import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.HashFunction;
@@ -95,8 +94,7 @@ public class HashService implements Hash {
 			final Hashable value = values[0];
 
 			switch (value) {
-			case final HashableByteArray hashableByteArray -> {
-				final ImmutableByteArray w = hashableByteArray.toHashableForm();
+			case final ImmutableByteArray w -> {
 				return hashFunction.hash(concat(BYTE_ARRAY_PREFIX, w));
 			}
 			case final HashableBigInteger hashableBigInteger -> {
@@ -201,8 +199,7 @@ public class HashService implements Hash {
 			final Hashable value = values[0];
 
 			switch (value) {
-			case final HashableByteArray hashableByteArray -> {
-				final ImmutableByteArray w = hashableByteArray.toHashableForm();
+			case final ImmutableByteArray w -> {
 				final ImmutableByteArray h = concat(BYTE_ARRAY_PREFIX, w);
 				return ByteArrays.cutToBitLength(shake256(L, h), l);
 			}

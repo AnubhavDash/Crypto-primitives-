@@ -39,7 +39,6 @@ import org.junit.jupiter.api.Test;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
-import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
@@ -88,7 +87,7 @@ class SignatureKeystoreServiceTest {
 		final SignatureKeystoreService<Supplier<String>> service2 = new SignatureKeystoreService<>(keyStoreToStream(store2, password2), KEYSTORE_TYPE,
 				password2, (keystore) -> true, () -> alias2, hashService);
 
-		final HashableByteArray message = HashableByteArray.from(randomService.randomBytes(1000));
+		final ImmutableByteArray message = randomService.randomBytes(1000);
 
 		// when
 		final ImmutableByteArray signature = service1.generateSignature(message, EMPTY_CONTEXT_DATA);
@@ -115,7 +114,7 @@ class SignatureKeystoreServiceTest {
 		final SignatureKeystoreService<Supplier<String>> service2 = new SignatureKeystoreService<>(keyStoreToStream(store2, password2), KEYSTORE_TYPE,
 				password2, (keystore) -> true, () -> alias2, hashService);
 
-		final HashableByteArray message = HashableByteArray.from(randomService.randomBytes(1000));
+		final ImmutableByteArray message = randomService.randomBytes(1000);
 
 		// when
 		final ImmutableByteArray signature = service1.generateSignature(message, EMPTY_CONTEXT_DATA);

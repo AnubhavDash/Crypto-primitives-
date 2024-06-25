@@ -23,14 +23,14 @@ import java.util.Arrays;
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Bytes;
 
-import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
+import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 
 /**
  * An immutable byte array wrapping a non-null array of bytes.
  *
  * <p>Instances of this class are immutable.</p>
  */
-public record ImmutableByteArray(byte[] elements) implements HashableByteArray {
+public record ImmutableByteArray(byte[] elements) implements Hashable {
 	public static final ImmutableByteArray EMPTY = new ImmutableByteArray(new byte[] {});
 
 	/**
