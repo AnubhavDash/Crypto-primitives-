@@ -56,7 +56,7 @@ class ConversionsTest {
 		@Test
 		void testConversionOfZeroBigIntegerIsOneZeroByte() {
 			final BigInteger zero = BigInteger.ZERO;
-			final ImmutableByteArray expected = ImmutableByteArray.from(new byte[] { 0 });
+			final ImmutableByteArray expected = ImmutableByteArray.of((byte) 0);
 			final ImmutableByteArray converted = integerToByteArray(zero);
 			assertEquals(expected, converted);
 		}
@@ -64,7 +64,7 @@ class ConversionsTest {
 		@Test
 		void testConversionOf256BigIntegerIsTwoBytes() {
 			final BigInteger value = BigInteger.valueOf(256);
-			final ImmutableByteArray expected = ImmutableByteArray.from(new byte[] { 1, 0 });
+			final ImmutableByteArray expected = ImmutableByteArray.of((byte) 1, (byte) 0);
 			final ImmutableByteArray converted = integerToByteArray(value);
 			assertEquals(expected, converted);
 		}
@@ -72,7 +72,7 @@ class ConversionsTest {
 		@Test
 		void testConversionOfIntegerMaxValuePlusOneIsCorrect() {
 			final BigInteger value = BigInteger.valueOf(Integer.MAX_VALUE).add(BigInteger.ONE);
-			final ImmutableByteArray expected = ImmutableByteArray.from(new byte[] { (byte) 0b10000000, 0, 0, 0 });
+			final ImmutableByteArray expected = ImmutableByteArray.of((byte) 0b10000000, (byte) 0, (byte) 0, (byte) 0);
 			final ImmutableByteArray converted = integerToByteArray(value);
 			assertEquals(expected, converted);
 		}
@@ -102,14 +102,14 @@ class ConversionsTest {
 
 		@Test
 		void testConversionOfByteArrayWithLeading1ToBigIntegerIsPositive() {
-			final ImmutableByteArray bytes = ImmutableByteArray.from(new byte[] { (byte) 0x80 });
+			final ImmutableByteArray bytes = ImmutableByteArray.of((byte) 0x80);
 			final BigInteger converted = byteArrayToInteger(bytes);
 			assertTrue(converted.signum() > 0);
 		}
 
 		@Test
 		void testConversionOf256ByteArrayRepresentationIs256() {
-			final ImmutableByteArray bytes = ImmutableByteArray.from(new byte[] { 1, 0 });
+			final ImmutableByteArray bytes = ImmutableByteArray.of((byte) 1, (byte) 0);
 			final BigInteger converted = byteArrayToInteger(bytes);
 			assertEquals(0, converted.compareTo(BigInteger.valueOf(256)));
 		}
@@ -252,7 +252,7 @@ class ConversionsTest {
 
 		@Test
 		void testConversionWithSpecificStringReturnsExpectedValue() {
-			final ImmutableByteArray expected = ImmutableByteArray.from(new byte[] { -30, -126, -84 });
+			final ImmutableByteArray expected = ImmutableByteArray.of((byte) -30, (byte) -126, (byte) -84);
 			assertEquals(expected, stringToByteArray("€"));
 		}
 	}
@@ -275,10 +275,9 @@ class ConversionsTest {
 
 		Stream<ImmutableByteArray> invalidUTF8ByteArrays() {
 			return Stream.of(
-					ImmutableByteArray.from(new byte[] { -37, -10 }),
-					ImmutableByteArray.from(new byte[] { -50, -29, 48 }),
-					ImmutableByteArray.from(new byte[] { 107, -93, 75, 41 }
-					));
+					ImmutableByteArray.of((byte) -37, (byte) -10),
+					ImmutableByteArray.of((byte) -50, (byte) -29, (byte) 48),
+					ImmutableByteArray.of((byte) 107, (byte) -93, (byte) 75, (byte) 41));
 		}
 
 		@ParameterizedTest(name = "byteArray = \"{0}\"")
@@ -291,7 +290,7 @@ class ConversionsTest {
 		@Test
 		void testConversionWithSpecificByteArrayReturnsExpectedValue() {
 			final String expected = "€";
-			assertEquals(expected, byteArrayToString(ImmutableByteArray.from(new byte[] { -30, -126, -84 })));
+			assertEquals(expected, byteArrayToString(ImmutableByteArray.of((byte) -30, (byte) -126, (byte) -84)));
 		}
 
 	}

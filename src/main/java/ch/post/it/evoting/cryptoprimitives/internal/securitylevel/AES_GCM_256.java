@@ -67,7 +67,7 @@ public class AES_GCM_256 implements AEAD {
 		cipher.updateAAD(associatedData.elements());
 
 		try {
-			return ImmutableByteArray.from(cipher.doFinal(plaintext.elements()));
+			return new ImmutableByteArray(cipher.doFinal(plaintext.elements()));
 		} catch (final BadPaddingException e) {
 			throw new IllegalStateException("We should never get this exception since it is only thrown in decryption mode.");
 		} catch (final IllegalBlockSizeException e) {
@@ -88,7 +88,7 @@ public class AES_GCM_256 implements AEAD {
 		cipher.updateAAD(associatedData.elements());
 
 		try {
-			return ImmutableByteArray.from(cipher.doFinal(ciphertext.elements()));
+			return new ImmutableByteArray(cipher.doFinal(ciphertext.elements()));
 		} catch (final BadPaddingException e) {
 			throw new IllegalStateException("We should never get this exception since no padding is needed for the configured algorithm.", e);
 		} catch (final IllegalBlockSizeException e) {

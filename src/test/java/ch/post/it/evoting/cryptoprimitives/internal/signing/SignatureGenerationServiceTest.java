@@ -24,7 +24,6 @@ import java.security.Security;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -79,7 +78,7 @@ class SignatureGenerationServiceTest {
 	@DisplayName("null parameters throws a NullPointerException")
 	void genSignatureWithNullParametersThrowsNullPointerException() {
 		assertThrows(NullPointerException.class, () -> signatureGenerationService.genSignature(null, emptyContextData));
-		final HashableByteArray message = HashableByteArray.from(ImmutableByteArray.from(new byte[] { 0b0000001 }));
+		final HashableByteArray message = HashableByteArray.from(ImmutableByteArray.of((byte) 0b0000001));
 		assertThrows(NullPointerException.class, () -> signatureGenerationService.genSignature(message, null));
 	}
 

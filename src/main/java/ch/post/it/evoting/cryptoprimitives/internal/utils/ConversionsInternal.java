@@ -69,10 +69,10 @@ public final class ConversionsInternal {
 		// BigInteger#toByteArray gives back a 2s complement representation of the value. Given that we work only with positive BigIntegers, this
 		// representation is equivalent to the binary representation, except for a potential extra leading zero byte. (The presence or not of the
 		// leading zero depends on the number of bits needed to represent this value).
-		final ImmutableByteArray twosComplement = ImmutableByteArray.from(x.toByteArray());
+		final ImmutableByteArray twosComplement = new ImmutableByteArray(x.toByteArray());
 		final ImmutableByteArray result;
 		if (twosComplement.get(0) == 0 && twosComplement.length() > 1) {
-			result = ImmutableByteArray.copy(twosComplement, 1, twosComplement.length() - 1);
+			result = ImmutableByteArray.copyOfRange(twosComplement, 1, twosComplement.length());
 		} else {
 			result = twosComplement;
 		}
@@ -97,7 +97,7 @@ public final class ConversionsInternal {
 			final byte[] result = new byte[buffer.remaining()];
 			buffer.get(result);
 
-			return ImmutableByteArray.from(result);
+			return new ImmutableByteArray(result);
 		} catch (final CharacterCodingException e) {
 			throw new IllegalArgumentException("The string does not correspond to a valid sequence of UTF-8 encoding.");
 		}

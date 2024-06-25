@@ -54,7 +54,7 @@ import ch.post.it.evoting.cryptoprimitives.signing.AuthorityInformation;
 class SignatureVerificationServiceTest {
 
 	private static final Hashable message = HashableString.from("message");
-	private static final ImmutableByteArray signature = ImmutableByteArray.from("signature".getBytes());
+	private static final ImmutableByteArray signature = new ImmutableByteArray("signature".getBytes());
 	private static final Hashable additionalContextData = HashableList.of(HashableString.from("context"), HashableBigInteger.from(BigInteger.ONE),
 			HashableString.from("1234"));
 	private static String authorityId;

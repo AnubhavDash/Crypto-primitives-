@@ -61,13 +61,13 @@ public final class EncryptionParameters {
 	/**
 	 * Generates verifiable encryption parameters used for the election.
 	 * <p>
-	 *     Executions with the same seed, yield the same encryption parameters.
+	 * Executions with the same seed, yield the same encryption parameters.
 	 * </p>
 	 *
 	 * @param seed        the name of the election event. Must be non-null.
 	 * @param smallPrimes a list of small primes. Must be non-null.
 	 * @return a {@link GqGroup} containing the verifiable encryption parameters p, q and g.
-	 * @throws NullPointerException if any of the inputs is null.
+	 * @throws NullPointerException     if any of the inputs is null.
 	 * @throws IllegalArgumentException if any of the numbers in small primes list is not a prime.
 	 */
 	@SuppressWarnings("java:S117")
@@ -83,7 +83,7 @@ public final class EncryptionParameters {
 		final int pBitLength = securityLevel.getPBitLength();
 
 		final ImmutableByteArray q_b_hat = shake256(stringToByteArray(seed), pBitLength / 8);
-		final ImmutableByteArray q_b = ImmutableByteArray.concat(ImmutableByteArray.from(new byte[] { 0x02 }), q_b_hat);
+		final ImmutableByteArray q_b = ImmutableByteArray.concat(ImmutableByteArray.of((byte) 0x02), q_b_hat);
 		final BigInteger q_prime = byteArrayToInteger(q_b).shiftRight(3);
 		BigInteger q = q_prime.subtract(q_prime.mod(SIX)).add(FIVE);
 		final ArrayList<BigInteger> r = new ArrayList<>(l);
@@ -96,7 +96,8 @@ public final class EncryptionParameters {
 				delta = delta.add(SIX);
 				int i = 0;
 				while (i < l) {
-					if ((r.get(i).add(delta).mod(sp.get(i)).equals(ZERO)) || (TWO.multiply(r.get(i).add(delta)).add(ONE).mod(sp.get(i)).equals(ZERO))) {
+					if ((r.get(i).add(delta).mod(sp.get(i)).equals(ZERO)) || (TWO.multiply(r.get(i).add(delta)).add(ONE).mod(sp.get(i))
+							.equals(ZERO))) {
 						delta = delta.add(SIX);
 						i = 0;
 					} else {
@@ -125,7 +126,7 @@ public final class EncryptionParameters {
 		shakeDigest.update(message.elements(), 0, message.length());
 		shakeDigest.doFinal(result, 0, outputLength);
 
-		return ImmutableByteArray.from(result);
+		return new ImmutableByteArray(result);
 	}
 
 	/**

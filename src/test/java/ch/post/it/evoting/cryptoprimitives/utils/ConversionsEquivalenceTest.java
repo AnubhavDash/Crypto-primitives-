@@ -93,6 +93,6 @@ class ConversionsEquivalenceTest {
 			B[n - i - 1] = x.mod(TWOHUNDRED_FIFTY_SIX).byteValue();
 			x = x.divide(TWOHUNDRED_FIFTY_SIX);
 		}
-		return ImmutableByteArray.from(B);
+		return new ImmutableByteArray(B);
 	}
 }

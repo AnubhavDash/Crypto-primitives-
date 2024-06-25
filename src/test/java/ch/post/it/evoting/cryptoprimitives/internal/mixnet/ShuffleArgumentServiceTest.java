@@ -342,7 +342,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 			// Necessary to return a constant value, otherwise some assertFalse tests can return true because of changes compensating each other (due
 			// to small test groups).
 			final HashService hashServiceMock = mock(HashService.class);
-			when(hashServiceMock.recursiveHash(any(Hashable[].class))).thenReturn(ImmutableByteArray.from(new byte[] { 0b10 }));
+			when(hashServiceMock.recursiveHash(any(Hashable[].class))).thenReturn(ImmutableByteArray.of((byte) 0b10));
 
 			shuffleArgumentService = new ShuffleArgumentService(publicKey, commitmentKey, randomService, hashServiceMock);
 		}

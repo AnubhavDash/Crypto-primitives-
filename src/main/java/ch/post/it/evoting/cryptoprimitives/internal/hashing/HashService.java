@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.hashing;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray.concat;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.integerToByteArray;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.stringToByteArray;
@@ -59,10 +60,10 @@ public class HashService implements Hash {
 	private static final HashService INSTANCE = new HashService(SecurityLevelConfig.getSystemSecurityLevel().getRecursiveHashHashFunction(),
 			SecurityLevelConfig.getSystemSecurityLevel().getRecursiveHashToZqXOF());
 
-	private static final ImmutableByteArray BYTE_ARRAY_PREFIX = ImmutableByteArray.from(new byte[] { 0x00 });
-	private static final ImmutableByteArray BIG_INTEGER_PREFIX = ImmutableByteArray.from(new byte[] { 0x01 });
-	private static final ImmutableByteArray STRING_PREFIX = ImmutableByteArray.from(new byte[] { 0x02 });
-	private static final ImmutableByteArray ARRAY_PREFIX = ImmutableByteArray.from(new byte[] { 0x03 });
+	private static final ImmutableByteArray BYTE_ARRAY_PREFIX = ImmutableByteArray.of((byte) 0x00);
+	private static final ImmutableByteArray BIG_INTEGER_PREFIX = ImmutableByteArray.of((byte) 0x01);
+	private static final ImmutableByteArray STRING_PREFIX = ImmutableByteArray.of((byte) 0x02);
+	private static final ImmutableByteArray ARRAY_PREFIX = ImmutableByteArray.of((byte) 0x03);
 
 	private static final String NO_VALUES = "Cannot hash no values.";
 	private final HashFunction hashFunction;
@@ -96,20 +97,20 @@ public class HashService implements Hash {
 			switch (value) {
 			case final HashableByteArray hashableByteArray -> {
 				final ImmutableByteArray w = hashableByteArray.toHashableForm();
-				return hashFunction.hash(ImmutableByteArray.concat(BYTE_ARRAY_PREFIX, w));
+				return hashFunction.hash(concat(BYTE_ARRAY_PREFIX, w));
 			}
 			case final HashableBigInteger hashableBigInteger -> {
 				final BigInteger w = hashableBigInteger.toHashableForm();
 				checkArgument(w.signum() >= 0);
-				return hashFunction.hash(ImmutableByteArray.concat(BIG_INTEGER_PREFIX, integerToByteArray(w)));
+				return hashFunction.hash(concat(BIG_INTEGER_PREFIX, integerToByteArray(w)));
 			}
 			case final HashableString hashableString -> {
 				final String w = hashableString.toHashableForm();
-				return hashFunction.hash(ImmutableByteArray.concat(STRING_PREFIX, stringToByteArray(w)));
+				return hashFunction.hash(concat(STRING_PREFIX, stringToByteArray(w)));
 			}
 			case final HashableList hashableList -> {
 				final List<? extends Hashable> w = hashableList.toHashableForm();
-				return hashFunction.hash(ImmutableByteArray.concat(
+				return hashFunction.hash(concat(
 						Stream.concat(
 								Stream.of(ARRAY_PREFIX),
 								w.stream().parallel().map(this::recursiveHash)
@@ -202,18 +203,18 @@ public class HashService implements Hash {
 			switch (value) {
 			case final HashableByteArray hashableByteArray -> {
 				final ImmutableByteArray w = hashableByteArray.toHashableForm();
-				final ImmutableByteArray h = ImmutableByteArray.concat(BYTE_ARRAY_PREFIX, w);
+				final ImmutableByteArray h = concat(BYTE_ARRAY_PREFIX, w);
 				return ByteArrays.cutToBitLength(shake256(L, h), l);
 			}
 			case final HashableBigInteger hashableBigInteger -> {
 				final BigInteger w = hashableBigInteger.toHashableForm();
 				checkArgument(w.signum() >= 0);
-				final ImmutableByteArray h = ImmutableByteArray.concat(BIG_INTEGER_PREFIX, integerToByteArray(w));
+				final ImmutableByteArray h = concat(BIG_INTEGER_PREFIX, integerToByteArray(w));
 				return ByteArrays.cutToBitLength(shake256(L, h), l);
 			}
 			case final HashableString hashableString -> {
 				final String w = hashableString.toHashableForm();
-				final ImmutableByteArray h = ImmutableByteArray.concat(STRING_PREFIX, stringToByteArray(w));
+				final ImmutableByteArray h = concat(STRING_PREFIX, stringToByteArray(w));
 				return ByteArrays.cutToBitLength(shake256(L, h), l);
 			}
 			case final HashableList hashableList -> {
@@ -243,6 +244,6 @@ public class HashService implements Hash {
 		shakeDigest.update(message.elements(), 0, message.length());
 		shakeDigest.doFinal(result, 0, outputLength);
 
-		return ImmutableByteArray.from(result);
+		return new ImmutableByteArray(result);
 	}
 }

@@ -319,10 +319,10 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 					one, two // s_0, s_x
 			).when(productRandomService).genRandomInteger(any());
 			when(productHashService.recursiveHash(any(Hashable[].class))).thenReturn(
-					ImmutableByteArray.from(new byte[] { 0b10 }),
-					ImmutableByteArray.from(new byte[] { 0b11 }),
-					ImmutableByteArray.from(new byte[] { 0b01 }),
-					ImmutableByteArray.from(new byte[] { 0b10 }));
+					ImmutableByteArray.of((byte) 0b10 ),
+					ImmutableByteArray.of((byte) 0b11 ),
+					ImmutableByteArray.of((byte) 0b01 ),
+					ImmutableByteArray.of((byte) 0b10 ));
 			final ProductArgumentService specificProductArgumentService = new ProductArgumentService(productRandomService, productHashService,
 					productPublicKey, productCommitmentKey);
 

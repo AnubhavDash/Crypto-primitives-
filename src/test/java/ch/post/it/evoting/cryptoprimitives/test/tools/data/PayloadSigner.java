@@ -32,7 +32,7 @@ public final class PayloadSigner {
 		final Signature sig = Signature.getInstance("SHA1WithRSA");
 		sig.initSign(privateKey);
 		sig.update(payload.elements());
-		return ImmutableByteArray.from(sig.sign());
+		return new ImmutableByteArray(sig.sign());
 	}
 
 	public static boolean verifyPayload(final PublicKey publicKey, final ImmutableByteArray payload, final ImmutableByteArray signature)

@@ -129,7 +129,7 @@ class SingleValueProductArgumentService {
 
 		// Calculate δ
 		final List<ZqElement> delta_mutable = new ArrayList<>(n);
-		delta_mutable.addFirst(d.getFirst());
+		delta_mutable.add(0, d.get(0));
 		if (n > 2) {
 			delta_mutable.addAll(1, randomService.genRandomVector(q, n - 2));
 		}
@@ -254,9 +254,9 @@ class SingleValueProductArgumentService {
 				String.format("prodDelta %s and commDelta %s are not equal", prodDelta, commDelta));
 
 		// Verify B
-		final Verifiable verifB = create(() -> b_tilde.getFirst().equals(a_tilde.getFirst()) && b_tilde.get(n - 1).equals(x.multiply(b)),
-				String.format("bTilde.get(0) %s must equal aTilde.get(0) %s and bTilde.get(n - 1) %s must equal x * b %s", b_tilde.getFirst(),
-						a_tilde.getFirst(), b_tilde.get(n - 1), x.multiply(b)));
+		final Verifiable verifB = create(() -> b_tilde.get(0).equals(a_tilde.get(0)) && b_tilde.get(n - 1).equals(x.multiply(b)),
+				String.format("bTilde.get(0) %s must equal aTilde.get(0) %s and bTilde.get(n - 1) %s must equal x * b %s", b_tilde.get(0),
+						a_tilde.get(0), b_tilde.get(n - 1), x.multiply(b)));
 
 		return verifA.and(verifDelta).and(verifB);
 	}

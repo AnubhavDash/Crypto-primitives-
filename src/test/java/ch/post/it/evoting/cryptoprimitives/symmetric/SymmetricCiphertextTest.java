@@ -28,8 +28,8 @@ class SymmetricCiphertextTest {
 	void checkConstructionImmutability() {
 		final byte[] sourceCiphertextBytes = new byte[] { 1, 2, 3 };
 		final byte[] sourceNonceBytes = new byte[] { 4, 5, 6 };
-		final ImmutableByteArray sourceCiphertext = ImmutableByteArray.from(sourceCiphertextBytes);
-		final ImmutableByteArray sourceNonce = ImmutableByteArray.from(sourceNonceBytes);
+		final ImmutableByteArray sourceCiphertext = new ImmutableByteArray(sourceCiphertextBytes);
+		final ImmutableByteArray sourceNonce = new ImmutableByteArray(sourceNonceBytes);
 		final SymmetricCiphertext symmetricCiphertext = new SymmetricCiphertext(sourceCiphertext, sourceNonce);
 
 		// Mute source arrays
@@ -45,8 +45,9 @@ class SymmetricCiphertextTest {
 
 	@Test
 	void checkGettersImmutability() {
-		final SymmetricCiphertext symmetricCiphertext = new SymmetricCiphertext(ImmutableByteArray.from(new byte[] { 1, 2, 3 }),
-				ImmutableByteArray.from(new byte[] { 4, 5, 6 }));
+		final SymmetricCiphertext symmetricCiphertext = new SymmetricCiphertext(
+				ImmutableByteArray.of((byte) 1, (byte) 2, (byte) 3),
+				ImmutableByteArray.of((byte) 4, (byte) 5, (byte) 6));
 		final ImmutableByteArray ciphertext = symmetricCiphertext.ciphertext();
 		final ImmutableByteArray nonce = symmetricCiphertext.nonce();
 		final byte[] ciphertextBytes = ciphertext.elements();

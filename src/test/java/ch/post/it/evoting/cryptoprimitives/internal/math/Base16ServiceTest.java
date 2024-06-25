@@ -42,15 +42,15 @@ class Base16ServiceTest {
 	private static Stream<Arguments> getInputsAndOutputs() {
 		return Stream.of(
 				Arguments.of(ImmutableByteArray.EMPTY, ""),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 65 }), "41"),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 96 }), "60"),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 0 }), "00"),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 127 }), "7F"),
-				Arguments.of(ImmutableByteArray.from(new byte[] { -128 }), "80"),
-				Arguments.of(ImmutableByteArray.from(new byte[] { -1 }), "FF"),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 65, 0 }), "4100"),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 1, 1, 1 }), "010101"),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 127, 0, -2, 3 }), "7F00FE03")
+				Arguments.of(ImmutableByteArray.of((byte) 65), "41"),
+				Arguments.of(ImmutableByteArray.of((byte) 96), "60"),
+				Arguments.of(ImmutableByteArray.of((byte) 0), "00"),
+				Arguments.of(ImmutableByteArray.of((byte) 127), "7F"),
+				Arguments.of(ImmutableByteArray.of((byte) -128), "80"),
+				Arguments.of(ImmutableByteArray.of((byte) -1), "FF"),
+				Arguments.of(ImmutableByteArray.of((byte) 65, (byte) 0), "4100"),
+				Arguments.of(ImmutableByteArray.of((byte) 1, (byte) 1, (byte) 1), "010101"),
+				Arguments.of(ImmutableByteArray.of((byte) 127, (byte) 0, (byte) -2, (byte) 3), "7F00FE03")
 		);
 	}
 

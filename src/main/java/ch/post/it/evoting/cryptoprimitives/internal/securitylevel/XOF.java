@@ -26,7 +26,7 @@ public interface XOF {
 	ImmutableByteArray xof(final Integer outputLength, final ImmutableByteArray message);
 
 	/**
-	 * @return Returns the minimum output lengths in bits of this algorithm
+	 * @return the minimum output lengths in bits of this algorithm
 	 */
 	int getMinimumOutputLengthBits();
 }

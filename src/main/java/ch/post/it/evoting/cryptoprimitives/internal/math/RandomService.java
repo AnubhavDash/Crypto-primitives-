@@ -123,16 +123,16 @@ public class RandomService implements Random {
 	/**
 	 * Generates a vector (collection) of random {@link ZqElement}s between 0 (incl.) and {@code upperBound} (excl.).
 	 *
-	 * @param upperBound q, the exclusive upper bound. Must be non null and strictly positive.
+	 * @param upperBound q, the exclusive upper bound. Must be non-null and strictly positive.
 	 * @param length     n, the desired length. Must be strictly positive.
 	 * @return {@code List<ZqElement>}
 	 */
 	public GroupVector<ZqElement, ZqGroup> genRandomVector(final BigInteger upperBound, final int length) {
 		final BigInteger q = checkNotNull(upperBound);
+		final int n = length;
+
 		checkArgument(q.signum() > 0, "The upper bound should be greater than zero");
 		checkArgument(length > 0, "The length should be greater than zero");
-
-		final int n = length;
 
 		final ZqGroup zqGroup = new ZqGroup(q);
 
@@ -146,12 +146,14 @@ public class RandomService implements Random {
 	 *
 	 * @param byteLength The number of bytes to generate.
 	 * @return An immutable array of {@code byteLength} random bytes.
+	 * @throws IllegalArgumentException if {@code byteLength} is negative.
 	 */
 	public ImmutableByteArray randomBytes(final int byteLength) {
+		checkArgument(byteLength >= 0, "The desired length of the byte array must be non-negative. [byteLength: %s]", byteLength);
 		final byte[] randomBytes = new byte[byteLength];
 		secureRandom.nextBytes(randomBytes);
 
-		return ImmutableByteArray.from(randomBytes);
+		return new ImmutableByteArray(randomBytes);
 	}
 
 	/**

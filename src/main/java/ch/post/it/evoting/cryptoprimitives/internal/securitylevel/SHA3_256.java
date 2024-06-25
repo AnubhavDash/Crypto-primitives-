@@ -52,7 +52,7 @@ public class SHA3_256 implements HashFunction {
 		checkNotNull(input);
 		try {
 			final MessageDigest instance = MessageDigest.getInstance("SHA3-256", BouncyCastleProvider.PROVIDER_NAME);
-			return ImmutableByteArray.from(instance.digest(input.elements()));
+			return new ImmutableByteArray(instance.digest(input.elements()));
 		} catch (final NoSuchAlgorithmException | NoSuchProviderException e) {
 			throw new IllegalStateException("Failed to create the SHA3-256 message digest for the HashService instantiation.");
 		}

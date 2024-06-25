@@ -43,15 +43,15 @@ class Base64ServiceTest {
 	private static Stream<Arguments> getInputsAndOutputs() {
 		return Stream.of(
 				Arguments.of(ImmutableByteArray.EMPTY, ""),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 65 }), "QQ=="),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 96 }), "YA=="),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 0 }), "AA=="),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 127 }), "fw=="),
-				Arguments.of(ImmutableByteArray.from(new byte[] { -128 }), "gA=="),
-				Arguments.of(ImmutableByteArray.from(new byte[] { -1 }), "/w=="),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 65, 0 }), "QQA="),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 1, 1, 1 }), "AQEB"),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 127, 0, -2, 3 }), "fwD+Aw==")
+				Arguments.of(ImmutableByteArray.of((byte) 65), "QQ=="),
+				Arguments.of(ImmutableByteArray.of((byte) 96), "YA=="),
+				Arguments.of(ImmutableByteArray.of((byte) 0), "AA=="),
+				Arguments.of(ImmutableByteArray.of((byte) 127), "fw=="),
+				Arguments.of(ImmutableByteArray.of((byte) -128), "gA=="),
+				Arguments.of(ImmutableByteArray.of((byte) -1), "/w=="),
+				Arguments.of(ImmutableByteArray.of((byte) 65, (byte) 0), "QQA="),
+				Arguments.of(ImmutableByteArray.of((byte) 1, (byte) 1, (byte) 1), "AQEB"),
+				Arguments.of(ImmutableByteArray.of((byte) 127, (byte) 0, (byte) -2, (byte) 3), "fwD+Aw==")
 		);
 	}
 

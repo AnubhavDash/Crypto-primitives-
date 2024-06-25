@@ -43,15 +43,15 @@ class Base32ServiceTest {
 	private static Stream<Arguments> getInputsAndOutputs() {
 		return Stream.of(
 				Arguments.of(ImmutableByteArray.EMPTY, ""),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 65 }), "IE======"),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 96 }), "MA======"),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 0 }), "AA======"),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 127 }), "P4======"),
-				Arguments.of(ImmutableByteArray.from(new byte[] { -128 }), "QA======"),
-				Arguments.of(ImmutableByteArray.from(new byte[] { -1 }), "74======"),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 65, 0 }), "IEAA===="),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 1, 1, 1 }), "AEAQC==="),
-				Arguments.of(ImmutableByteArray.from(new byte[] { 127, 0, -2, 3 }), "P4AP4AY=")
+				Arguments.of(ImmutableByteArray.of((byte) 65), "IE======"),
+				Arguments.of(ImmutableByteArray.of((byte) 96), "MA======"),
+				Arguments.of(ImmutableByteArray.of((byte) 0), "AA======"),
+				Arguments.of(ImmutableByteArray.of((byte) 127), "P4======"),
+				Arguments.of(ImmutableByteArray.of((byte) -128), "QA======"),
+				Arguments.of(ImmutableByteArray.of((byte) -1), "74======"),
+				Arguments.of(ImmutableByteArray.of((byte) 65, (byte) 0), "IEAA===="),
+				Arguments.of(ImmutableByteArray.of((byte) 1, (byte) 1, (byte) 1), "AEAQC==="),
+				Arguments.of(ImmutableByteArray.of((byte) 127, (byte) 0, (byte) -2, (byte) 3), "P4AP4AY=")
 		);
 	}
 

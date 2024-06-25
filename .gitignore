@@ -24,9 +24,6 @@
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
 
-# Gradle
-.idea/**/gradle.xml
-.idea/**/libraries
 
 # Gradle and Maven with auto-import
 # When using Gradle or Maven with auto-import, you should exclude module files,
@@ -43,50 +40,11 @@
 *.ipr
 target
 
-# CMake
-cmake-build-*/
-
-# Mongo Explorer plugin
-.idea/**/mongoSettings.xml
-
 # File-based project format
 *.iws
 
 # IntelliJ
 out/
 
-# mpeltonen/sbt-idea plugin
-.idea_modules/
-
-# JIRA plugin
-atlassian-ide-plugin.xml
-
-# Cursive Clojure plugin
-.idea/replstate.xml
-
 # SonarLint plugin
 .idea/sonarlint/
-.idea/sonarlint-state.xml
-
-# Crashlytics plugin (for Android Studio and IntelliJ)
-com_crashlytics_export_strings.xml
-crashlytics.properties
-crashlytics-build.properties
-fabric.properties
-
-# Editor-based Rest Client
-.idea/httpRequests
-
-# Android studio 3.1+ serialized cache file
-.idea/caches/build_file_checksums.ser
-
-# Scala
-.idea/scala_compiler.xml
-.idea/scala_settings.xml
-.idea/sbt.xml
-
-# Kubernetes
-.idea/kubernetes-settings.xml
-
-# Robotframework
-.idea/RobotProjectPreferences.xml

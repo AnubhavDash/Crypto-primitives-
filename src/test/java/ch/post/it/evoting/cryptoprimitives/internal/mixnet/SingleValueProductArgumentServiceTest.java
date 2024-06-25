@@ -260,7 +260,7 @@ class SingleValueProductArgumentServiceTest extends TestGroupSetup {
 			final SingleValueProductWitness witness = new SingleValueProductWitness(GroupVector.from(a), r);
 
 			final HashService hashService = mock(HashService.class);
-			when(hashService.recursiveHash(any(Hashable[].class))).thenReturn(ImmutableByteArray.from(new byte[] { 0b1010 }));
+			when(hashService.recursiveHash(any(Hashable[].class))).thenReturn(ImmutableByteArray.of((byte) 0b1010));
 			final SingleValueProductArgumentService svpArgumentProvider = new SingleValueProductArgumentService(randomService, hashService, pk, ck);
 			assertEquals(expected, svpArgumentProvider.getSingleValueProductArgument(statement, witness));
 		}

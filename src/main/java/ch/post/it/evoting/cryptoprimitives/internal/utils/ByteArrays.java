@@ -51,18 +51,19 @@ public final class ByteArrays {
 		// Operation.
 		final int length = (int) Math.ceil(n / (double) Byte.SIZE);
 		final int offset = N - length;
-		final byte B_prime_zero;
+		final byte[] B_prime = new byte[length];
 		if (n % Byte.SIZE != 0) {
-			B_prime_zero = (byte) (B.get(offset) & (byte) (Math.pow(2, n % Byte.SIZE) - 1));
+			B_prime[0] = (byte) (B.get(offset) & (byte) (Math.pow(2, n % Byte.SIZE) - 1));
 		} else {
-			B_prime_zero = B.get(offset);
+			B_prime[0] = B.get(offset);
+		}
+
+		for (int i = 1; i < length; i++) {
+			B_prime[i] = B.get(offset + i);
 		}
 
 		// Output.
-		return ImmutableByteArray.concat(
-				ImmutableByteArray.from(B_prime_zero),
-				ImmutableByteArray.copy(B, offset + 1, length - 1)
-		);
+		return new ImmutableByteArray(B_prime);
 	}
 
 	/**

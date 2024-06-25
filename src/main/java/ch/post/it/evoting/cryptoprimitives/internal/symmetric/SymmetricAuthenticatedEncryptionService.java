@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.symmetric;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray.concat;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.stringToByteArray;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -56,11 +57,9 @@ public class SymmetricAuthenticatedEncryptionService {
 
 		// Operation.
 		final ImmutableByteArray nonce = randomService.randomBytes(aead.getNonceLengthBytes());
-		final ImmutableByteArray associated = ImmutableByteArray.concat(
-				associated_bytes.stream()
-						.map(associated_i_bytes -> ImmutableByteArray.concat(
-								ImmutableByteArray.from(new byte[] { (byte) associated_i_bytes.length() }), associated_i_bytes))
-						.toArray(ImmutableByteArray[]::new)
+		final ImmutableByteArray associated = concat(associated_bytes.stream()
+				.map(associated_i_bytes -> concat(ImmutableByteArray.of((byte) associated_i_bytes.length()), associated_i_bytes))
+				.toArray(ImmutableByteArray[]::new)
 		);
 		final ImmutableByteArray C = aead.authenticatedEncryption(K, nonce, P, associated);
 
@@ -86,11 +85,9 @@ public class SymmetricAuthenticatedEncryptionService {
 				}).toList();
 
 		// Operation.
-		final ImmutableByteArray associated = ImmutableByteArray.concat(
-				associated_bytes.stream()
-						.map(associated_i_bytes -> ImmutableByteArray.concat(
-								ImmutableByteArray.from(new byte[] { (byte) associated_i_bytes.length() }), associated_i_bytes))
-						.toArray(ImmutableByteArray[]::new)
+		final ImmutableByteArray associated = concat(associated_bytes.stream()
+				.map(associated_i_bytes -> concat(ImmutableByteArray.of((byte) associated_i_bytes.length()), associated_i_bytes))
+				.toArray(ImmutableByteArray[]::new)
 		);
 
 		// Compute P.

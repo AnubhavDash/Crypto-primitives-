@@ -35,7 +35,7 @@ public final class Base16Service implements Base16 {
 		final String S = checkNotNull(string);
 		try {
 			// The method decode checks the given string is a valid Base16 string.
-			return ImmutableByteArray.from(BaseEncoding.base16().decode(S));
+			return new ImmutableByteArray(BaseEncoding.base16().decode(S));
 		} catch (final IllegalArgumentException e) {
 			throw new IllegalArgumentException("The given string is not a valid Base16 string.", e);
 		}

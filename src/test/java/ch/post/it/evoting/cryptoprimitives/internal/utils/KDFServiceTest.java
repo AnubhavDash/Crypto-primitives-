@@ -86,7 +86,7 @@ class KDFServiceTest {
 
 	@Test
 	void testPRKLengthSmallerThanHashLengthThrows() {
-		final ImmutableByteArray tooSmallPRK = ImmutableByteArray.from(new byte[DEFAULT_HASH_LENGTH_BYTES - 1]);
+		final ImmutableByteArray tooSmallPRK = new ImmutableByteArray(new byte[DEFAULT_HASH_LENGTH_BYTES - 1]);
 		assertThrows(IllegalArgumentException.class, () -> kdfService.KDF(tooSmallPRK, emptyInfo, requiredLength));
 	}
 
@@ -151,7 +151,7 @@ class KDFServiceTest {
 
 	@Test
 	void testKDFToZqPRKLengthSmallerThanHashLengthThrows() {
-		final ImmutableByteArray tooSmallPRK = ImmutableByteArray.from(new byte[DEFAULT_HASH_LENGTH_BYTES - 1]);
+		final ImmutableByteArray tooSmallPRK = new ImmutableByteArray(new byte[DEFAULT_HASH_LENGTH_BYTES - 1]);
 		assertThrows(IllegalArgumentException.class, () -> kdfService.KDFToZq(tooSmallPRK, emptyInfo, requestedUpperBound));
 	}
 

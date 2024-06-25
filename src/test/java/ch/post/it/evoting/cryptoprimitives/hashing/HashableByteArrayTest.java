@@ -28,8 +28,8 @@ class HashableByteArrayTest {
 	@Test
 	@DisplayName("correctly makes a copy of the input byte array and toHashableForm array")
 	void hashableByteArrayFromMakesCopy() {
-		final ImmutableByteArray bytes = ImmutableByteArray.from(new byte[] { 0b01, 0b10, 0b11 });
-		final ImmutableByteArray expected = ImmutableByteArray.from(new byte[] { 0b01, 0b10, 0b11 });
+		final ImmutableByteArray bytes = ImmutableByteArray.of((byte) 0b01, (byte) 0b10, (byte) 0b11);
+		final ImmutableByteArray expected = ImmutableByteArray.of((byte) 0b01, (byte) 0b10, (byte) 0b11);
 
 		final HashableByteArray hashableByteArray = HashableByteArray.from(bytes);
 

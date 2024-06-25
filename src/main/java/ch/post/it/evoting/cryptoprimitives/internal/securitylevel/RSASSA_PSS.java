@@ -171,7 +171,7 @@ public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 		} catch (final IOException e) {
 			throw new UncheckedIOException("Could not write message to output stream.", e);
 		}
-		return ImmutableByteArray.from(contentSigner.getSignature());
+		return new ImmutableByteArray(contentSigner.getSignature());
 	}
 
 	@Override

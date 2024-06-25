@@ -18,6 +18,8 @@ package ch.post.it.evoting.cryptoprimitives.collection;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.base.Preconditions;
@@ -63,6 +65,10 @@ public class ImmutableList<E> {
 
 	public boolean containsAll(final List<E> elements) {
 		return this.elements.containsAll(elements);
+	}
+
+	public static <E> Collector<E, ?, ImmutableList<E>> toImmutableList() {
+		return Collectors.collectingAndThen(Collectors.toList(), ImmutableList::new);
 	}
 
 }

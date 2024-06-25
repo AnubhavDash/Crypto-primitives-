@@ -73,7 +73,7 @@ public class LibraryLoader {
 
 		try {
 			final byte[] digest = MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(filePath));
-			final String calculatedHash = BaseEncodingFactory.createBase16().base16Encode(ImmutableByteArray.from(digest));
+			final String calculatedHash = BaseEncodingFactory.createBase16().base16Encode(new ImmutableByteArray(digest));
 
 			if (expectedHashes.stream().noneMatch(hash -> hash.toUpperCase(Locale.ENGLISH).equals(calculatedHash))) {
 				throw new IllegalArgumentException(

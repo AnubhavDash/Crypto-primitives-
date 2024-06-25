@@ -314,7 +314,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 					zero, // s_m
 					zero, one, three, four, two, one, two // t
 			).when(hadamardRandomService).genRandomInteger(any());
-			when(hadamardHashService.recursiveHash(any(Hashable[].class))).thenReturn(ImmutableByteArray.from(new byte[] { 0b10 }));
+			when(hadamardHashService.recursiveHash(any(Hashable[].class))).thenReturn(ImmutableByteArray.of((byte) 0b10));
 			final HadamardArgumentService specificHadamardArgumentService = new HadamardArgumentService(hadamardRandomService, hadamardHashService,
 					hadamardPublicKey, hadamardCommitmentKey);
 

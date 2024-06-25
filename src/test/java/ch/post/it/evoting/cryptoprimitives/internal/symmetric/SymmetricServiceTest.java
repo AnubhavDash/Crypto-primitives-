@@ -74,7 +74,7 @@ class SymmetricServiceTest extends TestGroupSetup {
 		keyGenerator.init(AES_KEY_SIZE);
 
 		// Generate encryptionKey
-		encryptionKey = ImmutableByteArray.from(keyGenerator.generateKey().getEncoded());
+		encryptionKey = new ImmutableByteArray(keyGenerator.generateKey().getEncoded());
 	}
 
 	@BeforeEach
@@ -90,7 +90,7 @@ class SymmetricServiceTest extends TestGroupSetup {
 	@DisplayName("valid parameters does not throw, basic encryption path with Java AES 256 GCM Encryption Algorithm")
 	void basicJavaAES256GCMEncryptionPath() {
 		final SymmetricCiphertext authenticationEncrypted = symmetricEncryptionService.genCiphertextSymmetric(
-				encryptionKey, ImmutableByteArray.from(plainText.getBytes(StandardCharsets.UTF_8)), associatedData);
+				encryptionKey, new ImmutableByteArray(plainText.getBytes(StandardCharsets.UTF_8)), associatedData);
 
 		final ImmutableByteArray authenticationDecrypted = symmetricEncryptionService.getPlaintextSymmetric(encryptionKey,
 				authenticationEncrypted.ciphertext(), authenticationEncrypted.nonce(), associatedData);
@@ -103,7 +103,7 @@ class SymmetricServiceTest extends TestGroupSetup {
 	void wrongEncryptionInvalidNonceLength() {
 		// Different nonce between encryption and decryption execute 'Invalid nonce length'!
 		final SymmetricCiphertext authenticationEncrypted = symmetricEncryptionService.genCiphertextSymmetric(
-				encryptionKey, ImmutableByteArray.from(plainText.getBytes(StandardCharsets.UTF_8)), associatedData);
+				encryptionKey, new ImmutableByteArray(plainText.getBytes(StandardCharsets.UTF_8)), associatedData);
 
 		nonce = randomService.randomBytes(DIFFERENT_NONCE_LENGTH);
 
@@ -120,7 +120,7 @@ class SymmetricServiceTest extends TestGroupSetup {
 
 		final ImmutableByteArray differentEncryptionKey = randomService.randomBytes(DIFFERENT_AES_KEY_SIZE / 8);
 
-		final ImmutableByteArray plainTextBytes = ImmutableByteArray.from(plainText.getBytes(StandardCharsets.UTF_8));
+		final ImmutableByteArray plainTextBytes = new ImmutableByteArray(plainText.getBytes(StandardCharsets.UTF_8));
 		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
 				() -> symmetricEncryptionService.genCiphertextSymmetric(differentEncryptionKey, plainTextBytes, associatedData));
 
@@ -140,7 +140,7 @@ class SymmetricServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("null parameters throws NullPointerException")
 		void nullParams() {
-			final ImmutableByteArray plainTextBytes = ImmutableByteArray.from(plainText.getBytes(StandardCharsets.UTF_8));
+			final ImmutableByteArray plainTextBytes = new ImmutableByteArray(plainText.getBytes(StandardCharsets.UTF_8));
 
 			assertThrows(NullPointerException.class,
 					() -> symmetricEncryptionService.genCiphertextSymmetric(null, plainTextBytes,
@@ -157,7 +157,7 @@ class SymmetricServiceTest extends TestGroupSetup {
 		@DisplayName("Associated data containing null throws IllegalArgumentException")
 		void associatedDataWithNull() {
 			associatedData.set(0, null);
-			final ImmutableByteArray plainTextBytes = ImmutableByteArray.from(plainText.getBytes(StandardCharsets.UTF_8));
+			final ImmutableByteArray plainTextBytes = new ImmutableByteArray(plainText.getBytes(StandardCharsets.UTF_8));
 			assertThrows(NullPointerException.class,
 					() -> symmetricEncryptionService.genCiphertextSymmetric(encryptionKey, plainTextBytes, associatedData));
 		}
@@ -206,7 +206,7 @@ class SymmetricServiceTest extends TestGroupSetup {
 		@DisplayName("null parameters throws NullPointerException")
 		void nullParams() {
 			final SymmetricCiphertext authenticationEncrypted = symmetricEncryptionService.genCiphertextSymmetric(
-					encryptionKey, ImmutableByteArray.from(plainText.getBytes(StandardCharsets.UTF_8)), associatedData);
+					encryptionKey, new ImmutableByteArray(plainText.getBytes(StandardCharsets.UTF_8)), associatedData);
 
 			final ImmutableByteArray ciphertext = authenticationEncrypted.ciphertext();
 			final ImmutableByteArray nonce = authenticationEncrypted.nonce();

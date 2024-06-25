@@ -85,7 +85,7 @@ public class Argon2Service implements Argon2 {
         final byte[] t = new byte[c.tagLength()];
         generator.generateBytes(k.elements(), t);
 
-        return ImmutableByteArray.from(t);
+        return new ImmutableByteArray(t);
     }
 
     private record Argon2Configuration(int tagLength, ImmutableByteArray salt, int memory, int parallelism,

@@ -78,8 +78,7 @@ public class KDFService implements KeyDerivation {
 		final ImmutableByteArray info = ImmutableByteArray.concat(
 				info_vector.stream()
 						.map(Conversions::stringToByteArray)
-						.map(info_i_bytes -> ImmutableByteArray.concat(ImmutableByteArray.from(new byte[] { (byte) info_i_bytes.length() }),
-								info_i_bytes))
+						.map(info_i_bytes -> ImmutableByteArray.concat(ImmutableByteArray.of((byte) info_i_bytes.length()), info_i_bytes))
 						.toArray(ImmutableByteArray[]::new)
 		);
 
@@ -97,7 +96,7 @@ public class KDFService implements KeyDerivation {
 		final byte[] OKM = new byte[L];
 		hkdf.generateBytes(OKM, 0, L);
 
-		return ImmutableByteArray.from(OKM);
+		return new ImmutableByteArray(OKM);
 	}
 
 	/**

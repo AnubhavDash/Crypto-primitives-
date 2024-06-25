@@ -153,16 +153,16 @@ class HashServiceTest {
 	void testRecursiveHashOfByteArrayReturnsHashOfByteArray() {
 		final ImmutableByteArray bytes = randomService.randomBytes(TEST_INPUT_LENGTH);
 		final ImmutableByteArray recursiveHash = hashService.recursiveHash(HashableByteArray.from(bytes));
-		final ImmutableByteArray regularHash = ImmutableByteArray.from(
-				messageDigest.digest(concat(ImmutableByteArray.from(new byte[] { 0x00 }), bytes).elements()));
+		final ImmutableByteArray regularHash = new ImmutableByteArray(
+				messageDigest.digest(concat(ImmutableByteArray.of((byte) 0x00), bytes).elements()));
 		assertEquals(regularHash, recursiveHash);
 	}
 
 	@Test
 	void testRecursiveHashOfStringReturnsHashOfString() {
 		final String string = randomService.genRandomString(TEST_INPUT_LENGTH, Base32Alphabet.getInstance());
-		final ImmutableByteArray expected = ImmutableByteArray.from(
-				messageDigest.digest(concat(ImmutableByteArray.from(new byte[] { 0x02 }), stringToByteArray(string)).elements()));
+		final ImmutableByteArray expected = new ImmutableByteArray(
+				messageDigest.digest(concat(ImmutableByteArray.of((byte) 0x02), stringToByteArray(string)).elements()));
 		final ImmutableByteArray recursiveHash = hashService.recursiveHash(HashableString.from(string));
 		assertEquals(expected, recursiveHash);
 	}
@@ -171,8 +171,8 @@ class HashServiceTest {
 	void testRecursiveHashOfBigIntegerValue10ReturnsSameHashOfInteger10() {
 		final BigInteger bigInteger = randomService.genRandomIntegerOfLength(3072);
 		final ImmutableByteArray recursiveHash = hashService.recursiveHash(HashableBigInteger.from(bigInteger));
-		final ImmutableByteArray regularHash = ImmutableByteArray.from(
-				messageDigest.digest(concat(ImmutableByteArray.from(new byte[] { 0x01 }), integerToByteArray(bigInteger)).elements()));
+		final ImmutableByteArray regularHash = new ImmutableByteArray(
+				messageDigest.digest(concat(ImmutableByteArray.of((byte) 0x01), integerToByteArray(bigInteger)).elements()));
 		assertEquals(regularHash, recursiveHash);
 	}
 
@@ -214,9 +214,9 @@ class HashServiceTest {
 
 		final byte[] concatenation = new byte[hashLength * 2 + 1];
 		concatenation[0] = 0x03;
-		System.arraycopy(messageDigest.digest(concat(ImmutableByteArray.from(new byte[] { 0x00 }), bytes1).elements()), 0, concatenation, 1,
+		System.arraycopy(messageDigest.digest(concat(ImmutableByteArray.of((byte) 0x00), bytes1).elements()), 0, concatenation, 1,
 				hashLength);
-		System.arraycopy(messageDigest.digest(concat(ImmutableByteArray.from(new byte[] { 0x00 }), bytes2).elements()), 0, concatenation,
+		System.arraycopy(messageDigest.digest(concat(ImmutableByteArray.of((byte) 0x00), bytes2).elements()), 0, concatenation,
 				hashLength + 1, hashLength);
 		final byte[] expected = messageDigest.digest(concatenation);
 
@@ -238,14 +238,14 @@ class HashServiceTest {
 
 		final byte[] subConcatenation = new byte[hashLength * 2 + 1];
 		subConcatenation[0] = 0x03;
-		System.arraycopy(messageDigest.digest(concat(ImmutableByteArray.from(new byte[] { 0x00 }), bytes2).elements()), 0, subConcatenation, 1,
+		System.arraycopy(messageDigest.digest(concat(ImmutableByteArray.of((byte) 0x00), bytes2).elements()), 0, subConcatenation, 1,
 				hashLength);
-		System.arraycopy(messageDigest.digest(concat(ImmutableByteArray.from(new byte[] { 0x00 }), bytes3).elements()), 0, subConcatenation,
+		System.arraycopy(messageDigest.digest(concat(ImmutableByteArray.of((byte) 0x00), bytes3).elements()), 0, subConcatenation,
 				hashLength + 1, hashLength);
 		final byte[] subHash = messageDigest.digest(subConcatenation);
 		final byte[] concatenation = new byte[hashLength * 2 + 1];
 		concatenation[0] = 0x03;
-		System.arraycopy(messageDigest.digest(concat(ImmutableByteArray.from(new byte[] { 0x00 }), bytes1).elements()), 0, concatenation, 1,
+		System.arraycopy(messageDigest.digest(concat(ImmutableByteArray.of((byte) 0x00), bytes1).elements()), 0, concatenation, 1,
 				hashLength);
 		System.arraycopy(subHash, 0, concatenation, hashLength + 1, hashLength);
 		final byte[] expected = messageDigest.digest(concatenation);
@@ -280,15 +280,15 @@ class HashServiceTest {
 		final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		outputStream.write(0x03);
 		outputStream.write(
-				messageDigest.digest(concat(ImmutableByteArray.from(new byte[] { 0x01 }), integerToByteArray(first.toHashableForm())).elements()));
-		outputStream.write(messageDigest.digest(concat(ImmutableByteArray.from(new byte[] { 0x00 }), second.toHashableForm()).elements()));
+				messageDigest.digest(concat(ImmutableByteArray.of((byte) 0x01), integerToByteArray(first.toHashableForm())).elements()));
+		outputStream.write(messageDigest.digest(concat(ImmutableByteArray.of((byte) 0x00), second.toHashableForm()).elements()));
 		final byte[] expectedSubSubListHash = messageDigest.digest(outputStream.toByteArray());
 		outputStream.close();
 
 		final ByteArrayOutputStream outputStream1 = new ByteArrayOutputStream();
 		outputStream1.write(0x03);
 		outputStream1.write(
-				messageDigest.digest(concat(ImmutableByteArray.from(new byte[] { 0x02 }), stringToByteArray(third.toHashableForm())).elements()));
+				messageDigest.digest(concat(ImmutableByteArray.of((byte) 0x02), stringToByteArray(third.toHashableForm())).elements()));
 		outputStream1.write(expectedSubSubListHash);
 		final byte[] expectedSubListHash = messageDigest.digest(outputStream1.toByteArray());
 		outputStream1.close();
@@ -296,8 +296,8 @@ class HashServiceTest {
 		final ByteArrayOutputStream outputStream2 = new ByteArrayOutputStream();
 		outputStream2.write(0x03);
 		outputStream2.write(
-				messageDigest.digest(concat(ImmutableByteArray.from(new byte[] { 0x01 }), integerToByteArray(first.toHashableForm())).elements()));
-		outputStream2.write(messageDigest.digest(concat(ImmutableByteArray.from(new byte[] { 0x00 }), second.toHashableForm()).elements()));
+				messageDigest.digest(concat(ImmutableByteArray.of((byte) 0x01), integerToByteArray(first.toHashableForm())).elements()));
+		outputStream2.write(messageDigest.digest(concat(ImmutableByteArray.of((byte) 0x00), second.toHashableForm()).elements()));
 		outputStream2.write(expectedSubListHash);
 		final byte[] expectedHash = messageDigest.digest(outputStream2.toByteArray());
 		outputStream2.close();
@@ -345,8 +345,8 @@ class HashServiceTest {
 		System.arraycopy(input.elements(), 0, first, 0, split);
 		System.arraycopy(input.elements(), split, second, 0, input.length() - split);
 		return new Split(
-				HashableByteArray.from(ImmutableByteArray.from(first)),
-				HashableByteArray.from(ImmutableByteArray.from(second)));
+				HashableByteArray.from(new ImmutableByteArray(first)),
+				HashableByteArray.from(new ImmutableByteArray(second)));
 	}
 
 	@Test

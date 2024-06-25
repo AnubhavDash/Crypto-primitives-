@@ -28,11 +28,17 @@ import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
 /**
  * An immutable byte array wrapping a non-null array of bytes.
  *
- * <p>Instances of this class are immutable. </p>
+ * <p>Instances of this class are immutable.</p>
  */
 public record ImmutableByteArray(byte[] elements) implements HashableByteArray {
 	public static final ImmutableByteArray EMPTY = new ImmutableByteArray(new byte[] {});
 
+	/**
+	 * Creates a new immutable byte array from the specified bytes.
+	 *
+	 * @param elements the bytes to wrap.
+	 * @throws NullPointerException if the specified bytes are null.
+	 */
 	public ImmutableByteArray {
 		elements = checkNotNull(elements).clone();
 	}
@@ -49,7 +55,8 @@ public record ImmutableByteArray(byte[] elements) implements HashableByteArray {
 	 * @return the byte at the specified index.
 	 */
 	public byte get(final int index) {
-		checkArgument(index >= 0 && index < length(), "Index is out of bounds. [index: %s, length: %s]", index, length());
+		final int length = length();
+		checkArgument(index >= 0 && index < length, "Index is out of bounds. [index: %s, length: %s]", index, length);
 		return elements[index];
 	}
 
@@ -95,26 +102,16 @@ public record ImmutableByteArray(byte[] elements) implements HashableByteArray {
 	}
 
 	/**
-	 * Creates a new immutable byte array from the specified byte array.
+	 * Creates a new immutable byte array from the specified bytes.
 	 *
-	 * @param elements the byte array to wrap. Must be non-null.
-	 * @return a new immutable byte array wrapping the specified byte array.
-	 * @throws NullPointerException if the specified byte array is null.
+	 * @param elements the bytes to wrap.
+	 * @return a new immutable byte array wrapping the specified bytes.
+	 * @throws NullPointerException if the specified bytes are null.
 	 */
-	public static ImmutableByteArray from(final byte[] elements) {
+	public static ImmutableByteArray of(final byte... elements) {
 		checkNotNull(elements);
 
 		return new ImmutableByteArray(elements);
-	}
-
-	/**
-	 * Creates a new immutable byte array from the specified byte.
-	 *
-	 * @param element the byte to wrap.
-	 * @return a new immutable byte array wrapping the specified byte.
-	 */
-	public static ImmutableByteArray from(final byte element) {
-		return ImmutableByteArray.from(new byte[] { element });
 	}
 
 	/**
@@ -132,46 +129,26 @@ public record ImmutableByteArray(byte[] elements) implements HashableByteArray {
 				.map(ImmutableByteArray::elements)
 				.toArray(byte[][]::new);
 
-		return ImmutableByteArray.from(Bytes.concat(byteArrays));
-	}
-
-	/**
-	 * Copies the specified range of the given immutable byte array into a new immutable byte array.
-	 *
-	 * @param original the original immutable byte array. Must be non-null.
-	 * @param from     the initial index of the range to be copied, inclusive.
-	 * @param to       the final index of the range to be copied, exclusive.
-	 * @return a new immutable byte array containing the specified range of the original immutable byte array.
-	 * @throws NullPointerException     if the original immutable byte array is null.
-	 * @throws IllegalArgumentException if the indexes are invalid. The range is valid if 0 &le; from &le; to &le; original.length.
-	 */
-	public static ImmutableByteArray copyOfRange(final ImmutableByteArray original, final int from, final int to) {
-		checkNotNull(original);
-		checkArgument(from >= 0 && from <= to && to <= original.length(), "Indexes are invalid. [from: %s, to: %s, originalLength: %s]", from, to,
-				original.length());
-
-		return ImmutableByteArray.from(Arrays.copyOfRange(original.elements(), from, to));
+		return new ImmutableByteArray(Bytes.concat(byteArrays));
 	}
 
 	/**
 	 * Copies the specified range of the given immutable byte array into a new immutable byte array.
 	 *
 	 * @param immutableByteArray the original immutable byte array. Must be non-null.
-	 * @param sourcePosition     the initial index of the range to be copied, inclusive.
-	 * @param length             the length of the range to be copied.
+	 * @param from               the initial index of the range to be copied, inclusive.
+	 * @param to                 the final index of the range to be copied, exclusive.
 	 * @return a new immutable byte array containing the specified range of the original immutable byte array.
 	 * @throws NullPointerException     if the original immutable byte array is null.
-	 * @throws IllegalArgumentException if the indexes are invalid. The range is valid if 0 &le; sourcePosition &le; sourcePosition + length &le;
-	 *                                  original.length.
+	 * @throws IllegalArgumentException if the indexes are invalid. The range is valid if 0 &le; from &le; to &le;
+	 *                                  <code>immutableByteArray.length</code>.
 	 */
-	public static ImmutableByteArray copy(final ImmutableByteArray immutableByteArray, final int sourcePosition, final int length) {
+	public static ImmutableByteArray copyOfRange(final ImmutableByteArray immutableByteArray, final int from, final int to) {
 		checkNotNull(immutableByteArray);
-		checkArgument(sourcePosition >= 0 && sourcePosition + length <= immutableByteArray.length(),
-				"Indexes are invalid. [sourcePosition: %s, length: %s, originalLength: %s]", sourcePosition, length, immutableByteArray.length());
+		final int length = immutableByteArray.length();
+		checkArgument(0 <= from && from <= to && to <= length, "Indexes are invalid. [from: %s, to: %s, originalLength: %s]", from, to, length);
 
-		final byte[] bytes = new byte[length];
-		System.arraycopy(immutableByteArray.elements(), sourcePosition, bytes, 0, length);
-
-		return ImmutableByteArray.from(bytes);
+		return new ImmutableByteArray(Arrays.copyOfRange(immutableByteArray.elements(), from, to));
 	}
+
 }

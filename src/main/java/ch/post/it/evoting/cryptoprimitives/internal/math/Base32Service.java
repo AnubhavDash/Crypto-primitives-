@@ -36,7 +36,7 @@ public final class Base32Service implements Base32 {
 		final String S = checkNotNull(string);
 		try {
 			// The method decode checks the given string is a valid Base32 string.
-			return ImmutableByteArray.from(BaseEncoding.base32().decode(S));
+			return new ImmutableByteArray(BaseEncoding.base32().decode(S));
 		} catch (final IllegalArgumentException e) {
 			throw new IllegalArgumentException("The given string is not a valid Base32 string.", e);
 		}

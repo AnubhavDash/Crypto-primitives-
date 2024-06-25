@@ -34,7 +34,7 @@ public final class Base64Service implements Base64 {
 		final String S = checkNotNull(string);
 		try {
 			// The method decode checks the given string is a valid Base64 string.
-			return ImmutableByteArray.from(java.util.Base64.getDecoder().decode(S));
+			return new ImmutableByteArray(java.util.Base64.getDecoder().decode(S));
 		} catch (final IllegalArgumentException e) {
 			throw new IllegalArgumentException("The given string is not a valid Base64 string.", e);
 		}

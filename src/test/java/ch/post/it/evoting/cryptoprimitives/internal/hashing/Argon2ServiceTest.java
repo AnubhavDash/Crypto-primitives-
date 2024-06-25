@@ -64,7 +64,7 @@ class Argon2ServiceTest {
 		void genArgon2idWithEmptyInput() {
 			// Given
 			when(randomService.randomBytes(16))
-					.thenReturn(ImmutableByteArray.from(HexFormat.of().parseHex("7332424c365a744a44376e784b7a576e")));
+					.thenReturn(new ImmutableByteArray(HexFormat.of().parseHex("7332424c365a744a44376e784b7a576e")));
 			final Argon2Profile config = Argon2Profile.TEST;
 
 			// When
@@ -72,7 +72,7 @@ class Argon2ServiceTest {
 			final Argon2Hash argon2Hash = service.genArgon2id(ImmutableByteArray.EMPTY);
 
 			// Then
-			assertEquals(ImmutableByteArray.from(HexFormat.of().parseHex("f11fb1bd1d0240f57064cb14e8281509447719c6090e7d37f37f4831af81b6e8")),
+			assertEquals(new ImmutableByteArray(HexFormat.of().parseHex("f11fb1bd1d0240f57064cb14e8281509447719c6090e7d37f37f4831af81b6e8")),
 					argon2Hash.tag());
 		}
 
@@ -140,10 +140,10 @@ class Argon2ServiceTest {
 			final Argon2Service service = new Argon2Service(randomService, config);
 			final ImmutableByteArray t = service.getArgon2id(
 					ImmutableByteArray.EMPTY,
-					ImmutableByteArray.from(HexFormat.of().parseHex("7332424c365a744a44376e784b7a576e")));
+					new ImmutableByteArray(HexFormat.of().parseHex("7332424c365a744a44376e784b7a576e")));
 
 			// Then
-			assertEquals(ImmutableByteArray.from(HexFormat.of().parseHex("f11fb1bd1d0240f57064cb14e8281509447719c6090e7d37f37f4831af81b6e8")), t);
+			assertEquals(new ImmutableByteArray(HexFormat.of().parseHex("f11fb1bd1d0240f57064cb14e8281509447719c6090e7d37f37f4831af81b6e8")), t);
 		}
 
 		private Stream<Arguments> getArgon2idJsonFileArgumentProvider() {
