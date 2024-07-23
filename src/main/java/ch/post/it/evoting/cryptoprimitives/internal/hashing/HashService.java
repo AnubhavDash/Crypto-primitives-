@@ -191,7 +191,7 @@ public class HashService implements Hash {
 		checkArgument(k > 0, NO_VALUES);
 		checkArgument(l >= xof.getMinimumOutputLengthBits(), "The requested bit length must be at least %s.", xof.getMinimumOutputLengthBits());
 
-		final int L = (int) Math.ceil(l / 8.0);
+		final int L = Math.ceilDivExact(l, Byte.SIZE);
 		if (k > 1) {
 			final HashableList v = HashableList.from(Arrays.asList(values));
 			return recursiveHashOfLength(l, v);

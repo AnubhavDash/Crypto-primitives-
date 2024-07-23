@@ -49,7 +49,7 @@ public final class ByteArrays {
 		checkArgument(n <= (N * Byte.SIZE), "The requested length must not be greater than the bit length of the byte array.");
 
 		// Operation.
-		final int length = (int) Math.ceil(n / (double) Byte.SIZE);
+		final int length = Math.ceilDivExact(n, Byte.SIZE);
 		final int offset = N - length;
 		final byte[] B_prime = new byte[length];
 		if (n % Byte.SIZE != 0) {
@@ -76,7 +76,7 @@ public final class ByteArrays {
 	public static int byteLength(final BigInteger x) {
 		checkNotNull(x);
 
-		final int n = (int) Math.ceil(x.bitLength() / (double) Byte.SIZE);
+		final int n = Math.ceilDivExact(x.bitLength(), Byte.SIZE);
 
 		return Math.max(n, 1);
 	}
