@@ -102,7 +102,7 @@ public class RandomService implements Random {
 	public List<String> genUniqueDecimalStrings(final int desiredCodeLength, final int numberOfUniqueCodes) {
 		final int l = desiredCodeLength;
 		final int n = numberOfUniqueCodes;
-		checkArgument(l > 0, "The desired length of the unique codes must be strictly positive.");
+		checkArgument(l >= 0, "The desired length of the unique codes must be greater than or equal to 0.");
 		checkArgument(n > 0, "The number of unique codes must be strictly positive.");
 
 		checkArgument(n <= Math.pow(10, l), "There cannot be more than 10^l codes.");
@@ -162,7 +162,7 @@ public class RandomService implements Random {
 	@SuppressWarnings("java:S117")
 	public String genRandomString(final int length, final Alphabet alphabet) {
 
-		checkArgument(length > 0, "The desired length of string must be strictly positive. [length: %s]", length);
+		checkArgument(length >= 0, "The desired length of string must be greater than or equal to 0. [length: %s]", length);
 
 		// Input
 		final int l = length;
