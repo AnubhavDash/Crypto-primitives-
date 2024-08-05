@@ -153,10 +153,19 @@ class RandomServiceTest {
 	}
 
 	@Test
+	void genUniqueDecimalStringsWithZeroCodeLengthDoesNotThrow() {
+				final int desiredCodesLength = 0;
+				final int numberOfCodes = 1;
+				final List<String> uniqueStrings = assertDoesNotThrow(() -> randomService.genUniqueDecimalStrings(desiredCodesLength, numberOfCodes));
+				final boolean allHaveCorrectSize = uniqueStrings.stream().map(String::length).allMatch(codeSize -> codeSize == desiredCodesLength);
+				assertTrue(allHaveCorrectSize);
+	}
+
+	@Test
 	void genUniqueDecimalStringsWithTooSmallDesiredCodeLengthThrows() {
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-				() -> randomService.genUniqueDecimalStrings(0, 1));
-		assertEquals("The desired length of the unique codes must be strictly positive.", exception.getMessage());
+				() -> randomService.genUniqueDecimalStrings(-1, 1));
+		assertEquals("The desired length of the unique codes must be greater than or equal to 0.", exception.getMessage());
 	}
 
 	@Test
@@ -198,7 +207,7 @@ class RandomServiceTest {
 
 	@RepeatedTest(10)
 	void genUniqueDecimalStringsWithTooManyCodesThrows() {
-		final int desiredCodesLength = randomService.genRandomInteger(9) + 1;
+		final int desiredCodesLength = randomService.genRandomInteger(9);
 		final int tooBigNumberOfUniqueCodes = (int) Math.pow(10, desiredCodesLength) + 1;
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 				() -> randomService.genUniqueDecimalStrings(desiredCodesLength, tooBigNumberOfUniqueCodes));
@@ -211,15 +220,20 @@ class RandomServiceTest {
 		private static final Alphabet alphabet = UsabilityBase32Alphabet.getInstance();
 		private static final int LENGTH = alphabet.size();
 
-		@ParameterizedTest
-		@ValueSource(ints = { -1, 0 })
+		@Test
 		@DisplayName("an invalid length throws an IllegalArgumentException")
-		void invalidLengthThrows(final int length) {
+		void invalidLengthThrows() {
 			final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
-					() -> randomService.genRandomString(length, alphabet));
+					() -> randomService.genRandomString(-2, alphabet));
 
-			assertEquals(String.format("The desired length of string must be strictly positive. [length: %s]", length),
+			assertEquals(String.format("The desired length of string must be greater than or equal to 0. [length: %s]", -2),
 					Throwables.getRootCause(illegalArgumentException).getMessage());
+		}
+
+		@Test
+		@DisplayName("a zero length does not throw an IllegalArgumentException")
+		void zeroLengthdoesNotThrow() {
+			assertDoesNotThrow(() -> randomService.genRandomString(0, alphabet));
 		}
 
 		@Test
