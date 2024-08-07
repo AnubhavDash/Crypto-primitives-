@@ -32,6 +32,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -274,6 +275,14 @@ public class ImmutableList<E> implements Iterable<E> {
 		checkNotNull(a);
 
 		return elements.toArray(a);
+	}
+
+	/**
+	 * @return an unordered unmodifiable Set containing the elements of the list.
+	 * @see Set#of(Object[])
+	 */
+	public Set<E> toSet() {
+		return elements.stream().collect(Collectors.toUnmodifiableSet());
 	}
 
 	@Override

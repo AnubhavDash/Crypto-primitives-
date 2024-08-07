@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -230,5 +231,15 @@ class ImmutableListTest {
 	void toArrayThrows() {
 		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
 		assertThrows(NullPointerException.class, () -> list.toArray(null));
+	}
+
+	@Test
+	void toSet() {
+		final ImmutableList<String> list = ImmutableList.of("a", "a", "b", "c", "b");
+		final Set<String> set = list.toSet();
+		assertEquals(3, set.size());
+		assertTrue(set.contains("a"));
+		assertTrue(set.contains("b"));
+		assertTrue(set.contains("c"));
 	}
 }
