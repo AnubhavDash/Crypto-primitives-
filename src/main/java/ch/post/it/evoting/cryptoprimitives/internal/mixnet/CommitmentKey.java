@@ -15,14 +15,15 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -128,13 +129,16 @@ final class CommitmentKey implements HashableList {
 
 	@Override
 	public String toString() {
-		final List<String> simpleGElements = gElements.stream().map(GqElement::getValue).map(BigInteger::toString).toList();
+		final ImmutableList<String> simpleGElements = gElements.stream()
+				.map(GqElement::getValue)
+				.map(BigInteger::toString)
+				.collect(toImmutableList());
 		return "CommitmentKey{" + "h=" + h + ", g elements=" + simpleGElements + '}';
 	}
 
 	@Override
-	public List<? extends Hashable> toHashableForm() {
-		return this.stream().toList();
+	public ImmutableList<Hashable> toHashableForm() {
+		return this.stream().collect(toImmutableList());
 	}
 
 }

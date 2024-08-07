@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.HexFormat;
-import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -34,6 +33,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Hash;
 import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Profile;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
@@ -77,7 +77,7 @@ class Argon2ServiceTest {
 		}
 
 		private Stream<Arguments> genArgon2idJsonFileArgumentProvider() {
-			final List<TestParameters> parametersList = TestParameters.fromResource("/hash/gen-argon2id.json");
+			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/hash/gen-argon2id.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// Context.
@@ -147,7 +147,7 @@ class Argon2ServiceTest {
 		}
 
 		private Stream<Arguments> getArgon2idJsonFileArgumentProvider() {
-			final List<TestParameters> parametersList = TestParameters.fromResource("/hash/get-argon2id.json");
+			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/hash/get-argon2id.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// Context.

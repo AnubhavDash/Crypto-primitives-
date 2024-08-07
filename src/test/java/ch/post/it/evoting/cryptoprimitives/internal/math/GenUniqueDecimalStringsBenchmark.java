@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.math.Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.Base10Alphabet;
 
@@ -48,31 +50,33 @@ import ch.post.it.evoting.cryptoprimitives.math.Base10Alphabet;
 public class GenUniqueDecimalStringsBenchmark {
 	@Benchmark
 	public void genUniqueDecimalStringsArrayList(final MyState state, final Blackhole bh) {
-		final List<String> strings = state.genUniqueDecimalStringsArrayList(state.desiredCodeLength, state.numberOfUniqueCodes);
+		final ImmutableList<String> strings = state.genUniqueDecimalStringsArrayList(state.desiredCodeLength, state.numberOfUniqueCodes);
 		bh.consume(strings);
 	}
 
 	@Benchmark
 	public void genUniqueDecimalStringsHashSet(final MyState state, final Blackhole bh) {
-		final List<String> strings = state.genUniqueDecimalStringsHashSet(state.desiredCodeLength, state.numberOfUniqueCodes);
+		final ImmutableList<String> strings = state.genUniqueDecimalStringsHashSet(state.desiredCodeLength, state.numberOfUniqueCodes);
 		bh.consume(strings);
 	}
 
 	@Benchmark
 	public void genUniqueDecimalStringsTreeSet(final MyState state, final Blackhole bh) {
-		final List<String> strings = state.genUniqueDecimalStringsTreeSet(state.desiredCodeLength, state.numberOfUniqueCodes);
+		final ImmutableList<String> strings = state.genUniqueDecimalStringsTreeSet(state.desiredCodeLength, state.numberOfUniqueCodes);
 		bh.consume(strings);
 	}
 
 	@Benchmark
 	public void genUniqueDecimalStringsConcurrentHashSetParallelized(final MyState state, final Blackhole bh) {
-		final List<String> strings = state.genUniqueDecimalStringsConcurrentHashSet(state.desiredCodeLength, state.numberOfUniqueCodes, true);
+		final ImmutableList<String> strings = state.genUniqueDecimalStringsConcurrentHashSet(state.desiredCodeLength, state.numberOfUniqueCodes,
+				true);
 		bh.consume(strings);
 	}
 
 	@Benchmark
 	public void genUniqueDecimalStringsConcurrentHashSetNotParallelized(final MyState state, final Blackhole bh) {
-		final List<String> strings = state.genUniqueDecimalStringsConcurrentHashSet(state.desiredCodeLength, state.numberOfUniqueCodes, false);
+		final ImmutableList<String> strings = state.genUniqueDecimalStringsConcurrentHashSet(state.desiredCodeLength, state.numberOfUniqueCodes,
+				false);
 		bh.consume(strings);
 	}
 
@@ -83,7 +87,7 @@ public class GenUniqueDecimalStringsBenchmark {
 		private final int desiredCodeLength = 4;
 		private final int numberOfUniqueCodes = 1000;
 
-		public List<String> genUniqueDecimalStringsArrayList(final int desiredCodeLength, final int numberOfUniqueCodes) {
+		public ImmutableList<String> genUniqueDecimalStringsArrayList(final int desiredCodeLength, final int numberOfUniqueCodes) {
 			final int l = desiredCodeLength;
 			final int n = numberOfUniqueCodes;
 			checkArgument(l > 0, "The desired length of the unique codes must be strictly positive.");
@@ -102,10 +106,10 @@ public class GenUniqueDecimalStringsBenchmark {
 				}
 			}
 
-			return codes;
+			return codes.stream().collect(toImmutableList());
 		}
 
-		public List<String> genUniqueDecimalStringsHashSet(final int desiredCodeLength, final int numberOfUniqueCodes) {
+		public ImmutableList<String> genUniqueDecimalStringsHashSet(final int desiredCodeLength, final int numberOfUniqueCodes) {
 			final int l = desiredCodeLength;
 			final int n = numberOfUniqueCodes;
 			checkArgument(l > 0, "The desired length of the unique codes must be strictly positive.");
@@ -121,10 +125,10 @@ public class GenUniqueDecimalStringsBenchmark {
 				codes.add(c);
 			}
 
-			return codes.stream().toList();
+			return codes.stream().collect(toImmutableList());
 		}
 
-		public List<String> genUniqueDecimalStringsTreeSet(final int desiredCodeLength, final int numberOfUniqueCodes) {
+		public ImmutableList<String> genUniqueDecimalStringsTreeSet(final int desiredCodeLength, final int numberOfUniqueCodes) {
 			final int l = desiredCodeLength;
 			final int n = numberOfUniqueCodes;
 			checkArgument(l > 0, "The desired length of the unique codes must be strictly positive.");
@@ -141,10 +145,10 @@ public class GenUniqueDecimalStringsBenchmark {
 				codes.add(c);
 			}
 
-			return codes.stream().toList();
+			return codes.stream().collect(toImmutableList());
 		}
 
-		public List<String> genUniqueDecimalStringsConcurrentHashSet(final int desiredCodeLength, final int numberOfUniqueCodes,
+		public ImmutableList<String> genUniqueDecimalStringsConcurrentHashSet(final int desiredCodeLength, final int numberOfUniqueCodes,
 				final boolean parallel) {
 			final int l = desiredCodeLength;
 			final int n = numberOfUniqueCodes;
@@ -165,7 +169,7 @@ public class GenUniqueDecimalStringsBenchmark {
 						} while (!codes.add(c));
 						return c;
 					})
-					.toList();
+					.collect(toImmutableList());
 		}
 	}
 }

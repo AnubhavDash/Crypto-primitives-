@@ -15,9 +15,8 @@
  */
 package ch.post.it.evoting.cryptoprimitives.symmetric;
 
-import java.util.List;
-
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 
 /**
  * Provides methods for symmetric encryption/decryption.
@@ -34,7 +33,7 @@ public interface Symmetric {
 	 * @throws IllegalArgumentException if the given encryptionKey is invalid for this underlying algorithm.
 	 */
 	SymmetricCiphertext genCiphertextSymmetric(final ImmutableByteArray encryptionKey, final ImmutableByteArray plaintext,
-			final List<String> associatedData);
+			final ImmutableList<String> associatedData);
 
 	/**
 	 * Symmetric authenticated decryption scheme based on authenticated Decryption with Associated Data (AEAD)
@@ -51,7 +50,7 @@ public interface Symmetric {
 	 *                                  </ul>
 	 */
 	ImmutableByteArray getPlaintextSymmetric(final ImmutableByteArray encryptionKey, final ImmutableByteArray ciphertext,
-			final ImmutableByteArray nonce, final List<String> associatedData);
+			final ImmutableByteArray nonce, final ImmutableList<String> associatedData);
 
 	/**
 	 * Gets the byte length of the nonce for this algorithm

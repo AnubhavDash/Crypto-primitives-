@@ -83,11 +83,8 @@ public final class MixnetService implements Mixnet {
 	@Override
 	public VerifiableShuffle genVerifiableShuffle(final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> inputCiphertexts,
 			final ElGamalMultiRecipientPublicKey publicKey) {
-		checkNotNull(inputCiphertexts);
-		checkNotNull(publicKey);
-
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = GroupVector.from(inputCiphertexts);
-		final ElGamalMultiRecipientPublicKey pk = publicKey;
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = checkNotNull(inputCiphertexts);
+		final ElGamalMultiRecipientPublicKey pk = checkNotNull(publicKey);
 		final int N = C.size();
 		final int l = C.getElementSize();
 		final int k = pk.size();

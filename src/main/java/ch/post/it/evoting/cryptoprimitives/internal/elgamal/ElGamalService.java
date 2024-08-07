@@ -15,8 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
-import java.util.List;
-
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamal;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
@@ -56,7 +55,7 @@ public class ElGamalService implements ElGamal {
 
 	@Override
 	public GqGroup getEncryptionParameters(final String seed) {
-		final List<Integer> sp = PrimesInternal.getSmallPrimes();
+		final ImmutableList<Integer> sp = PrimesInternal.getSmallPrimes();
 		return new EncryptionParameters().getEncryptionParameters(seed, sp);
 	}
 

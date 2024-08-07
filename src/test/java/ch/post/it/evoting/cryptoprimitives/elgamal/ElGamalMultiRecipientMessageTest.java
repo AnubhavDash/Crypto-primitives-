@@ -15,12 +15,12 @@
  */
 package ch.post.it.evoting.cryptoprimitives.elgamal;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
+import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +31,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientCiphertexts;
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientMessages;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -61,22 +62,22 @@ class ElGamalMultiRecipientMessageTest extends TestGroupSetup {
 	void constructionTest() {
 		final ElGamalMultiRecipientMessage message = new ElGamalMultiRecipientMessage(validMessageElements);
 
-		assertEquals(validMessageElements, message.stream().collect(GroupVector.toGroupVector()));
+		assertEquals(validMessageElements, message.stream().collect(toGroupVector()));
 	}
 
 	// Provides parameters for the withInvalidParameters test.
 	static Stream<Arguments> createInvalidArgumentsProvider() {
 		return Stream.of(
 				Arguments.of(null, NullPointerException.class, null),
-				Arguments.of(GroupVector.of(), IllegalArgumentException.class, "An ElGamal message must not be empty.")
+				Arguments.of(GroupVector.empty(), IllegalArgumentException.class, "An ElGamal message must not be empty.")
 		);
 	}
 
 	@ParameterizedTest(name = "message = {0} throws {1}")
 	@MethodSource("createInvalidArgumentsProvider")
 	@DisplayName("created with invalid parameters")
-	void constructionWithInvalidParametersTest(
-			final GroupVector<GqElement, GqGroup> messageElements, final Class<? extends RuntimeException> exceptionClass, final String errorMsg) {
+	void constructionWithInvalidParametersTest(final GroupVector<GqElement, GqGroup> messageElements,
+			final Class<? extends RuntimeException> exceptionClass, final String errorMsg) {
 		final Exception exception = assertThrows(exceptionClass, () -> new ElGamalMultiRecipientMessage(messageElements));
 		assertEquals(errorMsg, exception.getMessage());
 	}
@@ -87,9 +88,9 @@ class ElGamalMultiRecipientMessageTest extends TestGroupSetup {
 		final int n = randomService.genRandomInteger(10) + 1;
 		final ElGamalMultiRecipientMessage ones = ElGamalMultiRecipientMessages.ones(gqGroup, n);
 
-		final List<GqElement> onesList = Stream.generate(gqGroup::getIdentity).limit(n).collect(Collectors.toList());
+		final ImmutableList<GqElement> onesList = Stream.generate(gqGroup::getIdentity).limit(n).collect(toImmutableList());
 
-		assertEquals(onesList, ones.stream().collect(Collectors.toList()));
+		assertEquals(onesList, ones.stream().collect(toImmutableList()));
 		assertEquals(n, ones.size());
 	}
 
@@ -108,9 +109,9 @@ class ElGamalMultiRecipientMessageTest extends TestGroupSetup {
 		final GqElement constant = gqGroupGenerator.genMember();
 		final ElGamalMultiRecipientMessage constants = ElGamalMultiRecipientMessages.constantMessage(constant, n);
 
-		final List<GqElement> constantsList = Stream.generate(() -> constant).limit(n).collect(Collectors.toList());
+		final ImmutableList<GqElement> constantsList = Stream.generate(() -> constant).limit(n).collect(toImmutableList());
 
-		assertEquals(constantsList, constants.stream().collect(Collectors.toList()));
+		assertEquals(constantsList, constants.stream().collect(toImmutableList()));
 		assertEquals(n, constants.size());
 	}
 

@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +31,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.google.common.base.Throwables;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
 
@@ -58,7 +58,7 @@ class ByteArraysTest {
 
 	static Stream<Arguments> jsonFileCutToBitLengthArgumentProvider() {
 
-		final List<TestParameters> parametersList = TestParameters.fromResource("/cut-to-bit-length.json");
+		final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/cut-to-bit-length.json");
 
 		return parametersList.stream().parallel().map(testParameters -> {
 

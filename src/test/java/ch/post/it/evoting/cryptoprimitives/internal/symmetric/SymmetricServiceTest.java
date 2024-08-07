@@ -24,8 +24,6 @@ import static org.mockito.Mockito.when;
 
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Stream;
 
 import javax.crypto.KeyGenerator;
@@ -42,6 +40,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.google.common.base.Throwables;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.math.Base16Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
@@ -64,7 +63,7 @@ class SymmetricServiceTest extends TestGroupSetup {
 	private static ImmutableByteArray nonce;
 	private static String plainText;
 	private static SymmetricService symmetricEncryptionService;
-	private static List<String> associatedData;
+	private static ImmutableList<String> associatedData;
 
 	@BeforeAll
 	static void setUpAll() throws NoSuchAlgorithmException {
@@ -79,7 +78,7 @@ class SymmetricServiceTest extends TestGroupSetup {
 
 	@BeforeEach
 	void setUp() {
-		associatedData = Arrays.asList(
+		associatedData = ImmutableList.of(
 				randomService.genRandomString(ASSOCIATED_LENGTH, Base16Alphabet.getInstance()),
 				randomService.genRandomString(ASSOCIATED_LENGTH, Base64Alphabet.getInstance()));
 		plainText = randomService.genRandomString(PLAINTEXT_LENGTH, Base64Alphabet.getInstance());
@@ -153,24 +152,15 @@ class SymmetricServiceTest extends TestGroupSetup {
 							null));
 		}
 
-		@Test
-		@DisplayName("Associated data containing null throws IllegalArgumentException")
-		void associatedDataWithNull() {
-			associatedData.set(0, null);
-			final ImmutableByteArray plainTextBytes = new ImmutableByteArray(plainText.getBytes(StandardCharsets.UTF_8));
-			assertThrows(NullPointerException.class,
-					() -> symmetricEncryptionService.genCiphertextSymmetric(encryptionKey, plainTextBytes, associatedData));
-		}
-
 		static Stream<Arguments> genCiphertextSymmetricProvider() {
-			final List<TestParameters> parametersList = TestParameters.fromResource("/symmetric/gen-ciphertext-symmetric.json");
+			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/symmetric/gen-ciphertext-symmetric.json");
 
 			return parametersList.stream().map(testParameters -> {
 				// Inputs.
 				final JsonData input = testParameters.getInput();
 				final ImmutableByteArray encryptionKey = input.get("encryption_key", ImmutableByteArray.class);
 				final ImmutableByteArray plaintext = input.get("plaintext", ImmutableByteArray.class);
-				final List<String> associatedData = List.of(input.get("associated_data", String[].class));
+				final ImmutableList<String> associatedData = ImmutableList.of(input.get("associated_data", String[].class));
 
 				// Output.
 				final JsonData output = testParameters.getOutput();
@@ -186,8 +176,7 @@ class SymmetricServiceTest extends TestGroupSetup {
 		@MethodSource("genCiphertextSymmetricProvider")
 		@DisplayName("genCiphertextSymmetric returns expected output")
 		void testGenCiphertextSymmetricWithRealValues(final ImmutableByteArray encryptionKey, final ImmutableByteArray plaintext,
-				final List<String> associatedData,
-				final SymmetricCiphertext expectedResult, final String description) {
+				final ImmutableList<String> associatedData, final SymmetricCiphertext expectedResult, final String description) {
 			// mock RandomService to use the same nonce as in the test file.
 			final RandomService mockRandomService = spy(RandomService.class);
 			when(mockRandomService.randomBytes(anyInt())).thenReturn(expectedResult.nonce());
@@ -220,17 +209,8 @@ class SymmetricServiceTest extends TestGroupSetup {
 					() -> symmetricEncryptionService.getPlaintextSymmetric(encryptionKey, ciphertext, nonce, null));
 		}
 
-		@Test
-		@DisplayName("Associated data containing null throws IllegalArgumentException")
-		void associatedDataWithNull() {
-			associatedData.set(0, null);
-			assertThrows(NullPointerException.class,
-					() -> symmetricEncryptionService.getPlaintextSymmetric(encryptionKey, ImmutableByteArray.EMPTY,
-							ImmutableByteArray.EMPTY, associatedData));
-		}
-
 		static Stream<Arguments> getPlaintextSymmetricProvider() {
-			final List<TestParameters> parametersList = TestParameters.fromResource("/symmetric/get-plaintext-symmetric.json");
+			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/symmetric/get-plaintext-symmetric.json");
 
 			return parametersList.stream().map(testParameters -> {
 				// Inputs.
@@ -238,7 +218,7 @@ class SymmetricServiceTest extends TestGroupSetup {
 				final ImmutableByteArray encryptionKey = input.get("encryption_key", ImmutableByteArray.class);
 				final ImmutableByteArray ciphertext = input.get("ciphertext", ImmutableByteArray.class);
 				final ImmutableByteArray nonce = input.get("nonce", ImmutableByteArray.class);
-				final List<String> associatedData = List.of(input.get("associated_data", String[].class));
+				final ImmutableList<String> associatedData = ImmutableList.of(input.get("associated_data", String[].class));
 
 				// Output.
 				final JsonData output = testParameters.getOutput();
@@ -251,7 +231,7 @@ class SymmetricServiceTest extends TestGroupSetup {
 		@MethodSource("getPlaintextSymmetricProvider")
 		@DisplayName("getPlaintextSymmetric returns expected output")
 		void testGetPlaintextSymmetricWithRealValues(final ImmutableByteArray encryptionKey, final ImmutableByteArray ciphertext,
-				final ImmutableByteArray nonce, final List<String> associatedData, final ImmutableByteArray expectedResult,
+				final ImmutableByteArray nonce, final ImmutableList<String> associatedData, final ImmutableByteArray expectedResult,
 				final String description) {
 			final ImmutableByteArray actualResult = symmetricEncryptionService.getPlaintextSymmetric(encryptionKey, ciphertext, nonce,
 					associatedData);

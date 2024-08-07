@@ -48,6 +48,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
@@ -295,7 +296,6 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 			final ZqElement zqFour = ZqElement.create(BigInteger.valueOf(4), zqGroup);
 
 			// Create HadamardArgumentService
-			final int m = 3;
 			final ElGamalMultiRecipientPublicKey hadamardPublicKey = new ElGamalMultiRecipientPublicKey(GroupVector.of(gqNine, gqFour));
 			final CommitmentKey hadamardCommitmentKey = new CommitmentKey(gqNine, GroupVector.of(gqFour, gqNine));
 			final RandomService hadamardRandomService = spy(RandomService.class);
@@ -319,10 +319,10 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 					hadamardPublicKey, hadamardCommitmentKey);
 
 			// Create A
-			final List<List<ZqElement>> matrixColumns = new ArrayList<>(m);
-			matrixColumns.add(0, Arrays.asList(zqFour, zqZero));
-			matrixColumns.add(1, Arrays.asList(zqTwo, zqTwo));
-			matrixColumns.add(2, Arrays.asList(zqZero, zqFour));
+			final GroupVector<GroupVector<ZqElement, ZqGroup>, ZqGroup> matrixColumns = GroupVector.of(
+					GroupVector.of(zqFour, zqZero),
+					GroupVector.of(zqTwo, zqTwo),
+					GroupVector.of(zqZero, zqFour));
 			final GroupMatrix<ZqElement, ZqGroup> matrix = GroupMatrix.fromColumns(matrixColumns);
 
 			// Create b
@@ -423,11 +423,11 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = hadamardArgumentService.verifyHadamardArgument(statement, badArgument).verify();
 			assertFalse(verificationResult.isVerified());
-			assertEquals("c_B_0 must equal c_A_0.", verificationResult.getErrorMessages().getFirst());
+			assertEquals("c_B_0 must equal c_A_0.", verificationResult.getErrorMessages().get(0));
 
 			final int m = cUpperB.size();
 			final GqElement badcUpperBmMinusOne = cUpperB.get(m - 1).multiply(gqGroup.getGenerator());
-			badcUpperB = GroupVector.from(new ArrayList<>(cUpperB).subList(0, m - 1)).append(badcUpperBmMinusOne);
+			badcUpperB = GroupVector.from(ImmutableList.from(cUpperB).subList(0, m - 1)).append(badcUpperBmMinusOne);
 			badArgument = new HadamardArgument(badcUpperB, argument.get_zeroArgument());
 
 			//Need to remove 0 as this can lead to a valid proof even though we expect invalid
@@ -459,7 +459,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = argumentService.verifyHadamardArgument(statement, badArgument).verify();
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify the ZeroArgument.", verificationResult.getErrorMessages().element());
+			assertEquals("Failed to verify the ZeroArgument.", verificationResult.getErrorMessages().get(0));
 		}
 	}
 
@@ -503,38 +503,37 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 		@DisplayName("with specific values returns the expected result")
 		void getHadamardProductWithSpecificValues() {
 			final ZqGroup group = new ZqGroup(BigInteger.valueOf(11));
-			final List<List<ZqElement>> columns = new ArrayList<>(3);
 			// Column1 = [1, 2]
-			final List<ZqElement> column1 = new ArrayList<>(2);
-			column1.add(ZqElement.create(BigInteger.ONE, group));
-			column1.add(ZqElement.create(BigInteger.TWO, group));
-			columns.add(column1);
+			final GroupVector<ZqElement, ZqGroup> column1 = GroupVector.of(
+					ZqElement.create(BigInteger.ONE, group),
+					ZqElement.create(BigInteger.TWO, group));
 			// Column2 = [3, 4]
-			final List<ZqElement> column2 = new ArrayList<>(2);
-			column2.add(ZqElement.create(BigInteger.valueOf(3), group));
-			column2.add(ZqElement.create(BigInteger.valueOf(4), group));
-			columns.add(column2);
+			final GroupVector<ZqElement, ZqGroup> column2 = GroupVector.of(
+					ZqElement.create(BigInteger.valueOf(3), group),
+					ZqElement.create(BigInteger.valueOf(4), group));
 			// Column3 = [5, 6]
-			final List<ZqElement> column3 = new ArrayList<>(2);
-			column3.add(ZqElement.create(BigInteger.valueOf(5), group));
-			column3.add(ZqElement.create(BigInteger.valueOf(6), group));
-			columns.add(column3);
+			final GroupVector<ZqElement, ZqGroup> column3 = GroupVector.of(
+					ZqElement.create(BigInteger.valueOf(5), group),
+					ZqElement.create(BigInteger.valueOf(6), group));
+
+			final GroupVector<GroupVector<ZqElement, ZqGroup>, ZqGroup> columns = GroupVector.of(column1, column2, column3);
+
 			final GroupMatrix<ZqElement, ZqGroup> columnMatrix = GroupMatrix.fromColumns(columns);
 
 			// getHadamardProduct with j = 0 yields the first column vector
-			assertEquals(GroupVector.from(column1), hadamardArgumentService.getHadamardProduct(columnMatrix, 0));
+			assertEquals(column1, hadamardArgumentService.getHadamardProduct(columnMatrix, 0));
 
 			// getHadamardProduct with j = 1 yields the vector [3, 8]
-			final List<ZqElement> result2 = new ArrayList<>(2);
-			result2.add(ZqElement.create(BigInteger.valueOf(3), group));
-			result2.add(ZqElement.create(BigInteger.valueOf(8), group));
-			assertEquals(GroupVector.from(result2), hadamardArgumentService.getHadamardProduct(columnMatrix, 1));
+			final GroupVector<ZqElement, ZqGroup> result2 = GroupVector.of(
+					ZqElement.create(BigInteger.valueOf(3), group),
+					ZqElement.create(BigInteger.valueOf(8), group));
+			assertEquals(result2, hadamardArgumentService.getHadamardProduct(columnMatrix, 1));
 
 			// getHadamardProduct with j = 2 yields the vector [3, 8]
-			final List<ZqElement> result3 = new ArrayList<>(2);
-			result3.add(ZqElement.create(BigInteger.valueOf(4), group));
-			result3.add(ZqElement.create(BigInteger.valueOf(4), group));
-			assertEquals(GroupVector.from(result3), hadamardArgumentService.getHadamardProduct(columnMatrix, 2));
+			final GroupVector<ZqElement, ZqGroup> result3 = GroupVector.of(
+					ZqElement.create(BigInteger.valueOf(4), group),
+					ZqElement.create(BigInteger.valueOf(4), group));
+			assertEquals(result3, hadamardArgumentService.getHadamardProduct(columnMatrix, 2));
 		}
 
 		@ParameterizedTest
@@ -553,7 +552,7 @@ class HadamardArgumentServiceTest extends TestGroupSetup {
 		}
 
 		Stream<Arguments> verifyHadamardArgumentRealValuesProvider() {
-			final List<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-hadamard-argument.json");
+			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-hadamard-argument.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// Context.

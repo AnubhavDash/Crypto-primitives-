@@ -15,10 +15,10 @@
  */
 package ch.post.it.evoting.cryptoprimitives.collection;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
-
+import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 
@@ -29,17 +29,17 @@ import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
  */
 public class AuxiliaryInformation implements HashableList {
 
-	private final ImmutableHashableList<HashableString> elements;
+	private final ImmutableList<Hashable> elements;
 
 	public AuxiliaryInformation(final ImmutableList<String> elements) {
 		checkNotNull(elements);
 
-		this.elements = ImmutableHashableList.from(elements, HashableString::from);
+		this.elements = elements.stream().map(HashableString::from).collect(toImmutableList());
 	}
 
 	@Override
-	public List<HashableString> toHashableForm() {
-		return elements.toHashableForm();
+	public ImmutableList<Hashable> toHashableForm() {
+		return elements;
 	}
 }
 

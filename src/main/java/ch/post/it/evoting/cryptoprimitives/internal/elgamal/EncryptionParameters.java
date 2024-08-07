@@ -23,12 +23,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bouncycastle.crypto.digests.SHAKEDigest;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
@@ -71,7 +71,7 @@ public final class EncryptionParameters {
 	 * @throws IllegalArgumentException if any of the numbers in small primes list is not a prime.
 	 */
 	@SuppressWarnings("java:S117")
-	public GqGroup getEncryptionParameters(final String seed, final List<Integer> smallPrimes) {
+	public GqGroup getEncryptionParameters(final String seed, final ImmutableList<Integer> smallPrimes) {
 		checkNotNull(seed);
 		checkNotNull(smallPrimes);
 		smallPrimes.forEach(prime -> checkArgument(PrimesInternal.isSmallPrime(prime), "The given number is not a prime. [Number: %s]", prime));

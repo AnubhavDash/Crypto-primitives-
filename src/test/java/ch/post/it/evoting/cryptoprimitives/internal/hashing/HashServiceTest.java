@@ -16,6 +16,7 @@
 package ch.post.it.evoting.cryptoprimitives.internal.hashing;
 
 import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray.concat;
+import static ch.post.it.evoting.cryptoprimitives.hashing.HashableList.toHashableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.integerToByteArray;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.stringToByteArray;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -35,7 +36,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -54,6 +54,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
@@ -89,7 +90,7 @@ class HashServiceTest {
 
 	static Stream<Arguments> jsonFileRecursiveHashArgumentProvider() {
 
-		final List<TestParameters> parametersList = TestParameters.fromResource("/recursive-hash-sha3-256.json");
+		final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/recursive-hash-sha3-256.json");
 
 		return parametersList.stream().parallel().map(testParameters -> {
 
@@ -97,7 +98,7 @@ class HashServiceTest {
 
 			final JsonData input = testParameters.getInput().getJsonData("values");
 
-			final Hashable[] values = readInput(input).toArray(new Hashable[] {});
+			final Hashable[] values = readInput(input).toHashableForm().elements().toArray(new Hashable[] {});
 
 			final JsonData output = testParameters.getOutput();
 			final ImmutableByteArray hash = output.get("hash", ImmutableByteArray.class);
@@ -106,14 +107,14 @@ class HashServiceTest {
 		});
 	}
 
-	private static List<Hashable> readInput(final JsonData data) {
+	private static HashableList readInput(final JsonData data) {
 		final List<Hashable> values = new ArrayList<>();
 		if (data.jsonNode().isArray()) {
 			final ArrayNode nodes = (ArrayNode) data.jsonNode();
 			for (final JsonNode node : nodes) {
 				final JsonData nodeData = new JsonData(node);
 				if (nodeData.jsonNode().isArray()) {
-					values.add(HashableList.from(readInput(nodeData)));
+					values.add(readInput(nodeData));
 				} else {
 					values.add(readValue(nodeData));
 				}
@@ -122,7 +123,7 @@ class HashServiceTest {
 			values.add(readValue(data));
 		}
 
-		return List.copyOf(values);
+		return values.stream().collect(toHashableList());
 	}
 
 	private static Hashable readValue(final JsonData data) {
@@ -264,11 +265,8 @@ class HashServiceTest {
 		final HashableBigInteger first = genRandomHashableBigInteger();
 		final ImmutableByteArray second = genRandomHashableByteArray();
 		final HashableString third = genRandomHashableString();
-		final List<Hashable> subSubList = new LinkedList<>();
-		subSubList.add(first);
-		subSubList.add(second);
-		final HashableList hashableSubSubList = HashableList.from(List.copyOf(subSubList));
-		final HashableList subList = HashableList.of(third, hashableSubSubList);
+		final HashableList subSubList = HashableList.of(first, second);
+		final HashableList subList = HashableList.of(third, subSubList);
 		final HashableList input = HashableList.of(first, second, subList);
 
 		final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -416,14 +414,14 @@ class HashServiceTest {
 
 	static Stream<Arguments> jsonFileRecursiveHashToZqArgumentProvider() {
 
-		final List<TestParameters> parametersList = TestParameters.fromResource("/recursive-hash-to-zq.json");
+		final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/recursive-hash-to-zq.json");
 
 		return parametersList.stream().parallel().map(testParameters -> {
 
 			final JsonData input = testParameters.getInput();
 			final BigInteger q = input.get("q", BigInteger.class);
 			final JsonData valuesData = input.getJsonData("values");
-			final Hashable[] values = readInput(valuesData).toArray(new Hashable[] {});
+			final Hashable[] values = readInput(valuesData).toHashableForm().elements().toArray(new Hashable[] {});
 
 			final JsonData output = testParameters.getOutput();
 			final BigInteger resultValue = output.get("result", BigInteger.class);

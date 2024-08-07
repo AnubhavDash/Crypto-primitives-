@@ -15,6 +15,8 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
+import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
+
 import java.math.BigInteger;
 import java.util.HexFormat;
 import java.util.stream.Stream;
@@ -84,16 +86,16 @@ public class CiphertextExponentiationBenchmark {
 			exponents = Stream.generate(() -> randomService.genRandomInteger(q))
 					.map(v -> ZqElement.create(v, zqGroup))
 					.limit(ciphertextCount)
-					.collect(GroupVector.toGroupVector());
+					.collect(toGroupVector());
 
 			ciphertexts = Stream.generate(() -> ElGamalMultiRecipientCiphertext.create(
 							GqElement.GqElementFactory.fromSquareRoot(randomService.genRandomInteger(q), group),
 							Stream.generate(() -> randomService.genRandomInteger(q))
 									.map(v -> GqElement.GqElementFactory.fromSquareRoot(v, group))
 									.limit(ciphertextSize)
-									.toList()))
+									.collect(toGroupVector())))
 					.limit(ciphertextCount)
-					.collect(GroupVector.toGroupVector());
+					.collect(toGroupVector());
 		}
 	}
 

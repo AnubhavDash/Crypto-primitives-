@@ -20,7 +20,6 @@ import static ch.post.it.evoting.cryptoprimitives.test.tools.generator.GroupVect
 import static ch.post.it.evoting.cryptoprimitives.test.tools.generator.GroupVectorElementGenerator.generateElementMatrix;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -149,12 +148,11 @@ public class GqGroupGenerator {
 	 * @return a vector of {@code numElements} random {@link GqElement}.
 	 */
 	public GroupVector<GqElement, GqGroup> genRandomGqElementVector(final int numElements) {
-		return GroupVector.from(generateElementList(numElements, this::genMember));
+		return generateElementList(numElements, this::genMember);
 	}
 
 	public GroupMatrix<GqElement, GqGroup> genRandomGqElementMatrix(final int numRows, final int numColumns) {
-		final List<List<GqElement>> elements = generateElementMatrix(numRows, numColumns, this::genMember);
-		return GroupMatrix.fromRows(elements);
+		return GroupMatrix.fromRows(generateElementMatrix(numRows, numColumns, this::genMember));
 	}
 
 	private BigInteger randomBigInteger(final int bitLength) {

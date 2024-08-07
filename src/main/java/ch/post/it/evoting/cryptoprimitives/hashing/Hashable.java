@@ -27,7 +27,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
  *     <li>{@code ImmutableByteArray}, see {@link ImmutableByteArray}</li>
  *     <li>{@code String}, see {@link HashableString}</li>
  *     <li>{@code BigInteger}, see {@link HashableBigInteger}</li>
- *     <li>{@code List<Hashable>}, see {@link HashableList}</li>
+ *     <li>{@code ImmutableList<Hashable>}, see {@link HashableList}</li>
  * </ul>
  */
 public interface Hashable {

@@ -16,13 +16,13 @@
 package ch.post.it.evoting.cryptoprimitives.internal.symmetric;
 
 import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray.concat;
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.stringToByteArray;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
-
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.AEAD;
 import ch.post.it.evoting.cryptoprimitives.symmetric.Symmetric;
@@ -40,20 +40,21 @@ public class SymmetricAuthenticatedEncryptionService {
 	}
 
 	/**
-	 * @see Symmetric#genCiphertextSymmetric(ImmutableByteArray, ImmutableByteArray, List)
+	 * @see Symmetric#genCiphertextSymmetric(ImmutableByteArray, ImmutableByteArray, ImmutableList)
 	 */
 	SymmetricCiphertext genCiphertextSymmetric(final ImmutableByteArray encryptionKey, final ImmutableByteArray plaintext,
-			final List<String> associatedData) {
+			final ImmutableList<String> associatedData) {
 		// Input.
 		final ImmutableByteArray K = checkNotNull(encryptionKey);
 		final ImmutableByteArray P = checkNotNull(plaintext);
-		final List<ImmutableByteArray> associated_bytes = checkNotNull(associatedData).stream()
+		final ImmutableList<ImmutableByteArray> associated_bytes = checkNotNull(associatedData).stream()
 				.map(associated_i -> {
 					checkNotNull(associated_i);
 					final ImmutableByteArray associated_i_bytes = stringToByteArray(associated_i);
 					checkArgument(associated_i_bytes.length() <= 255, "The required length of each associated data must be smaller or equal to 255.");
 					return associated_i_bytes;
-				}).toList();
+				})
+				.collect(toImmutableList());
 
 		// Operation.
 		final ImmutableByteArray nonce = randomService.randomBytes(aead.getNonceLengthBytes());
@@ -68,21 +69,22 @@ public class SymmetricAuthenticatedEncryptionService {
 	}
 
 	/**
-	 * @see Symmetric#getPlaintextSymmetric(ImmutableByteArray, ImmutableByteArray, ImmutableByteArray, List)
+	 * @see Symmetric#getPlaintextSymmetric(ImmutableByteArray, ImmutableByteArray, ImmutableByteArray, ImmutableList)
 	 */
 	ImmutableByteArray getPlaintextSymmetric(final ImmutableByteArray encryptionKey, final ImmutableByteArray ciphertext,
-			final ImmutableByteArray nonce, final List<String> associatedData) {
+			final ImmutableByteArray nonce, final ImmutableList<String> associatedData) {
 		// Input.
 		final ImmutableByteArray K = checkNotNull(encryptionKey);
 		final ImmutableByteArray C = checkNotNull(ciphertext);
 		checkNotNull(nonce);
-		final List<ImmutableByteArray> associated_bytes = checkNotNull(associatedData).stream()
+		final ImmutableList<ImmutableByteArray> associated_bytes = checkNotNull(associatedData).stream()
 				.map(associated_i -> {
 					checkNotNull(associated_i);
 					final ImmutableByteArray associated_i_bytes = stringToByteArray(associated_i);
 					checkArgument(associated_i_bytes.length() <= 255, "The required length of each associated data must be smaller or equal to 255.");
 					return associated_i_bytes;
-				}).toList();
+				})
+				.collect(toImmutableList());
 
 		// Operation.
 		final ImmutableByteArray associated = concat(associated_bytes.stream()

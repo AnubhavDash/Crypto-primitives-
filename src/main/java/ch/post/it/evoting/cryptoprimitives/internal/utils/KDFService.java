@@ -22,7 +22,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.function.Supplier;
 
 import org.bouncycastle.crypto.Digest;
@@ -30,9 +29,9 @@ import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
 import org.bouncycastle.crypto.params.HKDFParameters;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
@@ -59,13 +58,12 @@ public class KDFService implements KeyDerivation {
 	 * See {@link KeyDerivation#KDF}
 	 */
 	@SuppressWarnings({ "java:S117", "java:S100" })
-	public ImmutableByteArray KDF(final ImmutableByteArray pseudoRandomKey, final List<String> contextInformation, final int requiredByteLength) {
+	public ImmutableByteArray KDF(final ImmutableByteArray pseudoRandomKey, final ImmutableList<String> contextInformation,
+			final int requiredByteLength) {
 		final int L = this.hashSupplier.get().getDigestSize();
 		final ImmutableByteArray PRK = checkNotNull(pseudoRandomKey);
 		final int l_straight = PRK.length();
-		final List<String> info_vector = checkNotNull(contextInformation).stream()
-				.map(Preconditions::checkNotNull)
-				.toList();
+		final ImmutableList<String> info_vector = checkNotNull(contextInformation);
 		final int l_curved = requiredByteLength;
 
 		checkArgument(l_curved > 0, "Requested byte length must be greater than 0. ");
@@ -100,10 +98,11 @@ public class KDFService implements KeyDerivation {
 	}
 
 	/**
-	 * See {@link KeyDerivation#KDFToZq(ImmutableByteArray, List, BigInteger)}
+	 * See {@link KeyDerivation#KDFToZq(ImmutableByteArray, ImmutableList, BigInteger)}
 	 */
 	@SuppressWarnings({ "java:S117", "java:S100" })
-	public ZqElement KDFToZq(final ImmutableByteArray pseudoRandomKey, final List<String> contextInformation, final BigInteger exclusiveUpperBound) {
+	public ZqElement KDFToZq(final ImmutableByteArray pseudoRandomKey, final ImmutableList<String> contextInformation,
+			final BigInteger exclusiveUpperBound) {
 		checkNotNull(exclusiveUpperBound);
 
 		final int lambda = SecurityLevelConfig.getSystemSecurityLevel().getSecurityStrength();
@@ -111,9 +110,7 @@ public class KDFService implements KeyDerivation {
 		final int L = this.hashSupplier.get().getDigestSize();
 		final ImmutableByteArray PRK = checkNotNull(pseudoRandomKey);
 		final int l_straight = PRK.length();
-		final List<String> info = checkNotNull(contextInformation).stream()
-				.map(Preconditions::checkNotNull)
-				.toList();
+		final ImmutableList<String> info = checkNotNull(contextInformation);
 		final BigInteger q = exclusiveUpperBound;
 
 		checkArgument(l_straight >= L, "The pseudo random key length must be greater than the hash function output length.");

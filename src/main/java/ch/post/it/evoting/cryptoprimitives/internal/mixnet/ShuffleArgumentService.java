@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientCiphertexts.getCiphertext;
 import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientCiphertexts.getCiphertextVectorExponentiation;
 import static ch.post.it.evoting.cryptoprimitives.internal.mixnet.CommitmentService.getCommitmentMatrix;
@@ -22,14 +23,13 @@ import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toList;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
@@ -157,12 +157,12 @@ class ShuffleArgumentService {
 		checkArgument(l <= k, "The ciphertexts must be smaller than the public key.");
 
 		final ElGamalMultiRecipientMessage one = ElGamalMultiRecipientMessages.ones(gqGroup, l);
-		final List<ElGamalMultiRecipientCiphertext> encryptedOnes = rho_vector.parallelStream()
+		final ImmutableList<ElGamalMultiRecipientCiphertext> encryptedOnes = rho_vector.parallelStream()
 				.map(rho_i -> getCiphertext(one, rho_i, pk))
-				.toList();
-		final List<ElGamalMultiRecipientCiphertext> C_pi = pi.stream()
+				.collect(toImmutableList());
+		final ImmutableList<ElGamalMultiRecipientCiphertext> C_pi = pi.stream()
 				.map(C_vector::get)
-				.toList();
+				.collect(toImmutableList());
 		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> computed_C_prime = IntStream.range(0, N)
 				.parallel()
 				.mapToObj(i -> encryptedOnes.get(i).getCiphertextProduct(C_pi.get(i)))
@@ -250,8 +250,8 @@ class ShuffleArgumentService {
 
 		// Compute matrix D.
 		final GroupMatrix<ZqElement, ZqGroup> yTimesA = A.rowStream()
-				.map(row -> row.stream().map(y::multiply).toList())
-				.collect(collectingAndThen(toList(), GroupMatrix::fromRows));
+				.map(row -> row.stream().map(y::multiply).collect(toGroupVector()))
+				.collect(collectingAndThen(toGroupVector(), GroupMatrix::fromRows));
 		final GroupMatrix<ZqElement, ZqGroup> D = matrixSum(yTimesA, B);
 
 		// Compute vector t.
@@ -496,8 +496,8 @@ class ShuffleArgumentService {
 				.parallel()
 				.mapToObj(i -> IntStream.range(0, first.numColumns())
 						.mapToObj(j -> first.get(i, j).add(second.get(i, j)))
-						.toList())
-				.collect(collectingAndThen(toList(), GroupMatrix::fromRows));
+						.collect(toGroupVector()))
+				.collect(collectingAndThen(toGroupVector(), GroupMatrix::fromRows));
 	}
 
 }

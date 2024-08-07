@@ -15,18 +15,17 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.zeroknowledgeproofs;
 
+import static ch.post.it.evoting.cryptoprimitives.hashing.HashableList.toHashableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import com.google.common.base.Preconditions;
-
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
@@ -90,21 +89,19 @@ public class ExponentiationProofService {
 
 		return gStream
 				.map(g_i -> g_i.exponentiate(x))
-				.collect(GroupVector.toGroupVector());
+				.collect(toGroupVector());
 	}
 
 	/**
-	 * @see ZeroKnowledgeProof#genExponentiationProof(GroupVector, ZqElement, GroupVector, List)
+	 * @see ZeroKnowledgeProof#genExponentiationProof(GroupVector, ZqElement, GroupVector, ImmutableList)
 	 */
 	public ExponentiationProof genExponentiationProof(final GroupVector<GqElement, GqGroup> bases, final ZqElement exponent,
-			final GroupVector<GqElement, GqGroup> exponentiations, final List<String> auxiliaryInformation) {
+			final GroupVector<GqElement, GqGroup> exponentiations, final ImmutableList<String> auxiliaryInformation) {
 		checkNotNull(bases);
 		checkNotNull(exponent);
 		checkNotNull(exponentiations);
 
-		final List<String> i_aux = checkNotNull(auxiliaryInformation).stream()
-				.map(Preconditions::checkNotNull)
-				.toList();
+		final ImmutableList<String> i_aux = checkNotNull(auxiliaryInformation);
 		final GroupVector<GqElement, GqGroup> g = bases;
 		final ZqElement x = exponent;
 		final GroupVector<GqElement, GqGroup> y = exponentiations;
@@ -136,9 +133,9 @@ public class ExponentiationProofService {
 		final HashableList h_aux;
 		if (!i_aux.isEmpty()) {
 			h_aux = HashableList.of(HashableString.from(EXPONENTIATION_PROOF),
-					HashableList.from(i_aux.stream()
+					i_aux.stream()
 							.map(HashableString::from)
-							.toList()));
+							.collect(toHashableList()));
 		} else {
 			h_aux = HashableList.of(HashableString.from(EXPONENTIATION_PROOF));
 		}
@@ -150,17 +147,15 @@ public class ExponentiationProofService {
 	}
 
 	/**
-	 * @see ZeroKnowledgeProof#verifyExponentiation(GroupVector, GroupVector, ExponentiationProof, List)
+	 * @see ZeroKnowledgeProof#verifyExponentiation(GroupVector, GroupVector, ExponentiationProof, ImmutableList)
 	 */
 	public boolean verifyExponentiation(final GroupVector<GqElement, GqGroup> bases, final GroupVector<GqElement, GqGroup> exponentiations,
-			final ExponentiationProof proof, final List<String> auxiliaryInformation) {
+			final ExponentiationProof proof, final ImmutableList<String> auxiliaryInformation) {
 		checkNotNull(bases);
 		checkNotNull(exponentiations);
 		checkNotNull(proof);
 
-		final List<String> i_aux = checkNotNull(auxiliaryInformation).stream()
-				.map(Preconditions::checkNotNull)
-				.toList();
+		final ImmutableList<String> i_aux = checkNotNull(auxiliaryInformation);
 		final GroupVector<GqElement, GqGroup> g = bases;
 		final GroupVector<GqElement, GqGroup> y = exponentiations;
 		final ZqElement e = proof.get_e();
@@ -198,9 +193,9 @@ public class ExponentiationProofService {
 		final HashableList h_aux;
 		if (!i_aux.isEmpty()) {
 			h_aux = HashableList.of(HashableString.from(EXPONENTIATION_PROOF),
-					HashableList.from(i_aux.stream()
+					i_aux.stream()
 							.map(HashableString::from)
-							.toList()));
+							.collect(toHashableList()));
 		} else {
 			h_aux = HashableList.of(HashableString.from(EXPONENTIATION_PROOF));
 		}
