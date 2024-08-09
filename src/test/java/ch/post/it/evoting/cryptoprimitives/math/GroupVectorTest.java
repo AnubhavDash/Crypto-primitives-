@@ -53,7 +53,7 @@ class GroupVectorTest {
 		final GroupVector<TestGroupElement, TestGroup> groupVector = GroupVector.of(e1, e2);
 		assertEquals(2, groupVector.size());
 
-		final GroupVector<TestGroupElement, TestGroup> emptyGroupVector = GroupVector.empty();
+		final GroupVector<TestGroupElement, TestGroup> emptyGroupVector = GroupVector.of();
 		assertEquals(0, emptyGroupVector.size());
 	}
 
@@ -180,8 +180,7 @@ class GroupVectorTest {
 		final TestValuedElement first = new TestValuedElement(BigInteger.ONE, group);
 		final TestValuedElement second = new TestValuedElement(BigInteger.TWO, group);
 		final TestValuedElement third = new TestValuedElement(BigInteger.valueOf(3), group);
-		final ImmutableList<TestValuedElement> elements = ImmutableList.of(first, second, third);
-		final GroupVector<TestValuedElement, TestGroup> vector = GroupVector.from(elements);
+		final GroupVector<TestValuedElement, TestGroup> vector = GroupVector.of(first, second, third);
 		assertAll(() -> {
 			assertFalse(vector.allEqual(TestValuedElement::getValue));
 			assertTrue(vector.allEqual(TestValuedElement::getGroup));
@@ -190,16 +189,14 @@ class GroupVectorTest {
 
 	@Test
 	void isEmptyReturnsTrueForEmptyVector() {
-		final ImmutableList<TestGroupElement> elements = ImmutableList.emptyList();
-		final GroupVector<TestGroupElement, TestGroup> vector = GroupVector.from(elements);
+		final GroupVector<TestGroupElement, TestGroup> vector = GroupVector.empty();
 		assertTrue(vector.isEmpty());
 	}
 
 	@Test
 	void isEmptyReturnsFalseForNonEmptyVector() {
 		final TestGroup group = new TestGroup();
-		final ImmutableList<TestGroupElement> elements = ImmutableList.of(new TestGroupElement(group));
-		final GroupVector<TestGroupElement, TestGroup> vector = GroupVector.from(elements);
+		final GroupVector<TestGroupElement, TestGroup> vector = GroupVector.of(new TestGroupElement(group));
 		assertFalse(vector.isEmpty());
 	}
 
@@ -207,8 +204,9 @@ class GroupVectorTest {
 	void appendWithInvalidParamsThrows() {
 		final TestGroup group = new TestGroup();
 		final int n = randomService.genRandomInteger(10) + 1;
-		final ImmutableList<TestGroupElement> elements = Stream.generate(() -> new TestGroupElement(group)).limit(n).collect(toImmutableList());
-		final GroupVector<TestGroupElement, TestGroup> groupVector = GroupVector.from(elements);
+		final GroupVector<TestGroupElement, TestGroup> groupVector = Stream.generate(() -> new TestGroupElement(group))
+				.limit(n)
+				.collect(toGroupVector());
 
 		assertThrows(NullPointerException.class, () -> groupVector.append(null));
 
@@ -222,8 +220,9 @@ class GroupVectorTest {
 	void appendWithDifferentSizeThrows() {
 		final TestGroup group = new TestGroup();
 		final int n = randomService.genRandomInteger(10) + 1;
-		final ImmutableList<TestSizedElement> elements = Stream.generate(() -> new TestSizedElement(group, 1)).limit(n).collect(toImmutableList());
-		final GroupVector<TestSizedElement, TestGroup> groupVector = GroupVector.from(elements);
+		final GroupVector<TestSizedElement, TestGroup> groupVector = Stream.generate(() -> new TestSizedElement(group, 1))
+				.limit(n)
+				.collect(toGroupVector());
 
 		final TestSizedElement element = new TestSizedElement(group, 2);
 		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> groupVector.append(element));
@@ -234,8 +233,9 @@ class GroupVectorTest {
 	void appendCorrectlyAppends() {
 		final TestGroup group = new TestGroup();
 		final int n = randomService.genRandomInteger(10) + 1;
-		final ImmutableList<TestGroupElement> elements = Stream.generate(() -> new TestGroupElement(group)).limit(n).collect(toImmutableList());
-		final GroupVector<TestGroupElement, TestGroup> groupVector = GroupVector.from(elements);
+		final GroupVector<TestGroupElement, TestGroup> groupVector = Stream.generate(() -> new TestGroupElement(group))
+				.limit(n)
+				.collect(toGroupVector());
 
 		final TestGroupElement element = new TestGroupElement(group);
 		final GroupVector<TestGroupElement, TestGroup> augmentedVector = groupVector.append(element);
@@ -248,8 +248,9 @@ class GroupVectorTest {
 	void prependWithInvalidParamsThrows() {
 		final TestGroup group = new TestGroup();
 		final int n = randomService.genRandomInteger(10) + 1;
-		final ImmutableList<TestGroupElement> elements = Stream.generate(() -> new TestGroupElement(group)).limit(n).collect(toImmutableList());
-		final GroupVector<TestGroupElement, TestGroup> groupVector = GroupVector.from(elements);
+		final GroupVector<TestGroupElement, TestGroup> groupVector = Stream.generate(() -> new TestGroupElement(group))
+				.limit(n)
+				.collect(toGroupVector());
 
 		assertThrows(NullPointerException.class, () -> groupVector.prepend(null));
 
@@ -262,8 +263,9 @@ class GroupVectorTest {
 	void prependWithDifferentSizeThrows() {
 		final TestGroup group = new TestGroup();
 		final int n = randomService.genRandomInteger(10) + 1;
-		final ImmutableList<TestSizedElement> elements = Stream.generate(() -> new TestSizedElement(group, 1)).limit(n).collect(toImmutableList());
-		final GroupVector<TestSizedElement, TestGroup> groupVector = GroupVector.from(elements);
+		final GroupVector<TestSizedElement, TestGroup> groupVector = Stream.generate(() -> new TestSizedElement(group, 1))
+				.limit(n)
+				.collect(toGroupVector());
 
 		final TestSizedElement element = new TestSizedElement(group, 2);
 		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> groupVector.prepend(element));
@@ -274,8 +276,9 @@ class GroupVectorTest {
 	void prependCorrectlyPrepends() {
 		final TestGroup group = new TestGroup();
 		final int n = randomService.genRandomInteger(10) + 1;
-		final ImmutableList<TestGroupElement> elements = Stream.generate(() -> new TestGroupElement(group)).limit(n).collect(toImmutableList());
-		final GroupVector<TestGroupElement, TestGroup> groupVector = GroupVector.from(elements);
+		final GroupVector<TestGroupElement, TestGroup> groupVector = Stream.generate(() -> new TestGroupElement(group))
+				.limit(n)
+				.collect(toGroupVector());
 
 		final TestGroupElement element = new TestGroupElement(group);
 		final GroupVector<TestGroupElement, TestGroup> augmentedVector = groupVector.prepend(element);
@@ -289,7 +292,9 @@ class GroupVectorTest {
 		final int n = randomService.genRandomInteger(10) + 1;
 		final TestGroup group = new TestGroup();
 		final ImmutableList<TestGroupElement> elements = Stream.generate(() -> new TestGroupElement(group)).limit(n).collect(toImmutableList());
-		final GroupVector<TestGroupElement, TestGroup> actual = elements.stream().collect(toGroupVector());
+		final GroupVector<TestGroupElement, TestGroup> actual = Stream.generate(() -> new TestGroupElement(group))
+				.limit(n)
+				.collect(toGroupVector());
 		final GroupVector<TestGroupElement, TestGroup> expected = GroupVector.from(elements);
 
 		assertEquals(expected, actual);
@@ -319,9 +324,9 @@ class GroupVectorTest {
 			n = randomService.genRandomInteger(BOUND_MATRIX_SIZE) + 1;
 
 			group = new TestGroup();
-			final ImmutableList<TestGroupElement> elements = Stream.generate(() -> new TestGroupElement(group)).limit((long) n * m)
-					.collect(toImmutableList());
-			groupVector = GroupVector.from(elements);
+			groupVector = Stream.generate(() -> new TestGroupElement(group))
+					.limit((long) n * m)
+					.collect(toGroupVector());
 		}
 
 		@Test

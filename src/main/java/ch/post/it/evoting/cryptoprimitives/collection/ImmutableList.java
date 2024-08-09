@@ -38,9 +38,12 @@ import java.util.stream.Stream;
 /**
  * An immutable list of non-null elements.
  *
- * <p>Instances of this class are immutable.</p>
+ * <p>Instances of this class are immutable. However, the immutability of the list
+ * does not guarantee the immutability of the elements contained within the list.
+ * To achieve complete immutability, the elements themselves must be immutable.</p>
  *
- * @param <E> the type of elements in the list.
+ * @param <E> the type of elements in the list. This type should be immutable
+ *            to ensure the overall immutability of the list.
  */
 public class ImmutableList<E> implements Iterable<E> {
 
@@ -113,20 +116,6 @@ public class ImmutableList<E> implements Iterable<E> {
 				return Collections.emptySet();
 			}
 		};
-	}
-
-	/**
-	 * @param element the element to be appended to the list. Must be non-null.
-	 * @return a new {@link ImmutableList} with the appended element.
-	 */
-	public ImmutableList<E> append(final E element) {
-		final E validated = validate(element);
-
-		final List<E> list = new ArrayList<>(this.elements);
-		list.add(validated);
-
-		// Since the existing elements have already been validated we can safely instantiate the new ImmutableList directly through the constructor.
-		return new ImmutableList<>(list);
 	}
 
 	/**
