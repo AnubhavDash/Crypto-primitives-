@@ -20,11 +20,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.util.HexFormat;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
@@ -32,6 +30,7 @@ import com.verificatum.vmgj.FpowmTab;
 import com.verificatum.vmgj.VMG;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
@@ -113,10 +112,8 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 	}
 
 	@Override
-	public BigInteger multiModExp(final List<BigInteger> bases, final List<BigInteger> exponents, final BigInteger modulus) {
-		final BigInteger[] basesArray = checkNotNull(bases).stream()
-				.map(Preconditions::checkNotNull)
-				.toArray(BigInteger[]::new);
+	public BigInteger multiModExp(final ImmutableList<BigInteger> bases, final ImmutableList<BigInteger> exponents, final BigInteger modulus) {
+		final BigInteger[] basesArray = checkNotNull(bases).stream().toArray(BigInteger[]::new);
 		checkArgument(basesArray.length != 0, "Bases must be non empty.");
 
 		final int exponentsSize = exponents.size();

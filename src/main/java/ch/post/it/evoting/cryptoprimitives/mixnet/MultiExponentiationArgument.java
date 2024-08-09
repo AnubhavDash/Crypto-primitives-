@@ -19,10 +19,9 @@ import static ch.post.it.evoting.cryptoprimitives.utils.Validations.allEqual;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
@@ -69,8 +68,8 @@ public class MultiExponentiationArgument implements HashableList {
 		this.tau = checkNotNull(tau);
 
 		// Cross group checking.
-		final List<GroupVectorElement<GqGroup>> gqGroups = Arrays.asList(c_A_0, c_B, E);
-		final List<GroupVectorElement<ZqGroup>> zqGroups = Arrays.asList(a, r, b, s, tau);
+		final ImmutableList<GroupVectorElement<GqGroup>> gqGroups = ImmutableList.of(c_A_0, c_B, E);
+		final ImmutableList<GroupVectorElement<ZqGroup>> zqGroups = ImmutableList.of(a, r, b, s, tau);
 		checkArgument(allEqual(gqGroups.stream(), GroupVectorElement::getGroup),
 				"cA0, cBVector, EVector must belong to the same group.");
 		checkArgument(allEqual(zqGroups.stream(), GroupVectorElement::getGroup), "aVector, r, b, s, tau, must belong to the same group.");
@@ -155,8 +154,8 @@ public class MultiExponentiationArgument implements HashableList {
 	}
 
 	@Override
-	public List<? extends Hashable> toHashableForm() {
-		return List.of(c_A_0, c_B, E, a, r, b, s, tau);
+	public ImmutableList<Hashable> toHashableForm() {
+		return ImmutableList.of(c_A_0, c_B, E, a, r, b, s, tau);
 	}
 
 	public static class Builder {

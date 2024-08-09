@@ -17,9 +17,9 @@
 package ch.post.it.evoting.cryptoprimitives.utils;
 
 import java.math.BigInteger;
-import java.util.List;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 
 public interface KeyDerivation {
@@ -34,7 +34,7 @@ public interface KeyDerivation {
 	 * @throws IllegalArgumentException if any of the preconditions mentioned above are not respected.
 	 */
 	@SuppressWarnings({ "java:S100" })
-	ImmutableByteArray KDF(final ImmutableByteArray pseudoRandomKey, final List<String> contextInformation, final int requiredByteLength);
+	ImmutableByteArray KDF(final ImmutableByteArray pseudoRandomKey, final ImmutableList<String> contextInformation, final int requiredByteLength);
 
 	/**
 	 * Generates a value in Zq using the Key Derivation Function based on SHA-256.
@@ -53,5 +53,5 @@ public interface KeyDerivation {
 	 *                                  </ul>
 	 */
 	@SuppressWarnings({ "java:S100" })
-	ZqElement KDFToZq(final ImmutableByteArray pseudoRandomKey, final List<String> contextInformation, final BigInteger exclusiveUpperBound);
+	ZqElement KDFToZq(final ImmutableByteArray pseudoRandomKey, final ImmutableList<String> contextInformation, final BigInteger exclusiveUpperBound);
 }

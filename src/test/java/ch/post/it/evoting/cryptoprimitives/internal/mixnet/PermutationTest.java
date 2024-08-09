@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -27,6 +28,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.mixnet.Permutation;
 
@@ -98,12 +100,12 @@ class PermutationTest {
 		final int size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE) + 1;
 		final Permutation permutation = permutationService.genPermutation(size);
 
-		final List<Integer> expectedMapping = IntStream.range(0, permutation.size())
+		final ImmutableList<Integer> expectedMapping = IntStream.range(0, permutation.size())
 				.map(permutation::get)
 				.boxed()
-				.collect(Collectors.toList());
+				.collect(toImmutableList());
 
-		assertEquals(expectedMapping, permutation.stream().collect(Collectors.toList()));
+		assertEquals(expectedMapping, permutation.stream().collect(toImmutableList()));
 	}
 
 	@Test
@@ -112,7 +114,7 @@ class PermutationTest {
 		valueMapping.add(10);
 		valueMapping.add(11);
 
-		final Permutation permutation = new Permutation(valueMapping);
+		final Permutation permutation = new Permutation(valueMapping.stream().collect(toImmutableList()));
 		valueMapping.remove(0);
 
 		assertEquals(2, permutation.size());

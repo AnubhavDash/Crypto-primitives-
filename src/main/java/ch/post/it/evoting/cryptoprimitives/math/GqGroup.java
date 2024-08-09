@@ -21,9 +21,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Objects;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
@@ -151,7 +151,7 @@ public final class GqGroup implements MathematicalGroup<GqGroup>, HashableList {
 	}
 
 	@Override
-	public List<? extends Hashable> toHashableForm() {
-		return List.of(HashableBigInteger.from(p), HashableBigInteger.from(q), generator);
+	public ImmutableList<Hashable> toHashableForm() {
+		return ImmutableList.of(HashableBigInteger.from(p), HashableBigInteger.from(q), generator);
 	}
 }

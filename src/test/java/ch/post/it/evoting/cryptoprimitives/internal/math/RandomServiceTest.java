@@ -26,24 +26,23 @@ import static org.mockito.Mockito.doAnswer;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 
 import com.google.common.base.Throwables;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.math.Alphabet;
+import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.UsabilityBase32Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
+import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 
 class RandomServiceTest {
 
@@ -81,10 +80,11 @@ class RandomServiceTest {
 	@Test
 	void genRandomIntegerAreEquivalent() {
 		final BigInteger upperBound = BigInteger.valueOf(1_000_000);
-		final List<ImmutableByteArray> randomBytesList = new ArrayList<>(3);
-		for (int i = 0; i < 3; i++) {
-			randomBytesList.add(randomService.randomBytes(byteLength(upperBound)));
-		}
+		final ImmutableList<ImmutableByteArray> randomBytesList = ImmutableList.of(
+				randomService.randomBytes(byteLength(upperBound)),
+				randomService.randomBytes(byteLength(upperBound)),
+				randomService.randomBytes(byteLength(upperBound))
+		);
 		try (final MockedConstruction<SecureRandom> mockedSecureRandom = Mockito.mockConstruction(SecureRandom.class,
 				this.prepareSecureRandom(randomBytesList))) {
 			final SecureRandom secureRandom1 = new SecureRandom();
@@ -100,12 +100,12 @@ class RandomServiceTest {
 		}
 	}
 
-	private MockedConstruction.MockInitializer<SecureRandom> prepareSecureRandom(final List<ImmutableByteArray> randomBytesList) {
+	private MockedConstruction.MockInitializer<SecureRandom> prepareSecureRandom(final ImmutableList<ImmutableByteArray> randomBytesList) {
 		checkArgument(randomBytesList.size() >= 3);
 		return (SecureRandom mockSecureRandom, MockedConstruction.Context context) ->
 				doAnswer(invocation -> {
 					final byte[] byteArray = invocation.getArgument(0, byte[].class);
-					System.arraycopy(randomBytesList.getFirst().elements(), 0, byteArray, 0, byteArray.length);
+					System.arraycopy(randomBytesList.get(0).elements(), 0, byteArray, 0, byteArray.length);
 					return null;
 				}).doAnswer(invocation -> {
 					final byte[] byteArray = invocation.getArgument(0, byte[].class);
@@ -117,7 +117,7 @@ class RandomServiceTest {
 					return null;
 				}).doAnswer(invocation -> {
 					final byte[] byteArray = invocation.getArgument(0, byte[].class);
-					System.arraycopy(randomBytesList.getFirst().elements(), 1, byteArray, 1, byteArray.length - 1);
+					System.arraycopy(randomBytesList.get(0).elements(), 1, byteArray, 1, byteArray.length - 1);
 					return null;
 				}).when(mockSecureRandom).nextBytes(Mockito.any());
 	}
@@ -126,7 +126,7 @@ class RandomServiceTest {
 	void genRandomVector() {
 		final BigInteger upperBound = BigInteger.valueOf(100);
 		final int length = 20;
-		final List<ZqElement> randomVector = randomService.genRandomVector(upperBound, length);
+		final GroupVector<ZqElement, ZqGroup> randomVector = randomService.genRandomVector(upperBound, length);
 
 		assertEquals(length, randomVector.size());
 		assertEquals(0, (int) randomVector.stream().filter(zq -> zq.getValue().compareTo(upperBound) >= 0).count());
@@ -154,11 +154,14 @@ class RandomServiceTest {
 
 	@Test
 	void genUniqueDecimalStringsWithZeroCodeLengthDoesNotThrow() {
-				final int desiredCodesLength = 0;
-				final int numberOfCodes = 1;
-				final List<String> uniqueStrings = assertDoesNotThrow(() -> randomService.genUniqueDecimalStrings(desiredCodesLength, numberOfCodes));
-				final boolean allHaveCorrectSize = uniqueStrings.stream().map(String::length).allMatch(codeSize -> codeSize == desiredCodesLength);
-				assertTrue(allHaveCorrectSize);
+		final int desiredCodesLength = 0;
+		final int numberOfCodes = 1;
+		final ImmutableList<String> uniqueStrings = assertDoesNotThrow(
+				() -> randomService.genUniqueDecimalStrings(desiredCodesLength, numberOfCodes));
+		final boolean allHaveCorrectSize = uniqueStrings.stream()
+				.map(String::length)
+				.allMatch(codeSize -> codeSize == desiredCodesLength);
+		assertTrue(allHaveCorrectSize);
 	}
 
 	@Test
@@ -179,7 +182,8 @@ class RandomServiceTest {
 	void genUniqueDecimalStringsReturnsStringsOfCorrectSize() {
 		final int desiredCodesLength = randomService.genRandomInteger(10) + 1;
 		final int numberOfCodes = randomService.genRandomInteger(10) + 1;
-		final List<String> uniqueStrings = assertDoesNotThrow(() -> randomService.genUniqueDecimalStrings(desiredCodesLength, numberOfCodes));
+		final ImmutableList<String> uniqueStrings = assertDoesNotThrow(
+				() -> randomService.genUniqueDecimalStrings(desiredCodesLength, numberOfCodes));
 		final boolean allHaveCorrectSize = uniqueStrings.stream().map(String::length).allMatch(codeSize -> codeSize == desiredCodesLength);
 		assertTrue(allHaveCorrectSize);
 	}
@@ -188,14 +192,15 @@ class RandomServiceTest {
 	void genUniqueDecimalStringsReturnsDesiredNumberOfStrings() {
 		final int desiredCodesLength = randomService.genRandomInteger(10) + 1;
 		final int numberOfCodes = randomService.genRandomInteger(10) + 1;
-		final List<String> uniqueStrings = assertDoesNotThrow(() -> randomService.genUniqueDecimalStrings(desiredCodesLength, numberOfCodes));
+		final ImmutableList<String> uniqueStrings = assertDoesNotThrow(
+				() -> randomService.genUniqueDecimalStrings(desiredCodesLength, numberOfCodes));
 		assertEquals(numberOfCodes, uniqueStrings.size());
 	}
 
 	@RepeatedTest(10)
 	void genUniqueDecimalStringsGeneratesUniqueStrings() {
 		final int desiredCodesLength = randomService.genRandomInteger(10) + 1;
-		final List<String> uniqueStrings = assertDoesNotThrow(() -> randomService.genUniqueDecimalStrings(desiredCodesLength, 3));
+		final ImmutableList<String> uniqueStrings = assertDoesNotThrow(() -> randomService.genUniqueDecimalStrings(desiredCodesLength, 3));
 		final String s1 = uniqueStrings.get(0);
 		final String s2 = uniqueStrings.get(1);
 		final String s3 = uniqueStrings.get(2);

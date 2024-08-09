@@ -16,6 +16,7 @@
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
 import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
+import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mockStatic;
@@ -23,7 +24,6 @@ import static org.mockito.Mockito.mockStatic;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -35,6 +35,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
@@ -68,7 +69,7 @@ class CommitmentKeyServiceTest {
 		h = generator.genNonIdentityNonGeneratorMember();
 		gs = Stream.generate(generator::genNonIdentityNonGeneratorMember)
 				.limit(10)
-				.collect(GroupVector.toGroupVector());
+				.collect(toGroupVector());
 	}
 
 	@Test
@@ -77,7 +78,7 @@ class CommitmentKeyServiceTest {
 		final CommitmentKey commitmentKey = new CommitmentKey(h, gs);
 
 		assertEquals(h, commitmentKey.stream().limit(1).toList().get(0));
-		assertEquals(gs, commitmentKey.stream().skip(1).collect(GroupVector.toGroupVector()));
+		assertEquals(gs, commitmentKey.stream().skip(1).collect(toGroupVector()));
 	}
 
 	@Test
@@ -88,7 +89,7 @@ class CommitmentKeyServiceTest {
 
 	@Test
 	void constructionWithEmptyListTest() {
-		final GroupVector<GqElement, GqGroup> empty = GroupVector.of();
+		final GroupVector<GqElement, GqGroup> empty = GroupVector.empty();
 		assertThrows(IllegalArgumentException.class, () -> new CommitmentKey(h, empty));
 	}
 
@@ -97,7 +98,7 @@ class CommitmentKeyServiceTest {
 		final GqGroup differentGroup = GroupTestData.getDifferentGqGroup(h.getGroup());
 		final GqGroupGenerator differentGroupGenerator = new GqGroupGenerator(differentGroup);
 		final GroupVector<GqElement, GqGroup> gList = Stream.generate(differentGroupGenerator::genNonIdentityNonGeneratorMember).limit(3)
-				.collect(GroupVector.toGroupVector());
+				.collect(toGroupVector());
 		assertThrows(IllegalArgumentException.class, () -> new CommitmentKey(h, gList));
 	}
 
@@ -120,7 +121,7 @@ class CommitmentKeyServiceTest {
 	}
 
 	static Stream<Arguments> getVerifiableCommitmentKeyArgumentProvider() {
-		final List<TestParameters> parametersList = TestParameters.fromResource("/mixnet/get-verifiable-commitment-key.json");
+		final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/mixnet/get-verifiable-commitment-key.json");
 
 		return parametersList.stream().parallel().map(testParameters -> {
 			// Context.
@@ -142,7 +143,7 @@ class CommitmentKeyServiceTest {
 				final GqElement h = GqElementFactory.fromValue(output.get("h", BigInteger.class), gqGroup);
 				final GroupVector<GqElement, GqGroup> gVector = Arrays.stream(output.get("g", BigInteger[].class))
 						.map(value -> GqElementFactory.fromValue(value, gqGroup))
-						.collect(GroupVector.toGroupVector());
+						.collect(toGroupVector());
 				final CommitmentKey expectedCommitmentKey = new CommitmentKey(h, gVector);
 
 				return Arguments.of(numberOfElements, gqGroup, expectedCommitmentKey, testParameters.getDescription(),

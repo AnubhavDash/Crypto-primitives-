@@ -21,9 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mockStatic;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -37,6 +34,7 @@ import org.mockito.MockedStatic;
 
 import com.google.common.base.Throwables;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
@@ -50,7 +48,7 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParamete
 class EncryptionParametersTest {
 
 	private static final String SEED = "Election_name";
-	private static final List<Integer> SMALL_PRIMES = PrimesInternal.getSmallPrimes();
+	private static final ImmutableList<Integer> SMALL_PRIMES = PrimesInternal.getSmallPrimes();
 	private static final int NAME_MAX_LENGTH = 10;
 	private static final TestRandomService randomService = new TestRandomService();
 
@@ -76,7 +74,7 @@ class EncryptionParametersTest {
 	@Test
 	@DisplayName("calling getEncryptionParameters with small primes list containing non-prime throws IllegalArgumentException")
 	void getEncryptionParametersWithNonPrimeInSmallPrimesThrows() {
-		final List<Integer> listWithNonPrime = new ArrayList<>(List.of(7, 8, 9, 10, 11));
+		final ImmutableList<Integer> listWithNonPrime = ImmutableList.of(7, 8, 9, 10, 11);
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 				() -> encryptionParameters.getEncryptionParameters(SEED, listWithNonPrime));
 		assertEquals("The given number is not a prime. [Number: 8]", Throwables.getRootCause(exception).getMessage());
@@ -85,7 +83,7 @@ class EncryptionParametersTest {
 	@Test
 	@DisplayName("calling getEncryptionParameters with an empty small primes list does not throw")
 	void getEncryptionParametersEmptySmallPrimesDoesNotThrow() {
-		assertDoesNotThrow(() -> encryptionParameters.getEncryptionParameters(SEED, Collections.emptyList()));
+		assertDoesNotThrow(() -> encryptionParameters.getEncryptionParameters(SEED, ImmutableList.emptyList()));
 	}
 
 	@Test
@@ -103,7 +101,7 @@ class EncryptionParametersTest {
 		final int electionNameLength = randomService.genRandomInteger(NAME_MAX_LENGTH) + 1;
 		final String randomSeed = randomService.genRandomString(electionNameLength, Base64Alphabet.getInstance());
 		final GqGroup gqGroup1 = encryptionParameters.getEncryptionParameters(randomSeed, SMALL_PRIMES);
-		final GqGroup gqGroup2 = encryptionParameters.getEncryptionParameters(randomSeed, Collections.emptyList());
+		final GqGroup gqGroup2 = encryptionParameters.getEncryptionParameters(randomSeed, ImmutableList.emptyList());
 
 		assertEquals(gqGroup1, gqGroup2);
 	}
@@ -118,7 +116,7 @@ class EncryptionParametersTest {
 	}
 
 	static Stream<Arguments> getEncryptionParametersProvider() {
-		final List<TestParameters> parametersList = TestParameters.fromResource("/elgamal/get-encryption-parameters.json");
+		final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/elgamal/get-encryption-parameters.json");
 
 		return parametersList.stream().parallel().map(testParameters -> {
 			// Inputs.

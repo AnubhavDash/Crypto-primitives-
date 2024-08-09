@@ -17,8 +17,6 @@ package ch.post.it.evoting.cryptoprimitives.test.tools.serialization;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -27,6 +25,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
 
 /**
@@ -54,7 +53,7 @@ public final class TestParameters {
 	 * @param resourceName The name of the json file.
 	 * @return The list of TestParameters after deserialization of the json file.
 	 */
-	public static List<TestParameters> fromResource(final String resourceName) {
+	public static ImmutableList<TestParameters> fromResource(final String resourceName) {
 		final URL url = TestParameters.class.getResource(resourceName);
 
 		if (url == null) {
@@ -64,7 +63,7 @@ public final class TestParameters {
 		try {
 			final ObjectMapper jsonMapper = new ObjectMapper();
 
-			return Arrays.asList(jsonMapper.readValue(url, TestParameters[].class));
+			return ImmutableList.of(jsonMapper.readValue(url, TestParameters[].class));
 		} catch (final IOException e) {
 			throw new RuntimeException("Read values failed for file " + url.getPath() + ". " + e.getMessage());
 		}

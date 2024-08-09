@@ -15,10 +15,12 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
@@ -46,7 +48,7 @@ class PermutationService {
 		final int N = size;
 		checkArgument(N > 0);
 
-		final ArrayList<Integer> pi = IntStream.range(0, N)
+		final List<Integer> pi = IntStream.range(0, N)
 				.boxed()
 				.collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
 		for (int i = 0; i < N; i++) {
@@ -56,7 +58,7 @@ class PermutationService {
 			pi.set(i + offset, tmp);
 		}
 
-		return new Permutation(pi);
+		return new Permutation(pi.stream().collect(toImmutableList()));
 	}
 
 }

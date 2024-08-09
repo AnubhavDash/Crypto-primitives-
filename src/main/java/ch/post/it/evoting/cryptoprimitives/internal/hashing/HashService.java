@@ -16,6 +16,7 @@
 package ch.post.it.evoting.cryptoprimitives.internal.hashing;
 
 import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray.concat;
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.integerToByteArray;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.stringToByteArray;
@@ -24,7 +25,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Stream;
 
 import org.bouncycastle.crypto.digests.SHAKEDigest;
@@ -34,6 +34,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Streams;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hash;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
@@ -83,15 +84,15 @@ public class HashService implements Hash {
 	 */
 	@Override
 	public ImmutableByteArray recursiveHash(final Hashable... values) {
-		checkNotNull(values);
-		Arrays.stream(values).forEach(Preconditions::checkNotNull);
-		checkArgument(values.length != 0, NO_VALUES);
+		final ImmutableList<Hashable> v = Arrays.stream(checkNotNull(values))
+				.map(Preconditions::checkNotNull)
+				.collect(toImmutableList());
+		checkArgument(!v.isEmpty(), NO_VALUES);
 
-		if (values.length > 1) {
-			final HashableList v = HashableList.from(List.of(values));
-			return recursiveHash(v);
+		if (v.size() > 1) {
+			return recursiveHash(HashableList.from(v));
 		} else {
-			final Hashable value = values[0];
+			final Hashable value = v.get(0);
 
 			switch (value) {
 			case final ImmutableByteArray w -> {
@@ -107,7 +108,7 @@ public class HashService implements Hash {
 				return hashFunction.hash(concat(STRING_PREFIX, stringToByteArray(w)));
 			}
 			case final HashableList hashableList -> {
-				final List<? extends Hashable> w = hashableList.toHashableForm();
+				final ImmutableList<? extends Hashable> w = hashableList.toHashableForm();
 				return hashFunction.hash(concat(
 						Stream.concat(
 								Stream.of(ARRAY_PREFIX),
@@ -183,8 +184,9 @@ public class HashService implements Hash {
 	@SuppressWarnings("java:S117")
 	@VisibleForTesting
 	ImmutableByteArray recursiveHashOfLength(final int requestedBitLength, final Hashable... values) {
-		checkNotNull(values);
-		Arrays.stream(values).forEach(Preconditions::checkNotNull);
+		final ImmutableList<Hashable> v = Arrays.stream(checkNotNull(values))
+				.map(Preconditions::checkNotNull)
+				.collect(toImmutableList());
 
 		final int k = values.length;
 		final int l = requestedBitLength;
@@ -193,8 +195,7 @@ public class HashService implements Hash {
 
 		final int L = Math.ceilDivExact(l, Byte.SIZE);
 		if (k > 1) {
-			final HashableList v = HashableList.from(Arrays.asList(values));
-			return recursiveHashOfLength(l, v);
+			return recursiveHashOfLength(l, HashableList.from(v));
 		} else {
 			final Hashable value = values[0];
 
@@ -215,10 +216,10 @@ public class HashService implements Hash {
 				return ByteArrays.cutToBitLength(shake256(L, h), l);
 			}
 			case final HashableList hashableList -> {
-				final List<? extends Hashable> w = hashableList.toHashableForm();
+				final ImmutableList<? extends Hashable> w = hashableList.toHashableForm();
 				final ImmutableByteArray h = Stream.concat(
 								Stream.of(ARRAY_PREFIX),
-								w.parallelStream().map(w_i -> recursiveHashOfLength(l, w_i)))
+								w.stream().parallel().map(w_i -> recursiveHashOfLength(l, w_i)))
 						.reduce(ImmutableByteArray.EMPTY, ImmutableByteArray::concat);
 				return ByteArrays.cutToBitLength(shake256(L, h), l);
 			}

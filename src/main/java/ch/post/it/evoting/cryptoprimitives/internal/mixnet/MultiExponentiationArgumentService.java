@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientCiphertexts.getCiphertext;
 import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientCiphertexts.getCiphertextVectorExponentiation;
 import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientMessages.constantMessage;
@@ -42,6 +43,7 @@ import java.util.stream.Stream;
 import com.google.common.annotations.VisibleForTesting;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
@@ -229,10 +231,10 @@ final class MultiExponentiationArgumentService {
 		final ZqElement x = ZqElement.create(byteArrayToInteger(x_bytes), zqGroup);
 
 		//Compute as, r, b, s, tau
-		final List<ZqElement> xPowers = LongStream.range(0, 2L * m)
+		final ImmutableList<ZqElement> xPowers = LongStream.range(0, 2L * m)
 				.mapToObj(BigInteger::valueOf)
 				.map(x::exponentiate)
-				.toList();
+				.collect(toImmutableList());
 
 		//For all the next computations we include the first element in the sum by starting at the index 0 instead of 1. This is possible since x^0
 		// is 1.
@@ -433,12 +435,12 @@ final class MultiExponentiationArgumentService {
 		final Memoizer<ZqElement> xPowers = new Memoizer<>(i -> x.exponentiate(BigInteger.valueOf(i)));
 
 		final GqElement prodCa = GqElementFactory.multiModExp(c_A.prepend(c_A_0),
-				IntStream.range(0, c_A.size() + 1).parallel().mapToObj(xPowers).collect(GroupVector.toGroupVector()));
+				IntStream.range(0, c_A.size() + 1).parallel().mapToObj(xPowers).collect(toGroupVector()));
 		final GqElement commA = getCommitment(a, r, ck);
 		final Verifiable verifA = create(() -> prodCa.equals(commA), "product Ca must equal commitment A.");
 
 		final GqElement prodCb = GqElementFactory.multiModExp(c_B,
-				IntStream.range(0, c_B.size()).parallel().mapToObj(xPowers).collect(GroupVector.toGroupVector()));
+				IntStream.range(0, c_B.size()).parallel().mapToObj(xPowers).collect(toGroupVector()));
 		final GqElement commB = getCommitment(GroupVector.of(b), s, ck);
 		final Verifiable verifB = create(() -> prodCb.equals(commB), "product Cb must equal commitment B.");
 

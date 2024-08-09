@@ -19,8 +19,7 @@ import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiR
 import static ch.post.it.evoting.cryptoprimitives.internal.mixnet.TestParser.parseCiphertexts;
 import static ch.post.it.evoting.cryptoprimitives.internal.mixnet.TestParser.parseCommitment;
 import static ch.post.it.evoting.cryptoprimitives.internal.mixnet.TestShuffleArgumentGenerator.ShuffleArgumentPair;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toList;
+import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,6 +47,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
@@ -201,7 +201,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> shuffledCiphertexts = IntStream.range(0, N)
 					.mapToObj(i -> getCiphertext(ones, randomness.get(i), publicKey)
 							.getCiphertextProduct(ciphertexts.get(permutation.get(i))))
-					.collect(collectingAndThen(toList(), GroupVector::from));
+					.collect(toGroupVector());
 
 			shuffleStatement = new ShuffleStatement(ciphertexts, shuffledCiphertexts);
 		}
@@ -276,7 +276,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> shuffledCiphertexts = IntStream.range(0, N)
 					.mapToObj(i -> getCiphertext(ones, shuffleWitness.get_rho().get(i), longerPublicKey)
 							.getCiphertextProduct(longerCiphertexts.get(shuffleWitness.get_pi().get(i))))
-					.collect(collectingAndThen(toList(), GroupVector::from));
+					.collect(toGroupVector());
 
 			final ShuffleStatement longerCiphertextsStatement = new ShuffleStatement(longerCiphertexts, shuffledCiphertexts);
 
@@ -295,8 +295,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 			shuffledCiphertexts.set(0, otherFirst);
 
 			// Recreate shuffled ciphertexts and statement.
-			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> differentShuffledCiphertexts = GroupVector.from(
-					shuffledCiphertexts);
+			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> differentShuffledCiphertexts = GroupVector.from(shuffledCiphertexts);
 			final ShuffleStatement differentShuffleStatement = new ShuffleStatement(this.shuffleStatement.get_C(),
 					differentShuffledCiphertexts);
 
@@ -443,7 +442,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = shuffleArgumentService.verifyShuffleArgument(badShuffleStatement, shuffleArgument, m, n);
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify MultiExponentiation Argument.", verificationResult.getErrorMessages().element());
+			assertEquals("Failed to verify MultiExponentiation Argument.", verificationResult.getErrorMessages().get(0));
 		}
 
 		@Test
@@ -462,7 +461,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = shuffleArgumentService.verifyShuffleArgument(shuffleStatement, badShuffleArgument, m, n);
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify Product Argument.", verificationResult.getErrorMessages().getFirst());
+			assertEquals("Failed to verify Product Argument.", verificationResult.getErrorMessages().get(0));
 		}
 
 		@Test
@@ -481,7 +480,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = shuffleArgumentService.verifyShuffleArgument(shuffleStatement, badShuffleArgument, m, n);
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify Product Argument.", verificationResult.getErrorMessages().getFirst());
+			assertEquals("Failed to verify Product Argument.", verificationResult.getErrorMessages().get(0));
 		}
 
 		@Test
@@ -518,7 +517,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = shuffleArgumentService.verifyShuffleArgument(shuffleStatement, badShuffleArgument, m, n);
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify Product Argument.", verificationResult.getErrorMessages().element());
+			assertEquals("Failed to verify Product Argument.", verificationResult.getErrorMessages().get(0));
 		}
 
 		@Test
@@ -547,11 +546,11 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = shuffleArgumentService.verifyShuffleArgument(shuffleStatement, badShuffleArgument, m, n);
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify MultiExponentiation Argument.", verificationResult.getErrorMessages().getFirst());
+			assertEquals("Failed to verify MultiExponentiation Argument.", verificationResult.getErrorMessages().get(0));
 		}
 
 		Stream<Arguments> jsonData() {
-			final List<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-shuffle-argument.json");
+			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-shuffle-argument.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// Context.

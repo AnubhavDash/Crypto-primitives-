@@ -39,7 +39,6 @@ public class DecryptionProofGenerator {
 	}
 
 	public GroupVector<DecryptionProof, ZqGroup> genDecryptionProofVector(final int numMessages, final int messageSize) {
-		return GroupVector.from(generateElementList(numMessages,
-				() -> new DecryptionProofGenerator(group).genDecryptionProof(messageSize)));
+		return generateElementList(numMessages, () -> new DecryptionProofGenerator(group).genDecryptionProof(messageSize));
 	}
 }

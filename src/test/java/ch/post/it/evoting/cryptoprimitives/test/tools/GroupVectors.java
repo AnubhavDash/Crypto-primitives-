@@ -15,9 +15,9 @@
  */
 package ch.post.it.evoting.cryptoprimitives.test.tools;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
+
+import java.util.stream.Stream;
 
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.internal.math.MathematicalGroup;
@@ -37,11 +37,9 @@ public class GroupVectors {
 	 * @param <G>     the group of these elements
 	 * @return a new GroupVector with the ith element replaced.
 	 */
-	public static <E extends GroupVectorElement<G> & Hashable, G extends MathematicalGroup<G>>
-	GroupVector<E, G> set(final GroupVector<E, G> vector, final int i, final E element) {
-		final List<E> modifiedElements = new ArrayList<>(vector);
-		modifiedElements.set(i, element);
-		return GroupVector.from(modifiedElements);
+	public static <E extends GroupVectorElement<G> & Hashable, G extends MathematicalGroup<G>> GroupVector<E, G> set(final GroupVector<E, G> vector,
+			final int i, final E element) {
+		return Stream.concat(Stream.concat(vector.stream().limit(i), Stream.of(element)), vector.stream().skip(i + 1)).collect(toGroupVector());
 	}
 
 	/**
@@ -55,10 +53,15 @@ public class GroupVectors {
 	 * @param <G>     the matrix element mathematical group type
 	 * @return a new matrix with all elements copied from the initial matrix except element (i,j) with the new value
 	 */
-	public static <E extends GroupVectorElement<G> & Hashable, G extends MathematicalGroup<G>>
-	GroupMatrix<E, G> set(final GroupMatrix<E, G> matrix, final int i, final int j, final E element) {
-		final List<List<E>> modifiedElements = matrix.rowStream().map(ArrayList::new).collect(Collectors.toList());
-		modifiedElements.get(i).set(j, element);
-		return GroupMatrix.fromRows(modifiedElements);
+	public static <E extends GroupVectorElement<G> & Hashable, G extends MathematicalGroup<G>> GroupMatrix<E, G> set(final GroupMatrix<E, G> matrix,
+			final int i, final int j, final E element) {
+
+		final GroupVector<E, G> modifiedRow =
+				Stream.concat(Stream.concat(matrix.getRow(i).stream().limit(j), Stream.of(element)), matrix.getRow(i).stream().skip(j + 1))
+						.collect(toGroupVector());
+
+		return GroupMatrix.fromRows(
+				Stream.concat(matrix.rowStream().limit(i), Stream.concat(Stream.of(modifiedRow), matrix.rowStream().skip(i + 1)))
+						.collect(toGroupVector()));
 	}
 }

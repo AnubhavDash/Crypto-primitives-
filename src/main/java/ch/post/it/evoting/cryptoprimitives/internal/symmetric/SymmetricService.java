@@ -15,11 +15,10 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.symmetric;
 
-import java.util.List;
-
 import com.google.common.annotations.VisibleForTesting;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.AEAD;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
@@ -48,13 +47,13 @@ public class SymmetricService implements Symmetric {
 
 	@Override
 	public SymmetricCiphertext genCiphertextSymmetric(final ImmutableByteArray encryptionKey, final ImmutableByteArray plaintext,
-			final List<String> associatedData) {
+			final ImmutableList<String> associatedData) {
 		return symmetricAuthenticatedEncryptionService.genCiphertextSymmetric(encryptionKey, plaintext, associatedData);
 	}
 
 	@Override
 	public ImmutableByteArray getPlaintextSymmetric(final ImmutableByteArray encryptionKey, final ImmutableByteArray ciphertext,
-			final ImmutableByteArray nonce, final List<String> associatedData) {
+			final ImmutableByteArray nonce, final ImmutableList<String> associatedData) {
 		return symmetricAuthenticatedEncryptionService.getPlaintextSymmetric(encryptionKey, ciphertext, nonce, associatedData);
 	}
 

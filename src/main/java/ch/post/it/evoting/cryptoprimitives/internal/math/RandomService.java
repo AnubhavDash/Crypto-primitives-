@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays.byteLength;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays.cutToBitLength;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
@@ -25,7 +26,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 import com.google.common.annotations.VisibleForTesting;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.math.Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.Base10Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -99,7 +100,7 @@ public class RandomService implements Random {
 	 * @see Random#genUniqueDecimalStrings(int, int)
 	 */
 	@SuppressWarnings("java:S117")
-	public List<String> genUniqueDecimalStrings(final int desiredCodeLength, final int numberOfUniqueCodes) {
+	public ImmutableList<String> genUniqueDecimalStrings(final int desiredCodeLength, final int numberOfUniqueCodes) {
 		final int l = desiredCodeLength;
 		final int n = numberOfUniqueCodes;
 		checkArgument(l >= 0, "The desired length of the unique codes must be greater than or equal to 0.");
@@ -117,7 +118,7 @@ public class RandomService implements Random {
 			codes.add(c);
 		}
 
-		return codes.stream().toList();
+		return codes.stream().collect(toImmutableList());
 	}
 
 	/**
@@ -125,7 +126,7 @@ public class RandomService implements Random {
 	 *
 	 * @param upperBound q, the exclusive upper bound. Must be non-null and strictly positive.
 	 * @param length     n, the desired length. Must be strictly positive.
-	 * @return {@code List<ZqElement>}
+	 * @return {@code GroupVector<ZqElement, ZqGroup>}
 	 */
 	public GroupVector<ZqElement, ZqGroup> genRandomVector(final BigInteger upperBound, final int length) {
 		final BigInteger q = checkNotNull(upperBound);

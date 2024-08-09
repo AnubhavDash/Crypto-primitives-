@@ -270,7 +270,7 @@ final class ZeroArgumentService {
 		checkArgument(m > 0, "The value of m must be strictly positive.");
 
 		// Computing the d vector.
-		final LinkedList<ZqElement> d = new LinkedList<>();
+		final List<ZqElement> d = new LinkedList<>();
 		for (int k = 0; k <= 2 * m; k++) {
 			ZqElement d_k = group.getIdentity();
 			for (int i = Math.max(0, k - m); i <= m; i++) {

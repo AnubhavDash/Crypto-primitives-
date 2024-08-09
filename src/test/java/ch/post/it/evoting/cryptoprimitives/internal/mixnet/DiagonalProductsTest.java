@@ -15,13 +15,11 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
+import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -120,12 +118,12 @@ class DiagonalProductsTest extends TestGroupSetup {
 	void getDiagonalProductsTooFewKeyElements() {
 		final GroupVector<GqElement, GqGroup> pkElements = Stream.generate(gqGroupGenerator::genNonIdentityNonGeneratorMember)
 				.limit(KEY_SIZE + 1)
-				.collect(GroupVector.toGroupVector());
+				.collect(toGroupVector());
 		final ElGamalMultiRecipientPublicKey otherPublicKey = new ElGamalMultiRecipientPublicKey(pkElements);
-		final List<List<ElGamalMultiRecipientCiphertext>> randomCiphertexts = Stream.generate(
-						() -> elGamalGenerator.genRandomCiphertexts(otherPublicKey, KEY_SIZE + 1, n))
+		final GroupVector<GroupVector<ElGamalMultiRecipientCiphertext, GqGroup>, GqGroup> randomCiphertexts = Stream.generate(
+						() -> elGamalGenerator.genRandomCiphertexts(otherPublicKey, KEY_SIZE + 1, n).stream().collect(toGroupVector()))
 				.limit(m)
-				.collect(Collectors.toList());
+				.collect(toGroupVector());
 		final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> otherCiphertexts = GroupMatrix.fromRows(randomCiphertexts);
 		final GroupMatrix<ZqElement, ZqGroup> otherExponents = zqGroupGenerator.genRandomZqElementMatrix(n, m + 1);
 
@@ -140,12 +138,12 @@ class DiagonalProductsTest extends TestGroupSetup {
 		// Generate ciphertexts from different group (a new key is also needed).
 		final GroupVector<GqElement, GqGroup> pkElements = Stream.generate(otherGqGroupGenerator::genNonIdentityNonGeneratorMember)
 				.limit(l)
-				.collect(GroupVector.toGroupVector());
+				.collect(toGroupVector());
 		final ElGamalMultiRecipientPublicKey differentGroupPublicKey = new ElGamalMultiRecipientPublicKey(pkElements);
-		final List<List<ElGamalMultiRecipientCiphertext>> otherGroupRandomCiphertexts = Stream.generate(
-						() -> otherGroupElGamalGenerator.genRandomCiphertexts(differentGroupPublicKey, l, n))
+		final GroupVector<GroupVector<ElGamalMultiRecipientCiphertext, GqGroup>, GqGroup> otherGroupRandomCiphertexts = Stream.generate(
+						() -> otherGroupElGamalGenerator.genRandomCiphertexts(differentGroupPublicKey, l, n).stream().collect(toGroupVector()))
 				.limit(m)
-				.collect(Collectors.toList());
+				.collect(toGroupVector());
 		final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> differentGroupCiphertexts = GroupMatrix
 				.fromRows(otherGroupRandomCiphertexts);
 
@@ -208,10 +206,10 @@ class DiagonalProductsTest extends TestGroupSetup {
 		// Create the ciphertext matrix:
 		// C0 = [ {1, ( 3, 6,  4)} { 4, (12, 16, 6)} ]
 		// C1 = [ {1, (13, 4, 18)} {13, ( 2,  3, 1)} ]
-		final ElGamalMultiRecipientCiphertext c0 = ElGamalMultiRecipientCiphertext.create(gOne, Arrays.asList(gThree, gSix, gFour));
-		final ElGamalMultiRecipientCiphertext c1 = ElGamalMultiRecipientCiphertext.create(gFour, Arrays.asList(gTwelve, gSixteen, gSix));
-		final ElGamalMultiRecipientCiphertext c2 = ElGamalMultiRecipientCiphertext.create(gOne, Arrays.asList(gThirteen, gFour, gEighteen));
-		final ElGamalMultiRecipientCiphertext c3 = ElGamalMultiRecipientCiphertext.create(gThirteen, Arrays.asList(gTwo, gThree, gOne));
+		final ElGamalMultiRecipientCiphertext c0 = ElGamalMultiRecipientCiphertext.create(gOne, GroupVector.of(gThree, gSix, gFour));
+		final ElGamalMultiRecipientCiphertext c1 = ElGamalMultiRecipientCiphertext.create(gFour, GroupVector.of(gTwelve, gSixteen, gSix));
+		final ElGamalMultiRecipientCiphertext c2 = ElGamalMultiRecipientCiphertext.create(gOne, GroupVector.of(gThirteen, gFour, gEighteen));
+		final ElGamalMultiRecipientCiphertext c3 = ElGamalMultiRecipientCiphertext.create(gThirteen, GroupVector.of(gTwo, gThree, gOne));
 		final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> ciphertextMatrix = GroupVector.of(c0, c1, c2, c3).toMatrix(2, 2);
 
 		// Create the exponent matrix
@@ -222,10 +220,10 @@ class DiagonalProductsTest extends TestGroupSetup {
 		// Create the expected output
 		// D = ( {13, (2, 3, 1)}, {12, (13, 9, 9)}, {8, (13, 16, 13)}, {4, (18, 9, 3)} )
 		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> expected = GroupVector.of(
-				ElGamalMultiRecipientCiphertext.create(gThirteen, Arrays.asList(gTwo, gThree, gOne)),
-				ElGamalMultiRecipientCiphertext.create(gTwelve, Arrays.asList(gThirteen, gNine, gNine)),
-				ElGamalMultiRecipientCiphertext.create(gEight, Arrays.asList(gThirteen, gSixteen, gThirteen)),
-				ElGamalMultiRecipientCiphertext.create(gFour, Arrays.asList(gEighteen, gNine, gThree))
+				ElGamalMultiRecipientCiphertext.create(gThirteen, GroupVector.of(gTwo, gThree, gOne)),
+				ElGamalMultiRecipientCiphertext.create(gTwelve, GroupVector.of(gThirteen, gNine, gNine)),
+				ElGamalMultiRecipientCiphertext.create(gEight, GroupVector.of(gThirteen, gSixteen, gThirteen)),
+				ElGamalMultiRecipientCiphertext.create(gFour, GroupVector.of(gEighteen, gNine, gThree))
 		);
 
 		final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(gqGroup);

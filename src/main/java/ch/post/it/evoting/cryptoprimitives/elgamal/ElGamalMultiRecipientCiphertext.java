@@ -15,16 +15,17 @@
  */
 package ch.post.it.evoting.cryptoprimitives.elgamal;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -73,12 +74,11 @@ public final class ElGamalMultiRecipientCiphertext implements GroupVectorElement
 	 *              </ul>
 	 * @return A new ElGamalMultiRecipientCiphertext with the specified gamma and phis
 	 */
-	public static ElGamalMultiRecipientCiphertext create(final GqElement gamma, final List<GqElement> phis) {
+	public static ElGamalMultiRecipientCiphertext create(final GqElement gamma, final GroupVector<GqElement, GqGroup> phis) {
 		checkNotNull(gamma);
+		checkNotNull(phis);
 
-		final GroupVector<GqElement, GqGroup> phisVector = GroupVector.from(checkNotNull(phis));
-
-		return new ElGamalMultiRecipientCiphertext(gamma, phisVector);
+		return new ElGamalMultiRecipientCiphertext(gamma, phis);
 	}
 
 	/**
@@ -209,13 +209,13 @@ public final class ElGamalMultiRecipientCiphertext implements GroupVectorElement
 
 	@Override
 	public String toString() {
-		final List<String> simplePhis = phis.stream().map(GqElement::getValue).map(BigInteger::toString).toList();
-		return "ElGamalMultiRecipientCiphertext{" + "gamma=" + gamma + ", phis=" + simplePhis + '}';
+		return "ElGamalMultiRecipientCiphertext{" + "gamma=" + gamma + ", phis=" + phis.stream().map(GqElement::getValue).map(BigInteger::toString)
+				.toList() + '}';
 	}
 
 	@Override
-	public List<? extends Hashable> toHashableForm() {
-		return this.stream().toList();
+	public ImmutableList<Hashable> toHashableForm() {
+		return this.stream().collect(toImmutableList());
 	}
 }
 

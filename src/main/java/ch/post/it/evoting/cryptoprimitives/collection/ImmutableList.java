@@ -15,60 +15,289 @@
  */
 package ch.post.it.evoting.cryptoprimitives.collection;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.common.base.Preconditions;
-
 /**
  * An immutable list of non-null elements.
  *
- * <p>Instances of this class are immutable. </p>
+ * <p>Instances of this class are immutable. However, the immutability of the list
+ * does not guarantee the immutability of the elements contained within the list.
+ * To achieve complete immutability, the elements themselves must be immutable.</p>
  *
- * @param <E> the type of elements in the list.
+ * @param <E> the type of elements in the list. This type should be immutable
+ *            to ensure the overall immutability of the list.
  */
-public class ImmutableList<E> {
+public class ImmutableList<E> implements Iterable<E> {
 
-	protected final List<E> elements;
+	private final List<E> elements;
 
-	public ImmutableList(final List<E> elements) {
-		this.elements = checkNotNull(elements).stream().map(Preconditions::checkNotNull).toList();
+	private ImmutableList(final List<E> elements) {
+		this.elements = Collections.unmodifiableList(elements);
 	}
 
+	/**
+	 * @param elements the elements to be added to the list.
+	 * @param <E>      the type of elements in the list.
+	 * @return an {@link ImmutableList} of elements.
+	 * @throws NullPointerException if the elements are null or any of the elements is null.
+	 */
+	public static <E> ImmutableList<E> from(final List<E> elements) {
+		return checkNotNull(elements).stream().collect(toImmutableList());
+	}
+
+	/**
+	 * @param elements the elements to be added to the list.
+	 * @param <E>      the type of elements in the list.
+	 * @return an {@link ImmutableList} of elements.
+	 * @throws NullPointerException if the elements are null or any of the elements is null.
+	 */
+	@SafeVarargs
+	public static <E> ImmutableList<E> of(final E... elements) {
+		return Arrays.stream(checkNotNull(elements)).collect(toImmutableList());
+	}
+
+	/**
+	 * @return an empty {@link ImmutableList}.
+	 */
+	public static <E> ImmutableList<E> emptyList() {
+		return ImmutableList.from(Collections.emptyList());
+	}
+
+	/**
+	 * @param <E> the type of elements in the list.
+	 * @return a collector that accumulates the input elements into an {@link ImmutableList}.
+	 * @throws NullPointerException if any of the accumulated elements is null.
+	 */
+	public static <E> Collector<E, ?, ImmutableList<E>> toImmutableList() {
+		return new Collector<E, List<E>, ImmutableList<E>>() {
+			@Override
+			public Supplier<List<E>> supplier() {
+				return ArrayList::new;
+			}
+
+			@Override
+			public BiConsumer<List<E>, E> accumulator() {
+				return (list, element) -> list.add(validate(element));
+			}
+
+			@Override
+			public BinaryOperator<List<E>> combiner() {
+				return (left, right) -> {
+					left.addAll(right);
+					return left;
+				};
+			}
+
+			@Override
+			public Function<List<E>, ImmutableList<E>> finisher() {
+				return ImmutableList::new;
+			}
+
+			@Override
+			public Set<Characteristics> characteristics() {
+				return Collections.emptySet();
+			}
+		};
+	}
+
+	/**
+	 * @param elements the elements to be appended to the list. Must be non-null and must not contain null elements.
+	 * @return a new {@link ImmutableList} with the appended elements.
+	 */
+	@SafeVarargs
+	public final ImmutableList<E> append(final E... elements) {
+		final List<E> validated = Arrays.stream(checkNotNull(elements)).map(ImmutableList::validate).toList();
+
+		final List<E> list = new ArrayList<>(this.elements);
+		list.addAll(validated);
+
+		// Since the existing elements have already been validated we can safely instantiate the new ImmutableList directly through the constructor.
+		return new ImmutableList<>(list);
+	}
+
+	/**
+	 * @param anotherList the other list whose elements are to be appended to this list. Must be non-null.
+	 * @return a new {@link ImmutableList} with the appended elements.
+	 */
+	public final ImmutableList<E> append(final ImmutableList<E> anotherList) {
+		checkNotNull(anotherList);
+		// anotherList's elements do not require validation since it is already an ImmutableList.
+
+		final List<E> list = new ArrayList<>(this.elements);
+		list.addAll(anotherList.elements());
+
+		// Since the existing elements have already been validated we can safely instantiate the new ImmutableList directly through the constructor.
+		return new ImmutableList<>(list);
+	}
+
+	/**
+	 * @return an unmodifiable copy list containing the elements.
+	 * @see List#copyOf(Collection)
+	 */
 	public List<E> elements() {
-		return List.copyOf(elements);
+		return elements;
 	}
 
+	/**
+	 * @see List#stream()
+	 */
 	public Stream<E> stream() {
-		return elements().stream();
+		return elements.stream();
 	}
 
+	/**
+	 * @see List#size()
+	 */
 	public int size() {
 		return elements.size();
 	}
 
+	/**
+	 * @param index the index of the element to return. Must be non-negative and less than the size of this list.
+	 * @return the element at the specified position in this list.
+	 * @throws IllegalArgumentException if the index is out of range.
+	 */
 	public E get(final int index) {
+		checkArgument(index >= 0 && index < size(), "Index is out of bounds. [index: %s, size: %s]", index, size());
+
 		return elements.get(index);
 	}
 
+	/**
+	 * @see List#isEmpty()
+	 */
 	public boolean isEmpty() {
 		return elements.isEmpty();
 	}
 
+	/**
+	 * @throws NullPointerException if the element is null.
+	 * @see List#contains(Object)
+	 */
 	public boolean contains(final E element) {
+		validate(element);
+
 		return elements.contains(element);
 	}
 
-	public boolean containsAll(final List<E> elements) {
-		return this.elements.containsAll(elements);
+	/**
+	 * @throws NullPointerException if the collection is null.
+	 * @see List#containsAll(Collection)
+	 */
+	public boolean containsAll(final Collection<E> c) {
+		checkNotNull(c);
+
+		return elements.containsAll(c);
 	}
 
-	public static <E> Collector<E, ?, ImmutableList<E>> toImmutableList() {
-		return Collectors.collectingAndThen(Collectors.toList(), ImmutableList::new);
+	/**
+	 * @param fromIndex the starting index (inclusive). Must be non-negative and less than the size of this list.
+	 * @param toIndex   the ending index (exclusive). Must be greater than or equal to the starting index and less than or equal to the size of this
+	 *                  list.
+	 * @return a new {@link ImmutableList} containing the elements between the specified indexes.
+	 * @throws IllegalArgumentException if the indexes are out of bounds.
+	 */
+	public ImmutableList<E> subList(final int fromIndex, final int toIndex) {
+		checkArgument(0 <= fromIndex && fromIndex <= toIndex && toIndex <= size(),
+				"Indexes are out of bounds. [fromIndex: %s, toIndex: %s, size: %s]", fromIndex, toIndex, size());
+
+		return elements.subList(fromIndex, toIndex).stream().collect(toImmutableList());
 	}
 
+	/**
+	 * @see List#iterator()
+	 */
+	@Override
+	public Iterator<E> iterator() {
+		return elements.iterator();
+	}
+
+	/**
+	 * @see List#spliterator()
+	 */
+	@Override
+	public Spliterator<E> spliterator() {
+		return elements.spliterator();
+	}
+
+	/**
+	 * @see List#forEach(Consumer)
+	 */
+	@Override
+	public void forEach(final Consumer<? super E> action) {
+		elements.forEach(action);
+	}
+
+	/**
+	 * @throws NullPointerException if the element is null.
+	 * @see List#indexOf(Object)
+	 */
+	public int indexOf(final E element) {
+		checkNotNull(element);
+
+		return elements.indexOf(element);
+	}
+
+	/**
+	 * @throws NullPointerException if the specified array is null.
+	 * @see List#toArray(Object[])
+	 */
+	public <T> T[] toArray(final T[] a) {
+		checkNotNull(a);
+
+		return elements.toArray(a);
+	}
+
+	/**
+	 * @return an unordered unmodifiable Set containing the elements of the list.
+	 * @see Set#of(Object[])
+	 */
+	public Set<E> toSet() {
+		return elements.stream().collect(Collectors.toUnmodifiableSet());
+	}
+
+	@Override
+	public String toString() {
+		return String.format("ImmutableList{elements=%s}", elements);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		final ImmutableList<?> that = (ImmutableList<?>) o;
+
+		return elements.equals(that.elements);
+	}
+
+	@Override
+	public int hashCode() {
+		return elements.hashCode();
+	}
+
+	private static <E> E validate(final E element) {
+		return checkNotNull(element);
+	}
 }

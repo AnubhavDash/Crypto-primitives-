@@ -31,64 +31,63 @@ import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 
 public class Argon2Service implements Argon2 {
 
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
+	static {
+		Security.addProvider(new BouncyCastleProvider());
+	}
 
-    private final RandomService randomService;
-    private final Argon2Profile config;
+	private final RandomService randomService;
+	private final Argon2Profile config;
 
-    public Argon2Service(final RandomService randomService, final Argon2Profile config) {
-        this.randomService = randomService;
-        this.config = config;
-    }
+	public Argon2Service(final RandomService randomService, final Argon2Profile config) {
+		this.randomService = randomService;
+		this.config = config;
+	}
 
-    /**
-     * See {@link Argon2#genArgon2id}
-     */
-    @Override
-    public Argon2Hash genArgon2id(final ImmutableByteArray inputKeyingMaterial) {
-        final ImmutableByteArray k = checkNotNull(inputKeyingMaterial);
+	/**
+	 * See {@link Argon2#genArgon2id}
+	 */
+	@Override
+	public Argon2Hash genArgon2id(final ImmutableByteArray inputKeyingMaterial) {
+		final ImmutableByteArray k = checkNotNull(inputKeyingMaterial);
 
-        final ImmutableByteArray s = randomService.randomBytes(16);
-        final ImmutableByteArray t = getArgon2id(k, s);
+		final ImmutableByteArray s = randomService.randomBytes(16);
+		final ImmutableByteArray t = getArgon2id(k, s);
 
-        return new Argon2Hash(t, s);
-    }
+		return new Argon2Hash(t, s);
+	}
 
-    /**
-     * See {@link Argon2#getArgon2id}
-     */
-    @Override
-    public ImmutableByteArray getArgon2id(final ImmutableByteArray inputKeyingMaterial, final ImmutableByteArray salt) {
-        final ImmutableByteArray k = checkNotNull(inputKeyingMaterial);
-        final ImmutableByteArray s = checkNotNull(salt);
-        final int m = config.get_m();
-        final int p = config.get_p();
-        final int i = config.get_i();
+	/**
+	 * See {@link Argon2#getArgon2id}
+	 */
+	@Override
+	public ImmutableByteArray getArgon2id(final ImmutableByteArray inputKeyingMaterial, final ImmutableByteArray salt) {
+		final ImmutableByteArray k = checkNotNull(inputKeyingMaterial);
+		final ImmutableByteArray s = checkNotNull(salt);
+		final int m = config.get_m();
+		final int p = config.get_p();
+		final int i = config.get_i();
 
-        final Argon2Configuration c = new Argon2Configuration(32, s, m, p, i);
-        return argon2id(c, k);
-    }
+		final Argon2Configuration c = new Argon2Configuration(32, s, m, p, i);
+		return argon2id(c, k);
+	}
 
-    private ImmutableByteArray argon2id(final Argon2Configuration c, final ImmutableByteArray k) {
-        final Argon2Parameters parameters = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
-                .withSalt(c.salt().elements())
-                .withMemoryPowOfTwo(c.memory())
-                .withParallelism(c.parallelism())
-                .withIterations(c.iterations())
-                .build();
+	private ImmutableByteArray argon2id(final Argon2Configuration c, final ImmutableByteArray k) {
+		final Argon2Parameters parameters = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
+				.withSalt(c.salt().elements())
+				.withMemoryPowOfTwo(c.memory())
+				.withParallelism(c.parallelism())
+				.withIterations(c.iterations())
+				.build();
 
-        final Argon2BytesGenerator generator = new Argon2BytesGenerator();
-        generator.init(parameters);
+		final Argon2BytesGenerator generator = new Argon2BytesGenerator();
+		generator.init(parameters);
 
-        final byte[] t = new byte[c.tagLength()];
-        generator.generateBytes(k.elements(), t);
+		final byte[] t = new byte[c.tagLength()];
+		generator.generateBytes(k.elements(), t);
 
-        return new ImmutableByteArray(t);
-    }
+		return new ImmutableByteArray(t);
+	}
 
-    private record Argon2Configuration(int tagLength, ImmutableByteArray salt, int memory, int parallelism,
-                                       int iterations) {
-    }
+	private record Argon2Configuration(int tagLength, ImmutableByteArray salt, int memory, int parallelism, int iterations) {
+	}
 }

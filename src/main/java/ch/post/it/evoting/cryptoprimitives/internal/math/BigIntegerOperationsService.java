@@ -21,13 +21,14 @@ import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TWO;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.verificatum.vmgj.VMG;
+
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 
 /**
  * <p>This class is thread-safe.</p>
@@ -62,7 +63,7 @@ public class BigIntegerOperationsService {
 		return bigIntegerOperations.modExponentiate(base, exponent, modulus);
 	}
 
-	public static BigInteger multiModExp(final List<BigInteger> bases, final List<BigInteger> exponents, final BigInteger modulus) {
+	public static BigInteger multiModExp(final ImmutableList<BigInteger> bases, final ImmutableList<BigInteger> exponents, final BigInteger modulus) {
 		return bigIntegerOperations.multiModExp(bases, exponents, modulus);
 	}
 
