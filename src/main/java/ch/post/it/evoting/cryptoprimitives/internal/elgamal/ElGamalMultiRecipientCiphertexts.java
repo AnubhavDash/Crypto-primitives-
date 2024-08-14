@@ -120,20 +120,20 @@ public class ElGamalMultiRecipientCiphertexts {
 		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = ciphertexts;
 		final GroupVector<ZqElement, ZqGroup> a = exponents;
 		final int l = C.getElementSize();
-		final int n = a.size();
+		final int N = a.size();
 
 		IntStream indices = IntStream.range(0, l);
 		if (ENABLE_PARALLEL_STREAMS) {
 			indices = indices.parallel();
 		}
 
-		final GqElement gamma_prod = GqElementFactory.multiModExp(IntStream.range(0, n)
+		final GqElement gamma_prod = GqElementFactory.multiModExp(IntStream.range(0, N)
 				.mapToObj(C::get)
 				.map(ElGamalMultiRecipientCiphertext::getGamma)
 				.collect(toGroupVector()), a);
 
 		final GroupVector<GqElement, GqGroup> phi_prod = indices
-				.mapToObj(i -> GqElementFactory.multiModExp(IntStream.range(0, n)
+				.mapToObj(i -> GqElementFactory.multiModExp(IntStream.range(0, N)
 						.mapToObj(C::get)
 						.map(ElGamalMultiRecipientCiphertext::getPhis)
 						.map(phi -> phi.get(i))
