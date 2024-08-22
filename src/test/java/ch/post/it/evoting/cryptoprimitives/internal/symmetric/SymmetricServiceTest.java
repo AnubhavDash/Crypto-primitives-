@@ -185,6 +185,30 @@ class SymmetricServiceTest extends TestGroupSetup {
 			final SymmetricCiphertext actualResult = symmetricService.genCiphertextSymmetric(encryptionKey, plaintext, associatedData);
 			assertEquals(expectedResult, actualResult, String.format("assertion failed for: %s", description));
 		}
+
+		@Test
+		@DisplayName("with an empty encryption key throws illegalArgumentException")
+		void emptyEncryptionKeyThrows() {
+			final ImmutableByteArray plainTextBytes = new ImmutableByteArray(plainText.getBytes(StandardCharsets.UTF_8));
+			final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
+					() -> symmetricEncryptionService.genCiphertextSymmetric(ImmutableByteArray.EMPTY, plainTextBytes, associatedData));
+
+			assertEquals("The encryption key must have a length between 1 and 255 bytes. [length: 0]",
+					Throwables.getRootCause(illegalArgumentException).getMessage());
+		}
+
+		@Test
+		@DisplayName("with an encryption key of length greater than 255 throws illegalArgumentException")
+		void biggerEncryptionKeyThrows() {
+			final int encryptionKeyLength = 256;
+			final ImmutableByteArray biggerEncryptionKey = randomService.randomBytes(encryptionKeyLength);
+			final ImmutableByteArray plainTextBytes = new ImmutableByteArray(plainText.getBytes(StandardCharsets.UTF_8));
+			final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
+					() -> symmetricEncryptionService.genCiphertextSymmetric(biggerEncryptionKey, plainTextBytes, associatedData));
+
+			assertEquals(String.format("The encryption key must have a length between 1 and 255 bytes. [length: %s]", encryptionKeyLength),
+					Throwables.getRootCause(illegalArgumentException).getMessage());
+		}
 	}
 
 	@Nested
@@ -198,15 +222,15 @@ class SymmetricServiceTest extends TestGroupSetup {
 					encryptionKey, new ImmutableByteArray(plainText.getBytes(StandardCharsets.UTF_8)), associatedData);
 
 			final ImmutableByteArray ciphertext = authenticationEncrypted.ciphertext();
-			final ImmutableByteArray nonce = authenticationEncrypted.nonce();
+			final ImmutableByteArray authenticationEncryptedNonce = authenticationEncrypted.nonce();
 			assertThrows(NullPointerException.class,
-					() -> symmetricEncryptionService.getPlaintextSymmetric(null, ciphertext, nonce, associatedData));
+					() -> symmetricEncryptionService.getPlaintextSymmetric(null, ciphertext, authenticationEncryptedNonce, associatedData));
 			assertThrows(NullPointerException.class,
-					() -> symmetricEncryptionService.getPlaintextSymmetric(encryptionKey, null, nonce, associatedData));
+					() -> symmetricEncryptionService.getPlaintextSymmetric(encryptionKey, null, authenticationEncryptedNonce, associatedData));
 			assertThrows(NullPointerException.class,
 					() -> symmetricEncryptionService.getPlaintextSymmetric(encryptionKey, ciphertext, null, associatedData));
 			assertThrows(NullPointerException.class,
-					() -> symmetricEncryptionService.getPlaintextSymmetric(encryptionKey, ciphertext, nonce, null));
+					() -> symmetricEncryptionService.getPlaintextSymmetric(encryptionKey, ciphertext, authenticationEncryptedNonce, null));
 		}
 
 		static Stream<Arguments> getPlaintextSymmetricProvider() {
@@ -236,6 +260,44 @@ class SymmetricServiceTest extends TestGroupSetup {
 			final ImmutableByteArray actualResult = symmetricEncryptionService.getPlaintextSymmetric(encryptionKey, ciphertext, nonce,
 					associatedData);
 			assertEquals(expectedResult, actualResult, String.format("assertion failed for: %s", description));
+		}
+
+		@Test
+		@DisplayName("with an empty encryption key throws illegalArgumentException")
+		void emptyEncryptionKeyThrows() {
+
+			final SymmetricCiphertext authenticationEncrypted = symmetricEncryptionService.genCiphertextSymmetric(
+					encryptionKey, new ImmutableByteArray(plainText.getBytes(StandardCharsets.UTF_8)), associatedData);
+
+			final ImmutableByteArray authenticationEncryptedCiphertext = authenticationEncrypted.ciphertext();
+			final ImmutableByteArray authenticationEncryptedNonce = authenticationEncrypted.nonce();
+
+			final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
+					() -> symmetricEncryptionService.getPlaintextSymmetric(ImmutableByteArray.EMPTY, authenticationEncryptedCiphertext,
+							authenticationEncryptedNonce, associatedData));
+
+			assertEquals("The encryption key must have a length between 1 and 255 bytes. [length: 0]",
+					Throwables.getRootCause(illegalArgumentException).getMessage());
+		}
+
+		@Test
+		@DisplayName("with an encryption key of length greater than 255 throws illegalArgumentException")
+		void biggerEncryptionKeyThrows() {
+			final int encryptionKeyLength = 256;
+			final ImmutableByteArray biggerEncryptionKey = randomService.randomBytes(encryptionKeyLength);
+
+			final SymmetricCiphertext authenticationEncrypted = symmetricEncryptionService.genCiphertextSymmetric(
+					encryptionKey, new ImmutableByteArray(plainText.getBytes(StandardCharsets.UTF_8)), associatedData);
+
+			final ImmutableByteArray authenticationEncryptedCiphertext = authenticationEncrypted.ciphertext();
+			final ImmutableByteArray authenticationEncryptedNonce = authenticationEncrypted.nonce();
+
+			final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
+					() -> symmetricEncryptionService.getPlaintextSymmetric(biggerEncryptionKey, authenticationEncryptedCiphertext,
+							authenticationEncryptedNonce, associatedData));
+
+			assertEquals(String.format("The encryption key must have a length between 1 and 255 bytes. [length: %s]", encryptionKeyLength),
+					Throwables.getRootCause(illegalArgumentException).getMessage());
 		}
 	}
 }
