@@ -125,15 +125,15 @@ public class RandomService implements Random {
 	 * Generates a vector (collection) of random {@link ZqElement}s between 0 (incl.) and {@code upperBound} (excl.).
 	 *
 	 * @param upperBound q, the exclusive upper bound. Must be non-null and strictly positive.
-	 * @param length     n, the desired length. Must be strictly positive.
-	 * @return {@code GroupVector<ZqElement, ZqGroup>}
+	 * @param length     n, the desired length. Must be positive.
+	 * @return A random {@code GroupVector<ZqElement, ZqGroup>} of {@code length} elements.
 	 */
 	public GroupVector<ZqElement, ZqGroup> genRandomVector(final BigInteger upperBound, final int length) {
 		final BigInteger q = checkNotNull(upperBound);
 		final int n = length;
 
-		checkArgument(q.signum() > 0, "The upper bound should be greater than zero");
-		checkArgument(length > 0, "The length should be greater than zero");
+		checkArgument(q.signum() > 0, "The upper bound must be strictly greater than zero");
+		checkArgument(length >= 0, "The length must be greater than or equal to zero");
 
 		final ZqGroup zqGroup = new ZqGroup(q);
 

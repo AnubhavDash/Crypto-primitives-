@@ -134,10 +134,17 @@ class RandomServiceTest {
 	}
 
 	@Test
+	void genEmptyRandomVector() {
+		final GroupVector<ZqElement, ZqGroup> randomVector = randomService.genRandomVector(BigInteger.TWO, 0);
+
+		assertTrue(randomVector.isEmpty());
+	}
+
+	@Test
 	void checkGenRandomVectorParameterChecks() {
 		assertThrows(NullPointerException.class, () -> randomService.genRandomVector(null, 1));
 		assertThrows(IllegalArgumentException.class, () -> randomService.genRandomVector(BigInteger.ZERO, 1));
-		assertThrows(IllegalArgumentException.class, () -> randomService.genRandomVector(BigInteger.ONE, 0));
+		assertThrows(IllegalArgumentException.class, () -> randomService.genRandomVector(BigInteger.TWO, -1));
 	}
 
 	@Test
