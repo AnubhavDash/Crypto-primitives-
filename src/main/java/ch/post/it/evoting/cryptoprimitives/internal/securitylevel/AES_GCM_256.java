@@ -58,6 +58,8 @@ public class AES_GCM_256 implements AEAD {
 	public ImmutableByteArray authenticatedEncryption(final ImmutableByteArray secretKey, final ImmutableByteArray nonce,
 			final ImmutableByteArray plaintext, final ImmutableByteArray associatedData) {
 		checkNotNull(secretKey);
+		checkArgument(1 <= secretKey.length() && secretKey.length() <= 255, "The secret key must have a length between 1 and 255 bytes. [length: %s]",
+				secretKey.length());
 		checkNotNull(nonce);
 		checkNotNull(plaintext);
 		checkNotNull(associatedData);
@@ -79,6 +81,8 @@ public class AES_GCM_256 implements AEAD {
 	public ImmutableByteArray authenticatedDecryption(final ImmutableByteArray secretKey, final ImmutableByteArray nonce,
 			final ImmutableByteArray associatedData, final ImmutableByteArray ciphertext) {
 		checkNotNull(secretKey);
+		checkArgument(1 <= secretKey.length() && secretKey.length() <= 255, "The secret key must have a length between 1 and 255 bytes. [length: %s]",
+				secretKey.length());
 		checkNotNull(nonce);
 		checkNotNull(associatedData);
 		checkNotNull(ciphertext);

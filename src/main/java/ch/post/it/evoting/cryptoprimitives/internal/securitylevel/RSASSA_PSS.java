@@ -122,7 +122,7 @@ public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 	}
 
 	private X509v3CertificateBuilder createCertificateBuilder(final PublicKey publicKey, final CertificateInfo info) {
-		final BigInteger serial = new BigInteger(RANDOM_SERVICE.randomBytes(SERIAL_LENGTH).elements());
+		final BigInteger serial = new BigInteger(1, RANDOM_SERVICE.randomBytes(SERIAL_LENGTH).elements());
 
 		final X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
 				.addRDN(BCStyle.CN, info.getAuthorityInformation().getCommonName())

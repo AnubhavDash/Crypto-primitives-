@@ -46,6 +46,8 @@ public class SymmetricAuthenticatedEncryptionService {
 			final ImmutableList<String> associatedData) {
 		// Input.
 		final ImmutableByteArray K = checkNotNull(encryptionKey);
+		checkArgument(1 <= K.length() && K.length() <= 255, "The encryption key must have a length between 1 and 255 bytes. [length: %s]",
+				K.length());
 		final ImmutableByteArray P = checkNotNull(plaintext);
 		final ImmutableList<ImmutableByteArray> associated_bytes = checkNotNull(associatedData).stream()
 				.map(associated_i -> {
@@ -75,6 +77,8 @@ public class SymmetricAuthenticatedEncryptionService {
 			final ImmutableByteArray nonce, final ImmutableList<String> associatedData) {
 		// Input.
 		final ImmutableByteArray K = checkNotNull(encryptionKey);
+		checkArgument(1 <= K.length() && K.length() <= 255, "The encryption key must have a length between 1 and 255 bytes. [length: %s]",
+				K.length());
 		final ImmutableByteArray C = checkNotNull(ciphertext);
 		checkNotNull(nonce);
 		final ImmutableList<ImmutableByteArray> associated_bytes = checkNotNull(associatedData).stream()
