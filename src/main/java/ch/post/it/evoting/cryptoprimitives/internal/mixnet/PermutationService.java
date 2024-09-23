@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
@@ -34,23 +35,22 @@ class PermutationService {
 	private final RandomService randomService;
 
 	public PermutationService(final RandomService randomService) {
-		checkNotNull(randomService);
-		this.randomService = randomService;
+		this.randomService = checkNotNull(randomService);
 	}
 
 	/**
 	 * Generates a permutation of integers [0, size).
 	 *
-	 * @param size N, the strictly positive number of values being permuted.
-	 * @return a Permutation object representing an individual permutation.
+	 * @param size N, the positive number of values being permuted.
+	 * @return a {@link Permutation} representing an individual permutation.
 	 */
 	Permutation genPermutation(final int size) {
 		final int N = size;
-		checkArgument(N > 0);
+		checkArgument(N >= 0);
 
 		final List<Integer> pi = IntStream.range(0, N)
 				.boxed()
-				.collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+				.collect(Collectors.toCollection(ArrayList::new));
 		for (int i = 0; i < N; i++) {
 			final int offset = randomService.genRandomInteger(N - i);
 			final int tmp = pi.get(i);

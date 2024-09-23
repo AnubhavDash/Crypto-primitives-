@@ -149,8 +149,8 @@ public class ImmutableList<E> implements Iterable<E> {
 	}
 
 	/**
-	 * @return an unmodifiable copy list containing the elements.
-	 * @see List#copyOf(Collection)
+	 * @return an unmodifiable list containing the elements.
+	 * @see Collections#unmodifiableList(List)
 	 */
 	public List<E> elements() {
 		return elements;
