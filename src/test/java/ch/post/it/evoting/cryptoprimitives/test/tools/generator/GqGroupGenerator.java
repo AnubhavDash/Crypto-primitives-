@@ -15,16 +15,16 @@
  */
 package ch.post.it.evoting.cryptoprimitives.test.tools.generator;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableSet.toImmutableSet;
 import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import static ch.post.it.evoting.cryptoprimitives.test.tools.generator.GroupVectorElementGenerator.generateElementList;
 import static ch.post.it.evoting.cryptoprimitives.test.tools.generator.GroupVectorElementGenerator.generateElementMatrix;
 
 import java.math.BigInteger;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableSet;
 import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -51,41 +51,40 @@ public class GqGroupGenerator {
 	/**
 	 * Get all members of the group.
 	 */
-	public Set<BigInteger> getMembers() {
+	public ImmutableSet<BigInteger> getMembers() {
 		if (group.getP().compareTo(MAX_GROUP_SIZE) > 0) {
 			throw new IllegalArgumentException("It would take too much time to generate all the group members for such a large group.");
 		}
 
-		final Set<BigInteger> members =
-				integersModP()
+		return integersModP()
 						.map(bi -> bi.modPow(BigInteger.TWO, group.getP()))
-						.collect(Collectors.toSet());
-		members.remove(BigInteger.ZERO);
-		return members;
+				.filter(e -> !e.equals(BigInteger.ZERO))
+				.collect(toImmutableSet());
 	}
 
 	/**
 	 * Get all prime members of the group different from the group generator.
 	 */
-	public Set<Integer> getSmallPrimeMembers() {
-		final Set<BigInteger> members = getMembers();
-		final Set<Integer> smallMembers = members.stream().map(BigInteger::intValueExact).collect(Collectors.toSet());
-		smallMembers.removeIf(member -> member.equals(group.getGenerator().getValue().intValueExact()) || !PrimesInternal.isSmallPrime(member));
-		return smallMembers;
+	public ImmutableSet<Integer> getSmallPrimeMembers() {
+		final ImmutableSet<BigInteger> members = getMembers();
+		return members.stream()
+				.map(BigInteger::intValueExact)
+				.filter(e -> !e.equals(group.getGenerator().getValue().intValueExact()))
+				.collect(toImmutableSet());
 	}
 
 	/**
 	 * Get all non members of the group smaller than p.
 	 */
-	public Set<BigInteger> getNonMembers() {
+	public ImmutableSet<BigInteger> getNonMembers() {
 		if (group.getP().compareTo(MAX_GROUP_SIZE) > 0) {
 			throw new IllegalArgumentException("It would take too much time to generate all the group members for such a large group.");
 		}
 
-		final Set<BigInteger> members = getMembers();
-		final Set<BigInteger> nonMembers = integersModP().collect(Collectors.toSet());
-		nonMembers.removeAll(members);
-		return nonMembers;
+		final ImmutableSet<BigInteger> members = getMembers();
+		return integersModP()
+				.filter(e -> !members.contains(e))
+				.collect(toImmutableSet());
 	}
 
 	/**

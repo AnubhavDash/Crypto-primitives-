@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.collection;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -22,9 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -114,11 +113,17 @@ class ImmutableListTest {
 		assertEquals(String.format("Indexes are out of bounds. [fromIndex: %s, toIndex: %s, size: %s]", fromIndex, toIndex, list.size()),
 				illegalArgumentException.getMessage());
 
-		final int anotherFromIndex = 1;
-		final int anotherToIndex = 0;
+		final int anotherFromIndex = 2;
+		final int anotherToIndex = 1;
 		illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> list.subList(anotherFromIndex, anotherToIndex));
 		assertEquals(
 				String.format("Indexes are out of bounds. [fromIndex: %s, toIndex: %s, size: %s]", anotherFromIndex, anotherToIndex, list.size()),
+				illegalArgumentException.getMessage());
+
+		final int negativeFromIndex = -1;
+		illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> list.subList(negativeFromIndex, anotherToIndex));
+		assertEquals(
+				String.format("Indexes are out of bounds. [fromIndex: %s, toIndex: %s, size: %s]", negativeFromIndex, anotherToIndex, list.size()),
 				illegalArgumentException.getMessage());
 	}
 
@@ -139,8 +144,8 @@ class ImmutableListTest {
 	void equals() {
 		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
 		assertTrue(list.equals(list));
-		assertNotEquals(null, list);
-		assertNotEquals("a", list);
+		assertFalse(list.equals(null));
+		assertFalse(list.equals("a"));
 		assertEquals(list, ImmutableList.of("a", "b", "c"));
 		assertNotEquals(list, ImmutableList.of("a", "b"));
 		assertNotEquals(list, ImmutableList.of("a", "b", "d"));
@@ -157,13 +162,16 @@ class ImmutableListTest {
 
 	@Test
 	void collectorTest() {
-		final ImmutableList<String> list = Stream.of("a", "b", "c").collect(ImmutableList.toImmutableList());
-		assertEquals(ImmutableList.of("a", "b", "c"), list);
+		final ImmutableList<String> listSequential = Stream.of("a", "b", "c").collect(toImmutableList());
+		assertEquals(ImmutableList.of("a", "b", "c"), listSequential);
+
+		final ImmutableList<String> listParallel = Stream.of("a", "b", "c").parallel().collect(toImmutableList());
+		assertEquals(ImmutableList.of("a", "b", "c"), listParallel);
 	}
 
 	@Test
 	void collectorThrows() {
-		assertThrows(NullPointerException.class, () -> Stream.of("ignored", null, "ignored").collect(ImmutableList.toImmutableList()));
+		assertThrows(NullPointerException.class, () -> Stream.of("ignored", null, "ignored").collect(toImmutableList()));
 	}
 
 	@Test
@@ -206,15 +214,25 @@ class ImmutableListTest {
 	@Test
 	void containsAllTest() {
 		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
-		assertTrue(list.containsAll(List.of("a", "b")));
-		assertFalse(list.containsAll(List.of("a", "d")));
-		assertFalse(list.containsAll(Collections.singletonList(null)));
+
+		// list
+		assertTrue(list.containsAll(ImmutableList.of("a", "b")));
+		assertFalse(list.containsAll(ImmutableList.of("a", "d")));
+
+		// set
+		assertTrue(list.containsAll(ImmutableSet.of("a", "b")));
+		assertFalse(list.containsAll(ImmutableSet.of("a", "d")));
 	}
 
 	@Test
 	void containsAllThrows() {
 		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
-		assertThrows(NullPointerException.class, () -> list.containsAll(null));
+
+		// list
+		assertThrows(NullPointerException.class, () -> list.containsAll((ImmutableList) null));
+
+		// set
+		assertThrows(NullPointerException.class, () -> list.containsAll((ImmutableSet) null));
 	}
 
 	@Test
@@ -234,12 +252,54 @@ class ImmutableListTest {
 	}
 
 	@Test
-	void toSet() {
+	void toImmutableSet() {
 		final ImmutableList<String> list = ImmutableList.of("a", "a", "b", "c", "b");
-		final Set<String> set = list.toSet();
+		final ImmutableSet<String> set = list.toImmutableSet();
 		assertEquals(3, set.size());
 		assertTrue(set.contains("a"));
 		assertTrue(set.contains("b"));
 		assertTrue(set.contains("c"));
+	}
+
+	@Test
+	void testHashCode() {
+		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
+		assertEquals(list.hashCode(), list.hashCode());
+		assertEquals(list.hashCode(), ImmutableList.of("a", "b", "c").hashCode());
+		assertNotEquals(list.hashCode(), ImmutableList.of("a", "b").hashCode());
+		assertNotEquals(list.hashCode(), ImmutableList.of("a", "b", "d").hashCode());
+		assertNotEquals(list.hashCode(), ImmutableList.of("a", "b", "c", "d").hashCode());
+	}
+
+	@Test
+	void testToString() {
+		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
+		assertEquals("ImmutableList{elements=[a, b, c]}", list.toString());
+	}
+
+	@Test
+	void testForEach() {
+		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
+		final List<String> result = new ArrayList<>();
+		list.forEach(result::add);
+		assertEquals(List.of("a", "b", "c"), result);
+
+		assertThrows(NullPointerException.class, () -> list.forEach(null));
+	}
+
+	@Test
+	void testIterator() {
+		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
+		final List<String> result = new ArrayList<>();
+		list.iterator().forEachRemaining(result::add);
+		assertEquals(List.of("a", "b", "c"), result);
+	}
+
+	@Test
+	void testSpliterator() {
+		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
+		final List<String> result = new ArrayList<>();
+		list.spliterator().forEachRemaining(result::add);
+		assertEquals(List.of("a", "b", "c"), result);
 	}
 }

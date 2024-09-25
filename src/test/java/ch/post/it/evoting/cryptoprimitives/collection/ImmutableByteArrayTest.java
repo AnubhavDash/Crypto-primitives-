@@ -17,6 +17,7 @@ package ch.post.it.evoting.cryptoprimitives.collection;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -72,6 +73,8 @@ class ImmutableByteArrayTest {
 		final ImmutableByteArray array1 = new ImmutableByteArray(input);
 		final ImmutableByteArray array2 = new ImmutableByteArray(input);
 		assertEquals(array1, array2);
+		assertNotEquals(array1, input);
+		assertNotEquals(array1, null);
 	}
 
 	@Test

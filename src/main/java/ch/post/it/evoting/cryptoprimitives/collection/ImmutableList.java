@@ -32,18 +32,16 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * An immutable list of non-null elements.
  *
  * <p>Instances of this class are immutable. However, the immutability of the list
- * does not guarantee the immutability of the elements contained within the list.
- * To achieve complete immutability, the elements themselves must be immutable.</p>
+ * does not guarantee the immutability of the elements contained within the list. To achieve complete immutability, the elements themselves must be
+ * immutable.</p>
  *
- * @param <E> the type of elements in the list. This type should be immutable
- *            to ensure the overall immutability of the list.
+ * @param <E> the type of elements in the list. This type should be immutable to ensure the overall immutability of the list.
  */
 public class ImmutableList<E> implements Iterable<E> {
 
@@ -199,13 +197,23 @@ public class ImmutableList<E> implements Iterable<E> {
 	}
 
 	/**
-	 * @throws NullPointerException if the collection is null.
+	 * @throws NullPointerException if the list is null.
 	 * @see List#containsAll(Collection)
 	 */
-	public boolean containsAll(final Collection<E> c) {
-		checkNotNull(c);
+	public boolean containsAll(final ImmutableList<E> list) {
+		checkNotNull(list);
 
-		return elements.containsAll(c);
+		return elements.containsAll(list.elements());
+	}
+
+	/**
+	 * @throws NullPointerException if the set is null.
+	 * @see List#containsAll(Collection)
+	 */
+	public boolean containsAll(final ImmutableSet<E> set) {
+		checkNotNull(set);
+
+		return elements.containsAll(set.elements());
 	}
 
 	/**
@@ -243,6 +251,8 @@ public class ImmutableList<E> implements Iterable<E> {
 	 */
 	@Override
 	public void forEach(final Consumer<? super E> action) {
+		checkNotNull(action);
+
 		elements.forEach(action);
 	}
 
@@ -267,11 +277,10 @@ public class ImmutableList<E> implements Iterable<E> {
 	}
 
 	/**
-	 * @return an unordered unmodifiable Set containing the elements of the list.
-	 * @see Set#of(Object[])
+	 * @return an {@link ImmutableSet} containing the elements of the list.
 	 */
-	public Set<E> toSet() {
-		return elements.stream().collect(Collectors.toUnmodifiableSet());
+	public ImmutableSet<E> toImmutableSet() {
+		return elements.stream().collect(ImmutableSet.toImmutableSet());
 	}
 
 	@Override
