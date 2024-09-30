@@ -19,6 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -35,16 +36,16 @@ import java.util.stream.Stream;
  * An immutable set of non-null elements.
  *
  * <p> Instances of this class are immutable. However, the immutability of the set does not guarantee the immutability of the elements contained
- * within the set. To achieve complete immutability, the elements themselves must be immutable. </p>
+ * within the set. To achieve complete immutability, the elements themselves must be immutable.
  *
  * @param <E> the type of elements in the set. This type should be immutable to ensure the overall immutability of the set.
  */
 public class ImmutableSet<E> implements Iterable<E> {
 
-	private final Set<E> elements;
+	private final Set<E> internalSet;
 
-	private ImmutableSet(final Set<E> elements) {
-		this.elements = Collections.unmodifiableSet(elements);
+	private ImmutableSet(final Set<E> internalSet) {
+		this.internalSet = Collections.unmodifiableSet(internalSet);
 	}
 
 	/**
@@ -54,7 +55,9 @@ public class ImmutableSet<E> implements Iterable<E> {
 	 * @throws NullPointerException if the given elements are null or if any of the elements is null.
 	 */
 	public static <E> ImmutableSet<E> from(final Set<E> elements) {
-		return checkNotNull(elements).stream().collect(toImmutableSet());
+		return checkNotNull(elements).stream()
+				.map(ImmutableSet::validateElement)
+				.collect(toImmutableSet());
 	}
 
 	/**
@@ -65,7 +68,9 @@ public class ImmutableSet<E> implements Iterable<E> {
 	 */
 	@SafeVarargs
 	public static <E> ImmutableSet<E> of(final E... elements) {
-		return Arrays.stream(checkNotNull(elements)).collect(toImmutableSet());
+		return Arrays.stream(checkNotNull(elements))
+				.map(ImmutableSet::validateElement)
+				.collect(toImmutableSet());
 	}
 
 	/**
@@ -80,8 +85,8 @@ public class ImmutableSet<E> implements Iterable<E> {
 	 * @param <E> the type of elements in the set.
 	 * @return a {@link Collector} that collects elements into an {@link ImmutableSet}.
 	 */
-	public static <E> Collector<E, ?, ImmutableSet<E>> toImmutableSet() {
-		return new Collector<E, Set<E>, ImmutableSet<E>>() {
+	public static <E> Collector<E, Set<E>, ImmutableSet<E>> toImmutableSet() {
+		return new Collector<>() {
 			@Override
 			public Supplier<Set<E>> supplier() {
 				return HashSet::new;
@@ -89,14 +94,19 @@ public class ImmutableSet<E> implements Iterable<E> {
 
 			@Override
 			public BiConsumer<Set<E>, E> accumulator() {
-				return (set, element) -> set.add(validate(element));
+				return (set, element) -> set.add(validateElement(element));
 			}
 
 			@Override
 			public BinaryOperator<Set<E>> combiner() {
 				return (left, right) -> {
-					left.addAll(right);
-					return left;
+					if (left.size() < right.size()) {
+						right.addAll(left);
+						return right;
+					} else {
+						left.addAll(right);
+						return left;
+					}
 				};
 			}
 
@@ -107,7 +117,7 @@ public class ImmutableSet<E> implements Iterable<E> {
 
 			@Override
 			public Set<Characteristics> characteristics() {
-				return Collections.emptySet();
+				return Collections.unmodifiableSet(EnumSet.of(Collector.Characteristics.UNORDERED));
 			}
 		};
 	}
@@ -116,7 +126,7 @@ public class ImmutableSet<E> implements Iterable<E> {
 	 * @see Set#size()
 	 */
 	public int size() {
-		return elements.size();
+		return internalSet.size();
 	}
 
 	/**
@@ -124,41 +134,41 @@ public class ImmutableSet<E> implements Iterable<E> {
 	 * @see Set#contains(Object)
 	 */
 	public boolean contains(final E element) {
-		validate(element);
+		validateElement(element);
 
-		return elements.contains(element);
+		return internalSet.contains(element);
 	}
 
 	/**
 	 * @throws NullPointerException if the given collection is null.
 	 * @see Set#containsAll(java.util.Collection)
 	 */
-	public boolean containsAll(final ImmutableSet<E> another) {
-		checkNotNull(another);
+	public boolean containsAll(final ImmutableSet<E> immutableSet) {
+		checkNotNull(immutableSet);
 
-		return elements.containsAll(another.elements());
+		return internalSet.containsAll(immutableSet.asSet());
 	}
 
 	/**
 	 * @see Set#isEmpty()
 	 */
 	public boolean isEmpty() {
-		return elements.isEmpty();
+		return internalSet.isEmpty();
 	}
 
 	/**
 	 * @see Set#stream()
 	 */
 	public Stream<E> stream() {
-		return elements.stream();
+		return internalSet.stream();
 	}
 
 	/**
 	 * @return an unmodifiable set containing the elements.
 	 * @see Collections#unmodifiableSet(Set)
 	 */
-	public Set<E> elements() {
-		return elements;
+	public Set<E> asSet() {
+		return internalSet;
 	}
 
 	/**
@@ -169,7 +179,7 @@ public class ImmutableSet<E> implements Iterable<E> {
 	public void forEach(final Consumer<? super E> action) {
 		checkNotNull(action);
 
-		elements.forEach(action);
+		internalSet.forEach(action);
 	}
 
 	/**
@@ -177,7 +187,7 @@ public class ImmutableSet<E> implements Iterable<E> {
 	 */
 	@Override
 	public Iterator<E> iterator() {
-		return elements.iterator();
+		return internalSet.iterator();
 	}
 
 	/**
@@ -185,12 +195,12 @@ public class ImmutableSet<E> implements Iterable<E> {
 	 */
 	@Override
 	public Spliterator<E> spliterator() {
-		return elements.spliterator();
+		return internalSet.spliterator();
 	}
 
 	@Override
 	public String toString() {
-		return String.format("ImmutableSet{elements=%s}", elements);
+		return String.format("ImmutableSet{elements=%s}", internalSet);
 	}
 
 	@Override
@@ -203,15 +213,15 @@ public class ImmutableSet<E> implements Iterable<E> {
 		}
 		final ImmutableSet<?> that = (ImmutableSet<?>) o;
 
-		return elements.equals(that.elements());
+		return internalSet.equals(that.asSet());
 	}
 
 	@Override
 	public int hashCode() {
-		return elements.hashCode();
+		return internalSet.hashCode();
 	}
 
-	private static <E> E validate(final E element) {
+	private static <E> E validateElement(final E element) {
 		return checkNotNull(element);
 	}
 }

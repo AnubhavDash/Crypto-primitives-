@@ -98,7 +98,7 @@ class HashServiceTest {
 
 			final JsonData input = testParameters.getInput().getJsonData("values");
 
-			final Hashable[] values = readInput(input).toHashableForm().elements().toArray(new Hashable[] {});
+			final Hashable[] values = readInput(input).toHashableForm().asList().toArray(new Hashable[] {});
 
 			final JsonData output = testParameters.getOutput();
 			final ImmutableByteArray hash = output.get("hash", ImmutableByteArray.class);
@@ -421,7 +421,7 @@ class HashServiceTest {
 			final JsonData input = testParameters.getInput();
 			final BigInteger q = input.get("q", BigInteger.class);
 			final JsonData valuesData = input.getJsonData("values");
-			final Hashable[] values = readInput(valuesData).toHashableForm().elements().toArray(new Hashable[] {});
+			final Hashable[] values = readInput(valuesData).toHashableForm().asList().toArray(new Hashable[] {});
 
 			final JsonData output = testParameters.getOutput();
 			final BigInteger resultValue = output.get("result", BigInteger.class);

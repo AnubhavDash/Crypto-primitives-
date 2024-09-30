@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.collection;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.emptyList;
 import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -24,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -44,9 +46,9 @@ class ImmutableListTest {
 		mutableInput.set(0, "d");
 		assertEquals("a", list.get(0));
 
-		final List<String> elements = list.elements();
-		assertThrows(UnsupportedOperationException.class, () -> elements.set(0, "d"));
-		assertEquals("a", elements.get(0));
+		final List<String> unmodifiable = list.asList();
+		assertThrows(UnsupportedOperationException.class, () -> unmodifiable.set(0, "d"));
+		assertEquals("a", unmodifiable.get(0));
 	}
 
 	@Test
@@ -68,6 +70,22 @@ class ImmutableListTest {
 	}
 
 	@Test
+	void getFirst() {
+		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
+		assertEquals("a", list.getFirst());
+		final NoSuchElementException noSuchElementException = assertThrows(NoSuchElementException.class, () -> emptyList().getFirst());
+		assertEquals("The list is empty.", noSuchElementException.getMessage());
+	}
+
+	@Test
+	void getLast() {
+		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
+		assertEquals("c", list.getLast());
+		final NoSuchElementException noSuchElementException = assertThrows(NoSuchElementException.class, () -> emptyList().getLast());
+		assertEquals("The list is empty.", noSuchElementException.getMessage());
+	}
+
+	@Test
 	void getThrows() {
 		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
 		final int index = 3;
@@ -83,7 +101,7 @@ class ImmutableListTest {
 	void isEmpty() {
 		assertFalse(ImmutableList.of("a", "b", "c").isEmpty());
 		assertTrue(ImmutableList.of().isEmpty());
-		assertTrue(ImmutableList.emptyList().isEmpty());
+		assertTrue(emptyList().isEmpty());
 	}
 
 	@Test
@@ -95,7 +113,7 @@ class ImmutableListTest {
 
 	@Test
 	void containsThrows() {
-		assertThrows(NullPointerException.class, () -> ImmutableList.emptyList().contains(null));
+		assertThrows(NullPointerException.class, () -> emptyList().contains(null));
 	}
 
 	@Test
@@ -137,7 +155,7 @@ class ImmutableListTest {
 
 	@Test
 	void indexOfThrows() {
-		assertThrows(NullPointerException.class, () -> ImmutableList.emptyList().indexOf(null));
+		assertThrows(NullPointerException.class, () -> emptyList().indexOf(null));
 	}
 
 	@Test
@@ -149,7 +167,7 @@ class ImmutableListTest {
 		assertEquals(list, ImmutableList.of("a", "b", "c"));
 		assertNotEquals(list, ImmutableList.of("a", "b"));
 		assertNotEquals(list, ImmutableList.of("a", "b", "d"));
-		assertEquals(ImmutableList.emptyList(), ImmutableList.of());
+		assertEquals(emptyList(), ImmutableList.of());
 	}
 
 	@Test
@@ -201,7 +219,7 @@ class ImmutableListTest {
 
 	@Test
 	void appendThrows() {
-		final ImmutableList<String> list = ImmutableList.emptyList();
+		final ImmutableList<String> list = emptyList();
 		final String[] s = new String[1];
 		s[0] = null;
 

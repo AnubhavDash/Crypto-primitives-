@@ -39,10 +39,10 @@ class ImmutableSetTest {
 		mutable.add("c");
 
 		final ImmutableSet<String> set = ImmutableSet.from(mutable);
-		final Set<String> unmodifiable = set.elements();
+		final Set<String> unmodifiable = set.asSet();
 		assertThrows(UnsupportedOperationException.class, () -> unmodifiable.add("d"));
 		assertTrue(set.contains("a"));
-		assertFalse(set.elements().contains("d"));
+		assertFalse(set.asSet().contains("d"));
 
 		mutable.add("d");
 		assertTrue(mutable.contains("d"));
@@ -149,7 +149,7 @@ class ImmutableSetTest {
 	@Test
 	void testElements() {
 		final ImmutableSet<String> set = ImmutableSet.of("a", "b", "c");
-		final Set<String> unmodifiable = set.elements();
+		final Set<String> unmodifiable = set.asSet();
 		assertEquals(3, unmodifiable.size());
 
 		assertThrows(UnsupportedOperationException.class, () -> unmodifiable.add("d"));

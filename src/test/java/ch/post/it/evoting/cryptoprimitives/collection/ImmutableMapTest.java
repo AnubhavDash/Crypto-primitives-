@@ -28,14 +28,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class ImmutableMapTest {
@@ -50,76 +50,97 @@ class ImmutableMapTest {
 		mutableInput.put("three", 3);
 		assertEquals(ImmutableSet.of(entry("one", 1), entry("two", 2)), immutableMap.entrySet());
 
-		final Map<String, Integer> elements = immutableMap.elements();
-		assertThrows(UnsupportedOperationException.class, () -> elements.put("three", 3));
+		final Map<String, Integer> map = immutableMap.asMap();
+		assertThrows(UnsupportedOperationException.class, () -> map.put("three", 3));
 	}
 
-	@Test
-	void testFrom() {
+	@Nested
+	class testFrom {
 		final Map<String, Integer> map = new HashMap<>();
-		map.put("one", 1);
-
 		final Map<String, Integer> mapWithNullKey = new HashMap<>();
-		mapWithNullKey.put(null, 1);
-
 		final Map<String, Integer> mapWithNullValue = new HashMap<>();
-		mapWithNullValue.put("one", null);
 
-		assertDoesNotThrow(() -> from(map));
-		assertThrows(NullPointerException.class, () -> from(mapWithNullKey));
-		assertThrows(NullPointerException.class, () -> from(mapWithNullValue));
-		assertThrows(NullPointerException.class, () -> from(null));
+		@BeforeEach
+		void setUp() {
+			map.put("one", 1);
+			mapWithNullKey.put(null, 1);
+			mapWithNullValue.put("one", null);
+		}
 
-		// with supplier
-		assertDoesNotThrow(() -> from(map, HashMap::new));
-		assertThrows(NullPointerException.class, () -> from(map, null));
-		assertThrows(NullPointerException.class, () -> from(mapWithNullKey, HashMap::new));
-		assertThrows(NullPointerException.class, () -> from(mapWithNullValue, HashMap::new));
-		assertThrows(NullPointerException.class, () -> from(null, HashMap::new));
+		@Test
+		void testFromWithMap() {
+			assertDoesNotThrow(() -> from(map));
+			assertThrows(NullPointerException.class, () -> from(mapWithNullKey));
+			assertThrows(NullPointerException.class, () -> from(mapWithNullValue));
+			assertThrows(NullPointerException.class, () -> from(null));
+		}
+
+		@Test
+		void testFromWithMapAndMapFactory() {
+			assertDoesNotThrow(() -> from(map, HashMap::new));
+			assertThrows(NullPointerException.class, () -> from(map, null));
+			assertThrows(NullPointerException.class, () -> from(mapWithNullKey, HashMap::new));
+			assertThrows(NullPointerException.class, () -> from(mapWithNullValue, HashMap::new));
+			assertThrows(NullPointerException.class, () -> from(null, HashMap::new));
+		}
+
 	}
 
-	@Test
-	@SuppressWarnings("java:S5778")
-		// manually checked.
-	void testOf() {
-		// zero key-value pair
-		assertDoesNotThrow(() -> of());
+	@Nested
+	class testOf {
 
-		// one key-value pair
-		assertDoesNotThrow(() -> of("one", 1));
-		assertThrows(NullPointerException.class, () -> of(null, 1));
-		assertThrows(NullPointerException.class, () -> of("one", null));
+		@Test
+		void testOfWithZeroKeyPair() {
+			assertDoesNotThrow(() -> of());
+		}
 
-		// two key-value pairs
-		assertDoesNotThrow(() -> of("one", 1, "two", 2));
-		assertThrows(NullPointerException.class, () -> of(null, 1, "two", 2));
-		assertThrows(NullPointerException.class, () -> of("one", 1, "two", null));
+		@Test
+		void testOfWithOneKeyPair() {
+			assertDoesNotThrow(() -> of("one", 1));
+			assertThrows(NullPointerException.class, () -> of(null, 1));
+			assertThrows(NullPointerException.class, () -> of("one", null));
+		}
 
-		// three key-value pairs
-		assertDoesNotThrow(() -> of("one", 1, "two", 2, "three", 3));
-		assertThrows(NullPointerException.class, () -> of(null, 1, "two", 2, "three", 3));
-		assertThrows(NullPointerException.class, () -> of("one", 1, "two", null, "three", 3));
+		@Test
+		void testOfWithTwoKeyPairs() {
+			assertDoesNotThrow(() -> of("one", 1, "two", 2));
+			assertThrows(NullPointerException.class, () -> of(null, 1, "two", 2));
+			assertThrows(NullPointerException.class, () -> of("one", 1, "two", null));
+		}
 
-		// four key-value pairs
-		assertDoesNotThrow(() -> of("one", 1, "two", 2, "three", 3, "four", 4));
-		assertThrows(NullPointerException.class, () -> of(null, 1, "two", 2, "three", 3, "four", 4));
-		assertThrows(NullPointerException.class, () -> of("one", 1, "two", null, "three", 3, "four", 4));
+		@Test
+		void testOfWithThreeKeyPairs() {
+			assertDoesNotThrow(() -> of("one", 1, "two", 2, "three", 3));
+			assertThrows(NullPointerException.class, () -> of(null, 1, "two", 2, "three", 3));
+			assertThrows(NullPointerException.class, () -> of("one", 1, "two", null, "three", 3));
+		}
 
-		// five+ key-value pairs
-		assertDoesNotThrow(() -> of(
-				entry("one", 1),
-				entry("two", 2),
-				entry("three", 3),
-				entry("four", 4),
-				entry("five", 5))
-		);
-		assertThrows(NullPointerException.class, () -> of(
-				entry("one", 1),
-				entry("two", 2),
-				entry("three", 3),
-				entry("four", 4),
-				null)
-		);
+		@Test
+		void testOfWithFourKeyPairs() {
+			assertDoesNotThrow(() -> of("one", 1, "two", 2, "three", 3, "four", 4));
+			assertThrows(NullPointerException.class, () -> of(null, 1, "two", 2, "three", 3, "four", 4));
+			assertThrows(NullPointerException.class, () -> of("one", 1, "two", null, "three", 3, "four", 4));
+		}
+
+		@Test
+		@SuppressWarnings("java:S5778")
+			// manually checked.
+		void testOfWithFiveKeyPairs() {
+			assertDoesNotThrow(() -> of(
+					entry("one", 1),
+					entry("two", 2),
+					entry("three", 3),
+					entry("four", 4),
+					entry("five", 5))
+			);
+			assertThrows(NullPointerException.class, () -> of(
+					entry("one", 1),
+					entry("two", 2),
+					entry("three", 3),
+					entry("four", 4),
+					null)
+			);
+		}
 	}
 
 	@Test
@@ -127,10 +148,10 @@ class ImmutableMapTest {
 		assertEquals(0, emptyMap().size());
 	}
 
-	@Test
+	@Nested
 	@SuppressWarnings("java:S5778")
-		// manually checked.
-	void testToImmutableMap() {
+			// manually checked.
+	class testToImmutableMap {
 		final ImmutableMap<String, Integer> immutable = of("one", 1, "two", 2);
 
 		final ImmutableList<ImmutableMap.Entry<String, Integer>> entries = ImmutableList.of(
@@ -155,37 +176,44 @@ class ImmutableMapTest {
 				entry("one", 1),
 				entry("one", 2));
 
-		// toImmutableMap()
-		final ImmutableMap<String, Integer> collected = entries.stream().parallel().collect(toImmutableMap());
-		assertEquals(immutable, collected);
-		assertThrows(NullPointerException.class, () -> entriesWithNullElement.get().collect(toImmutableMap()));
-		assertThrows(NullPointerException.class, () -> entriesWithNullKey.get().collect(toImmutableMap()));
-		assertThrows(NullPointerException.class, () -> entriesWithNullValue.get().collect(toImmutableMap()));
-		assertThrows(IllegalStateException.class, () -> entriesWithDuplicatedKey.get().collect(toImmutableMap()));
+		@Test
+		void testToImmutableMapNoArgs() {
+			assertDoesNotThrow(() -> entries.stream().collect(toImmutableMap()));
+			assertThrows(NullPointerException.class, () -> entriesWithNullElement.get().collect(toImmutableMap()));
+			assertThrows(NullPointerException.class, () -> entriesWithNullKey.get().collect(toImmutableMap()));
+			assertThrows(NullPointerException.class, () -> entriesWithNullValue.get().collect(toImmutableMap()));
+			assertThrows(IllegalStateException.class, () -> entriesWithDuplicatedKey.get().collect(toImmutableMap()));
+		}
 
-		// toImmutableMap(mapFactory)
-		final ImmutableMap<String, Integer> collectedWithMapFactory = entries.stream().parallel().collect(toImmutableMap(ConcurrentHashMap::new));
-		assertEquals(immutable, collectedWithMapFactory);
-		assertThrows(NullPointerException.class, () -> entries.stream().collect(toImmutableMap(null)));
-		assertThrows(NullPointerException.class, () -> entriesWithNullElement.get().collect(toImmutableMap(ConcurrentHashMap::new)));
-		assertThrows(NullPointerException.class, () -> entriesWithNullKey.get().collect(toImmutableMap(ConcurrentHashMap::new)));
-		assertThrows(NullPointerException.class, () -> entriesWithNullValue.get().collect(toImmutableMap(ConcurrentHashMap::new)));
-		assertThrows(IllegalStateException.class, () -> entriesWithDuplicatedKey.get().parallel().collect(toImmutableMap(ConcurrentHashMap::new)));
+		@Test
+		void testToImmutableMapWithMapFactory() {
+			final ImmutableMap<String, Integer> collectedWithMapFactory = entries.stream().parallel().collect(toImmutableMap(ConcurrentHashMap::new));
+			assertEquals(immutable, collectedWithMapFactory);
+			assertThrows(NullPointerException.class, () -> entries.stream().collect(toImmutableMap(null)));
+			assertThrows(NullPointerException.class, () -> entriesWithNullElement.get().collect(toImmutableMap(ConcurrentHashMap::new)));
+			assertThrows(NullPointerException.class, () -> entriesWithNullKey.get().collect(toImmutableMap(ConcurrentHashMap::new)));
+			assertThrows(NullPointerException.class, () -> entriesWithNullValue.get().collect(toImmutableMap(ConcurrentHashMap::new)));
+			assertThrows(IllegalStateException.class,
+					() -> entriesWithDuplicatedKey.get().parallel().collect(toImmutableMap(ConcurrentHashMap::new)));
+		}
 
-		// toImmutableMap(keyMapper, valueMapper)
-		final ImmutableMap<String, Integer> collectedWithKeyValueMapper = entries.stream().parallel()
-				.collect(toImmutableMap(ImmutableMap.Entry::key, ImmutableMap.Entry::value));
-		assertEquals(immutable, collectedWithKeyValueMapper);
-		assertThrows(NullPointerException.class, () -> entries.stream().collect(toImmutableMap(null, ImmutableMap.Entry::value)));
-		assertThrows(NullPointerException.class, () -> entries.stream().collect(toImmutableMap(ImmutableMap.Entry::key, null)));
-		assertThrows(NullPointerException.class,
-				() -> entriesWithNullElement.get().collect(toImmutableMap(ImmutableMap.Entry::key, ImmutableMap.Entry::value)));
-		assertThrows(NullPointerException.class,
-				() -> entriesWithNullKey.get().collect(toImmutableMap(ImmutableMap.Entry::key, ImmutableMap.Entry::value)));
-		assertThrows(NullPointerException.class,
-				() -> entriesWithNullValue.get().collect(toImmutableMap(ImmutableMap.Entry::key, ImmutableMap.Entry::value)));
-		assertThrows(IllegalStateException.class,
-				() -> entriesWithDuplicatedKey.get().parallel().collect(toImmutableMap(ImmutableMap.Entry::key, ImmutableMap.Entry::value)));
+		@Test
+		void testToImmutableMapWithKeyMapperAndValueMapper() {
+			final ImmutableMap<String, Integer> collectedWithKeyValueMapper = entries.stream().parallel()
+					.collect(toImmutableMap(ImmutableMap.Entry::key, ImmutableMap.Entry::value));
+			assertEquals(immutable, collectedWithKeyValueMapper);
+			assertThrows(NullPointerException.class, () -> entries.stream().collect(toImmutableMap(null, ImmutableMap.Entry::value)));
+			assertThrows(NullPointerException.class, () -> entries.stream().collect(toImmutableMap(ImmutableMap.Entry::key, null)));
+			assertThrows(NullPointerException.class,
+					() -> entriesWithNullElement.get().collect(toImmutableMap(ImmutableMap.Entry::key, ImmutableMap.Entry::value)));
+			assertThrows(NullPointerException.class,
+					() -> entriesWithNullKey.get().collect(toImmutableMap(ImmutableMap.Entry::key, ImmutableMap.Entry::value)));
+			assertThrows(NullPointerException.class,
+					() -> entriesWithNullValue.get().collect(toImmutableMap(ImmutableMap.Entry::key, ImmutableMap.Entry::value)));
+			assertThrows(IllegalStateException.class,
+					() -> entriesWithDuplicatedKey.get().parallel().collect(toImmutableMap(ImmutableMap.Entry::key, ImmutableMap.Entry::value)));
+		}
+
 	}
 
 	@Test
@@ -199,8 +227,8 @@ class ImmutableMapTest {
 	@Test
 	void testValues() {
 		final ImmutableMap<String, Integer> immutable = of("one", 1, "two", 2);
-		final Collection<Integer> values = immutable.values();
-		assertEquals(Set.of(1, 2), Set.copyOf(values));
+		final ImmutableList<Integer> values = immutable.values();
+		assertEquals(ImmutableList.of(1, 2), values);
 	}
 
 	@Test
@@ -253,12 +281,12 @@ class ImmutableMapTest {
 	}
 
 	@Test
-	void testElements() {
+	void testAsMap() {
 		final ImmutableMap<String, Integer> immutable = of("one", 1, "two", 2);
-		final Map<String, Integer> elements = immutable.elements();
-		assertEquals(2, elements.size());
-		assertEquals(1, elements.get("one"));
-		assertEquals(2, elements.get("two"));
+		final Map<String, Integer> map = immutable.asMap();
+		assertEquals(2, map.size());
+		assertEquals(1, map.get("one"));
+		assertEquals(2, map.get("two"));
 	}
 
 	@Test
@@ -284,21 +312,27 @@ class ImmutableMapTest {
 		assertEquals(immutable.hashCode(), other.hashCode());
 	}
 
-	@Test
-	void testEntry() {
-		// method
-		final ImmutableMap.Entry<String, Integer> entry = entry("one", 1);
-		assertEquals("one", entry.key());
-		assertEquals(1, entry.value());
-		assertThrows(NullPointerException.class, () -> entry(null, 1));
-		assertThrows(NullPointerException.class, () -> entry("one", null));
+	@Nested
+	class testEntry {
 
-		// record
-		final ImmutableMap.Entry<String, Integer> another = new ImmutableMap.Entry<>("one", 1);
-		assertEquals("one", another.key());
-		assertEquals(1, another.value());
-		assertThrows(NullPointerException.class, () -> new ImmutableMap.Entry<>(null, 1));
-		assertThrows(NullPointerException.class, () -> new ImmutableMap.Entry<>("one", null));
+		@Test
+		void testEntryByMethod() {
+			final ImmutableMap.Entry<String, Integer> entry = entry("one", 1);
+			assertEquals("one", entry.key());
+			assertEquals(1, entry.value());
+			assertThrows(NullPointerException.class, () -> entry(null, 1));
+			assertThrows(NullPointerException.class, () -> entry("one", null));
+		}
+
+		@Test
+		void testEntryByConstructor() {
+			final ImmutableMap.Entry<String, Integer> entry = new ImmutableMap.Entry<>("one", 1);
+			assertEquals("one", entry.key());
+			assertEquals(1, entry.value());
+			assertThrows(NullPointerException.class, () -> new ImmutableMap.Entry<>(null, 1));
+			assertThrows(NullPointerException.class, () -> new ImmutableMap.Entry<>("one", null));
+		}
+
 	}
 
 	@Test
