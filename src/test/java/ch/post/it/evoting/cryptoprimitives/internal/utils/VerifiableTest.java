@@ -77,7 +77,7 @@ class VerifiableTest {
 
 			final VerificationResult verify = failVerifiable.and(otherFailVerifiable).verify();
 			assertFalse(verify.isVerified());
-			assertArrayEquals(expectedMessages.toArray(), verify.getErrorMessages().elements().toArray());
+			assertArrayEquals(expectedMessages.toArray(), verify.getErrorMessages().asList().toArray());
 		}
 
 		@Test
@@ -88,7 +88,7 @@ class VerifiableTest {
 
 			final VerificationResult verify = successVerifiable.and(otherFailVerifiable).verify();
 			assertFalse(verify.isVerified());
-			assertArrayEquals(expectedMessages.toArray(), verify.getErrorMessages().elements().toArray());
+			assertArrayEquals(expectedMessages.toArray(), verify.getErrorMessages().asList().toArray());
 		}
 
 		@Test
@@ -99,7 +99,7 @@ class VerifiableTest {
 
 			final VerificationResult verify = failVerifiable.and(otherSuccessVerifiable).verify();
 			assertFalse(verify.isVerified());
-			assertArrayEquals(expectedMessages.toArray(), verify.getErrorMessages().elements().toArray());
+			assertArrayEquals(expectedMessages.toArray(), verify.getErrorMessages().asList().toArray());
 		}
 
 		@Test
@@ -163,7 +163,7 @@ class VerifiableTest {
 			expected.push(testMessage);
 
 			assertFalse(failureWithExtraMessage.verify().isVerified());
-			assertArrayEquals(expected.toArray(), failureWithExtraMessage.verify().getErrorMessages().elements().toArray());
+			assertArrayEquals(expected.toArray(), failureWithExtraMessage.verify().getErrorMessages().asList().toArray());
 		}
 
 		@Test

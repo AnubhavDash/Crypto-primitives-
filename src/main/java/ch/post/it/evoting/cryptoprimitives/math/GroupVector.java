@@ -120,7 +120,7 @@ public class GroupVector<E extends GroupVectorElement<G> & Hashable, G extends M
 
 	@Override
 	protected List<E> delegate() {
-		return this.elements.elements();
+		return this.elements.asList();
 	}
 
 	/**

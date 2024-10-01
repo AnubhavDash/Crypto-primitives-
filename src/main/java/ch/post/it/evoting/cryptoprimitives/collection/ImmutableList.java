@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.BiConsumer;
@@ -32,25 +33,23 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * An immutable list of non-null elements.
  *
  * <p>Instances of this class are immutable. However, the immutability of the list
- * does not guarantee the immutability of the elements contained within the list.
- * To achieve complete immutability, the elements themselves must be immutable.</p>
+ * does not guarantee the immutability of the elements contained within the list. To achieve complete immutability, the elements themselves must be
+ * immutable.
  *
- * @param <E> the type of elements in the list. This type should be immutable
- *            to ensure the overall immutability of the list.
+ * @param <E> the type of elements in the list. This type should be immutable to ensure the overall immutability of the list.
  */
 public class ImmutableList<E> implements Iterable<E> {
 
-	private final List<E> elements;
+	private final List<E> internalList;
 
-	private ImmutableList(final List<E> elements) {
-		this.elements = Collections.unmodifiableList(elements);
+	private ImmutableList(final List<E> internalList) {
+		this.internalList = Collections.unmodifiableList(internalList);
 	}
 
 	/**
@@ -60,7 +59,9 @@ public class ImmutableList<E> implements Iterable<E> {
 	 * @throws NullPointerException if the elements are null or any of the elements is null.
 	 */
 	public static <E> ImmutableList<E> from(final List<E> elements) {
-		return checkNotNull(elements).stream().collect(toImmutableList());
+		return checkNotNull(elements).stream()
+				.map(ImmutableList::validateElement)
+				.collect(toImmutableList());
 	}
 
 	/**
@@ -71,7 +72,9 @@ public class ImmutableList<E> implements Iterable<E> {
 	 */
 	@SafeVarargs
 	public static <E> ImmutableList<E> of(final E... elements) {
-		return Arrays.stream(checkNotNull(elements)).collect(toImmutableList());
+		return Arrays.stream(checkNotNull(elements))
+				.map(ImmutableList::validateElement)
+				.collect(toImmutableList());
 	}
 
 	/**
@@ -86,8 +89,8 @@ public class ImmutableList<E> implements Iterable<E> {
 	 * @return a collector that accumulates the input elements into an {@link ImmutableList}.
 	 * @throws NullPointerException if any of the accumulated elements is null.
 	 */
-	public static <E> Collector<E, ?, ImmutableList<E>> toImmutableList() {
-		return new Collector<E, List<E>, ImmutableList<E>>() {
+	public static <E> Collector<E, List<E>, ImmutableList<E>> toImmutableList() {
+		return new Collector<>() {
 			@Override
 			public Supplier<List<E>> supplier() {
 				return ArrayList::new;
@@ -95,7 +98,7 @@ public class ImmutableList<E> implements Iterable<E> {
 
 			@Override
 			public BiConsumer<List<E>, E> accumulator() {
-				return (list, element) -> list.add(validate(element));
+				return (list, element) -> list.add(validateElement(element));
 			}
 
 			@Override
@@ -124,9 +127,11 @@ public class ImmutableList<E> implements Iterable<E> {
 	 */
 	@SafeVarargs
 	public final ImmutableList<E> append(final E... elements) {
-		final List<E> validated = Arrays.stream(checkNotNull(elements)).map(ImmutableList::validate).toList();
+		final List<E> validated = Arrays.stream(checkNotNull(elements))
+				.map(ImmutableList::validateElement)
+				.toList();
 
-		final List<E> list = new ArrayList<>(this.elements);
+		final List<E> list = new ArrayList<>(this.internalList);
 		list.addAll(validated);
 
 		// Since the existing elements have already been validated we can safely instantiate the new ImmutableList directly through the constructor.
@@ -134,40 +139,40 @@ public class ImmutableList<E> implements Iterable<E> {
 	}
 
 	/**
-	 * @param anotherList the other list whose elements are to be appended to this list. Must be non-null.
+	 * @param other the other immutable list whose elements are to be appended to this list. Must be non-null.
 	 * @return a new {@link ImmutableList} with the appended elements.
 	 */
-	public final ImmutableList<E> append(final ImmutableList<E> anotherList) {
-		checkNotNull(anotherList);
-		// anotherList's elements do not require validation since it is already an ImmutableList.
+	public final ImmutableList<E> append(final ImmutableList<E> other) {
+		checkNotNull(other);
+		// other's elements do not require validation since it is already an ImmutableList.
 
-		final List<E> list = new ArrayList<>(this.elements);
-		list.addAll(anotherList.elements());
+		final List<E> list = new ArrayList<>(this.internalList);
+		list.addAll(other.asList());
 
 		// Since the existing elements have already been validated we can safely instantiate the new ImmutableList directly through the constructor.
 		return new ImmutableList<>(list);
 	}
 
 	/**
-	 * @return an unmodifiable copy list containing the elements.
-	 * @see List#copyOf(Collection)
+	 * @return an unmodifiable list containing the elements.
+	 * @see Collections#unmodifiableList(List)
 	 */
-	public List<E> elements() {
-		return elements;
+	public List<E> asList() {
+		return internalList;
 	}
 
 	/**
 	 * @see List#stream()
 	 */
 	public Stream<E> stream() {
-		return elements.stream();
+		return internalList.stream();
 	}
 
 	/**
 	 * @see List#size()
 	 */
 	public int size() {
-		return elements.size();
+		return internalList.size();
 	}
 
 	/**
@@ -178,14 +183,40 @@ public class ImmutableList<E> implements Iterable<E> {
 	public E get(final int index) {
 		checkArgument(index >= 0 && index < size(), "Index is out of bounds. [index: %s, size: %s]", index, size());
 
-		return elements.get(index);
+		return internalList.get(index);
+	}
+
+	/**
+	 * @return the first element of the list.
+	 * @throws NoSuchElementException if the list is empty.
+	 * @see List#getFirst()
+	 */
+	public E getFirst() {
+		if (this.isEmpty()) {
+			throw new NoSuchElementException("The list is empty.");
+		} else {
+			return internalList.getFirst();
+		}
+	}
+
+	/**
+	 * @return the last element of the list.
+	 * @throws NoSuchElementException if the list is empty.
+	 * @see List#getLast()
+	 */
+	public E getLast() {
+		if (this.isEmpty()) {
+			throw new NoSuchElementException("The list is empty.");
+		} else {
+			return internalList.getLast();
+		}
 	}
 
 	/**
 	 * @see List#isEmpty()
 	 */
 	public boolean isEmpty() {
-		return elements.isEmpty();
+		return internalList.isEmpty();
 	}
 
 	/**
@@ -193,19 +224,29 @@ public class ImmutableList<E> implements Iterable<E> {
 	 * @see List#contains(Object)
 	 */
 	public boolean contains(final E element) {
-		validate(element);
+		validateElement(element);
 
-		return elements.contains(element);
+		return internalList.contains(element);
 	}
 
 	/**
-	 * @throws NullPointerException if the collection is null.
+	 * @throws NullPointerException if the list is null.
 	 * @see List#containsAll(Collection)
 	 */
-	public boolean containsAll(final Collection<E> c) {
-		checkNotNull(c);
+	public boolean containsAll(final ImmutableList<E> immutableList) {
+		checkNotNull(immutableList);
 
-		return elements.containsAll(c);
+		return internalList.containsAll(immutableList.asList());
+	}
+
+	/**
+	 * @throws NullPointerException if the set is null.
+	 * @see List#containsAll(Collection)
+	 */
+	public boolean containsAll(final ImmutableSet<E> immutableSet) {
+		checkNotNull(immutableSet);
+
+		return internalList.containsAll(immutableSet.asSet());
 	}
 
 	/**
@@ -219,7 +260,7 @@ public class ImmutableList<E> implements Iterable<E> {
 		checkArgument(0 <= fromIndex && fromIndex <= toIndex && toIndex <= size(),
 				"Indexes are out of bounds. [fromIndex: %s, toIndex: %s, size: %s]", fromIndex, toIndex, size());
 
-		return elements.subList(fromIndex, toIndex).stream().collect(toImmutableList());
+		return internalList.subList(fromIndex, toIndex).stream().collect(toImmutableList());
 	}
 
 	/**
@@ -227,7 +268,7 @@ public class ImmutableList<E> implements Iterable<E> {
 	 */
 	@Override
 	public Iterator<E> iterator() {
-		return elements.iterator();
+		return internalList.iterator();
 	}
 
 	/**
@@ -235,7 +276,7 @@ public class ImmutableList<E> implements Iterable<E> {
 	 */
 	@Override
 	public Spliterator<E> spliterator() {
-		return elements.spliterator();
+		return internalList.spliterator();
 	}
 
 	/**
@@ -243,7 +284,9 @@ public class ImmutableList<E> implements Iterable<E> {
 	 */
 	@Override
 	public void forEach(final Consumer<? super E> action) {
-		elements.forEach(action);
+		checkNotNull(action);
+
+		internalList.forEach(action);
 	}
 
 	/**
@@ -251,9 +294,9 @@ public class ImmutableList<E> implements Iterable<E> {
 	 * @see List#indexOf(Object)
 	 */
 	public int indexOf(final E element) {
-		checkNotNull(element);
+		validateElement(element);
 
-		return elements.indexOf(element);
+		return internalList.indexOf(element);
 	}
 
 	/**
@@ -263,20 +306,19 @@ public class ImmutableList<E> implements Iterable<E> {
 	public <T> T[] toArray(final T[] a) {
 		checkNotNull(a);
 
-		return elements.toArray(a);
+		return internalList.toArray(a);
 	}
 
 	/**
-	 * @return an unordered unmodifiable Set containing the elements of the list.
-	 * @see Set#of(Object[])
+	 * @return an {@link ImmutableSet} containing the elements of the list.
 	 */
-	public Set<E> toSet() {
-		return elements.stream().collect(Collectors.toUnmodifiableSet());
+	public ImmutableSet<E> toImmutableSet() {
+		return internalList.stream().collect(ImmutableSet.toImmutableSet());
 	}
 
 	@Override
 	public String toString() {
-		return String.format("ImmutableList{elements=%s}", elements);
+		return String.format("ImmutableList{elements=%s}", internalList);
 	}
 
 	@Override
@@ -289,15 +331,15 @@ public class ImmutableList<E> implements Iterable<E> {
 		}
 		final ImmutableList<?> that = (ImmutableList<?>) o;
 
-		return elements.equals(that.elements);
+		return internalList.equals(that.internalList);
 	}
 
 	@Override
 	public int hashCode() {
-		return elements.hashCode();
+		return internalList.hashCode();
 	}
 
-	private static <E> E validate(final E element) {
+	private static <E> E validateElement(final E element) {
 		return checkNotNull(element);
 	}
 }
