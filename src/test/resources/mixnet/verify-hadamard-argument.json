@@ -57,7 +57,10 @@
 				}
 			}
 		},
-		"output": true
+		"output": {
+			"result": true,
+			"x": "0xC242E7600C6C9976F97BD6B3F541773E19B3622CCDB7BDA68FCCB222CD798795"
+		}
 	},
 	{
 		"description": "3072-bits, m=8, n=8, l=2",
@@ -156,7 +159,10 @@
 				}
 			}
 		},
-		"output": true
+		"output": {
+			"result": true,
+			"x": "0xD28EA2101B54FB1E484EE965E0C58E491A86BF15A5BAA7DD4B25BAE293B3C3A9"
+		}
 	},
 	{
 		"description": "3072-bits, m=8, n=8, l=4",
@@ -257,6 +263,9 @@
 				}
 			}
 		},
-		"output": true
+		"output": {
+			"result": true,
+			"x": "0x38F63627E29A4A5E20A0C0401773C01EE26C66EFDFAA1B638C7F2C84BCC278C8"
+		}
 	}
 ]

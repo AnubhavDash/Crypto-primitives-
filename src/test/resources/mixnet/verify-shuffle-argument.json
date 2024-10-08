@@ -102,7 +102,10 @@
 				}
 			}
 		},
-		"output": true
+		"output": {
+			"result": true,
+			"x": "0x897067748576517A64746216CED9F7ACA5DD4F7FEC366E8EF3B124E90230FC17"
+		}
 	},
 	{
 		"description": "3072-bits, m=2, n=3, l=2",
@@ -323,7 +326,10 @@
 				}
 			}
 		},
-		"output": true
+		"output": {
+			"result": true,
+			"x": "0x753063A10A7E3A3318E9F4CD96EA4131E042DC14847A07AB59D951977BBCAAFB"
+		}
 	},
 	{
 		"description": "3072-bits, m=8, n=8, l=2",
@@ -1512,7 +1518,10 @@
 				}
 			}
 		},
-		"output": true
+		"output": {
+			"result": true,
+			"x": "0x8D04D64FCDE008EB661A49E433A940E78E29037E5C381AB293EF41C3BC441A45"
+		}
 	},
 	{
 		"description": "3072-bits, m=8, n=8, l=4",
@@ -2991,6 +3000,9 @@
 				}
 			}
 		},
-		"output": true
+		"output": {
+			"result": true,
+			"x": "0x31A78B4D1CF6784430E1B23F0087C5686E3A4128DE5D77A7EED70AD6786D1BCC"
+		}
 	}
 ]
