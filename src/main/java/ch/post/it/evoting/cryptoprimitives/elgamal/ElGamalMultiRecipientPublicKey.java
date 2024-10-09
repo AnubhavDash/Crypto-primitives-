@@ -15,16 +15,16 @@
  */
 package ch.post.it.evoting.cryptoprimitives.elgamal;
 
-import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 import com.google.common.base.Preconditions;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -79,8 +79,8 @@ public final class ElGamalMultiRecipientPublicKey implements GroupVectorElement<
 	/**
 	 * @return a copy of the key elements as a list.
 	 */
-	public ImmutableList<GqElement> getKeyElements() {
-		return publicKeyElements.stream().collect(toImmutableList());
+	public List<GqElement> getKeyElements() {
+		return new ArrayList<>(publicKeyElements);
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public final class ElGamalMultiRecipientPublicKey implements GroupVectorElement<
 	}
 
 	@Override
-	public ImmutableList<Hashable> toHashableForm() {
+	public List<? extends Hashable> toHashableForm() {
 		return this.publicKeyElements.toHashableForm();
 	}
 

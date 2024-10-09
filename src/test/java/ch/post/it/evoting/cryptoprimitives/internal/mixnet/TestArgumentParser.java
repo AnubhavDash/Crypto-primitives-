@@ -18,9 +18,11 @@ package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.StreamSupport;
 
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
@@ -187,9 +189,9 @@ class TestArgumentParser {
 		final BigInteger[] phisValues = ciphertextData.get("phis", BigInteger[].class);
 
 		final GqElement gamma = GqElementFactory.fromValue(gammaValue, gqGroup);
-		final GroupVector<GqElement, GqGroup> phis = Arrays.stream(phisValues)
+		final List<GqElement> phis = Arrays.stream(phisValues)
 				.map(bi -> GqElementFactory.fromValue(bi, gqGroup))
-				.collect(toGroupVector());
+				.toList();
 
 		return ElGamalMultiRecipientCiphertext.create(gamma, phis);
 	}
@@ -211,7 +213,7 @@ class TestArgumentParser {
 
 		return StreamSupport.stream(ciphertextDataMatrix.jsonNode().spliterator(), false)
 				.map(node -> parseCiphertextVector(new JsonData(node)))
-				.collect(collectingAndThen(toGroupVector(), GroupMatrix::fromRows));
+				.collect(collectingAndThen(toList(), GroupMatrix::fromRows));
 	}
 
 }

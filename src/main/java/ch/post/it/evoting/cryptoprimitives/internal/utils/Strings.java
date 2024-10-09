@@ -30,7 +30,8 @@ public final class Strings {
 		final int u = S.length();
 		final int l = length;
 
-		checkArgument(l >= 0, "The input length must be positive. [l: %s]", l);
+		checkArgument(u > 0, "The input string must be non-empty. [u: %s]", u);
+		checkArgument(l > 0, "The input length must be strictly positive. [l: %s]", l);
 
 		// Operation. This implementation yields the same result as the specification's pseudocode,
 		// and we have a corresponding unit test that asserts the equivalence of the two implementations.

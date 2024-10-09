@@ -19,47 +19,46 @@
 
 	<groupId>ch.post.it.evoting.cryptoprimitives</groupId>
 	<artifactId>crypto-primitives</artifactId>
-	<version>1.5.0.0-b16</version>
+	<version>1.4.4.0-b0</version>
 	<packaging>jar</packaging>
 
 	<name>Crypto Primitives</name>
 
 	<properties>
 		<!-- Dependencies versions -->
-		<archunit.version>1.3.0</archunit.version>
-		<guava.version>33.3.0-jre</guava.version>
-		<bouncycastle.version>1.78.1</bouncycastle.version>
-		<jackson.version>2.17.2</jackson.version>
+		<guava.version>33.2.1-jre</guava.version>
+		<bouncycastle.version>1.78</bouncycastle.version>
+		<jackson.version>2.17.0</jackson.version>
 		<jmh.version>1.37</jmh.version>
-		<junit-jupiter.version>5.11.0</junit-jupiter.version>
-		<junit-platform-launcher.version>1.11.0</junit-platform-launcher.version>
-		<mockito.version>5.13.0</mockito.version>
-		<slf4j.version>2.0.16</slf4j.version>
+		<junit-jupiter.version>5.10.2</junit-jupiter.version>
+		<junit-platform-launcher.version>1.10.2</junit-platform-launcher.version>
+		<mockito.version>5.12.0</mockito.version>
+		<slf4j.version>2.0.12</slf4j.version>
 		<reproducible-build-maven-plugin.version>0.15.2</reproducible-build-maven-plugin.version>
 
 		<!-- Plugins versions -->
 		<jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
-		<maven-clean-plugin.version>3.4.0</maven-clean-plugin.version>
+		<maven-clean-plugin.version>3.3.2</maven-clean-plugin.version>
 		<maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
 		<maven-dependency-check.version>10.0.4</maven-dependency-check.version>
-		<maven-deploy-plugin.version>3.1.3</maven-deploy-plugin.version>
+		<maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
 		<maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
-		<maven-failsafe-plugin.version>3.5.0</maven-failsafe-plugin.version>
-		<maven-install-plugin.version>3.1.3</maven-install-plugin.version>
-		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-		<maven-release-plugin.version>3.1.1</maven-release-plugin.version>
+		<maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
+		<maven-install-plugin.version>3.1.1</maven-install-plugin.version>
+		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+		<maven-release-plugin.version>3.0.1</maven-release-plugin.version>
 		<maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
-		<maven-surefire-plugin.version>3.5.0</maven-surefire-plugin.version>
+		<maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
 		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-		<versions-maven-plugin.version>2.17.1</versions-maven-plugin.version>
-		<maven-javadoc-plugin.version>3.10.0</maven-javadoc-plugin.version>
+		<versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
+		<maven-javadoc-plugin.version>3.7.0</maven-javadoc-plugin.version>
 
 		<!-- Project settings -->
 		<maven.compiler.release>21</maven.compiler.release>
-		<maven-enforcer-plugin.requiredJavaVersion>[21.0.3]</maven-enforcer-plugin.requiredJavaVersion>
-		<maven-enforcer-plugin.requiredMavenVersion>[3.9.7]</maven-enforcer-plugin.requiredMavenVersion>
+		<maven-enforcer-plugin.requiredJavaVersion>[21.0.4]</maven-enforcer-plugin.requiredJavaVersion>
+		<maven-enforcer-plugin.requiredMavenVersion>[3.9.9]</maven-enforcer-plugin.requiredMavenVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.outputTimestamp>2024-09-30T15:44:42+02:00</project.build.outputTimestamp>
+		<project.build.outputTimestamp>2024-10-09T11:40:04+02:00</project.build.outputTimestamp>
 
 		<!--  Sonar  -->
 		<sonar.scm.disabled>true</sonar.scm.disabled>
@@ -101,7 +100,12 @@
 			<!-- Test dependencies -->
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>
-				<artifactId>junit-jupiter</artifactId>
+				<artifactId>junit-jupiter-api</artifactId>
+				<version>${junit-jupiter.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-params</artifactId>
 				<version>${junit-jupiter.version}</version>
 			</dependency>
 			<dependency>
@@ -113,11 +117,6 @@
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-junit-jupiter</artifactId>
 				<version>${mockito.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.tngtech.archunit</groupId>
-				<artifactId>archunit-junit5</artifactId>
-				<version>${archunit.version}</version>
 			</dependency>
 
 			<!-- com.fasterxml.jackson -->
@@ -169,7 +168,12 @@
 		<!-- Test dependencies -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter</artifactId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-params</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -180,11 +184,6 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-junit-jupiter</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.tngtech.archunit</groupId>
-			<artifactId>archunit-junit5</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

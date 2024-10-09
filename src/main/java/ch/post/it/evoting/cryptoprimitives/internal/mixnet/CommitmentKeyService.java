@@ -16,12 +16,12 @@
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
 import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
-import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.function.Predicate;
 
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
@@ -109,12 +109,12 @@ public class CommitmentKeyService {
 
 		}
 
-		final GroupVector<GqElement, GqGroup> v_elements = v.stream()
+		final List<GqElement> v_elements = v.stream()
 				.map(e -> GqElementFactory.fromValue(e, gqGroup))
-				.collect(toGroupVector());
+				.toList();
 
 		final GqElement h = v_elements.get(0);
-		final GroupVector<GqElement, GqGroup> g_vector = v_elements.subVector(1, v_elements.size());
+		final GroupVector<GqElement, GqGroup> g_vector = GroupVector.from(v_elements.subList(1, v_elements.size()));
 		return new CommitmentKey(h, g_vector);
 	}
 }

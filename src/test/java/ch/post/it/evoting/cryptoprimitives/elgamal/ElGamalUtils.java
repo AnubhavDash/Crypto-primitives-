@@ -15,12 +15,11 @@
  */
 package ch.post.it.evoting.cryptoprimitives.elgamal;
 
-import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
-
 import java.math.BigInteger;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -28,14 +27,11 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 public class ElGamalUtils {
 
 	//Convert a matrix of values to ciphertexts
-	public static GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> valuesToCiphertext(final Stream<ImmutableList<Integer>> ciphertextValues,
-			final GqGroup group) {
+	public static GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> valuesToCiphertext(final Stream<List<Integer>> ciphertextValues, final GqGroup group) {
 		return ciphertextValues
-				.map(values -> values.stream()
-						.map(BigInteger::valueOf)
-						.map(value -> GqElement.GqElementFactory.fromValue(value, group))
-						.collect(toGroupVector()))
-				.map(values -> ElGamalMultiRecipientCiphertext.create(values.get(0), values.subVector(1, values.size())))
-				.collect(toGroupVector());
+				.map(values -> values.stream().map(BigInteger::valueOf).map(value -> GqElement.GqElementFactory.fromValue(value, group))
+						.collect(Collectors.toList()))
+				.map(values -> ElGamalMultiRecipientCiphertext.create(values.get(0), values.subList(1, values.size())))
+				.collect(GroupVector.toGroupVector());
 	}
 }

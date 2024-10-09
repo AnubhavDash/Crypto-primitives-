@@ -23,7 +23,6 @@ import java.util.stream.StreamSupport;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.math.Base64;
 import ch.post.it.evoting.cryptoprimitives.math.BaseEncodingFactory;
 
@@ -67,7 +66,7 @@ public record JsonData(JsonNode jsonNode) {
 			return clazz.cast(jsonNode.get(field).asText());
 		} else if (clazz.equals(String[].class)) {
 			return clazz.cast(getStringArray(field));
-		} else if (clazz.equals(ImmutableByteArray.class)) {
+		} else if (clazz.equals(byte[].class)) {
 			return clazz.cast(BASE_64.base64Decode(jsonNode.get(field).asText()));
 		} else if (clazz.equals(Boolean.class)) {
 			return clazz.cast(jsonNode.get(field).asBoolean());

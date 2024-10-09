@@ -64,7 +64,7 @@ public class GenRandomIntegerBenchmark {
 		public static BigInteger genRandomIntegerWithBigInteger(final BigInteger upperBound, final SecureRandom secureRandom) {
 			// Input.
 			checkNotNull(upperBound);
-			checkArgument(upperBound.signum() > 0, "The upper bound must be a positive integer greater than 0.");
+			checkArgument(upperBound.compareTo(BigInteger.ZERO) > 0, "The upper bound must be a positive integer greater than 0.");
 			final BigInteger m = upperBound;
 
 			// Operation.

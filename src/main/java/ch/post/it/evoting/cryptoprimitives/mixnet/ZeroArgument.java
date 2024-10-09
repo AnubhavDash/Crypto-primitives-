@@ -19,9 +19,10 @@ import static ch.post.it.evoting.cryptoprimitives.utils.Validations.allEqual;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -66,8 +67,8 @@ public class ZeroArgument implements HashableList {
 		this.t_prime = checkNotNull(t_prime);
 
 		// Cross group checking.
-		final ImmutableList<GroupVectorElement<GqGroup>> gqGroupMembers = ImmutableList.of(c_A_0, c_B_m, c_d);
-		final ImmutableList<GroupVectorElement<ZqGroup>> zqGroupMembers = ImmutableList.of(a_prime, b_prime, r_prime, s_prime, t_prime);
+		final List<GroupVectorElement<GqGroup>> gqGroupMembers = Arrays.asList(c_A_0, c_B_m, c_d);
+		final List<GroupVectorElement<ZqGroup>> zqGroupMembers = Arrays.asList(a_prime, b_prime, r_prime, s_prime, t_prime);
 		checkArgument(allEqual(gqGroupMembers.stream(), GroupVectorElement::getGroup), "cA0, cBm, cd must belong to the same group.");
 		checkArgument(allEqual(zqGroupMembers.stream(), GroupVectorElement::getGroup),
 				"aPrime, bPrime, rPrime, sPrime, tPrime must belong to the same group.");
@@ -147,8 +148,8 @@ public class ZeroArgument implements HashableList {
 	}
 
 	@Override
-	public ImmutableList<Hashable> toHashableForm() {
-		return ImmutableList.of(c_A_0, c_B_m, c_d, a_prime, b_prime, r_prime, s_prime, t_prime);
+	public List<? extends Hashable> toHashableForm() {
+		return List.of(c_A_0, c_B_m, c_d, a_prime, b_prime, r_prime, s_prime, t_prime);
 	}
 
 	/**

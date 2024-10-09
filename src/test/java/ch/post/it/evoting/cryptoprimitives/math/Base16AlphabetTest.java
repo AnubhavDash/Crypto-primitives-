@@ -90,7 +90,10 @@ class Base16AlphabetTest {
 	@DisplayName("contains with a null character behaves as expected")
 	@Test
 	void containsWithNullCharacter() {
-		assertThrows(NullPointerException.class, () -> base16Alphabet.contains(null));
+		final boolean expected = false;
+
+		final boolean isContained = assertDoesNotThrow(() -> base16Alphabet.contains(null));
+		assertEquals(expected, isContained);
 	}
 
 	@DisplayName("contains with a character part of the alphabet behaves as expected")
@@ -161,7 +164,11 @@ class Base16AlphabetTest {
 	@DisplayName("indexOf with a null character behaves as expected")
 	@Test
 	void indexOfNullHappyPath() {
-		assertThrows(NullPointerException.class, () -> base16Alphabet.indexOf(null));
+		final int expected = -1;
+
+		final int index = assertDoesNotThrow(() -> base16Alphabet.indexOf(null));
+
+		assertEquals(expected, index);
 	}
 
 	@DisplayName("indexOf with a character part of the alphabet behaves as expected")

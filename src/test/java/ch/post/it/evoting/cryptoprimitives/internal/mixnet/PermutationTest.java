@@ -15,142 +15,106 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
-import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.mixnet.Permutation;
 
-@DisplayName("A Permutation")
 class PermutationTest {
 
-	private static final int MAX_PERMUTATION_TEST_SIZE = 100;
+	private static final int MAX_PERMUTATION_TEST_SIZE = 1000;
 
 	private static final TestRandomService randomService = new TestRandomService();
 	private static final PermutationService permutationService = new PermutationService(randomService);
 
 	@Test
-	@DisplayName("calling size returns correct size")
-	void sizeReturnsCorrectSize() {
-		final int size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE);
-		final Permutation permutation = permutationService.genPermutation(size);
+	void permutationWithNullParameter() {
+		assertThrows(NullPointerException.class, () -> new Permutation(null));
+	}
 
+	@Test
+	void genPermutationThrowsForNonPositiveSize() {
+		final int size = -randomService.genRandomInteger(Integer.MAX_VALUE);
+		assertThrows(IllegalArgumentException.class, () -> permutationService.genPermutation(size));
+	}
+
+	@RepeatedTest(10)
+	void genPermutationContainsAllValuesInInputRange() {
+		final int size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE) + 1;
+		final Permutation permutation = permutationService.genPermutation(size);
+		final TreeSet<Integer> values = computePermutationValues(permutation);
+
+		assertEquals(size, values.size());
+		assertEquals(0, values.first());
+		assertEquals(size - 1, values.last());
+	}
+
+	private TreeSet<Integer> computePermutationValues(final Permutation permutation) {
+		return IntStream.range(0, permutation.size()).map(permutation::get).boxed().collect(Collectors.toCollection(TreeSet::new));
+	}
+
+	@Test
+	void getThrowsForNegativeValue() {
+		final int size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE) + 1;
+		final int value = -randomService.genRandomInteger(Integer.MAX_VALUE);
+		final Permutation permutation = permutationService.genPermutation(size);
+		assertThrows(IllegalArgumentException.class, () -> permutation.get(value));
+	}
+
+	@Test
+	void getThrowsForValueAboveSize() {
+		final int size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE) + 1;
+		final int value = randomService.genRandomInteger(Integer.MAX_VALUE - size) + size;
+		final Permutation permutation = permutationService.genPermutation(size);
+		assertThrows(IllegalArgumentException.class, () -> permutation.get(value));
+	}
+
+	@Test
+	void getThrowsForValueOfSize() {
+		final int size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE) + 1;
+		final Permutation permutation = permutationService.genPermutation(size);
+		assertThrows(IllegalArgumentException.class, () -> permutation.get(size));
+	}
+
+	@Test
+	void getSizeReturnsSize() {
+		final int size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE) + 1;
+		final Permutation permutation = permutationService.genPermutation(size);
 		assertEquals(size, permutation.size());
 	}
 
 	@Test
-	@DisplayName("calling stream returns correct elements")
 	void streamReturnsCorrectElements() {
-		final int size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE);
+		final int size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE) + 1;
 		final Permutation permutation = permutationService.genPermutation(size);
 
-		final ImmutableList<Integer> expectedMapping = IntStream.range(0, permutation.size())
+		final List<Integer> expectedMapping = IntStream.range(0, permutation.size())
 				.map(permutation::get)
 				.boxed()
-				.collect(toImmutableList());
+				.collect(Collectors.toList());
 
-		assertEquals(expectedMapping, permutation.stream().collect(toImmutableList()));
+		assertEquals(expectedMapping, permutation.stream().collect(Collectors.toList()));
 	}
 
 	@Test
-	@DisplayName("is immutable")
 	void immutableValueMapping() {
-		final List<Integer> valueMapping = new ArrayList<>() {{
-			add(10);
-			add(11);
-		}};
+		final List<Integer> valueMapping = new ArrayList<>();
+		valueMapping.add(10);
+		valueMapping.add(11);
 
-		final Permutation permutation = new Permutation(valueMapping.stream().collect(toImmutableList()));
-		valueMapping.removeFirst();
+		final Permutation permutation = new Permutation(valueMapping);
+		valueMapping.remove(0);
 
 		assertEquals(2, permutation.size());
 	}
-
-	@Nested
-	@DisplayName("constructed with")
-	class ConstructorTest {
-
-		@Test
-		@DisplayName("null parameter throws NullPointerException")
-		void nullParameterThrows() {
-			assertThrows(NullPointerException.class, () -> new Permutation(null));
-		}
-
-		@Test
-		@DisplayName("empty list returns empty permutation")
-		void emptyListReturnsEmptyPermutation() {
-			final Permutation permutation = new Permutation(ImmutableList.emptyList());
-
-			assertEquals(Permutation.EMPTY, permutation);
-		}
-
-		@Test
-		@DisplayName("valid parameter does not throw")
-		void validParameterDoesNotThrow() {
-			final ImmutableList<Integer> validValueMapping = IntStream.range(0, MAX_PERMUTATION_TEST_SIZE)
-					.boxed()
-					.collect(toImmutableList());
-
-			assertDoesNotThrow(() -> new Permutation(validValueMapping));
-		}
-
-	}
-
-	@Nested
-	@DisplayName("calling get with")
-	class GetTest {
-
-		private int size;
-		private Permutation permutation;
-
-		@BeforeEach
-		void setUp() {
-			size = randomService.genRandomInteger(MAX_PERMUTATION_TEST_SIZE);
-			permutation = permutationService.genPermutation(size);
-		}
-
-		@Test
-		@DisplayName("negative value throws IllegalArgumentException")
-		void getThrowsForNegativeValue() {
-			final int value = -randomService.genRandomInteger(Integer.MAX_VALUE);
-
-			assertThrows(IllegalArgumentException.class, () -> permutation.get(value));
-		}
-
-		@Test
-		@DisplayName("value above size throws IllegalArgumentException")
-		void getThrowsForValueAboveSize() {
-			final int value = randomService.genRandomInteger(Integer.MAX_VALUE - size) + size;
-
-			assertThrows(IllegalArgumentException.class, () -> permutation.get(value));
-		}
-
-		@Test
-		@DisplayName("value equal to size throws IllegalArgumentException")
-		void getThrowsForValueOfSize() {
-			assertThrows(IllegalArgumentException.class, () -> permutation.get(size));
-		}
-
-		@Test
-		@DisplayName("valid value does not throw")
-		void getValidValueDoesNotThrow() {
-			final Permutation permutation = permutationService.genPermutation(size + 1);
-
-			assertDoesNotThrow(() -> permutation.get(size - 1));
-		}
-
-	}
-
 }

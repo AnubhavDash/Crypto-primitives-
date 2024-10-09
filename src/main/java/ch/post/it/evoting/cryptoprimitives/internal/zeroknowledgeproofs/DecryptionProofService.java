@@ -15,7 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.zeroknowledgeproofs;
 
-import static ch.post.it.evoting.cryptoprimitives.hashing.HashableList.toHashableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.math.Vectors.vectorAddition;
 import static ch.post.it.evoting.cryptoprimitives.internal.math.Vectors.vectorScalarMultiplication;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
@@ -25,10 +24,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import com.google.common.base.Preconditions;
+
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
@@ -90,7 +91,7 @@ public class DecryptionProofService {
 						x.stream().map(gamma::exponentiate))
 				.collect(toGroupVector());
 
-		return y;
+		return GroupVector.from(y);
 	}
 
 	/**
@@ -103,19 +104,21 @@ public class DecryptionProofService {
 	 *     <li>the ciphertext and the secret key must have the same group order</li>
 	 * </ul>
 	 *
-	 * @param ciphertext           c, an ElGamal ciphertext for which correct decryption is to be proved. Must be non-null.
-	 * @param keyPair              (pk, sk), the pair of public key and secret key used for encryption and decryption. Must be non-null.
-	 * @param message              m, the message that is obtained by decrypting c with the secret key {@code sk}. Must be non-null.
-	 * @param auxiliaryInformation i<sub>aux</sub>, auxiliary information to be used for the hash. Must be non-null. Can be empty.
+	 * @param ciphertext           c, an ElGamal ciphertext for which correct decryption is to be proved. Must be non null.
+	 * @param keyPair              (pk, sk), the pair of public key and secret key used for encryption and decryption. Must be non null.
+	 * @param message              m, the message that is obtained by decrypting c with the secret key {@code sk}. Must be non null.
+	 * @param auxiliaryInformation i<sub>aux</sub>, auxiliary information to be used for the hash. Must be non null. Can be empty.
 	 * @return a decryption proof.
 	 */
 	public DecryptionProof genDecryptionProof(final ElGamalMultiRecipientCiphertext ciphertext, final ElGamalMultiRecipientKeyPair keyPair,
-			final ElGamalMultiRecipientMessage message, final ImmutableList<String> auxiliaryInformation) {
+			final ElGamalMultiRecipientMessage message, final List<String> auxiliaryInformation) {
 		checkNotNull(ciphertext);
 		checkNotNull(keyPair);
 		checkNotNull(message);
 
-		final ImmutableList<String> i_aux = checkNotNull(auxiliaryInformation);
+		final List<String> i_aux = checkNotNull(auxiliaryInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 		final ElGamalMultiRecipientCiphertext C = ciphertext;
 		final ElGamalMultiRecipientPrivateKey sk = keyPair.getPrivateKey();
 		final ElGamalMultiRecipientPublicKey pk = keyPair.getPublicKey();
@@ -153,9 +156,9 @@ public class DecryptionProofService {
 			h_aux = HashableList.of(HashableString.from(DECRYPTION_PROOF),
 					phi,
 					m,
-					i_aux.stream()
+					HashableList.from(i_aux.stream()
 							.map(HashableString::from)
-							.collect(toHashableList()));
+							.toList()));
 		} else {
 			h_aux = HashableList.of(HashableString.from(DECRYPTION_PROOF), phi, m);
 		}
@@ -178,21 +181,23 @@ public class DecryptionProofService {
 	 *     <li>The ciphertext must be smaller than or equal to the public key.</li>
 	 * </ul>
 	 *
-	 * @param ciphertext           C, the ciphertext that was used to generate the proof. Must be non-null.
-	 * @param publicKey            pk, the public key that was used to generate the proof. Must be non-null.
-	 * @param message              m, the message that was used to generate the proof. Must be non-null.
-	 * @param decryptionProof      (e, z), the decryption proof to be verified. Must be non-null.
-	 * @param auxiliaryInformation i<sub>aux</sub>, auxiliary information that was used during proof generation. Must be non-null.
+	 * @param ciphertext           C, the ciphertext that was used to generate the proof. Must be non null.
+	 * @param publicKey            pk, the public key that was used to generate the proof. Must be non null.
+	 * @param message              m, the message that was used to generate the proof. Must be non null.
+	 * @param decryptionProof      (e, z), the decryption proof to be verified. Must be non null.
+	 * @param auxiliaryInformation i<sub>aux</sub>, auxiliary information that was used during proof generation. Must be non null.
 	 * @return {@code true} if the decryption proof is valid, {@code false} otherwise.
 	 */
 	public Verifiable verifyDecryption(final ElGamalMultiRecipientCiphertext ciphertext, final ElGamalMultiRecipientPublicKey publicKey,
-			final ElGamalMultiRecipientMessage message, final DecryptionProof decryptionProof, final ImmutableList<String> auxiliaryInformation) {
+			final ElGamalMultiRecipientMessage message, final DecryptionProof decryptionProof, final List<String> auxiliaryInformation) {
 		checkNotNull(ciphertext);
 		checkNotNull(publicKey);
 		checkNotNull(message);
 		checkNotNull(decryptionProof);
 
-		final ImmutableList<String> i_aux = checkNotNull(auxiliaryInformation);
+		final List<String> i_aux = checkNotNull(auxiliaryInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 		final ElGamalMultiRecipientCiphertext C = ciphertext;
 		final ElGamalMultiRecipientPublicKey pk = publicKey;
 		final ElGamalMultiRecipientMessage m = message;
@@ -238,9 +243,9 @@ public class DecryptionProofService {
 			h_aux = HashableList.of(HashableString.from(DECRYPTION_PROOF),
 					phi,
 					m,
-					i_aux.stream()
+					HashableList.from(i_aux.stream()
 							.map(HashableString::from)
-							.collect(toHashableList()));
+							.toList()));
 		} else {
 			h_aux = HashableList.of(HashableString.from(DECRYPTION_PROOF), phi, m);
 		}

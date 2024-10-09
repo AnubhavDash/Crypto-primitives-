@@ -33,7 +33,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.signing.CertificateInfo;
 import ch.post.it.evoting.cryptoprimitives.signing.AuthorityInformation;
@@ -106,7 +105,7 @@ class RSASSA_PSSTest {
 	class SignTest {
 
 		private PrivateKey privateKey;
-		private ImmutableByteArray message;
+		private byte[] message;
 
 		@BeforeEach
 		void setup() {
@@ -124,9 +123,9 @@ class RSASSA_PSSTest {
 		@Test
 		@DisplayName("with valid arguments signs message")
 		void signWithValidArgumentsDoesNotThrow() {
-			final ImmutableByteArray signature = assertDoesNotThrow(() -> rsassa_pss.sign(privateKey, message));
+			final byte[] signature = assertDoesNotThrow(() -> rsassa_pss.sign(privateKey, message));
 
-			assertEquals(384, signature.length());
+			assertEquals(384, signature.length);
 		}
 	}
 
@@ -135,8 +134,8 @@ class RSASSA_PSSTest {
 	class VerifyTest {
 
 		private PublicKey publicKey;
-		private ImmutableByteArray message;
-		private ImmutableByteArray signature;
+		private byte[] message;
+		private byte[] signature;
 
 		@BeforeEach
 		void setup() {
@@ -156,12 +155,12 @@ class RSASSA_PSSTest {
 		@Test
 		@DisplayName("with signature bytes of incorrect size throws an IllegalArgumentException")
 		void verifyWithSignatureBytesIncorrectSizeThrows() {
-			final ImmutableByteArray tooShortSignature = randomService.randomBytes(383);
+			final byte[] tooShortSignature = randomService.randomBytes(383);
 			final IllegalArgumentException exceptionTooShortSignature = assertThrows(IllegalArgumentException.class,
 					() -> rsassa_pss.verify(publicKey, message, tooShortSignature));
 			assertEquals("The signature must have the expected size. [found: 383, expected: 384]", exceptionTooShortSignature.getMessage());
 
-			final ImmutableByteArray tooLongSignature = randomService.randomBytes(385);
+			final byte[] tooLongSignature = randomService.randomBytes(385);
 			final IllegalArgumentException exceptionTooLongSignature = assertThrows(IllegalArgumentException.class,
 					() -> rsassa_pss.verify(publicKey, message, tooLongSignature));
 			assertEquals("The signature must have the expected size. [found: 385, expected: 384]", exceptionTooLongSignature.getMessage());
@@ -177,8 +176,8 @@ class RSASSA_PSSTest {
 		@DisplayName("with correct signature verifies")
 		void verifyWithCorrectSignatureReturnsTrue() {
 			final KeyPair keyPair = rsassa_pss.genKeyPair();
-			final ImmutableByteArray message = randomService.randomBytes(10);
-			final ImmutableByteArray signature = rsassa_pss.sign(keyPair.getPrivate(), message);
+			final byte[] message = randomService.randomBytes(10);
+			final byte[] signature = rsassa_pss.sign(keyPair.getPrivate(), message);
 
 			assertTrue(rsassa_pss.verify(keyPair.getPublic(), message, signature));
 		}

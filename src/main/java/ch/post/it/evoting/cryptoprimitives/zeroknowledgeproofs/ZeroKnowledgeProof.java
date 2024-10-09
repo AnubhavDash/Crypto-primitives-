@@ -15,7 +15,8 @@
  */
 package ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import java.util.List;
+
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
@@ -46,7 +47,8 @@ public interface ZeroKnowledgeProof {
 	 *                                  </ul>
 	 */
 	VerifiableDecryptions genVerifiableDecryptions(final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts,
-			final ElGamalMultiRecipientKeyPair keyPair, final ImmutableList<String> auxiliaryInformation);
+			final ElGamalMultiRecipientKeyPair keyPair,
+			final List<String> auxiliaryInformation);
 
 	/**
 	 * Verifies the validity of the given {@link DecryptionProof}s.
@@ -59,8 +61,8 @@ public interface ZeroKnowledgeProof {
 	 * @return the result of the verification.
 	 */
 	VerificationResult verifyDecryptions(final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts,
-			final ElGamalMultiRecipientPublicKey publicKey, final VerifiableDecryptions verifiableDecryptions,
-			final ImmutableList<String> auxiliaryInformation);
+			final ElGamalMultiRecipientPublicKey publicKey,
+			final VerifiableDecryptions verifiableDecryptions, final List<String> auxiliaryInformation);
 
 	/**
 	 * Generates a proof of validity for the provided exponentiations.
@@ -80,7 +82,7 @@ public interface ZeroKnowledgeProof {
 	 *                                  </ul>
 	 */
 	ExponentiationProof genExponentiationProof(final GroupVector<GqElement, GqGroup> bases, final ZqElement exponent,
-			final GroupVector<GqElement, GqGroup> exponentiations, final ImmutableList<String> auxiliaryInformation);
+			final GroupVector<GqElement, GqGroup> exponentiations, final List<String> auxiliaryInformation);
 
 	/**
 	 * Verifies the validity of a given {@link ExponentiationProof}.
@@ -103,7 +105,7 @@ public interface ZeroKnowledgeProof {
 	 *                                  </ul>
 	 */
 	boolean verifyExponentiation(final GroupVector<GqElement, GqGroup> bases, final GroupVector<GqElement, GqGroup> exponentiations,
-			final ExponentiationProof proof, final ImmutableList<String> auxiliaryInformation);
+			final ExponentiationProof proof, final List<String> auxiliaryInformation);
 
 	/**
 	 * Generates a proof of equality of the plaintext corresponding to the two provided encryptions.
@@ -126,7 +128,7 @@ public interface ZeroKnowledgeProof {
 	 */
 	PlaintextEqualityProof genPlaintextEqualityProof(final ElGamalMultiRecipientCiphertext firstCiphertext,
 			final ElGamalMultiRecipientCiphertext secondCiphertext, final GqElement firstPublicKey, final GqElement secondPublicKey,
-			final GroupVector<ZqElement, ZqGroup> randomness, final ImmutableList<String> auxiliaryInformation);
+			final GroupVector<ZqElement, ZqGroup> randomness, final List<String> auxiliaryInformation);
 
 	/**
 	 * Verifies the validity of a plaintext equality proof.
@@ -148,7 +150,7 @@ public interface ZeroKnowledgeProof {
 	 */
 	boolean verifyPlaintextEquality(final ElGamalMultiRecipientCiphertext firstCiphertext, final ElGamalMultiRecipientCiphertext secondCiphertext,
 			final GqElement firstPublicKey, final GqElement secondPublicKey, final PlaintextEqualityProof plaintextEqualityProof,
-			final ImmutableList<String> auxiliaryInformation);
+			final List<String> auxiliaryInformation);
 
 	/**
 	 * Generates a proof of knowledge of a discrete logarithm.
@@ -160,7 +162,7 @@ public interface ZeroKnowledgeProof {
 	 * @throws NullPointerException     if auxiliary information is null
 	 * @throws IllegalArgumentException if the auxiliary information contains null elements
 	 */
-	SchnorrProof genSchnorrProof(final ZqElement witness, final GqElement statement, final ImmutableList<String> auxiliaryInformation);
+	SchnorrProof genSchnorrProof(final ZqElement witness, final GqElement statement, final List<String> auxiliaryInformation);
 
 	/**
 	 * Verifies the validity of a Schnorr proof.
@@ -171,6 +173,6 @@ public interface ZeroKnowledgeProof {
 	 * @return {@code true} if the schnorr proof is valid, {@code false} otherwise.
 	 * @throws NullPointerException if any of the bases, exponentiations, or plaintextEqualityProof is null
 	 */
-	boolean verifySchnorrProof(final SchnorrProof proof, final GqElement statement, final ImmutableList<String> auxiliaryInformation);
+	boolean verifySchnorrProof(final SchnorrProof proof, final GqElement statement, final List<String> auxiliaryInformation);
 
 }

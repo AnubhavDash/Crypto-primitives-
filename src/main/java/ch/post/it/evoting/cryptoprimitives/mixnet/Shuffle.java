@@ -32,7 +32,7 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
  */
 public record Shuffle(GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts,
 					  Permutation permutation, GroupVector<ZqElement, ZqGroup> reEncryptionExponents) {
-	public static final Shuffle EMPTY = new Shuffle(GroupVector.empty(), Permutation.EMPTY, GroupVector.empty());
+	public static final Shuffle EMPTY = new Shuffle(GroupVector.of(), Permutation.EMPTY, GroupVector.of());
 
 	public Shuffle {
 		checkNotNull(ciphertexts);

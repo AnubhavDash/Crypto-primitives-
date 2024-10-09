@@ -51,25 +51,25 @@ class GqGroupTest {
 
 	@Test
 	void testCreateGroupWithNonPrimePFails() {
-		final BigInteger nonPrime = BigInteger.valueOf(22);
+		BigInteger nonPrime = BigInteger.valueOf(22);
 		assertThrows(IllegalArgumentException.class, () -> new GqGroup(nonPrime, q, g));
 	}
 
 	@Test
 	void testCreateGroupWithNonPrimeQFails() {
-		final BigInteger nonPrime = BigInteger.TEN;
+		BigInteger nonPrime = BigInteger.TEN;
 		assertThrows(IllegalArgumentException.class, () -> new GqGroup(p, nonPrime, g));
 	}
 
 	@Test
 	void testCreateGroupWithNonSafeQFails() {
-		final BigInteger nonSafePrimeQ = BigInteger.valueOf(7);
+		BigInteger nonSafePrimeQ = BigInteger.valueOf(7);
 		assertThrows(IllegalArgumentException.class, () -> new GqGroup(p, nonSafePrimeQ, g));
 	}
 
 	@Test
 	void testCreateGroupWithNonMemberGeneratorFails() {
-		final BigInteger nonMember = smallGroupGenerator.genNonMemberValue();
+		BigInteger nonMember = smallGroupGenerator.genNonMemberValue();
 		assertThrows(IllegalArgumentException.class, () -> new GqGroup(p, q, nonMember));
 	}
 
@@ -77,13 +77,13 @@ class GqGroupTest {
 
 	@Test
 	void testGroupMemberReturnsTrueForGroupMember() {
-		final BigInteger member = smallGroupGenerator.genMemberValue();
+		BigInteger member = smallGroupGenerator.genMemberValue();
 		assertTrue(smallGroup.isGroupMember(member));
 	}
 
 	@Test
 	void testGroupMemberReturnsFalseForNonGroupMember() {
-		final BigInteger nonMember = smallGroupGenerator.genNonMemberValue();
+		BigInteger nonMember = smallGroupGenerator.genNonMemberValue();
 		assertFalse(smallGroup.isGroupMember(nonMember));
 	}
 
@@ -104,16 +104,16 @@ class GqGroupTest {
 
 	@Test
 	void testGetIdentityElementOnce() {
-		final GqElement identity = GqElementFactory.fromValue(BigInteger.ONE, smallGroup);
+		GqElement identity = GqElementFactory.fromValue(BigInteger.ONE, smallGroup);
 		assertEquals(identity, smallGroup.getIdentity(), "The element returned is not the expected identity element");
 	}
 
 	@Test
 	void testGetIdentityElementTwice() {
-		final String errorMessage = "The %s element returned is not the expected identity element";
-		final GqElement identityElement = GqElementFactory.fromValue(BigInteger.ONE, smallGroup);
-		final GqElement firstIdentity = smallGroup.getIdentity();
-		final GqElement secondIdentity = smallGroup.getIdentity();
+		String errorMessage = "The %s element returned is not the expected identity element";
+		GqElement identityElement = GqElementFactory.fromValue(BigInteger.ONE, smallGroup);
+		GqElement firstIdentity = smallGroup.getIdentity();
+		GqElement secondIdentity = smallGroup.getIdentity();
 
 		assertEquals(identityElement, firstIdentity, String.format(errorMessage, "first"));
 		assertEquals(identityElement, secondIdentity, String.format(errorMessage, "second"));
@@ -131,14 +131,14 @@ class GqGroupTest {
 
 	@Test
 	void testEqualsDifferentObjectType() {
-		final String notAGroup = "I am not a group";
-		final String errorMessage = "Expected that objects would not be equals";
+		String notAGroup = "I am not a group";
+		String errorMessage = "Expected that objects would not be equals";
 		assertNotEquals(new GqGroup(p, q, g), notAGroup, errorMessage);
 	}
 
 	@Test
 	void testEqualsTrue() {
-		final String errorMessage = "Expected that objects would be equals";
+		String errorMessage = "Expected that objects would be equals";
 		assertEquals(new GqGroup(p, q, g), smallGroup, errorMessage);
 	}
 }

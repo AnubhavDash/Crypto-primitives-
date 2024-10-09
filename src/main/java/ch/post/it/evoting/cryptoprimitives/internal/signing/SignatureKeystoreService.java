@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hash;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.signing.SignatureFactory;
@@ -93,7 +92,7 @@ public class SignatureKeystoreService<T extends Supplier<String>> implements Sig
 	 * See {@link SignatureKeystore#generateSignature}
 	 */
 	@Override
-	public ImmutableByteArray generateSignature(final Hashable message, final Hashable additionalContextData) throws SignatureException {
+	public byte[] generateSignature(final Hashable message, final Hashable additionalContextData) throws SignatureException {
 		return signatureGenerationService.genSignature(message, additionalContextData);
 	}
 
@@ -101,8 +100,7 @@ public class SignatureKeystoreService<T extends Supplier<String>> implements Sig
 	 * See {@link SignatureKeystore#verifySignature}
 	 */
 	@Override
-	public boolean verifySignature(final T signerAlias, final Hashable message, final Hashable additionalContextData,
-			final ImmutableByteArray signature)
+	public boolean verifySignature(final T signerAlias, final Hashable message, final Hashable additionalContextData, final byte[] signature)
 			throws SignatureException {
 		return signatureVerificationService.verifySignature(signerAlias.get(), message, additionalContextData, signature);
 	}
