@@ -1,5 +1,12 @@
 # Changelog
 
+## Release 1.4.4
+
+The following improvements are included in release 1.4.4:
+
+* [Code] Removed an unused import in SymmetricAuthenticatedEncryptionService.
+* [Code] Updated dependencies and third-party libraries.
+
 ## Release 1.4.3
 
 Release 1.4.3 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
