@@ -19,13 +19,14 @@
 
 	<groupId>ch.post.it.evoting.cryptoprimitives</groupId>
 	<artifactId>crypto-primitives</artifactId>
-	<version>1.4.4.0-RC1</version>
+	<version>1.5.0.0-b17</version>
 	<packaging>jar</packaging>
 
 	<name>Crypto Primitives</name>
 
 	<properties>
 		<!-- Dependencies versions -->
+		<archunit.version>1.3.0</archunit.version>
 		<guava.version>33.3.1-jre</guava.version>
 		<bouncycastle.version>1.78.1</bouncycastle.version>
 		<jackson.version>2.18.0</jackson.version>
@@ -58,7 +59,7 @@
 		<maven-enforcer-plugin.requiredJavaVersion>[21.0.4]</maven-enforcer-plugin.requiredJavaVersion>
 		<maven-enforcer-plugin.requiredMavenVersion>[3.9.9]</maven-enforcer-plugin.requiredMavenVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.outputTimestamp>2024-10-14T14:33:17+02:00</project.build.outputTimestamp>
+		<project.build.outputTimestamp>2024-10-15T15:52:52+02:00</project.build.outputTimestamp>
 
 		<!--  Sonar  -->
 		<sonar.scm.disabled>true</sonar.scm.disabled>
@@ -100,12 +101,7 @@
 			<!-- Test dependencies -->
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>
-				<artifactId>junit-jupiter-api</artifactId>
-				<version>${junit-jupiter.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.junit.jupiter</groupId>
-				<artifactId>junit-jupiter-params</artifactId>
+				<artifactId>junit-jupiter</artifactId>
 				<version>${junit-jupiter.version}</version>
 			</dependency>
 			<dependency>
@@ -117,6 +113,11 @@
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-junit-jupiter</artifactId>
 				<version>${mockito.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.tngtech.archunit</groupId>
+				<artifactId>archunit-junit5</artifactId>
+				<version>${archunit.version}</version>
 			</dependency>
 
 			<!-- com.fasterxml.jackson -->
@@ -168,12 +169,7 @@
 		<!-- Test dependencies -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-params</artifactId>
+			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -184,6 +180,11 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.tngtech.archunit</groupId>
+			<artifactId>archunit-junit5</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

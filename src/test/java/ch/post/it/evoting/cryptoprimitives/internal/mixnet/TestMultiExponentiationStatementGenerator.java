@@ -28,15 +28,15 @@ public class TestMultiExponentiationStatementGenerator {
 	private final GqGroupGenerator gqGroupGenerator;
 	private final ElGamalGenerator elGamalGenerator;
 
-	TestMultiExponentiationStatementGenerator(GqGroup gqGroup) {
+	TestMultiExponentiationStatementGenerator(final GqGroup gqGroup) {
 		this.gqGroupGenerator = new GqGroupGenerator(gqGroup);
 		this.elGamalGenerator = new ElGamalGenerator(gqGroup);
 	}
 
-	MultiExponentiationStatement genRandomStatement(int n, int m, int l) {
-		GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> CMatrix = elGamalGenerator.genRandomCiphertextMatrix(m, n, l);
-		ElGamalMultiRecipientCiphertext C = elGamalGenerator.genRandomCiphertext(l);
-		GroupVector<GqElement, GqGroup> cA = gqGroupGenerator.genRandomGqElementVector(m);
+	MultiExponentiationStatement genRandomStatement(final int n, final int m, final int l) {
+		final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> CMatrix = elGamalGenerator.genRandomCiphertextMatrix(m, n, l);
+		final ElGamalMultiRecipientCiphertext C = elGamalGenerator.genRandomCiphertext(l);
+		final GroupVector<GqElement, GqGroup> cA = gqGroupGenerator.genRandomGqElementVector(m);
 		return new MultiExponentiationStatement(CMatrix, C, cA);
 	}
 }

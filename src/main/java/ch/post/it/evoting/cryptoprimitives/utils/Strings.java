@@ -24,15 +24,11 @@ public interface Strings {
 	 *     otherwise the string is kept in its whole length.
 	 * </p>
 	 *
-	 * @param string S, the string to be truncated. Must be non-null and non-empty.
-	 * @param length l, the desired maximum length for the truncated string. Must be strictly positive.
+	 * @param string S, the string to be truncated. Must be non-null.
+	 * @param length l, the desired maximum length for the truncated string. Must be positive.
 	 * @return S<sup>'</sup>, the truncated string.
 	 * @throws NullPointerException     if the input string is null.
-	 * @throws IllegalArgumentException if
-	 *                                  <ul>
-	 *                                      <li>the input string is empty.</li>
-	 *                                      <li>the input length is not strictly positive.</li>
-	 *                                  </ul>
+	 * @throws IllegalArgumentException if the input length is not positive.
 	 */
 	static String truncate(final String string, final int length) {
 		return ch.post.it.evoting.cryptoprimitives.internal.utils.Strings.truncate(string, length);

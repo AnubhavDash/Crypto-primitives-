@@ -18,8 +18,7 @@ package ch.post.it.evoting.cryptoprimitives.mixnet;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
-
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
@@ -59,7 +58,7 @@ public record VerifiableShuffle(
 	}
 
 	@Override
-	public List<Hashable> toHashableForm() {
-		return List.of(shuffledCiphertexts, shuffleArgument);
+	public ImmutableList<Hashable> toHashableForm() {
+		return ImmutableList.of(shuffledCiphertexts, shuffleArgument);
 	}
 }

@@ -24,6 +24,7 @@ import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hash;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
@@ -52,16 +53,17 @@ public class SignatureVerificationService implements SignatureVerification {
 	 * @param message               The message that was signed. Must be non-null.
 	 * @param additionalContextData Additional context data. Must be non-null. May be empty.
 	 * @param signature             The signature of the message. Must be non-null.
-	 * @return
-	 * @throws SignatureException
+	 * @return true if the signature is valid, false otherwise.
+	 * @throws SignatureException if the timestamp is outside the signing certificate's validity.
 	 */
 	@Override
-	public boolean verifySignature(final String authorityId, final Hashable message, final Hashable additionalContextData, final byte[] signature)
+	public boolean verifySignature(final String authorityId, final Hashable message, final Hashable additionalContextData,
+			final ImmutableByteArray signature)
 			throws SignatureException {
 		final String id = checkNotNull(authorityId);
 		final Hashable m = checkNotNull(message);
 		final Hashable c = checkNotNull(additionalContextData);
-		final byte[] s = checkNotNull(signature);
+		final ImmutableByteArray s = checkNotNull(signature);
 
 		final X509Certificate cert = findCertificate(id);
 		final Instant t = getTimeStamp();
@@ -75,7 +77,7 @@ public class SignatureVerificationService implements SignatureVerification {
 		}
 
 		final PublicKey pubKey = cert.getPublicKey();
-		final byte[] h = hash.recursiveHash(HashableList.of(m, c));
+		final ImmutableByteArray h = hash.recursiveHash(HashableList.of(m, c));
 
 		return signatureSupportingAlgorithm.verify(pubKey, h, s);
 	}

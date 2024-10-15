@@ -64,7 +64,7 @@ public class ZqGroupGenerator {
 	 * @return a vector of {@code numElements} random {@link ZqElement}.
 	 */
 	public GroupVector<ZqElement, ZqGroup> genRandomZqElementVector(final int numElements) {
-		return GroupVector.from(generateElementList(numElements, this::genRandomZqElementMember));
+		return generateElementList(numElements, this::genRandomZqElementMember);
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class ZqGroupGenerator {
 	 * @return a vector of {@code numElements} defined {@link ZqElement}.
 	 */
 	public GroupVector<ZqElement, ZqGroup> initializeElementVectorWithElement(final int numElements, final ZqElement element) {
-		return GroupVector.from(generateElementList(numElements, () -> element));
+		return generateElementList(numElements, () -> element);
 	}
 
 	/**

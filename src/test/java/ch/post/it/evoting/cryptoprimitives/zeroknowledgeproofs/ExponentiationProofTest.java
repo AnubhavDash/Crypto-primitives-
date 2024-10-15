@@ -50,7 +50,7 @@ class ExponentiationProofTest extends TestGroupSetup {
 	}
 
 	@Test
-	void validArtguments() {
+	void validArguments() {
 		assertDoesNotThrow(() -> new ExponentiationProof(e, z));
 	}
 }

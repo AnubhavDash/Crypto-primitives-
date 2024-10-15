@@ -15,12 +15,11 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.hashing;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.HexFormat;
-import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -33,6 +32,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Hash;
 import ch.post.it.evoting.cryptoprimitives.hashing.Argon2Profile;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
@@ -63,19 +64,20 @@ class Argon2ServiceTest {
 		void genArgon2idWithEmptyInput() {
 			// Given
 			when(randomService.randomBytes(16))
-					.thenReturn(HexFormat.of().parseHex("7332424c365a744a44376e784b7a576e"));
+					.thenReturn(new ImmutableByteArray(HexFormat.of().parseHex("7332424c365a744a44376e784b7a576e")));
 			final Argon2Profile config = Argon2Profile.TEST;
 
 			// When
 			final Argon2Service service = new Argon2Service(randomService, config);
-			final Argon2Hash argon2Hash = service.genArgon2id(new byte[] {});
+			final Argon2Hash argon2Hash = service.genArgon2id(ImmutableByteArray.EMPTY);
 
 			// Then
-			assertArrayEquals(HexFormat.of().parseHex("f11fb1bd1d0240f57064cb14e8281509447719c6090e7d37f37f4831af81b6e8"), argon2Hash.getTag());
+			assertEquals(new ImmutableByteArray(HexFormat.of().parseHex("f11fb1bd1d0240f57064cb14e8281509447719c6090e7d37f37f4831af81b6e8")),
+					argon2Hash.tag());
 		}
 
 		private Stream<Arguments> genArgon2idJsonFileArgumentProvider() {
-			final List<TestParameters> parametersList = TestParameters.fromResource("/hash/gen-argon2id.json");
+			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/hash/gen-argon2id.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// Context.
@@ -83,8 +85,6 @@ class Argon2ServiceTest {
 				final Integer m = context.get("m", Integer.class);
 				final Integer p = context.get("p", Integer.class);
 				final Integer i = context.get("i", Integer.class);
-
-
 
 				// Input.
 				final JsonData input = testParameters.getInput();
@@ -119,8 +119,8 @@ class Argon2ServiceTest {
 			final Argon2Hash argon2Hash = service.genArgon2id(base64.base64Decode(k));
 
 			// Then
-			assertArrayEquals(base64.base64Decode(t), argon2Hash.getTag(), String.format("tag assertion failed for: %s", description));
-			assertArrayEquals(base64.base64Decode(s), argon2Hash.getSalt(), String.format("salt assertion failed for: %s", description));
+			assertEquals(base64.base64Decode(t), argon2Hash.tag(), String.format("tag assertion failed for: %s", description));
+			assertEquals(base64.base64Decode(s), argon2Hash.salt(), String.format("salt assertion failed for: %s", description));
 		}
 
 	}
@@ -138,14 +138,16 @@ class Argon2ServiceTest {
 
 			// When
 			final Argon2Service service = new Argon2Service(randomService, config);
-			final byte[] t = service.getArgon2id(new byte[] {}, HexFormat.of().parseHex("7332424c365a744a44376e784b7a576e"));
+			final ImmutableByteArray t = service.getArgon2id(
+					ImmutableByteArray.EMPTY,
+					new ImmutableByteArray(HexFormat.of().parseHex("7332424c365a744a44376e784b7a576e")));
 
 			// Then
-			assertArrayEquals(HexFormat.of().parseHex("f11fb1bd1d0240f57064cb14e8281509447719c6090e7d37f37f4831af81b6e8"), t);
+			assertEquals(new ImmutableByteArray(HexFormat.of().parseHex("f11fb1bd1d0240f57064cb14e8281509447719c6090e7d37f37f4831af81b6e8")), t);
 		}
 
 		private Stream<Arguments> getArgon2idJsonFileArgumentProvider() {
-			final List<TestParameters> parametersList = TestParameters.fromResource("/hash/get-argon2id.json");
+			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/hash/get-argon2id.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// Context.
@@ -179,10 +181,10 @@ class Argon2ServiceTest {
 
 			// When
 			final Argon2Service service = new Argon2Service(randomService, config);
-			final byte[] actual_t = service.getArgon2id(base64.base64Decode(k), base64.base64Decode(s));
+			final ImmutableByteArray actual_t = service.getArgon2id(base64.base64Decode(k), base64.base64Decode(s));
 
 			// Then
-			assertArrayEquals(base64.base64Decode(t), actual_t, String.format("tag assertion failed for: %s", description));
+			assertEquals(base64.base64Decode(t), actual_t, String.format("tag assertion failed for: %s", description));
 		}
 
 	}

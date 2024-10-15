@@ -15,6 +15,8 @@
  */
 package ch.post.it.evoting.cryptoprimitives.hashing;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+
 public interface Argon2 {
 
 	/**
@@ -24,7 +26,7 @@ public interface Argon2 {
 	 * @return The tag and the salt represented as a {@link Argon2Hash} (t,s) ∈ &#8492;<sup>32</sup> × &#8492;<sup>16</sup>.
 	 * @throws NullPointerException if the input keying material is null.
 	 */
-	Argon2Hash genArgon2id(byte[] inputKeyingMaterial);
+	Argon2Hash genArgon2id(ImmutableByteArray inputKeyingMaterial);
 
 	/**
 	 * Computes the Argon2id tag from the input keying material and the given salt.
@@ -34,5 +36,5 @@ public interface Argon2 {
 	 * @return The tag t ∈ &#8492;<sup>32</sup>.
 	 * @throws NullPointerException if any input is null.
 	 */
-	byte[] getArgon2id(byte[] inputKeyingMaterial, byte[] salt);
+	ImmutableByteArray getArgon2id(ImmutableByteArray inputKeyingMaterial, ImmutableByteArray salt);
 }

@@ -20,17 +20,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.util.HexFormat;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 import com.verificatum.vmgj.FpowmTab;
 import com.verificatum.vmgj.VMG;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
@@ -73,11 +73,11 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 
 	private static String deriveCacheKey(final BigInteger base, final BigInteger modulus) {
 		checkArgument(modulus.signum() >= 0);
-		final byte[] bytes = hashService.recursiveHash(
+		final ImmutableByteArray bytes = hashService.recursiveHash(
 				HashableString.from(Boolean.toString(base.signum() >= 0)),
 				HashableBigInteger.from(base.abs()),
 				HashableBigInteger.from(modulus));
-		return HexFormat.of().formatHex(bytes);
+		return HexFormat.of().formatHex(bytes.elements());
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 		checkNotNull(base);
 		checkNotNull(exponent);
 		checkNotNull(modulus);
-		checkArgument(exponent.compareTo(BigInteger.ZERO) >= 0 || base.gcd(modulus).equals(BigInteger.ONE),
+		checkArgument(exponent.signum() >= 0 || base.gcd(modulus).equals(BigInteger.ONE),
 				"When the exponent is negative, base and modulus must be relatively prime");
 		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
 		checkArgument(modulus.testBit(0), "The modulus must be odd");
@@ -112,10 +112,8 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 	}
 
 	@Override
-	public BigInteger multiModExp(final List<BigInteger> bases, final List<BigInteger> exponents, final BigInteger modulus) {
-		final BigInteger[] basesArray = checkNotNull(bases).stream()
-				.map(Preconditions::checkNotNull)
-				.toArray(BigInteger[]::new);
+	public BigInteger multiModExp(final ImmutableList<BigInteger> bases, final ImmutableList<BigInteger> exponents, final BigInteger modulus) {
+		final BigInteger[] basesArray = checkNotNull(bases).stream().toArray(BigInteger[]::new);
 		checkArgument(basesArray.length != 0, "Bases must be non empty.");
 
 		final int exponentsSize = exponents.size();
