@@ -120,11 +120,7 @@ public record JsonData(JsonNode jsonNode) {
 	}
 
 	private static BigInteger stringToBigInteger(final String s) {
-		if (!s.startsWith("0x")) {
-			throw new IllegalArgumentException("Invalid integer format. Must match hexadecimal format starting with: \"0x\".");
-		}
-
-		return new BigInteger(s.substring(2), 16);
+		return new BigInteger(BASE_64.base64Decode(s).elements());
 	}
 
 	private String[] getStringArray(final String field) {
