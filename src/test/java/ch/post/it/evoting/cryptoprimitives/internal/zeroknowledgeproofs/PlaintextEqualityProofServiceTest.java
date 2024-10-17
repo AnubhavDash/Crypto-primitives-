@@ -26,6 +26,8 @@ import static org.mockito.Mockito.mockStatic;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -39,7 +41,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamal;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
@@ -172,7 +173,7 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 		private GqElement firstPublicKey;
 		private GqElement secondPublicKey;
 		private GroupVector<ZqElement, ZqGroup> randomness;
-		private ImmutableList<String> auxiliaryInformation;
+		private List<String> auxiliaryInformation;
 
 		@BeforeEach
 		void setUp() {
@@ -186,7 +187,7 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 			secondCiphertext = elGamal.getCiphertext(plaintext, randomness.get(1),
 					new ElGamalMultiRecipientPublicKey(GroupVector.of(secondPublicKey)));
 
-			auxiliaryInformation = ImmutableList.of(
+			auxiliaryInformation = Arrays.asList(
 					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
 					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
 		}
@@ -214,6 +215,15 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 					.genPlaintextEqualityProof(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey, null, auxiliaryInformation));
 			assertThrows(NullPointerException.class, () -> plaintextEqualityProofService
 					.genPlaintextEqualityProof(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey, randomness, null));
+		}
+
+		@Test
+		@DisplayName("auxiliary information containing null throws NullPointerException")
+		void auxiliaryInformationWithNull() {
+			auxiliaryInformation.set(0, null);
+			assertThrows(NullPointerException.class,
+					() -> plaintextEqualityProofService.genPlaintextEqualityProof(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey,
+							randomness, auxiliaryInformation));
 		}
 
 		@Test
@@ -258,7 +268,7 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 			firstPublicKey = gqGroupGenerator.genMember();
 			secondPublicKey = gqGroupGenerator.genMember();
 			randomness = zqGroupGenerator.genRandomZqElementVector(2);
-			auxiliaryInformation = ImmutableList.of(
+			auxiliaryInformation = Arrays.asList(
 					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
 					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
 
@@ -312,7 +322,7 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 		private GqElement secondPublicKey;
 		private GroupVector<ZqElement, ZqGroup> randomness;
 		private PlaintextEqualityProof plaintextEqualityProof;
-		private ImmutableList<String> auxiliaryInformation;
+		private List<String> auxiliaryInformation;
 
 		@BeforeEach
 		void setUp() {
@@ -326,7 +336,7 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 			secondCiphertext = elGamal.getCiphertext(plaintext, randomness.get(1),
 					new ElGamalMultiRecipientPublicKey(GroupVector.of(secondPublicKey)));
 
-			auxiliaryInformation = ImmutableList.of(
+			auxiliaryInformation = Arrays.asList(
 					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
 					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
 
@@ -345,10 +355,10 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 		@DisplayName("empty auxiliary information returns true")
 		void emptyAux() {
 			final PlaintextEqualityProof plaintextEqualityProof = plaintextEqualityProofService.genPlaintextEqualityProof(firstCiphertext,
-					secondCiphertext, firstPublicKey, secondPublicKey, randomness, ImmutableList.emptyList());
+					secondCiphertext, firstPublicKey, secondPublicKey, randomness, Collections.emptyList());
 
 			assertTrue(plaintextEqualityProofService.verifyPlaintextEquality(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey,
-					plaintextEqualityProof, ImmutableList.emptyList()));
+					plaintextEqualityProof, Collections.emptyList()));
 		}
 
 		@Test
@@ -366,6 +376,15 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 					.verifyPlaintextEquality(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey, null, auxiliaryInformation));
 			assertThrows(NullPointerException.class, () -> plaintextEqualityProofService
 					.verifyPlaintextEquality(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey, plaintextEqualityProof, null));
+		}
+
+		@Test
+		@DisplayName("auxiliary information containing null throws NullPointerException")
+		void auxiliaryInformationWithNull() {
+			auxiliaryInformation.set(0, null);
+			assertThrows(NullPointerException.class,
+					() -> plaintextEqualityProofService.verifyPlaintextEquality(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey,
+							plaintextEqualityProof, auxiliaryInformation));
 		}
 
 		@Test
@@ -394,7 +413,7 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 			firstPublicKey = gqGroupGenerator.genMember();
 			secondPublicKey = gqGroupGenerator.genMember();
 			randomness = zqGroupGenerator.genRandomZqElementVector(2);
-			auxiliaryInformation = ImmutableList.of(
+			auxiliaryInformation = Arrays.asList(
 					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
 					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
 			plaintextEqualityProof = plaintextEqualityProofService.genPlaintextEqualityProof(firstCiphertext, secondCiphertext, firstPublicKey,
@@ -441,7 +460,7 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 		}
 
 		private Stream<Arguments> jsonFileArgumentProvider() {
-			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/zeroknowledgeproofs/verify-plaintext-equality.json");
+			final List<TestParameters> parametersList = TestParameters.fromResource("/zeroknowledgeproofs/verify-plaintext-equality.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// Context.
@@ -459,17 +478,16 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 
 					// Parse firstCiphertext (upper_c) parameters
 					final GqElement firstGamma = GqElementFactory.fromValue(input.getJsonData("upper_c").get("gamma", BigInteger.class), gqGroup);
-					final GroupVector<GqElement, GqGroup> firstPhi = Arrays.stream(input.getJsonData("upper_c").get("phis", BigInteger[].class))
-							.map(upperCA -> GqElementFactory.fromValue(upperCA, gqGroup)).collect(toGroupVector());
+					final List<GqElement> firstPhi = Arrays.stream(input.getJsonData("upper_c").get("phis", BigInteger[].class))
+							.map(upperCA -> GqElementFactory.fromValue(upperCA, gqGroup)).toList();
 
 					final ElGamalMultiRecipientCiphertext firstCiphertext = ElGamalMultiRecipientCiphertext.create(firstGamma, firstPhi);
 
 					// Parse secondCiphertext (upper_c_prime) parameters
 					final GqElement secondGamma = GqElementFactory.fromValue(input.getJsonData("upper_c_prime").get("gamma", BigInteger.class),
 							gqGroup);
-					final GroupVector<GqElement, GqGroup> secondPhi = Arrays.stream(
-									input.getJsonData("upper_c_prime").get("phis", BigInteger[].class))
-							.map(upperCA -> GqElementFactory.fromValue(upperCA, gqGroup)).collect(toGroupVector());
+					final List<GqElement> secondPhi = Arrays.stream(input.getJsonData("upper_c_prime").get("phis", BigInteger[].class))
+							.map(upperCA -> GqElementFactory.fromValue(upperCA, gqGroup)).toList();
 
 					final ElGamalMultiRecipientCiphertext secondCiphertext = ElGamalMultiRecipientCiphertext.create(secondGamma, secondPhi);
 
@@ -494,7 +512,7 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 
 					// Parse auxiliaryInformation parameters (i_aux)
 					final String[] auxInformation = input.get("i_aux", String[].class);
-					final ImmutableList<String> auxiliaryInformation = ImmutableList.of(auxInformation);
+					final List<String> auxiliaryInformation = Arrays.asList(auxInformation);
 
 					// Parse output parameters
 					final JsonData output = testParameters.getOutput();
@@ -514,7 +532,7 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 		void verifyPlaintextEqualityProofWithRealValues(final ElGamalMultiRecipientCiphertext firstCiphertext,
 				final ElGamalMultiRecipientCiphertext secondCiphertext,
 				final GqElement firstPublicKey, final GqElement secondPublicKey, final PlaintextEqualityProof plaintextEqualityProof,
-				final ImmutableList<String> auxiliaryInformation, final boolean expected, final String description) {
+				final List<String> auxiliaryInformation, final boolean expected, final String description) {
 
 			final PlaintextEqualityProofService plaintextEqualityProofService = new PlaintextEqualityProofService(randomService,
 					HashService.getInstance());

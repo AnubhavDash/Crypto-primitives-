@@ -56,7 +56,6 @@ import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.signing.CertificateInfo;
 
@@ -90,10 +89,10 @@ public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 	@Override
 	public KeyPair genKeyPair() {
 		try {
-			final KeyPairGenerator generator = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
+			KeyPairGenerator generator = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
 			generator.initialize(KEY_LENGTH);
 			return generator.genKeyPair();
-		} catch (final NoSuchAlgorithmException e) {
+		} catch (NoSuchAlgorithmException e) {
 			throw new IllegalStateException(
 					String.format("Requested cryptographic algorithm is not available in the environment. [Requested: %s]", KEY_GENERATION_ALGORITHM),
 					e);
@@ -101,7 +100,7 @@ public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 	}
 
 	@Override
-	public X509Certificate getCertificate(final KeyPair keyPair, final CertificateInfo info) {
+	public X509Certificate getCertificate(KeyPair keyPair, CertificateInfo info) {
 		try {
 			final X509v3CertificateBuilder certificateBuilder = createCertificateBuilder(keyPair.getPublic(), info);
 
@@ -112,7 +111,7 @@ public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 
 			return converter.getCertificate(holder);
 
-		} catch (final OperatorCreationException | CertificateException e) {
+		} catch (OperatorCreationException | CertificateException e) {
 			throw new IllegalStateException("There is a problem generating the certificate.", e);
 		}
 	}
@@ -122,7 +121,7 @@ public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 	}
 
 	private X509v3CertificateBuilder createCertificateBuilder(final PublicKey publicKey, final CertificateInfo info) {
-		final BigInteger serial = new BigInteger(1, RANDOM_SERVICE.randomBytes(SERIAL_LENGTH).elements());
+		final BigInteger serial = new BigInteger(RANDOM_SERVICE.randomBytes(SERIAL_LENGTH));
 
 		final X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
 				.addRDN(BCStyle.CN, info.getAuthorityInformation().getCommonName())
@@ -145,7 +144,7 @@ public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 		try {
 			builder.addExtension(Extension.keyUsage, true, info.getUsage());
 			builder.addExtension(Extension.basicConstraints, true, basicConstraints);
-		} catch (final CertIOException e) {
+		} catch (CertIOException e) {
 			throw new IllegalStateException("Badly configured extension.", e);
 		}
 
@@ -153,7 +152,7 @@ public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 	}
 
 	@Override
-	public ImmutableByteArray sign(final PrivateKey privateKey, final ImmutableByteArray message) {
+	public byte[] sign(final PrivateKey privateKey, final byte[] message) {
 		checkNotNull(privateKey);
 		checkNotNull(message);
 
@@ -166,21 +165,21 @@ public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 		}
 		final OutputStream outputStream = contentSigner.getOutputStream();
 		try {
-			outputStream.write(message.elements());
+			outputStream.write(message);
 			outputStream.close();
 		} catch (final IOException e) {
 			throw new UncheckedIOException("Could not write message to output stream.", e);
 		}
-		return new ImmutableByteArray(contentSigner.getSignature());
+		return contentSigner.getSignature();
 	}
 
 	@Override
-	public boolean verify(final PublicKey publicKey, final ImmutableByteArray hash, final ImmutableByteArray signatureBytes) {
+	public boolean verify(final PublicKey publicKey, final byte[] hash, final byte[] signatureBytes) {
 		checkNotNull(publicKey);
 		checkNotNull(hash);
 		checkNotNull(signatureBytes);
-		checkArgument(signatureBytes.length() == SIGNATURE_LENGTH, "The signature must have the expected size. [found: %s, expected: %s]",
-				signatureBytes.length(), SIGNATURE_LENGTH);
+		checkArgument(signatureBytes.length == SIGNATURE_LENGTH, "The signature must have the expected size. [found: %s, expected: %s]",
+				signatureBytes.length, SIGNATURE_LENGTH);
 
 		final JcaContentVerifierProviderBuilder jcaContentVerifierProviderBuilder = new JcaContentVerifierProviderBuilder();
 		final ContentVerifierProvider contentVerifierProvider;
@@ -201,11 +200,11 @@ public class RSASSA_PSS implements SignatureSupportingAlgorithm {
 		}
 		final OutputStream outputStream = contentVerifier.getOutputStream();
 		try {
-			outputStream.write(hash.elements());
+			outputStream.write(hash);
 			outputStream.close();
 		} catch (final IOException e) {
 			throw new UncheckedIOException("Could not write hash to output stream.", e);
 		}
-		return contentVerifier.verify(signatureBytes.elements());
+		return contentVerifier.verify(signatureBytes);
 	}
 }

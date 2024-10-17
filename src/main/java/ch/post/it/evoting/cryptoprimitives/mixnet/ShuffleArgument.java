@@ -19,9 +19,10 @@ import static ch.post.it.evoting.cryptoprimitives.utils.Validations.allEqual;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -56,15 +57,15 @@ public final class ShuffleArgument implements GroupVectorElement<GqGroup>, Hasha
 		this.multiExponentiationArgument = checkNotNull(multiExponentiationArgument);
 
 		// Cross group checking.
-		final ImmutableList<GqGroup> gqGroups = ImmutableList.of(c_A.getGroup(), c_B.getGroup(), productArgument.getGroup(),
-				multiExponentiationArgument.getGroup());
+		final List<GqGroup> gqGroups = Arrays
+				.asList(c_A.getGroup(), c_B.getGroup(), productArgument.getGroup(), multiExponentiationArgument.getGroup());
 		checkArgument(allEqual(gqGroups.stream(), g -> g),
 				"The commitments cA, cB, the product and the multi exponentiation arguments must belong to the same group.");
 		this.group = productArgument.getGroup();
 
 		// Cross dimensions checking.
-		final ImmutableList<Integer> mDimensions = ImmutableList.of(c_A.size(), c_B.size(), productArgument.get_m(),
-				multiExponentiationArgument.get_m());
+		final List<Integer> mDimensions = Arrays
+				.asList(c_A.size(), c_B.size(), productArgument.get_m(), multiExponentiationArgument.get_m());
 		checkArgument(allEqual(mDimensions.stream(), d -> d),
 				"The commitments cA, cB and the product and multi exponentiation arguments must have the same dimension m.");
 		this.m = productArgument.get_m();
@@ -132,8 +133,8 @@ public final class ShuffleArgument implements GroupVectorElement<GqGroup>, Hasha
 	}
 
 	@Override
-	public ImmutableList<Hashable> toHashableForm() {
-		return ImmutableList.of(c_A, c_B, productArgument, multiExponentiationArgument);
+	public List<? extends Hashable> toHashableForm() {
+		return List.of(c_A, c_B, productArgument, multiExponentiationArgument);
 	}
 
 	public static class Builder {

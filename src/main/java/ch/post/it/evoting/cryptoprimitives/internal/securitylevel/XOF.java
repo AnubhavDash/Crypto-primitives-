@@ -16,17 +16,16 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.securitylevel;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-
 /**
  * Extendable Output Function (XOF)
  */
 public interface XOF {
 
-	ImmutableByteArray xof(final Integer outputLength, final ImmutableByteArray message);
+	byte[] xof(final Integer outputLength, final byte[] message);
 
 	/**
-	 * @return the minimum output lengths in bits of this algorithm
+	 * Returns the minimum output lengths in bits of this algorithm
+	 * @return
 	 */
 	int getMinimumOutputLengthBits();
 }

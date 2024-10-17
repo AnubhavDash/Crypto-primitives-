@@ -16,11 +16,9 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.securitylevel;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-
 /**
  * Cryptographic hash function
  */
 public interface HashFunction {
-	ImmutableByteArray hash(final ImmutableByteArray input);
+	byte[] hash(final byte[] input);
 }

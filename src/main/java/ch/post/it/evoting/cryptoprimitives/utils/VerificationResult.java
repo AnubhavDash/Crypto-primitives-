@@ -15,7 +15,8 @@
  */
 package ch.post.it.evoting.cryptoprimitives.utils;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import java.util.Deque;
+
 import ch.post.it.evoting.cryptoprimitives.internal.utils.VerificationFailure;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.VerificationSuccess;
 
@@ -37,6 +38,6 @@ public sealed interface VerificationResult permits VerificationFailure, Verifica
 	 * @return a copy of the error messages list. This is analogous to a stack trace of errors. The first error message represents the highest level
 	 * error.
 	 */
-	ImmutableList<String> getErrorMessages();
+	Deque<String> getErrorMessages();
 }
 

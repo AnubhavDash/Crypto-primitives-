@@ -16,16 +16,12 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.securitylevel;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Security;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 
 /*
 	This class is thread safe.
@@ -48,12 +44,11 @@ public class SHA3_256 implements HashFunction {
 	}
 
 	@Override
-	public ImmutableByteArray hash(final ImmutableByteArray input) {
-		checkNotNull(input);
+	public byte[] hash(final byte[] input) {
 		try {
 			final MessageDigest instance = MessageDigest.getInstance("SHA3-256", BouncyCastleProvider.PROVIDER_NAME);
-			return new ImmutableByteArray(instance.digest(input.elements()));
-		} catch (final NoSuchAlgorithmException | NoSuchProviderException e) {
+			return instance.digest(input);
+		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
 			throw new IllegalStateException("Failed to create the SHA3-256 message digest for the HashService instantiation.");
 		}
 	}

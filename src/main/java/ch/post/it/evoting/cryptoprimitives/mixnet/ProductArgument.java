@@ -19,10 +19,11 @@ import static ch.post.it.evoting.cryptoprimitives.utils.Validations.allEqual;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -63,7 +64,7 @@ public final class ProductArgument implements HashableList {
 		checkNotNull(singleValueProductArgument);
 
 		// Cross group checking.
-		final ImmutableList<GqGroup> gqGroups = ImmutableList.of(c_b.getGroup(), hadamardArgument.getGroup(), singleValueProductArgument.getGroup());
+		final List<GqGroup> gqGroups = Arrays.asList(c_b.getGroup(), hadamardArgument.getGroup(), singleValueProductArgument.getGroup());
 		checkArgument(allEqual(gqGroups.stream(), g -> g),
 				"The commitment b, Hadamard argument and single value product argument groups must have the same order.");
 
@@ -137,10 +138,10 @@ public final class ProductArgument implements HashableList {
 	}
 
 	@Override
-	public ImmutableList<Hashable> toHashableForm() {
+	public List<? extends Hashable> toHashableForm() {
 		if (c_b == null) {
-			return ImmutableList.of(singleValueProductArgument);
+			return List.of(singleValueProductArgument);
 		}
-		return ImmutableList.of(c_b, hadamardArgument, singleValueProductArgument);
+		return List.of(c_b, hadamardArgument, singleValueProductArgument);
 	}
 }

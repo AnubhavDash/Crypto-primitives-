@@ -15,15 +15,17 @@
  */
 package ch.post.it.evoting.cryptoprimitives.utils;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.LinkedList;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.VerificationFailure;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.VerificationSuccess;
 
@@ -39,7 +41,7 @@ class VerificationResultTest {
 	void constructorWithValidMessage() {
 		assertFalse(verificationFailure.isVerified());
 		assertEquals(1, verificationFailure.getErrorMessages().size());
-		assertEquals(initialErrorMessage, verificationFailure.getErrorMessages().get(0));
+		assertEquals(initialErrorMessage, verificationFailure.getErrorMessages().getFirst());
 	}
 
 	@Test
@@ -66,12 +68,14 @@ class VerificationResultTest {
 		final VerificationFailure newVerificationResult = verificationFailure.addErrorMessage("Error message 1.");
 
 		assertEquals(1, verificationFailure.getErrorMessages().size());
-		assertEquals(initialErrorMessage, verificationFailure.getErrorMessages().get(0));
+		assertEquals(initialErrorMessage, verificationFailure.getErrorMessages().getFirst());
 
-		final ImmutableList<String> expectedMessages = ImmutableList.of("Error message 1.", initialErrorMessage);
+		final LinkedList<String> expectedMessages = new LinkedList<>();
+		expectedMessages.push(initialErrorMessage);
+		expectedMessages.push("Error message 1.");
 
 		assertEquals(2, newVerificationResult.getErrorMessages().size());
-		assertEquals(expectedMessages, newVerificationResult.getErrorMessages());
+		assertArrayEquals(expectedMessages.toArray(), newVerificationResult.getErrorMessages().toArray());
 	}
 
 	@Test

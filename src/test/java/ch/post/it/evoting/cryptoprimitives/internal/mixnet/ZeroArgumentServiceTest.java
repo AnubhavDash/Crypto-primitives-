@@ -17,6 +17,7 @@ package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
 import static ch.post.it.evoting.cryptoprimitives.internal.mixnet.TestParser.parseCommitment;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,6 +28,8 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -41,7 +44,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
@@ -219,12 +221,12 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 			final ZqGroup group = new ZqGroup(ELEVEN);
 
 			// Construct the two matrices and value y.
-			final GroupVector<ZqElement, ZqGroup> a0 = GroupVector.of(ZqElement.create(ZERO, group), ZqElement.create(TWO, group));
-			final GroupVector<ZqElement, ZqGroup> a1 = GroupVector.of(ZqElement.create(FOUR, group), ZqElement.create(SIX, group));
-			final GroupVector<ZqElement, ZqGroup> b0 = GroupVector.of(ZqElement.create(ONE, group), ZqElement.create(THREE, group));
-			final GroupVector<ZqElement, ZqGroup> b1 = GroupVector.of(ZqElement.create(FIVE, group), ZqElement.create(SEVEN, group));
-			final GroupMatrix<ZqElement, ZqGroup> firstMatrix = GroupMatrix.fromRows(GroupVector.of(a0, a1));
-			final GroupMatrix<ZqElement, ZqGroup> secondMatrix = GroupMatrix.fromRows(GroupVector.of(b0, b1));
+			final List<ZqElement> a0 = asList(ZqElement.create(ZERO, group), ZqElement.create(TWO, group));
+			final List<ZqElement> a1 = asList(ZqElement.create(FOUR, group), ZqElement.create(SIX, group));
+			final List<ZqElement> b0 = asList(ZqElement.create(ONE, group), ZqElement.create(THREE, group));
+			final List<ZqElement> b1 = asList(ZqElement.create(FIVE, group), ZqElement.create(SEVEN, group));
+			final GroupMatrix<ZqElement, ZqGroup> firstMatrix = GroupMatrix.fromRows(asList(a0, a1));
+			final GroupMatrix<ZqElement, ZqGroup> secondMatrix = GroupMatrix.fromRows(asList(b0, b1));
 			final ZqElement y = ZqElement.create(EIGHT, group);
 
 			// Expected d vector.
@@ -258,7 +260,7 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with any null parameter throws NullPointerException")
 		void starMapNullParams() {
-			final GroupVector<ZqElement, ZqGroup> emptyVector = GroupVector.empty();
+			final GroupVector<ZqElement, ZqGroup> emptyVector = GroupVector.of();
 
 			assertAll(
 					() -> assertThrows(NullPointerException.class, () -> zeroArgumentService.starMap(null, secondVector, y)),
@@ -280,7 +282,7 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 			assertEquals("The provided vectors must have the same size.", exception.getMessage());
 
 			// With empty vectors.
-			final GroupVector<ZqElement, ZqGroup> emptyVector = GroupVector.empty();
+			final GroupVector<ZqElement, ZqGroup> emptyVector = GroupVector.of();
 			final IllegalArgumentException exceptionSecondEmpty = assertThrows(IllegalArgumentException.class,
 					() -> zeroArgumentService.starMap(firstVector, emptyVector, y));
 			assertEquals("The provided vectors must have the same size.", exceptionSecondEmpty.getMessage());
@@ -315,8 +317,8 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with empty vectors returns identity")
 		void starMapEmptyVectors() {
-			final GroupVector<ZqElement, ZqGroup> firstVector = GroupVector.empty();
-			final GroupVector<ZqElement, ZqGroup> secondVector = GroupVector.empty();
+			final GroupVector<ZqElement, ZqGroup> firstVector = GroupVector.of();
+			final GroupVector<ZqElement, ZqGroup> secondVector = GroupVector.of();
 
 			assertEquals(zqGroup.getIdentity(), zeroArgumentService.starMap(firstVector, secondVector, y));
 		}
@@ -352,7 +354,7 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 		}
 
 		Stream<Arguments> starMapRealValuesProvider() {
-			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/mixnet/bilinearMap.json");
+			final List<TestParameters> parametersList = TestParameters.fromResource("/mixnet/bilinearMap.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// Context.
@@ -499,9 +501,9 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 		void getZeroArgStarMapNotZero() {
 			// Create a simple witness.
 			final GroupMatrix<ZqElement, ZqGroup> matrixA = GroupMatrix
-					.fromRows(GroupVector.of(GroupVector.of(ZqElement.create(ONE, zqGroup))));
+					.fromRows(Collections.singletonList(Collections.singletonList(ZqElement.create(ONE, zqGroup))));
 			final GroupMatrix<ZqElement, ZqGroup> matrixB = GroupMatrix
-					.fromRows(GroupVector.of(GroupVector.of(ZqElement.create(ONE, zqGroup))));
+					.fromRows(Collections.singletonList(Collections.singletonList(ZqElement.create(ONE, zqGroup))));
 			final GroupVector<ZqElement, ZqGroup> exponentsR = GroupVector.of(ZqElement.create(ONE, zqGroup));
 			final GroupVector<ZqElement, ZqGroup> exponentsS = GroupVector.of(ZqElement.create(ONE, zqGroup));
 			final ZeroWitness otherWitness = new ZeroWitness(matrixA, matrixB, exponentsR, exponentsS);
@@ -594,7 +596,7 @@ class ZeroArgumentServiceTest extends TestGroupSetup {
 		}
 
 		Stream<Arguments> verifyZeroArgumentRealValuesProvider() {
-			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-zero-argument.json");
+			final List<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-zero-argument.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// Context.

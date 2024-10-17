@@ -70,8 +70,8 @@ class ZeroStatementTest extends TestGroupSetup {
 	@Test
 	@DisplayName("constructed with empty commitments works as expected")
 	void constructEmptyCommitments() {
-		final GroupVector<GqElement, GqGroup> emptyCommitmentsA = GroupVector.empty();
-		final GroupVector<GqElement, GqGroup> emptyCommitmentsB = GroupVector.empty();
+		final GroupVector<GqElement, GqGroup> emptyCommitmentsA = GroupVector.of();
+		final GroupVector<GqElement, GqGroup> emptyCommitmentsB = GroupVector.of();
 
 		assertThrows(IllegalArgumentException.class, () -> new ZeroStatement(emptyCommitmentsA, emptyCommitmentsB, y));
 	}
@@ -79,8 +79,8 @@ class ZeroStatementTest extends TestGroupSetup {
 	@Test
 	@DisplayName("constructed with any null parameters throws NullPointerException")
 	void constructNullParams() {
-		final GroupVector<GqElement, GqGroup> emptyCommitmentsA = GroupVector.empty();
-		final GroupVector<GqElement, GqGroup> emptyCommitmentsB = GroupVector.empty();
+		final GroupVector<GqElement, GqGroup> emptyCommitmentsA = GroupVector.of();
+		final GroupVector<GqElement, GqGroup> emptyCommitmentsB = GroupVector.of();
 
 		assertAll(
 				() -> assertThrows(NullPointerException.class, () -> new ZeroStatement(null, commitmentsB, y)),

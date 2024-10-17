@@ -36,7 +36,6 @@ import org.openjdk.jmh.infra.Blackhole;
 
 import com.google.common.base.Preconditions;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
@@ -49,18 +48,18 @@ import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 public class FixedBaseCacheBenchmark {
 	private static final HashService hashService = HashService.getInstance();
 
-	private static String deriveCacheKey(final BigInteger base, final BigInteger modulus) {
+	private static String deriveCacheKey(BigInteger base, BigInteger modulus) {
 		Preconditions.checkArgument(modulus.signum() >= 0);
-		final ImmutableByteArray bytes = hashService.recursiveHash(
+		byte[] bytes = hashService.recursiveHash(
 				HashableString.from(Boolean.toString(base.signum() >= 0)),
 				HashableBigInteger.from(base.abs()),
 				HashableBigInteger.from(modulus));
-		return HexFormat.of().formatHex(bytes.elements());
+		return HexFormat.of().formatHex(bytes);
 	}
 
 	@Benchmark
-	public void deriveAndSearch(final MyState state, final Blackhole bh) {
-		final String value = state.cache.get(deriveCacheKey(state.knownBase, state.modulus));
+	public void deriveAndSearch(MyState state, Blackhole bh) {
+		String value = state.cache.get(deriveCacheKey(state.knownBase, state.modulus));
 		bh.consume(value);
 	}
 
@@ -90,11 +89,11 @@ public class FixedBaseCacheBenchmark {
 		@Setup(Level.Trial)
 		public void setup() {
 			cache = new ConcurrentSkipListMap<>();
-			final String knownKey = deriveCacheKey(knownBase, modulus);
+			String knownKey = deriveCacheKey(knownBase, modulus);
 			cache.put(knownKey, "Hi");
 
 			for (int i = 0; i < numberOfEntries - 1; i++) {
-				cache.put(HexFormat.of().formatHex(hashService.recursiveHash(HashableBigInteger.from(i + 1)).elements()), "Nope");
+				cache.put(HexFormat.of().formatHex(hashService.recursiveHash(HashableBigInteger.from(i + 1))), "Nope");
 			}
 		}
 	}

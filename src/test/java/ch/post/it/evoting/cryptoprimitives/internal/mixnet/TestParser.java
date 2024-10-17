@@ -45,7 +45,7 @@ public class TestParser {
 		for (final JsonNode ciphertextNode : ciphertextsData.jsonNode()) {
 			results.add(parseCiphertext(ciphertextNode, group));
 		}
-		return results.stream().collect(toGroupVector());
+		return GroupVector.from(results);
 	}
 
 	static ElGamalMultiRecipientCiphertext parseCiphertext(final JsonNode ciphertextNode, final GqGroup group) {
@@ -53,8 +53,7 @@ public class TestParser {
 		final BigInteger gamma = ciphertextData.get("gamma", BigInteger.class);
 		final GqElement gammaElement = GqElementFactory.fromValue(gamma, group);
 		final BigInteger[] phis = ciphertextData.get("phis", BigInteger[].class);
-		final GroupVector<GqElement, GqGroup> phiElements = Arrays.stream(phis).map(value -> GqElementFactory.fromValue(value, group))
-				.collect(toGroupVector());
+		final List<GqElement> phiElements = Arrays.stream(phis).map(value -> GqElementFactory.fromValue(value, group)).toList();
 		return ElGamalMultiRecipientCiphertext.create(gammaElement, phiElements);
 	}
 }

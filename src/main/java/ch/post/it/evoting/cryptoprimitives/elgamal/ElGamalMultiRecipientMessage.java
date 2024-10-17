@@ -18,10 +18,12 @@ package ch.post.it.evoting.cryptoprimitives.elgamal;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import com.google.common.base.Preconditions;
+
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -42,10 +44,11 @@ public final class ElGamalMultiRecipientMessage implements GroupVectorElement<Gq
 	/**
 	 * Creates an {@link ElGamalMultiRecipientMessage} object.
 	 *
-	 * @param messageElements the group vector of Gq group message elements. Must be non-nul and non-empty.
+	 * @param messageElements the group vector of Gq group message elements. Must be non-null, non-empty and not contain null elements.
 	 */
 	public ElGamalMultiRecipientMessage(final GroupVector<GqElement, GqGroup> messageElements) {
 		this.messageElements = checkNotNull(messageElements);
+		this.messageElements.forEach(Preconditions::checkNotNull);
 		checkArgument(!this.messageElements.isEmpty(), "An ElGamal message must not be empty.");
 	}
 
@@ -93,7 +96,7 @@ public final class ElGamalMultiRecipientMessage implements GroupVectorElement<Gq
 	}
 
 	@Override
-	public ImmutableList<Hashable> toHashableForm() {
+	public List<? extends Hashable> toHashableForm() {
 		return this.messageElements.toHashableForm();
 	}
 }
