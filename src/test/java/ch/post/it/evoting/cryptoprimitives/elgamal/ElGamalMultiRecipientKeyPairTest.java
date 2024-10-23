@@ -47,7 +47,7 @@ class ElGamalMultiRecipientKeyPairTest {
 		final BigInteger q = BigInteger.valueOf(11);
 		final BigInteger g = BigInteger.TWO;
 
-		
+
 		publicKeyGroup = new GqGroup(p, q, g);
 		privateKeyGroup = ZqGroup.sameOrderAs(publicKeyGroup);
 
@@ -108,7 +108,7 @@ class ElGamalMultiRecipientKeyPairTest {
 		final GqGroup smallGroup = new GqGroup(p, q, g);
 		final ElGamalMultiRecipientKeyPair keyPair = ElGamalMultiRecipientKeyPair.genKeyPair(smallGroup, 10 * q.intValue(), randomSer);
 		keyPair.getPrivateKey().stream().forEach(sk -> {
-			assertTrue(sk.getValue().compareTo(BigInteger.ZERO) >= 0);
+			assertTrue(sk.getValue().signum() >= 0);
 			assertTrue(sk.getValue().compareTo(q) < 0);
 		});
 	}

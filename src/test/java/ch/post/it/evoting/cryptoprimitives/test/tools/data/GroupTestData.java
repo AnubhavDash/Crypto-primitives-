@@ -15,12 +15,13 @@
  */
 package ch.post.it.evoting.cryptoprimitives.test.tools.data;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
@@ -31,7 +32,7 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.generator.Generators;
  */
 public class GroupTestData {
 
-	private static final List<GqGroup> smallTestGroups;
+	private static final ImmutableList<GqGroup> smallTestGroups;
 	private static final TestRandomService randomService = new TestRandomService();
 
 	static {
@@ -56,7 +57,7 @@ public class GroupTestData {
 		final BigInteger g4 = BigInteger.valueOf(3);
 		final GqGroup group4 = new GqGroup(p4, q4, g4);
 
-		smallTestGroups = List.of(group1, group2, group3, group4);
+		smallTestGroups = ImmutableList.of(group1, group2, group3, group4);
 	}
 
 	private GroupTestData() {
@@ -76,8 +77,8 @@ public class GroupTestData {
 	 * @return a different {@link GqGroup}.
 	 */
 	public static GqGroup getDifferentGqGroup(final GqGroup gqGroup) {
-		final List<GqGroup> otherGroups = new ArrayList<>(smallTestGroups);
-		otherGroups.remove(gqGroup);
+		final ImmutableList<GqGroup> otherGroups = smallTestGroups.stream().filter(group -> !group.equals(gqGroup)).collect(toImmutableList());
+
 		return getRandomGqGroupFrom(otherGroups);
 	}
 
@@ -113,7 +114,7 @@ public class GroupTestData {
 		}
 	}
 
-	private static GqGroup getRandomGqGroupFrom(final List<GqGroup> groups) {
+	private static GqGroup getRandomGqGroupFrom(final ImmutableList<GqGroup> groups) {
 		return groups.get(randomService.genRandomInteger(groups.size()));
 	}
 

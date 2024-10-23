@@ -15,6 +15,8 @@
  */
 package ch.post.it.evoting.cryptoprimitives.hashing;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.Argon2Service;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 
@@ -27,7 +29,9 @@ public class Argon2Factory {
 		randomService = new RandomService();
 	}
 
-	public static Argon2 createArgon2(Argon2Profile config) {
+	public static Argon2 createArgon2(final Argon2Profile config) {
+		checkNotNull(config);
+
 		return new Argon2Service(INSTANCE.randomService, config);
 	}
 }

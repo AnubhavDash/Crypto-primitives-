@@ -15,12 +15,11 @@
  */
 package ch.post.it.evoting.cryptoprimitives.elgamal;
 
+import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.math.BigInteger;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +45,7 @@ class ElGamalMultiRecipientEncryptionDecryptionTest extends TestGroupSetup {
 	void setUp() {
 		final GroupVector<GqElement, GqGroup> validMessageElements = Stream.generate(gqGroupGenerator::genMember)
 				.limit(NUM_ELEMENTS)
-				.collect(GroupVector.toGroupVector());
+				.collect(toGroupVector());
 		message = new ElGamalMultiRecipientMessage(validMessageElements);
 	}
 
@@ -104,9 +103,11 @@ class ElGamalMultiRecipientEncryptionDecryptionTest extends TestGroupSetup {
 		final ZqElement exponent = genNonZeroExponent(gqGroup.getQ());
 		final ElGamalMultiRecipientPublicKey publicKey = keyPair.getPublicKey();
 		final ElGamalMultiRecipientCiphertext ciphertext = ElGamalMultiRecipientCiphertexts.getCiphertext(message, exponent, publicKey);
-		final List<ZqElement> privateKeyElements = keyPair.getPrivateKey().stream().collect(Collectors.toList());
-		privateKeyElements.add(genNonZeroExponent(gqGroup.getQ()));
-		final ElGamalMultiRecipientPrivateKey longerPrivateKey = new ElGamalMultiRecipientPrivateKey(GroupVector.from(privateKeyElements));
+		final GroupVector<ZqElement, ZqGroup> privateKeyElements = Stream.concat(
+						keyPair.getPrivateKey().stream(),
+						Stream.of(genNonZeroExponent(gqGroup.getQ())))
+				.collect(toGroupVector());
+		final ElGamalMultiRecipientPrivateKey longerPrivateKey = new ElGamalMultiRecipientPrivateKey(privateKeyElements);
 		final ElGamalMultiRecipientMessage otherMessage = ElGamalMultiRecipientMessages.getMessage(ciphertext, longerPrivateKey);
 
 		assertEquals(message, otherMessage);

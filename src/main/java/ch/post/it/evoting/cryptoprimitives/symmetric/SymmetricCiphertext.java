@@ -17,54 +17,17 @@ package ch.post.it.evoting.cryptoprimitives.symmetric;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Arrays;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 
 /**
  * A symmetric ciphertext composed of a ciphertext and nonce.
  *
  * <p>Instances of this class are immutable.</p>
  */
-public record SymmetricCiphertext(byte[] ciphertext, byte[] nonce) {
+public record SymmetricCiphertext(ImmutableByteArray ciphertext, ImmutableByteArray nonce) {
 
-	public SymmetricCiphertext(final byte[] ciphertext, final byte[] nonce) {
+	public SymmetricCiphertext {
 		checkNotNull(ciphertext);
 		checkNotNull(nonce);
-		this.ciphertext = Arrays.copyOf(ciphertext, ciphertext.length);
-		this.nonce = Arrays.copyOf(nonce, nonce.length);
-	}
-
-	public byte[] getCiphertext() {
-		return Arrays.copyOf(ciphertext, ciphertext.length);
-	}
-
-	public byte[] getNonce() {
-		return Arrays.copyOf(nonce, nonce.length);
-	}
-
-	@Override
-	public boolean equals(final Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		final SymmetricCiphertext that = (SymmetricCiphertext) o;
-		return Arrays.equals(ciphertext, that.ciphertext) && Arrays.equals(nonce, that.nonce);
-	}
-
-	@Override
-	public int hashCode() {
-		int result = Arrays.hashCode(ciphertext);
-		result = 31 * result + Arrays.hashCode(nonce);
-		return result;
-	}
-
-	@Override
-	public String toString() {
-		return "SymmetricCiphertext{" +
-				"ciphertext=" + Arrays.toString(ciphertext) +
-				", nonce=" + Arrays.toString(nonce) +
-				'}';
 	}
 }
