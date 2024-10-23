@@ -16,6 +16,7 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.utils;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -42,10 +43,17 @@ class ByteArraysTest {
 	}
 
 	@Test
-	void testCutToBitLengtRequestedLengthZeroThrows() {
+	void testCutToBitLengtRequestedLengthNegativeThrows() {
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-				() -> ByteArrays.cutToBitLength(ImmutableByteArray.of((byte) 0b10011), 0));
-		assertEquals("The requested length must be strictly positive.", Throwables.getRootCause(exception).getMessage());
+				() -> ByteArrays.cutToBitLength(ImmutableByteArray.of((byte) 0b10011), -1));
+		assertEquals("The requested length must be positive.", Throwables.getRootCause(exception).getMessage());
+	}
+
+	@Test
+	void testCutToBitLengtRequestedLengthZeroReturnsEmpty() {
+		final ImmutableByteArray expected = ImmutableByteArray.of();
+		final ImmutableByteArray result = assertDoesNotThrow(() -> ByteArrays.cutToBitLength(ImmutableByteArray.of((byte) 0b10011), 0));
+		assertEquals(expected, result);
 	}
 
 	@Test

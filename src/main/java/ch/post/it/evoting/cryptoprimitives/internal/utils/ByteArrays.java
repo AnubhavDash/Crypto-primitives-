@@ -42,8 +42,7 @@ public final class ByteArrays {
 		final int N = B.length();
 		final int n = requestedLength;
 
-		checkArgument(N > 0, "The byte array length must be strictly positive.");
-		checkArgument(n > 0, "The requested length must be strictly positive.");
+		checkArgument(n >= 0, "The requested length must be positive.");
 
 		// Require.
 		checkArgument(n <= (N * Byte.SIZE), "The requested length must not be greater than the bit length of the byte array.");
@@ -52,15 +51,13 @@ public final class ByteArrays {
 		final int length = Math.ceilDivExact(n, Byte.SIZE);
 		final int offset = N - length;
 		final byte[] B_prime = new byte[length];
-		if (n % Byte.SIZE != 0) {
-			B_prime[0] = (byte) (B.get(offset) & (byte) (Math.pow(2, n % Byte.SIZE) - 1));
-		} else {
-			B_prime[0] = B.get(offset);
-		}
-
-		for (int i = 1; i < length; i++) {
+		for (int i = 0; i < length; i++) {
 			B_prime[i] = B.get(offset + i);
 		}
+		if (n % Byte.SIZE != 0) {
+			B_prime[0] = (byte) (B.get(offset) & (byte) (Math.pow(2, n % Byte.SIZE) - 1));
+		}
+
 
 		// Output.
 		return new ImmutableByteArray(B_prime);
