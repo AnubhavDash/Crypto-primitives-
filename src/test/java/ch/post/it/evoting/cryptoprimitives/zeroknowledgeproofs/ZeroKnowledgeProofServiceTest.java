@@ -27,7 +27,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import ch.post.it.evoting.cryptoprimitives.collection.AuxiliaryInformation;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamal;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
@@ -50,7 +50,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 	private int ciphertextLength;
 	private GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts;
 	private ElGamalMultiRecipientKeyPair keyPair;
-	private ImmutableList<String> auxiliaryInformation;
+	private AuxiliaryInformation auxiliaryInformation;
 
 	@BeforeEach
 	void setup() {
@@ -63,7 +63,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 		ciphertextLength = randomService.genRandomInteger(keyLength) + 1;
 		ciphertexts = elGamalGenerator.genRandomCiphertextVector(numCiphertexts, ciphertextLength);
 		keyPair = elGamal.genKeyPair(gqGroup, keyLength, randomService);
-		auxiliaryInformation = ImmutableList.of("a", "b");
+		auxiliaryInformation = AuxiliaryInformation.of("a", "b");
 	}
 
 	@Nested
@@ -80,7 +80,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("Generating verifiable decryptions with valid arguments does not throw")
 		void genVerifiableDecryptionsWithValidArguments() {
-			assertDoesNotThrow(() -> zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, keyPair, ImmutableList.emptyList()));
+			assertDoesNotThrow(() -> zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, keyPair, AuxiliaryInformation.of()));
 			assertDoesNotThrow(() -> zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, keyPair, auxiliaryInformation));
 		}
 
@@ -123,7 +123,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 		void setup() {
 			publicKey = keyPair.getPublicKey();
 			verifiableDecryptions = zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, keyPair, auxiliaryInformation);
-			verifiableDecryptionsEmptyAux = zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, keyPair, ImmutableList.emptyList());
+			verifiableDecryptionsEmptyAux = zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, keyPair, AuxiliaryInformation.of());
 		}
 
 		@Test
@@ -149,7 +149,7 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 
 			result = assertDoesNotThrow(
 					() -> zeroKnowledgeProofService.verifyDecryptions(ciphertexts, publicKey, verifiableDecryptionsEmptyAux,
-									ImmutableList.emptyList())
+									AuxiliaryInformation.of())
 							.isVerified());
 			assertTrue(result);
 		}

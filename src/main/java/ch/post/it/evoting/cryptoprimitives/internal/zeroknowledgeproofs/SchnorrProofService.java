@@ -15,15 +15,14 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.zeroknowledgeproofs;
 
-import static ch.post.it.evoting.cryptoprimitives.hashing.HashableList.toHashableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 
+import ch.post.it.evoting.cryptoprimitives.collection.AuxiliaryInformation;
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
@@ -39,7 +38,8 @@ import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.ZeroKnowledgeProo
 @SuppressWarnings("java:S117")
 public class SchnorrProofService {
 
-	private static final String GEN_SCHNORR_PROOF_SERVICE = "SchnorrProof";
+	private static final HashableString GEN_SCHNORR_PROOF_SERVICE = HashableString.from("SchnorrProof");
+
 	private final RandomService randomService;
 	private final HashService hashService;
 
@@ -71,9 +71,9 @@ public class SchnorrProofService {
 	}
 
 	/**
-	 * @see ZeroKnowledgeProof#genSchnorrProof(ZqElement, GqElement, ImmutableList<String>)
+	 * @see ZeroKnowledgeProof#genSchnorrProof(ZqElement, GqElement, AuxiliaryInformation)
 	 */
-	public SchnorrProof genSchnorrProof(final ZqElement witness, final GqElement statement, final ImmutableList<String> auxiliaryInformation) {
+	public SchnorrProof genSchnorrProof(final ZqElement witness, final GqElement statement, final AuxiliaryInformation auxiliaryInformation) {
 
 		checkNotNull(witness);
 		checkNotNull(statement);
@@ -92,7 +92,7 @@ public class SchnorrProofService {
 		final BigInteger p = gqGroup.getP();
 
 		// Variables.
-		final ImmutableList<String> i_aux = auxiliaryInformation;
+		final AuxiliaryInformation i_aux = auxiliaryInformation;
 		final GqElement y = statement;
 		final ZqElement x = witness;
 
@@ -103,12 +103,9 @@ public class SchnorrProofService {
 
 		final HashableList h_aux;
 		if (!i_aux.isEmpty()) {
-			h_aux = HashableList.of(HashableString.from(GEN_SCHNORR_PROOF_SERVICE),
-					i_aux.stream()
-							.map(HashableString::from)
-							.collect(toHashableList()));
+			h_aux = HashableList.of(GEN_SCHNORR_PROOF_SERVICE, i_aux);
 		} else {
-			h_aux = HashableList.of(HashableString.from(GEN_SCHNORR_PROOF_SERVICE));
+			h_aux = HashableList.of(GEN_SCHNORR_PROOF_SERVICE);
 		}
 
 		final BigInteger eValue = byteArrayToInteger(hashService.recursiveHash(f, y, c, h_aux));
@@ -120,9 +117,9 @@ public class SchnorrProofService {
 	}
 
 	/**
-	 * @see ZeroKnowledgeProof#verifySchnorrProof(SchnorrProof, GqElement, ImmutableList<String>)
+	 * @see ZeroKnowledgeProof#verifySchnorrProof(SchnorrProof, GqElement, AuxiliaryInformation)
 	 */
-	public boolean verifySchnorrProof(final SchnorrProof proof, final GqElement statement, final ImmutableList<String> auxiliaryInformation) {
+	public boolean verifySchnorrProof(final SchnorrProof proof, final GqElement statement, final AuxiliaryInformation auxiliaryInformation) {
 
 		checkNotNull(proof);
 		checkNotNull(statement);
@@ -139,7 +136,7 @@ public class SchnorrProofService {
 		final GqElement g = gqGroup.getGenerator();
 
 		// Variables.
-		final ImmutableList<String> i_aux = auxiliaryInformation;
+		final AuxiliaryInformation i_aux = auxiliaryInformation;
 		final ZqElement e = proof.get_e();
 		final ZqElement z = proof.get_z();
 		final GqElement y = statement;
@@ -152,11 +149,9 @@ public class SchnorrProofService {
 
 		final HashableList h_aux;
 		if (!i_aux.isEmpty()) {
-			h_aux = HashableList.of(HashableString.from(GEN_SCHNORR_PROOF_SERVICE),
-					i_aux.stream().map(HashableString::from)
-							.collect(toHashableList()));
+			h_aux = HashableList.of(GEN_SCHNORR_PROOF_SERVICE, i_aux);
 		} else {
-			h_aux = HashableList.of(HashableString.from(GEN_SCHNORR_PROOF_SERVICE));
+			h_aux = HashableList.of(GEN_SCHNORR_PROOF_SERVICE);
 		}
 
 		final ImmutableByteArray h = hashService.recursiveHash(f, y, c_prime, h_aux);

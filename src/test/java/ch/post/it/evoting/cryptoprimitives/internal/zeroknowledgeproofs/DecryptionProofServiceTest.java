@@ -21,12 +21,17 @@ import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -41,15 +46,19 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 
+import ch.post.it.evoting.cryptoprimitives.collection.AuxiliaryInformation;
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamal;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
+import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPrivateKey;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
+import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
@@ -61,12 +70,13 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.Generators;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
+import ch.post.it.evoting.cryptoprimitives.utils.VerificationResult;
 import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.DecryptionProof;
 
 class DecryptionProofServiceTest extends TestGroupSetup {
 
 	private static final ElGamal elGamal = new ElGamalService();
-	private static final ImmutableList<String> auxiliaryInformation = ImmutableList.of("aux", "1");
+	private static final AuxiliaryInformation auxiliaryInformation = AuxiliaryInformation.of("aux", "1");
 
 	private static DecryptionProofService decryptionProofService;
 
@@ -187,7 +197,7 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with valid arguments does not throw")
 		void genDecryptionProofWithValidArguments() {
-			assertDoesNotThrow(() -> decryptionProofService.genDecryptionProof(ciphertext, keyPair, message, ImmutableList.emptyList()));
+			assertDoesNotThrow(() -> decryptionProofService.genDecryptionProof(ciphertext, keyPair, message, AuxiliaryInformation.of()));
 			assertDoesNotThrow(() -> decryptionProofService.genDecryptionProof(ciphertext, keyPair, message, auxiliaryInformation));
 		}
 
@@ -307,8 +317,8 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 			final GroupVector<GqElement, GqGroup> messageElements = gqGroupGenerator.genRandomGqElementVector(messageLength);
 			message = new ElGamalMultiRecipientMessage(messageElements);
 			ciphertext = elGamal.getCiphertext(message, zqGroupGenerator.genRandomZqElementMember(), keyPair.getPublicKey());
-			decryptionProof = decryptionProofService.genDecryptionProof(ciphertext, keyPair, message, ImmutableList.emptyList());
-			assertTrue(decryptionProofService.verifyDecryption(ciphertext, publicKey, message, decryptionProof, ImmutableList.emptyList()).verify()
+			decryptionProof = decryptionProofService.genDecryptionProof(ciphertext, keyPair, message, AuxiliaryInformation.of());
+			assertTrue(decryptionProofService.verifyDecryption(ciphertext, publicKey, message, decryptionProof, AuxiliaryInformation.of()).verify()
 					.isVerified());
 		}
 
@@ -381,27 +391,28 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 					() -> decryptionProofService.verifyDecryption(ciphertext, publicKey, message, decryptionProof, auxiliaryInformation));
 			assertEquals("The ciphertext, the message and the decryption proof must have the same size.", exception.getMessage());
 		}
-/*
+
 		@Test
 		@DisplayName("with another ciphertext returns false")
 		void verifyDecryptionWithOtherCiphertext() {
-			TestValues values = new TestValues();
+			final TestValues values = new TestValues();
 			final ElGamalMultiRecipientMessage m = values.m;
 			final ElGamalMultiRecipientKeyPair keyPair = values.createKeyPair();
 			final ElGamalMultiRecipientCiphertext c = values.c;
-			final List<String> iAux = values.iAux;
+			final AuxiliaryInformation iAux = values.iAux;
 
 			final DecryptionProofService service1 = values.createDecryptionProofService();
 			final DecryptionProofService service2 = values.createDecryptionProofService();
 
 			// Create expected output
 			final DecryptionProof proof1 = service1.genDecryptionProof(c, keyPair, m, iAux);
-			final DecryptionProof proof2 = service2.genDecryptionProof(c, keyPair, m, ImmutableList.emptyList());
+			final DecryptionProof proof2 = service2.genDecryptionProof(c, keyPair, m, AuxiliaryInformation.of());
 
 			final ElGamalMultiRecipientCiphertext cPrime = ElGamalMultiRecipientCiphertext.create(values.gEight, c.getPhis());
 
 			final VerificationResult result1 = service1.verifyDecryption(cPrime, keyPair.getPublicKey(), m, proof1, iAux).verify();
-			final VerificationResult result2 = service1.verifyDecryption(cPrime, keyPair.getPublicKey(), m, proof2, ImmutableList.emptyList()).verify();
+			final VerificationResult result2 = service1.verifyDecryption(cPrime, keyPair.getPublicKey(), m, proof2, AuxiliaryInformation.of())
+					.verify();
 
 			assertFalse(result1.isVerified());
 			assertFalse(result2.isVerified());
@@ -413,27 +424,27 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with another public key returns false")
 		void verifyDecryptionWithOtherPublicKey() {
-			TestValues values = new TestValues();
+			final TestValues values = new TestValues();
 			final ElGamalMultiRecipientMessage m = values.m;
 			final ElGamalMultiRecipientKeyPair keyPair = values.createKeyPair();
 			final ElGamalMultiRecipientCiphertext c = values.c;
-			final List<String> iAux = values.iAux;
+			final AuxiliaryInformation iAux = values.iAux;
 
 			final DecryptionProofService service1 = values.createDecryptionProofService();
 			final DecryptionProofService service2 = values.createDecryptionProofService();
 
 			// Create expected output
 			final DecryptionProof proof1 = service1.genDecryptionProof(c, keyPair, m, iAux);
-			final DecryptionProof proof2 = service2.genDecryptionProof(c, keyPair, m, ImmutableList.emptyList());
+			final DecryptionProof proof2 = service2.genDecryptionProof(c, keyPair, m, AuxiliaryInformation.of());
 
 			final ElGamalMultiRecipientPublicKey pkPrime = new ElGamalMultiRecipientPublicKey(
-					Arrays.asList(values.gEight, values.gEight, values.gFour));
+					GroupVector.of(values.gEight, values.gFour, values.gFour));
 
 			assertFalse(service1.verifyDecryption(c, pkPrime, m, proof1, iAux).verify().isVerified());
-			assertFalse(service2.verifyDecryption(c, pkPrime, m, proof2, ImmutableList.emptyList()).verify().isVerified());
+			assertFalse(service2.verifyDecryption(c, pkPrime, m, proof2, AuxiliaryInformation.of()).verify().isVerified());
 
 			final VerificationResult result1 = service1.verifyDecryption(c, pkPrime, m, proof1, iAux).verify();
-			final VerificationResult result2 = service1.verifyDecryption(c, pkPrime, m, proof2, ImmutableList.emptyList()).verify();
+			final VerificationResult result2 = service1.verifyDecryption(c, pkPrime, m, proof2, AuxiliaryInformation.of()).verify();
 
 			assertFalse(result1.isVerified());
 			assertFalse(result2.isVerified());
@@ -445,23 +456,24 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with another message returns false")
 		void verifyDecryptionWithOtherMessage() {
-			TestValues values = new TestValues();
+			final TestValues values = new TestValues();
 			final ElGamalMultiRecipientMessage m = values.m;
 			final ElGamalMultiRecipientKeyPair keyPair = values.createKeyPair();
 			final ElGamalMultiRecipientCiphertext c = values.c;
-			final List<String> iAux = values.iAux;
+			final AuxiliaryInformation iAux = values.iAux;
 
 			final DecryptionProofService service1 = values.createDecryptionProofService();
 			final DecryptionProofService service2 = values.createDecryptionProofService();
 
 			// Create expected output
 			final DecryptionProof proof1 = service1.genDecryptionProof(c, keyPair, m, iAux);
-			final DecryptionProof proof2 = service2.genDecryptionProof(c, keyPair, m, ImmutableList.emptyList());
+			final DecryptionProof proof2 = service2.genDecryptionProof(c, keyPair, m, AuxiliaryInformation.of());
 
-			final ElGamalMultiRecipientMessage mPrime = new ElGamalMultiRecipientMessage(Arrays.asList(values.gEight, values.gEight, values.gThree));
+			final ElGamalMultiRecipientMessage mPrime = new ElGamalMultiRecipientMessage(GroupVector.of(values.gEight, values.gEight, values.gThree));
 
 			final VerificationResult result1 = service1.verifyDecryption(c, keyPair.getPublicKey(), mPrime, proof1, iAux).verify();
-			final VerificationResult result2 = service1.verifyDecryption(c, keyPair.getPublicKey(), mPrime, proof2, ImmutableList.emptyList()).verify();
+			final VerificationResult result2 = service1.verifyDecryption(c, keyPair.getPublicKey(), mPrime, proof2, AuxiliaryInformation.of())
+					.verify();
 
 			assertFalse(result1.isVerified());
 			assertFalse(result2.isVerified());
@@ -473,21 +485,20 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with another auxiliary information returns false")
 		void verifyDecryptionWithOtherAuxiliaryInformation() {
-			TestValues values = new TestValues();
+			final TestValues values = new TestValues();
 			final ElGamalMultiRecipientMessage m = values.m;
 			final ElGamalMultiRecipientKeyPair keyPair = values.createKeyPair();
 			final ElGamalMultiRecipientCiphertext c = values.c;
-			final List<String> iAux = values.iAux;
+			final AuxiliaryInformation iAux = values.iAux;
 
 			final DecryptionProofService service1 = values.createDecryptionProofService();
 			final DecryptionProofService service2 = values.createDecryptionProofService();
 
 			// Create expected output
 			final DecryptionProof proof1 = service1.genDecryptionProof(c, keyPair, m, iAux);
-			final DecryptionProof proof2 = service2.genDecryptionProof(c, keyPair, m, ImmutableList.emptyList());
+			final DecryptionProof proof2 = service2.genDecryptionProof(c, keyPair, m, AuxiliaryInformation.of());
 
-			final List<String> iAuxPrime = new ArrayList<>(iAux);
-			iAuxPrime.add("primes");
+			final AuxiliaryInformation iAuxPrime = iAux.append(HashableString.from("primes"));
 
 			final VerificationResult result1 = service1.verifyDecryption(c, keyPair.getPublicKey(), m, proof1, iAuxPrime).verify();
 			final VerificationResult result2 = service1.verifyDecryption(c, keyPair.getPublicKey(), m, proof2, iAuxPrime).verify();
@@ -498,7 +509,6 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 			assertEquals(String.format("Could not verify decryption proof of ciphertext %s.", c), result1.getErrorMessages().getFirst());
 			assertEquals(String.format("Could not verify decryption proof of ciphertext %s.", c), result2.getErrorMessages().getFirst());
 		}
- */
 
 		private Stream<Arguments> jsonFileArgumentProvider() {
 			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/zeroknowledgeproofs/verify-decryption.json");
@@ -553,7 +563,7 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 
 					// Parse auxiliary information parameters
 					final String[] auxInformation = input.get("additional_information", String[].class);
-					final ImmutableList<String> auxiliaryInformation = ImmutableList.of(auxInformation);
+					final AuxiliaryInformation auxiliaryInformation = AuxiliaryInformation.of(auxInformation);
 
 					// Parse output parameters
 					final JsonData output = testParameters.getOutput();
@@ -566,11 +576,82 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 			});
 		}
 
+		private static class TestValues {
+			// Create BigIntegers
+			private final BigInteger TWO = BigInteger.valueOf(2);
+			private final BigInteger THREE = BigInteger.valueOf(3);
+			private final BigInteger FOUR = BigInteger.valueOf(4);
+			private final BigInteger FIVE = BigInteger.valueOf(5);
+			private final BigInteger SIX = BigInteger.valueOf(6);
+			private final BigInteger SEVEN = BigInteger.valueOf(7);
+			private final BigInteger EIGHT = BigInteger.valueOf(8);
+			private final BigInteger TEN = BigInteger.TEN;
+			// Create groups
+			private final BigInteger p = BigInteger.valueOf(23);
+			private final BigInteger q = BigInteger.valueOf(11);
+			private final BigInteger g = BigInteger.valueOf(2);
+			private final GqGroup gqGroup = new GqGroup(p, q, g);
+			// Create GqElements
+			private final GqElement gThree = GqElementFactory.fromValue(THREE, gqGroup);
+			private final GqElement gFour = GqElementFactory.fromValue(FOUR, gqGroup);
+			private final GqElement gEight = GqElementFactory.fromValue(EIGHT, gqGroup);
+			// Create input arguments
+			// c = {9, (18, 9, 13)}
+			// sk = (3, 7, 2)
+			// pk = (8, 13, 4)
+			// m = (4, 8, 3)
+			// iAux = "Auxiliary Data"
+			private final ElGamalMultiRecipientMessage m = new ElGamalMultiRecipientMessage(GroupVector.of(gFour, gEight, gThree));
+			private final GqElement gThirteen = GqElementFactory.fromValue(BigInteger.valueOf(13), gqGroup);
+			private final ElGamalMultiRecipientPublicKey pk = new ElGamalMultiRecipientPublicKey(GroupVector.of(gEight, gThirteen, gFour));
+			private final ZqGroup zqGroup = new ZqGroup(q);
+			// Create ZqElements
+			private final ZqElement zOne = ZqElement.create(BigInteger.ONE, zqGroup);
+			private final ZqElement zTwo = ZqElement.create(TWO, zqGroup);
+			private final ZqElement zThree = ZqElement.create(THREE, zqGroup);
+			private final ZqElement zFive = ZqElement.create(FIVE, zqGroup);
+			private final ElGamalMultiRecipientCiphertext c = elGamal.getCiphertext(m, zFive, pk);
+			private final ZqElement zSeven = ZqElement.create(SEVEN, zqGroup);
+			private final ElGamalMultiRecipientPrivateKey sk = new ElGamalMultiRecipientPrivateKey(GroupVector.of(zThree, zSeven, zTwo));
+			// Create output arguments
+			private final ZqElement e = zSeven;
+			private final ZqElement zEight = ZqElement.create(EIGHT, zqGroup);
+			private final GroupVector<ZqElement, ZqGroup> z = GroupVector.of(zThree, zOne, zEight);
+
+			private final AuxiliaryInformation iAux = AuxiliaryInformation.of("Auxiliary Data");
+			private final List<BigInteger> randomValues = Arrays.asList(FOUR, SEVEN, FIVE);
+
+			private ElGamalMultiRecipientKeyPair createKeyPair() {
+				final ElGamalMultiRecipientKeyPair keyPair = mock(ElGamalMultiRecipientKeyPair.class);
+				when(keyPair.getPrivateKey()).thenReturn(sk);
+				when(keyPair.getPublicKey()).thenReturn(pk);
+				return keyPair;
+			}
+
+			private RandomService getSpecificRandomService() {
+				return new RandomService() {
+					final Iterator<BigInteger> values = randomValues.iterator();
+
+					@Override
+					public BigInteger genRandomInteger(final BigInteger upperBound) {
+						return values.next();
+					}
+				};
+			}
+
+			private DecryptionProofService createDecryptionProofService() {
+				final RandomService randomService = getSpecificRandomService();
+				final HashService hashService = TestHashService.create(q);
+				return new DecryptionProofService(randomService, hashService);
+			}
+
+		}
+
 		@ParameterizedTest()
 		@MethodSource("jsonFileArgumentProvider")
 		@DisplayName("with real values gives expected result")
 		void verifyDecryptionProofWithRealValues(final ElGamalMultiRecipientCiphertext ciphertext, final ElGamalMultiRecipientPublicKey publicKey,
-				final ElGamalMultiRecipientMessage message, final DecryptionProof decryptionProof, final ImmutableList<String> auxiliaryInformation,
+				final ElGamalMultiRecipientMessage message, final DecryptionProof decryptionProof, final AuxiliaryInformation auxiliaryInformation,
 				final boolean expected, final String description) {
 			final DecryptionProofService decryptionProofService = new DecryptionProofService(randomService, HashService.getInstance());
 			final boolean actual = assertDoesNotThrow(

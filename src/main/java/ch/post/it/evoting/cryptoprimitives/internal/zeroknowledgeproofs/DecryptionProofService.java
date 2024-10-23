@@ -15,7 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.zeroknowledgeproofs;
 
-import static ch.post.it.evoting.cryptoprimitives.hashing.HashableList.toHashableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.math.Vectors.vectorAddition;
 import static ch.post.it.evoting.cryptoprimitives.internal.math.Vectors.vectorScalarMultiplication;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
@@ -28,7 +27,7 @@ import java.math.BigInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import ch.post.it.evoting.cryptoprimitives.collection.AuxiliaryInformation;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
@@ -55,7 +54,7 @@ import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.DecryptionProof;
 @SuppressWarnings("java:S117")
 public class DecryptionProofService {
 
-	private static final String DECRYPTION_PROOF = "DecryptionProof";
+	private static final HashableString DECRYPTION_PROOF = HashableString.from("DecryptionProof");
 
 	private final ElGamalService elGamalService = new ElGamalService();
 	private final RandomService randomService;
@@ -110,12 +109,12 @@ public class DecryptionProofService {
 	 * @return a decryption proof.
 	 */
 	public DecryptionProof genDecryptionProof(final ElGamalMultiRecipientCiphertext ciphertext, final ElGamalMultiRecipientKeyPair keyPair,
-			final ElGamalMultiRecipientMessage message, final ImmutableList<String> auxiliaryInformation) {
+			final ElGamalMultiRecipientMessage message, final AuxiliaryInformation auxiliaryInformation) {
 		checkNotNull(ciphertext);
 		checkNotNull(keyPair);
 		checkNotNull(message);
 
-		final ImmutableList<String> i_aux = checkNotNull(auxiliaryInformation);
+		final AuxiliaryInformation i_aux = checkNotNull(auxiliaryInformation);
 		final ElGamalMultiRecipientCiphertext C = ciphertext;
 		final ElGamalMultiRecipientPrivateKey sk = keyPair.getPrivateKey();
 		final ElGamalMultiRecipientPublicKey pk = keyPair.getPublicKey();
@@ -150,14 +149,9 @@ public class DecryptionProofService {
 				.collect(toGroupVector());
 		final HashableList h_aux;
 		if (!i_aux.isEmpty()) {
-			h_aux = HashableList.of(HashableString.from(DECRYPTION_PROOF),
-					phi,
-					m,
-					i_aux.stream()
-							.map(HashableString::from)
-							.collect(toHashableList()));
+			h_aux = HashableList.of(DECRYPTION_PROOF, phi, m, i_aux);
 		} else {
-			h_aux = HashableList.of(HashableString.from(DECRYPTION_PROOF), phi, m);
+			h_aux = HashableList.of(DECRYPTION_PROOF, phi, m);
 		}
 		final BigInteger e_value = byteArrayToInteger(hashService.recursiveHash(f, y, c, h_aux));
 		final ZqElement e = ZqElement.create(e_value, ZqGroup.sameOrderAs(gqGroup));
@@ -186,13 +180,13 @@ public class DecryptionProofService {
 	 * @return {@code true} if the decryption proof is valid, {@code false} otherwise.
 	 */
 	public Verifiable verifyDecryption(final ElGamalMultiRecipientCiphertext ciphertext, final ElGamalMultiRecipientPublicKey publicKey,
-			final ElGamalMultiRecipientMessage message, final DecryptionProof decryptionProof, final ImmutableList<String> auxiliaryInformation) {
+			final ElGamalMultiRecipientMessage message, final DecryptionProof decryptionProof, final AuxiliaryInformation auxiliaryInformation) {
 		checkNotNull(ciphertext);
 		checkNotNull(publicKey);
 		checkNotNull(message);
 		checkNotNull(decryptionProof);
 
-		final ImmutableList<String> i_aux = checkNotNull(auxiliaryInformation);
+		final AuxiliaryInformation i_aux = checkNotNull(auxiliaryInformation);
 		final ElGamalMultiRecipientCiphertext C = ciphertext;
 		final ElGamalMultiRecipientPublicKey pk = publicKey;
 		final ElGamalMultiRecipientMessage m = message;
@@ -235,14 +229,9 @@ public class DecryptionProofService {
 				.collect(toGroupVector());
 		final HashableList h_aux;
 		if (!i_aux.isEmpty()) {
-			h_aux = HashableList.of(HashableString.from(DECRYPTION_PROOF),
-					phi,
-					m,
-					i_aux.stream()
-							.map(HashableString::from)
-							.collect(toHashableList()));
+			h_aux = HashableList.of(DECRYPTION_PROOF, phi, m, i_aux);
 		} else {
-			h_aux = HashableList.of(HashableString.from(DECRYPTION_PROOF), phi, m);
+			h_aux = HashableList.of(DECRYPTION_PROOF, phi, m);
 		}
 		final BigInteger e_prime_value = byteArrayToInteger(hashService.recursiveHash(f, y, c_prime, h_aux));
 		final ZqElement e_prime = ZqElement.create(e_prime_value, zqGroup);

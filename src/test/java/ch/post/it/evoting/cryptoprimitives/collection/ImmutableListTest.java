@@ -44,11 +44,11 @@ class ImmutableListTest {
 		final List<String> mutableInput = Stream.of("a", "b", "c").collect(Collectors.toCollection(ArrayList::new));
 		final ImmutableList<String> list = ImmutableList.from(mutableInput);
 		mutableInput.set(0, "d");
-		assertEquals("a", list.get(0));
+		assertEquals("a", list.getFirst());
 
 		final List<String> unmodifiable = list.asList();
 		assertThrows(UnsupportedOperationException.class, () -> unmodifiable.set(0, "d"));
-		assertEquals("a", unmodifiable.get(0));
+		assertEquals("a", unmodifiable.getFirst());
 	}
 
 	@Test
@@ -66,7 +66,7 @@ class ImmutableListTest {
 	@Test
 	void get() {
 		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
-		assertEquals("a", list.get(0));
+		assertEquals("a", list.getFirst());
 	}
 
 	@Test
@@ -202,13 +202,6 @@ class ImmutableListTest {
 	}
 
 	@Test
-	void appendVarArgsTest() {
-		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
-
-		assertEquals(ImmutableList.of("a", "b", "c", "d", "e"), list.append("d", "e"));
-	}
-
-	@Test
 	void appendImmutableListTest() {
 		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
 		final ImmutableList<String> appendedList = list.append(ImmutableList.of("d", "e"));
@@ -220,12 +213,8 @@ class ImmutableListTest {
 	@Test
 	void appendThrows() {
 		final ImmutableList<String> list = emptyList();
-		final String[] s = new String[1];
-		s[0] = null;
 
 		assertThrows(NullPointerException.class, () -> list.append((String) null));
-		assertThrows(NullPointerException.class, () -> list.append((String[]) null));
-		assertThrows(NullPointerException.class, () -> list.append(s));
 		assertThrows(NullPointerException.class, () -> list.append((ImmutableList<String>) null));
 	}
 
@@ -247,10 +236,10 @@ class ImmutableListTest {
 		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
 
 		// list
-		assertThrows(NullPointerException.class, () -> list.containsAll((ImmutableList) null));
+		assertThrows(NullPointerException.class, () -> list.containsAll((ImmutableList<String>) null));
 
 		// set
-		assertThrows(NullPointerException.class, () -> list.containsAll((ImmutableSet) null));
+		assertThrows(NullPointerException.class, () -> list.containsAll((ImmutableSet<String>) null));
 	}
 
 	@Test
@@ -292,7 +281,7 @@ class ImmutableListTest {
 	@Test
 	void testToString() {
 		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
-		assertEquals("ImmutableList{elements=[a, b, c]}", list.toString());
+		assertEquals("[a, b, c]", list.toString());
 	}
 
 	@Test

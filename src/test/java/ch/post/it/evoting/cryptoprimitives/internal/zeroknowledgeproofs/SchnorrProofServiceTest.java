@@ -37,6 +37,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 
+import ch.post.it.evoting.cryptoprimitives.collection.AuxiliaryInformation;
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
@@ -135,13 +136,13 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 		private static final int STR_LEN = 2;
 		private GqElement statement;
 		private ZqElement witness;
-		private ImmutableList<String> auxiliaryInformation;
+		private AuxiliaryInformation auxiliaryInformation;
 
 		@BeforeEach
 		void setUp() {
 			witness = zqGroupGenerator.genRandomZqElementMember();
 			statement = gqGroupGenerator.genMember().getGroup().getGenerator().exponentiate(witness);
-			auxiliaryInformation = ImmutableList.of(
+			auxiliaryInformation = AuxiliaryInformation.of(
 					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
 					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
 		}
@@ -172,7 +173,7 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 
 		private static final int STR_LEN = 4;
 		private GqElement statement;
-		private ImmutableList<String> auxiliaryInformation;
+		private AuxiliaryInformation auxiliaryInformation;
 		private ZqElement witness;
 		private SchnorrProof schnorrProof;
 
@@ -181,7 +182,7 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 			statement = gqGroupGenerator.genMember();
 			witness = zqGroupGenerator.genRandomZqElementMember();
 			statement = statement.getGroup().getGenerator().exponentiate(witness);
-			auxiliaryInformation = ImmutableList.of(
+			auxiliaryInformation = AuxiliaryInformation.of(
 					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
 					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
 			schnorrProof = schnorrProofService.genSchnorrProof(witness, statement, auxiliaryInformation);
@@ -196,8 +197,8 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("empty auxiliary information returns true")
 		void emptyAux() {
-			final SchnorrProof schnorrProof = schnorrProofService.genSchnorrProof(witness, statement, ImmutableList.emptyList());
-			assertTrue(schnorrProofService.verifySchnorrProof(schnorrProof, statement, ImmutableList.emptyList()));
+			final SchnorrProof schnorrProof = schnorrProofService.genSchnorrProof(witness, statement, AuxiliaryInformation.of());
+			assertTrue(schnorrProofService.verifySchnorrProof(schnorrProof, statement, AuxiliaryInformation.of()));
 		}
 
 		@Test
@@ -241,7 +242,7 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 
 					// Parse auxiliaryInformation parameters (i_aux)
 					final String[] auxInformation = input.get("additional_information", String[].class);
-					final ImmutableList<String> auxiliaryInformation = ImmutableList.of(auxInformation);
+					final AuxiliaryInformation auxiliaryInformation = AuxiliaryInformation.of(auxInformation);
 
 					// Parse output parameters
 					final JsonData output = testParameters.getOutput();
@@ -259,7 +260,7 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 		@MethodSource("jsonFileArgumentProvider")
 		@DisplayName("with real values gives expected result")
 		void verifySchnorrProofWithRealValues(final SchnorrProof schnorrProof, final GqElement statement,
-				final ImmutableList<String> auxiliaryInformation, final boolean expected, final String description) {
+				final AuxiliaryInformation auxiliaryInformation, final boolean expected, final String description) {
 
 			final SchnorrProofService SchnorrProofService = new SchnorrProofService(randomService,
 					HashService.getInstance());

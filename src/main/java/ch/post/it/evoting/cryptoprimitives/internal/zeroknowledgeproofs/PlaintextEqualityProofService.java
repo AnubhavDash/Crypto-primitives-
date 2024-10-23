@@ -15,7 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.zeroknowledgeproofs;
 
-import static ch.post.it.evoting.cryptoprimitives.hashing.HashableList.toHashableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.math.Vectors.vectorAddition;
 import static ch.post.it.evoting.cryptoprimitives.internal.math.Vectors.vectorExponentiation;
 import static ch.post.it.evoting.cryptoprimitives.internal.math.Vectors.vectorMultiplication;
@@ -28,6 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 
+import ch.post.it.evoting.cryptoprimitives.collection.AuxiliaryInformation;
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
@@ -47,7 +47,8 @@ import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.ZeroKnowledgeProo
 @SuppressWarnings("java:S117")
 public class PlaintextEqualityProofService {
 
-	private static final String PLAINTEXT_EQUALITY_PROOF = "PlaintextEqualityProof";
+	private static final HashableString PLAINTEXT_EQUALITY_PROOF = HashableString.from("PlaintextEqualityProof");
+
 	private final RandomService randomService;
 	private final HashService hashService;
 
@@ -94,11 +95,11 @@ public class PlaintextEqualityProofService {
 
 	/**
 	 * @see ZeroKnowledgeProof#genPlaintextEqualityProof(ElGamalMultiRecipientCiphertext, ElGamalMultiRecipientCiphertext, GqElement, GqElement,
-	 * GroupVector, ImmutableList)
+	 * GroupVector, AuxiliaryInformation)
 	 */
 	public PlaintextEqualityProof genPlaintextEqualityProof(final ElGamalMultiRecipientCiphertext firstCiphertext,
 			final ElGamalMultiRecipientCiphertext secondCiphertext, final GqElement firstPublicKey, final GqElement secondPublicKey,
-			final GroupVector<ZqElement, ZqGroup> randomness, final ImmutableList<String> auxiliaryInformation) {
+			final GroupVector<ZqElement, ZqGroup> randomness, final AuxiliaryInformation auxiliaryInformation) {
 
 		checkNotNull(firstCiphertext);
 		checkNotNull(secondCiphertext);
@@ -135,7 +136,7 @@ public class PlaintextEqualityProofService {
 		final GqElement c_1 = firstCiphertext.get(0);
 		final GqElement c_0_prime = secondCiphertext.getGamma();
 		final GqElement c_1_prime = secondCiphertext.get(0);
-		final ImmutableList<String> i_aux = auxiliaryInformation;
+		final AuxiliaryInformation i_aux = auxiliaryInformation;
 
 		// Operation.
 		final GroupVector<ZqElement, ZqGroup> b = randomService.genRandomVector(q, 2);
@@ -145,14 +146,9 @@ public class PlaintextEqualityProofService {
 
 		final HashableList h_aux;
 		if (!i_aux.isEmpty()) {
-			h_aux = HashableList.of(HashableString.from(PLAINTEXT_EQUALITY_PROOF),
-					c_1,
-					c_1_prime,
-					i_aux.stream()
-							.map(HashableString::from)
-							.collect(toHashableList()));
+			h_aux = HashableList.of(PLAINTEXT_EQUALITY_PROOF, c_1, c_1_prime, i_aux);
 		} else {
-			h_aux = HashableList.of(HashableString.from(PLAINTEXT_EQUALITY_PROOF), c_1, c_1_prime);
+			h_aux = HashableList.of(PLAINTEXT_EQUALITY_PROOF, c_1, c_1_prime);
 		}
 
 		final BigInteger eValue = byteArrayToInteger(hashService.recursiveHash(f, y, c, h_aux));
@@ -164,11 +160,11 @@ public class PlaintextEqualityProofService {
 
 	/**
 	 * @see ZeroKnowledgeProof#verifyPlaintextEquality(ElGamalMultiRecipientCiphertext, ElGamalMultiRecipientCiphertext, GqElement, GqElement,
-	 * PlaintextEqualityProof, ImmutableList)
+	 * PlaintextEqualityProof, AuxiliaryInformation)
 	 */
 	public boolean verifyPlaintextEquality(final ElGamalMultiRecipientCiphertext firstCiphertext,
 			final ElGamalMultiRecipientCiphertext secondCiphertext, final GqElement firstPublicKey, final GqElement secondPublicKey,
-			final PlaintextEqualityProof plaintextEqualityProof, final ImmutableList<String> auxiliaryInformation) {
+			final PlaintextEqualityProof plaintextEqualityProof, final AuxiliaryInformation auxiliaryInformation) {
 
 		checkNotNull(firstCiphertext);
 		checkNotNull(secondCiphertext);
@@ -203,7 +199,7 @@ public class PlaintextEqualityProofService {
 		final GqElement h = firstPublicKey;
 		final GqElement h_prime = secondPublicKey;
 		final PlaintextEqualityProof ez = plaintextEqualityProof;
-		final ImmutableList<String> i_aux = auxiliaryInformation;
+		final AuxiliaryInformation i_aux = auxiliaryInformation;
 		final GroupVector<ZqElement, ZqGroup> z = ez.get_z();
 		final ZqElement e = ez.get_e();
 
@@ -217,14 +213,9 @@ public class PlaintextEqualityProofService {
 
 		final HashableList h_aux;
 		if (!i_aux.isEmpty()) {
-			h_aux = HashableList.of(HashableString.from(PLAINTEXT_EQUALITY_PROOF),
-					c_1,
-					c_1_prime,
-					i_aux.stream()
-							.map(HashableString::from)
-							.collect(toHashableList()));
+			h_aux = HashableList.of(PLAINTEXT_EQUALITY_PROOF, c_1, c_1_prime, i_aux);
 		} else {
-			h_aux = HashableList.of(HashableString.from(PLAINTEXT_EQUALITY_PROOF), c_1, c_1_prime);
+			h_aux = HashableList.of(PLAINTEXT_EQUALITY_PROOF, c_1, c_1_prime);
 		}
 
 		final BigInteger e_prime_value = byteArrayToInteger(hashService.recursiveHash(f, y, c_prime, h_aux));

@@ -48,6 +48,11 @@ public class ImmutableList<E> implements Iterable<E> {
 
 	private final List<E> internalList;
 
+	protected ImmutableList(final ImmutableList<E> immutableList) {
+		// The parameter immutableList is guaranteed by construction to be validated.
+		this.internalList = checkNotNull(immutableList).internalList;
+	}
+
 	private ImmutableList(final List<E> internalList) {
 		this.internalList = Collections.unmodifiableList(internalList);
 	}
@@ -59,9 +64,8 @@ public class ImmutableList<E> implements Iterable<E> {
 	 * @throws NullPointerException if the elements are null or any of the elements is null.
 	 */
 	public static <E> ImmutableList<E> from(final List<E> elements) {
-		return checkNotNull(elements).stream()
-				.map(ImmutableList::validateElement)
-				.collect(toImmutableList());
+		// The validation of each element is done while collecting.
+		return checkNotNull(elements).stream().collect(toImmutableList());
 	}
 
 	/**
@@ -72,9 +76,8 @@ public class ImmutableList<E> implements Iterable<E> {
 	 */
 	@SafeVarargs
 	public static <E> ImmutableList<E> of(final E... elements) {
-		return Arrays.stream(checkNotNull(elements))
-				.map(ImmutableList::validateElement)
-				.collect(toImmutableList());
+		// The validation of each element is done while collecting.
+		return Arrays.stream(checkNotNull(elements)).collect(toImmutableList());
 	}
 
 	/**
@@ -122,35 +125,31 @@ public class ImmutableList<E> implements Iterable<E> {
 	}
 
 	/**
-	 * @param elements the elements to be appended to the list. Must be non-null and must not contain null elements.
-	 * @return a new {@link ImmutableList} with the appended elements.
+	 * @param element the element to be appended to the list. Must be non-null.
+	 * @return a new {@link ImmutableList} with the appended element.
 	 */
-	@SafeVarargs
-	public final ImmutableList<E> append(final E... elements) {
-		final List<E> validated = Arrays.stream(checkNotNull(elements))
-				.map(ImmutableList::validateElement)
+	public ImmutableList<E> append(final E element) {
+		final List<E> appendedList = Stream.concat(
+						internalList.stream(),
+						Stream.of(validateElement(element)))
 				.toList();
 
-		final List<E> list = new ArrayList<>(this.internalList);
-		list.addAll(validated);
-
-		// Since the existing elements have already been validated we can safely instantiate the new ImmutableList directly through the constructor.
-		return new ImmutableList<>(list);
+		// Use private constructor to avoid re-validating the elements.
+		return new ImmutableList<>(appendedList);
 	}
 
 	/**
 	 * @param other the other immutable list whose elements are to be appended to this list. Must be non-null.
 	 * @return a new {@link ImmutableList} with the appended elements.
 	 */
-	public final ImmutableList<E> append(final ImmutableList<E> other) {
-		checkNotNull(other);
-		// other's elements do not require validation since it is already an ImmutableList.
+	public ImmutableList<E> append(final ImmutableList<E> other) {
+		final List<E> appendedList = Stream.concat(
+						this.internalList.stream(),
+						checkNotNull(other).stream())
+				.toList();
 
-		final List<E> list = new ArrayList<>(this.internalList);
-		list.addAll(other.asList());
-
-		// Since the existing elements have already been validated we can safely instantiate the new ImmutableList directly through the constructor.
-		return new ImmutableList<>(list);
+		// Use private constructor to avoid re-validating the elements.
+		return new ImmutableList<>(appendedList);
 	}
 
 	/**
@@ -260,7 +259,8 @@ public class ImmutableList<E> implements Iterable<E> {
 		checkArgument(0 <= fromIndex && fromIndex <= toIndex && toIndex <= size(),
 				"Indexes are out of bounds. [fromIndex: %s, toIndex: %s, size: %s]", fromIndex, toIndex, size());
 
-		return internalList.subList(fromIndex, toIndex).stream().collect(toImmutableList());
+		// Use private constructor to avoid re-validating the elements.
+		return new ImmutableList<>(internalList.subList(fromIndex, toIndex));
 	}
 
 	/**
@@ -318,7 +318,7 @@ public class ImmutableList<E> implements Iterable<E> {
 
 	@Override
 	public String toString() {
-		return String.format("ImmutableList{elements=%s}", internalList);
+		return internalList.toString();
 	}
 
 	@Override
@@ -342,4 +342,5 @@ public class ImmutableList<E> implements Iterable<E> {
 	private static <E> E validateElement(final E element) {
 		return checkNotNull(element);
 	}
+
 }
