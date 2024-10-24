@@ -19,6 +19,7 @@ import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Collections;
 import java.util.stream.IntStream;
 
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -164,7 +165,7 @@ public class CommitmentService {
 		final GroupVector<ZqElement, ZqGroup> t = randomElements;
 		final CommitmentKey ck = commitmentKey;
 
-		final GroupMatrix<ZqElement, ZqGroup> d_matrix = GroupMatrix.fromRows(GroupVector.of(d));
+		final GroupMatrix<ZqElement, ZqGroup> d_matrix = GroupMatrix.fromRows(Collections.singletonList(d));
 
 		// Cross dimension checking.
 		checkArgument(d_matrix.numColumns() == t.size(), "The elements vector and the random elements must be of equal length");

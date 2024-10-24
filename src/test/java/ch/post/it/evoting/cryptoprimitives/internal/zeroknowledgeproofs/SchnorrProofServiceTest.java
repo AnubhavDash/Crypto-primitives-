@@ -24,6 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mockStatic;
 
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -37,8 +40,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 
-import ch.post.it.evoting.cryptoprimitives.collection.AuxiliaryInformation;
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
@@ -136,13 +137,13 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 		private static final int STR_LEN = 2;
 		private GqElement statement;
 		private ZqElement witness;
-		private AuxiliaryInformation auxiliaryInformation;
+		private List<String> auxiliaryInformation;
 
 		@BeforeEach
 		void setUp() {
 			witness = zqGroupGenerator.genRandomZqElementMember();
 			statement = gqGroupGenerator.genMember().getGroup().getGenerator().exponentiate(witness);
-			auxiliaryInformation = AuxiliaryInformation.of(
+			auxiliaryInformation = Arrays.asList(
 					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
 					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
 		}
@@ -164,6 +165,13 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 			assertThrows(NullPointerException.class, () -> schnorrProofService
 					.genSchnorrProof(witness, statement, null));
 		}
+
+		@Test
+		@DisplayName("auxiliary information containing null throws NullPointerException")
+		void auxiliaryInformationWithNull() {
+			auxiliaryInformation.set(0, null);
+			assertThrows(NullPointerException.class, () -> schnorrProofService.genSchnorrProof(witness, statement, auxiliaryInformation));
+		}
 	}
 
 	@Nested
@@ -173,7 +181,7 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 
 		private static final int STR_LEN = 4;
 		private GqElement statement;
-		private AuxiliaryInformation auxiliaryInformation;
+		private List<String> auxiliaryInformation;
 		private ZqElement witness;
 		private SchnorrProof schnorrProof;
 
@@ -182,7 +190,7 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 			statement = gqGroupGenerator.genMember();
 			witness = zqGroupGenerator.genRandomZqElementMember();
 			statement = statement.getGroup().getGenerator().exponentiate(witness);
-			auxiliaryInformation = AuxiliaryInformation.of(
+			auxiliaryInformation = Arrays.asList(
 					randomService.genRandomString(STR_LEN, Base16Alphabet.getInstance()),
 					randomService.genRandomString(STR_LEN, Base64Alphabet.getInstance()));
 			schnorrProof = schnorrProofService.genSchnorrProof(witness, statement, auxiliaryInformation);
@@ -197,8 +205,8 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("empty auxiliary information returns true")
 		void emptyAux() {
-			final SchnorrProof schnorrProof = schnorrProofService.genSchnorrProof(witness, statement, AuxiliaryInformation.of());
-			assertTrue(schnorrProofService.verifySchnorrProof(schnorrProof, statement, AuxiliaryInformation.of()));
+			final SchnorrProof schnorrProof = schnorrProofService.genSchnorrProof(witness, statement, Collections.emptyList());
+			assertTrue(schnorrProofService.verifySchnorrProof(schnorrProof, statement, Collections.emptyList()));
 		}
 
 		@Test
@@ -212,8 +220,15 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 					.verifySchnorrProof(schnorrProof, statement, null));
 		}
 
+		@Test
+		@DisplayName("auxiliary information containing null throws NullPointerException")
+		void auxiliaryInformationWithNull() {
+			auxiliaryInformation.set(0, null);
+			assertThrows(NullPointerException.class, () -> schnorrProofService.verifySchnorrProof(schnorrProof, statement, auxiliaryInformation));
+		}
+
 		private Stream<Arguments> jsonFileArgumentProvider() {
-			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/zeroknowledgeproofs/verify-schnorr.json");
+			final List<TestParameters> parametersList = TestParameters.fromResource("/zeroknowledgeproofs/verify-schnorr.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// Context.
@@ -242,7 +257,7 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 
 					// Parse auxiliaryInformation parameters (i_aux)
 					final String[] auxInformation = input.get("additional_information", String[].class);
-					final AuxiliaryInformation auxiliaryInformation = AuxiliaryInformation.of(auxInformation);
+					final List<String> auxiliaryInformation = Arrays.asList(auxInformation);
 
 					// Parse output parameters
 					final JsonData output = testParameters.getOutput();
@@ -259,8 +274,8 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 		@ParameterizedTest()
 		@MethodSource("jsonFileArgumentProvider")
 		@DisplayName("with real values gives expected result")
-		void verifySchnorrProofWithRealValues(final SchnorrProof schnorrProof, final GqElement statement,
-				final AuxiliaryInformation auxiliaryInformation, final boolean expected, final String description) {
+		void verifySchnorrProofWithRealValues(final SchnorrProof schnorrProof, final GqElement statement, final List<String> auxiliaryInformation,
+				final boolean expected, final String description) {
 
 			final SchnorrProofService SchnorrProofService = new SchnorrProofService(randomService,
 					HashService.getInstance());

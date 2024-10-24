@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -26,8 +27,6 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 
 class Base64ServiceTest {
 
@@ -42,23 +41,24 @@ class Base64ServiceTest {
 
 	private static Stream<Arguments> getInputsAndOutputs() {
 		return Stream.of(
-				Arguments.of(ImmutableByteArray.EMPTY, ""),
-				Arguments.of(ImmutableByteArray.of((byte) 65), "QQ=="),
-				Arguments.of(ImmutableByteArray.of((byte) 96), "YA=="),
-				Arguments.of(ImmutableByteArray.of((byte) 0), "AA=="),
-				Arguments.of(ImmutableByteArray.of((byte) 127), "fw=="),
-				Arguments.of(ImmutableByteArray.of((byte) -128), "gA=="),
-				Arguments.of(ImmutableByteArray.of((byte) -1), "/w=="),
-				Arguments.of(ImmutableByteArray.of((byte) 65, (byte) 0), "QQA="),
-				Arguments.of(ImmutableByteArray.of((byte) 1, (byte) 1, (byte) 1), "AQEB"),
-				Arguments.of(ImmutableByteArray.of((byte) 127, (byte) 0, (byte) -2, (byte) 3), "fwD+Aw==")
+				Arguments.of(new byte[] {}, ""),
+				Arguments.of(new byte[] { 65 }, "QQ=="),
+				Arguments.of(new byte[] { 96 }, "YA=="),
+				Arguments.of(new byte[] { 0 }, "AA=="),
+				Arguments.of(new byte[] { 127 }, "fw=="),
+				Arguments.of(new byte[] { -128 }, "gA=="),
+				Arguments.of(new byte[] { -1 }, "/w=="),
+				Arguments.of(new byte[] { 65, 0 }, "QQA="),
+				Arguments.of(new byte[] { 1, 1, 1 }, "AQEB"),
+				Arguments.of(new byte[] { 127, 0, -2, 3 }, "fwD+Aw==")
+
 		);
 	}
 
 	@ParameterizedTest
 	@MethodSource("getInputsAndOutputs")
 	@DisplayName("base64Encode with valid input gives expected output")
-	void base64EncodeWithValidInputGivesExpectedResult(final ImmutableByteArray input, final String expectedOutput) {
+	void base64EncodeWithValidInputGivesExpectedResult(final byte[] input, final String expectedOutput) {
 		final String result = base64Service.base64Encode(input);
 
 		assertEquals(expectedOutput, result);
@@ -67,10 +67,10 @@ class Base64ServiceTest {
 	@ParameterizedTest
 	@MethodSource("getInputsAndOutputs")
 	@DisplayName("base64Decode with valid inputs gives expected output")
-	void base64DecodeWithValidInputGivesExpectedResult(final ImmutableByteArray expectedOutput, final String input) {
-		final ImmutableByteArray result = base64Service.base64Decode(input);
+	void base64DecodeWithValidInputGivesExpectedResult(final byte[] expectedOutput, final String input) {
+		final byte[] result = base64Service.base64Decode(input);
 
-		assertEquals(expectedOutput, result);
+		assertArrayEquals(expectedOutput, result);
 	}
 
 	static Stream<String> getInvalidStrings() {
@@ -90,10 +90,10 @@ class Base64ServiceTest {
 	@RepeatedTest(10)
 	@DisplayName("base64Encode then base64Decode returns initial value")
 	void base64EncodeThenBase64DecodeReturnsInitialValue() {
-		final ImmutableByteArray randomBytes = randomService.randomBytes(16);
+		final byte[] randomBytes = randomService.randomBytes(16);
 
 		final String string = base64Service.base64Encode(randomBytes);
-		final ImmutableByteArray result = base64Service.base64Decode(string);
-		assertEquals(randomBytes, result);
+		final byte[] result = base64Service.base64Decode(string);
+		assertArrayEquals(randomBytes, result);
 	}
 }

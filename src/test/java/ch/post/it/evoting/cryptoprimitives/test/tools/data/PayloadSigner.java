@@ -19,27 +19,25 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-
 public final class PayloadSigner {
 
 	private PayloadSigner() {
 		// static usage only
 	}
 
-	public static ImmutableByteArray signPayload(final PrivateKey privateKey, final ImmutableByteArray payload)
+	public static byte[] signPayload(final PrivateKey privateKey, final byte[] payload)
 			throws Exception {
 		final Signature sig = Signature.getInstance("SHA1WithRSA");
 		sig.initSign(privateKey);
-		sig.update(payload.elements());
-		return new ImmutableByteArray(sig.sign());
+		sig.update(payload);
+		return sig.sign();
 	}
 
-	public static boolean verifyPayload(final PublicKey publicKey, final ImmutableByteArray payload, final ImmutableByteArray signature)
+	public static boolean verifyPayload(final PublicKey publicKey, final byte[] payload, final byte[] signature)
 			throws Exception {
 		final Signature sig = Signature.getInstance("SHA1WithRSA");
 		sig.initVerify(publicKey);
-		sig.update(payload.elements());
-		return sig.verify(signature.elements());
+		sig.update(payload);
+		return sig.verify(signature);
 	}
 }

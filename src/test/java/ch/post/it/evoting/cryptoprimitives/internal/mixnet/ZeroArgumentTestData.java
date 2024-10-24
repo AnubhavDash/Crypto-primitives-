@@ -15,8 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
-import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -120,8 +118,7 @@ public class ZeroArgumentTestData {
 		final List<ZqElement> lastRow = new ArrayList<>(matrixB.getRow(n - 1));
 		lastRow.set(m - 1, matrixBLastElem.get());
 		rows.set(n - 1, lastRow);
-		final GroupMatrix<ZqElement, ZqGroup> updatedMatrixB = GroupMatrix.fromRows(
-				rows.stream().map(c -> c.stream().collect(toGroupVector())).collect(toGroupVector()));
+		final GroupMatrix<ZqElement, ZqGroup> updatedMatrixB = GroupMatrix.fromRows(rows);
 
 		// Construct the remaining parts of the statement.
 		final GroupVector<GqElement, GqGroup> commitmentsCa = CommitmentService

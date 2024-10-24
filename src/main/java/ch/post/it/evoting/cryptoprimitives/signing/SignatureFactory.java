@@ -20,12 +20,12 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SignatureSupportingAlgorithm;
 import ch.post.it.evoting.cryptoprimitives.internal.signing.GenKeysAndCertService;
 import ch.post.it.evoting.cryptoprimitives.internal.signing.SignatureGenerationService;
 import ch.post.it.evoting.cryptoprimitives.internal.signing.SignatureVerificationService;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SignatureSupportingAlgorithm;
 
 public class SignatureFactory {
 

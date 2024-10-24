@@ -44,7 +44,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.TestSignatureSupportingAlgorithm;
 import ch.post.it.evoting.cryptoprimitives.signing.AuthorityInformation;
@@ -178,10 +177,10 @@ class GenKeysAndCertServiceTest {
 		final Certificate certificate = output.certificate();
 		final PrivateKey privateKey = output.privateKey();
 
-		final ImmutableByteArray payload = createRandomPayload();
+		final byte[] payload = createRandomPayload();
 
 		// when
-		final ImmutableByteArray actual = signPayload(privateKey, payload);
+		final byte[] actual = signPayload(privateKey, payload);
 
 		// then
 		assertTrue(verifyPayload(certificate.getPublicKey(), payload, actual));
@@ -195,7 +194,7 @@ class GenKeysAndCertServiceTest {
 		return date.toInstant().atZone(ZoneId.of("Europe/Zurich")).toLocalDate();
 	}
 
-	private static ImmutableByteArray createRandomPayload() {
+	private static byte[] createRandomPayload() {
 		return randomService.randomBytes(10);
 	}
 }

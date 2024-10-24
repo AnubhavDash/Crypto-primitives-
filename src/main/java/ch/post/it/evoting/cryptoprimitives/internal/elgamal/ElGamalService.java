@@ -15,7 +15,8 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import java.util.List;
+
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamal;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
@@ -32,13 +33,13 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 public class ElGamalService implements ElGamal {
 
 	@Override
-	public ElGamalMultiRecipientCiphertext getCiphertext(final ElGamalMultiRecipientMessage message, final ZqElement exponent,
-			final ElGamalMultiRecipientPublicKey publicKey) {
+	public ElGamalMultiRecipientCiphertext getCiphertext(ElGamalMultiRecipientMessage message, ZqElement exponent,
+			ElGamalMultiRecipientPublicKey publicKey) {
 		return ElGamalMultiRecipientCiphertexts.getCiphertext(message, exponent, publicKey);
 	}
 
 	@Override
-	public ElGamalMultiRecipientCiphertext neutralElement(final int numPhi, final GqGroup group) {
+	public ElGamalMultiRecipientCiphertext neutralElement(int numPhi, GqGroup group) {
 		return ElGamalMultiRecipientCiphertexts.neutralElement(numPhi, group);
 	}
 
@@ -49,28 +50,28 @@ public class ElGamalService implements ElGamal {
 	}
 
 	@Override
-	public ElGamalMultiRecipientMessage ones(final GqGroup group, final int size) {
+	public ElGamalMultiRecipientMessage ones(GqGroup group, int size) {
 		return ElGamalMultiRecipientMessages.ones(group, size);
 	}
 
 	@Override
 	public GqGroup getEncryptionParameters(final String seed) {
-		final ImmutableList<Integer> sp = PrimesInternal.getSmallPrimes();
+		final List<Integer> sp = PrimesInternal.getSmallPrimes();
 		return new EncryptionParameters().getEncryptionParameters(seed, sp);
 	}
 
 	@Override
-	public ElGamalMultiRecipientKeyPair genKeyPair(final GqGroup group, final int numElements, final Random random) {
+	public ElGamalMultiRecipientKeyPair genKeyPair(GqGroup group, int numElements, Random random) {
 		return ElGamalMultiRecipientKeyPair.genKeyPair(group, numElements, random);
 	}
 
 	@Override
-	public ElGamalMultiRecipientKeyPair from(final ElGamalMultiRecipientPrivateKey privateKey, final GqElement generator) {
+	public ElGamalMultiRecipientKeyPair from(ElGamalMultiRecipientPrivateKey privateKey, GqElement generator) {
 		return ElGamalMultiRecipientKeyPair.from(privateKey, generator);
 	}
 
 	@Override
-	public ElGamalMultiRecipientPublicKey combinePublicKeys(final GroupVector<ElGamalMultiRecipientPublicKey, GqGroup> publicKeyList) {
+	public ElGamalMultiRecipientPublicKey combinePublicKeys(GroupVector<ElGamalMultiRecipientPublicKey, GqGroup> publicKeyList) {
 		return ElGamalMultiRecipientPublicKeys.combinePublicKeys(publicKeyList);
 	}
 }

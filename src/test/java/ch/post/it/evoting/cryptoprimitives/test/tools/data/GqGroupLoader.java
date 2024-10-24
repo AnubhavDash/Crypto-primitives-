@@ -28,7 +28,7 @@ public class GqGroupLoader {
 	private final GqGroup group;
 
 	GqGroupLoader(final String fileName) throws IOException {
-		final ObjectMapper mapper = new ObjectMapper();
+		ObjectMapper mapper = new ObjectMapper();
 		final JsonNode jsonNode = mapper.readTree(GqGroupLoader.class.getResource(fileName));
 
 		final BigInteger p = new BigInteger(jsonNode.get("p").asText(), 10);

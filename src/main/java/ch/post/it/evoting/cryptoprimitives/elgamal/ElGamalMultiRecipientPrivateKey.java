@@ -19,12 +19,12 @@ import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 import com.google.common.base.Preconditions;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -112,7 +112,7 @@ public final class ElGamalMultiRecipientPrivateKey implements GroupVectorElement
 	}
 
 	@Override
-	public ImmutableList<Hashable> toHashableForm() {
+	public List<? extends Hashable> toHashableForm() {
 		return privateKeyElements.toHashableForm();
 	}
 }

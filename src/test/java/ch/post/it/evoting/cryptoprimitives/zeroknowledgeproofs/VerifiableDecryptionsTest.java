@@ -15,7 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs;
 
-import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -52,7 +51,7 @@ class VerifiableDecryptionsTest extends TestGroupSetup {
 					final ZqElement e = zqGroupGenerator.genRandomZqElementMember();
 					final GroupVector<ZqElement, ZqGroup> z = zqGroupGenerator.genRandomZqElementVector(numPhis);
 					return new DecryptionProof(e, z);
-				}).collect(toGroupVector());
+				}).collect(GroupVector.toGroupVector());
 	}
 
 	@Test
@@ -65,7 +64,7 @@ class VerifiableDecryptionsTest extends TestGroupSetup {
 	@Test
 	@DisplayName("Constructing a VerifiableDecryptions with an empty vector of ciphertexts throws an IllegalArgumentException")
 	void constructVerifiableDecryptionsWithEmptyCiphertextVector() {
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> emptyCiphertextsVector = GroupVector.empty();
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> emptyCiphertextsVector = GroupVector.of();
 		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
 				() -> new VerifiableDecryptions(emptyCiphertextsVector, decryptionProofs));
 		assertEquals("There must be at least 1 ciphertext.", illegalArgumentException.getMessage());
