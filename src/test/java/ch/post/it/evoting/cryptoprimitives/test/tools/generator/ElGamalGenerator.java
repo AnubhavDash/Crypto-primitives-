@@ -15,12 +15,13 @@
  */
 package ch.post.it.evoting.cryptoprimitives.test.tools.generator;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.test.tools.generator.GroupVectorElementGenerator.generateElementList;
 import static ch.post.it.evoting.cryptoprimitives.test.tools.generator.GroupVectorElementGenerator.generateElementMatrix;
 
-import java.util.List;
 import java.util.stream.Stream;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamal;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
@@ -50,12 +51,12 @@ public class ElGamalGenerator {
 		this.groupGenerator = new GqGroupGenerator(group);
 	}
 
-	private List<GqElement> genRandomMessageElements(final int size) {
+	private GroupVector<GqElement, GqGroup> genRandomMessageElements(final int size) {
 		return generateElementList(size, this.groupGenerator::genMember);
 	}
 
 	public ElGamalMultiRecipientMessage genRandomMessage(final int size) {
-		return new ElGamalMultiRecipientMessage(GroupVector.from(genRandomMessageElements(size)));
+		return new ElGamalMultiRecipientMessage(genRandomMessageElements(size));
 	}
 
 	public ElGamalMultiRecipientPublicKey genRandomPublicKey(final int size) {
@@ -77,7 +78,7 @@ public class ElGamalGenerator {
 	}
 
 	public GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> genRandomCiphertextVector(final int size, final int ciphertextSize) {
-		return GroupVector.from(generateElementList(size, () -> genRandomCiphertext(ciphertextSize)));
+		return generateElementList(size, () -> genRandomCiphertext(ciphertextSize));
 	}
 
 	public GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> genRandomCiphertextMatrix(final int numRows, final int numColumns,
@@ -86,24 +87,23 @@ public class ElGamalGenerator {
 	}
 
 	public GroupVector<ElGamalMultiRecipientMessage, GqGroup> genRandomMessageVector(final int size, final int messageSize) {
-		return GroupVector.from(generateElementList(size, () -> genRandomMessage(messageSize)));
+		return generateElementList(size, () -> genRandomMessage(messageSize));
 	}
 
 	/**
 	 * Generate a random list of ciphertexts encrypted with the same publicKey.
 	 */
-	public List<ElGamalMultiRecipientCiphertext> genRandomCiphertexts(final ElGamalMultiRecipientPublicKey publicKey, final int numElements,
+	public ImmutableList<ElGamalMultiRecipientCiphertext> genRandomCiphertexts(final ElGamalMultiRecipientPublicKey publicKey, final int numElements,
 			final int numCiphertexts) {
 		final ElGamalMultiRecipientMessage randomMessage = genRandomMessage(numElements);
 		final ZqElement randomExponent = ZqElement.create(randomService.genRandomInteger(group.getQ()), ZqGroup.sameOrderAs(group));
 
 		return Stream.generate(() -> elGamal.getCiphertext(randomMessage, randomExponent, publicKey))
-				.limit(numCiphertexts).toList();
+				.limit(numCiphertexts).collect(toImmutableList());
 	}
 
-	public static ElGamalMultiRecipientCiphertext encryptMessage(
-			final ElGamalMultiRecipientMessage originalMessage, final ElGamalMultiRecipientKeyPair keyPair,
-			final ZqGroup zqGroup) {
+	public static ElGamalMultiRecipientCiphertext encryptMessage(final ElGamalMultiRecipientMessage originalMessage,
+			final ElGamalMultiRecipientKeyPair keyPair, final ZqGroup zqGroup) {
 		final TestRandomService randomService = new TestRandomService();
 		final ZqElement exponent = ZqElement.create(randomService.genRandomInteger(zqGroup.getQ()), zqGroup);
 		return elGamal.getCiphertext(originalMessage, exponent, keyPair.getPublicKey());

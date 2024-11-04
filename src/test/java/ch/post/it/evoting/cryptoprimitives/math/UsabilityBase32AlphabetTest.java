@@ -90,10 +90,7 @@ class UsabilityBase32AlphabetTest {
 	@DisplayName("contains with a null character behaves as expected")
 	@Test
 	void containsWithNullCharacter() {
-		final boolean expected = false;
-
-		final boolean isContained = assertDoesNotThrow(() -> usabilityBase32Alphabet.contains(null));
-		assertEquals(expected, isContained);
+		assertThrows(NullPointerException.class, () -> usabilityBase32Alphabet.contains(null));
 	}
 
 	@DisplayName("contains with a character part of the alphabet behaves as expected")
@@ -164,11 +161,7 @@ class UsabilityBase32AlphabetTest {
 	@DisplayName("indexOf with a null character behaves as expected")
 	@Test
 	void indexOfNullHappyPath() {
-		final int expected = -1;
-
-		final int index = assertDoesNotThrow(() -> usabilityBase32Alphabet.indexOf(null));
-
-		assertEquals(expected, index);
+		assertThrows(NullPointerException.class, () -> usabilityBase32Alphabet.indexOf(null));
 	}
 
 	@DisplayName("indexOf with a character part of the alphabet behaves as expected")

@@ -15,8 +15,8 @@
  */
 package ch.post.it.evoting.cryptoprimitives.symmetric;
 
-import java.util.List;
-
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 
 /**
  * Provides methods for symmetric encryption/decryption.
@@ -32,7 +32,8 @@ public interface Symmetric {
 	 * @return The authenticated ciphertext C ∈ B<sup>c</sup> and the nonce ∈ B<sup>n</sup>.
 	 * @throws IllegalArgumentException if the given encryptionKey is invalid for this underlying algorithm.
 	 */
-	SymmetricCiphertext genCiphertextSymmetric(final byte[] encryptionKey, final byte[] plaintext, final List<String> associatedData);
+	SymmetricCiphertext genCiphertextSymmetric(final ImmutableByteArray encryptionKey, final ImmutableByteArray plaintext,
+			final ImmutableList<String> associatedData);
 
 	/**
 	 * Symmetric authenticated decryption scheme based on authenticated Decryption with Associated Data (AEAD)
@@ -48,8 +49,8 @@ public interface Symmetric {
 	 *                                      <li>the nonce does not match the expected format.</li>
 	 *                                  </ul>
 	 */
-	byte[] getPlaintextSymmetric(final byte[] encryptionKey, final byte[] ciphertext, final byte[] nonce, final List<String> associatedData);
-
+	ImmutableByteArray getPlaintextSymmetric(final ImmutableByteArray encryptionKey, final ImmutableByteArray ciphertext,
+			final ImmutableByteArray nonce, final ImmutableList<String> associatedData);
 
 	/**
 	 * Gets the byte length of the nonce for this algorithm

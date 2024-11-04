@@ -20,12 +20,11 @@ import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
 import java.util.stream.IntStream;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 
+import ch.post.it.evoting.cryptoprimitives.collection.AuxiliaryInformation;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
@@ -81,16 +80,12 @@ public class ZeroKnowledgeProofService implements ZeroKnowledgeProof {
 
 	@Override
 	public VerifiableDecryptions genVerifiableDecryptions(final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts,
-			final ElGamalMultiRecipientKeyPair keyPair, final List<String> auxiliaryInformation) {
-		checkNotNull(ciphertexts);
+			final ElGamalMultiRecipientKeyPair keyPair, final AuxiliaryInformation auxiliaryInformation) {
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = checkNotNull(ciphertexts);
 		checkNotNull(keyPair);
-		final List<String> auxiliaryInformationCopy = checkNotNull(auxiliaryInformation).stream()
-				.map(Preconditions::checkNotNull)
-				.toList();
+		final AuxiliaryInformation i_aux = checkNotNull(auxiliaryInformation);
 
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = ciphertexts;
 		final ElGamalMultiRecipientPrivateKey sk = keyPair.getPrivateKey();
-		final List<String> i_aux = auxiliaryInformationCopy;
 		final int l = C.getElementSize();
 		final int k = sk.size();
 
@@ -118,15 +113,12 @@ public class ZeroKnowledgeProofService implements ZeroKnowledgeProof {
 	@Override
 	public VerificationResult verifyDecryptions(final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts,
 			final ElGamalMultiRecipientPublicKey publicKey, final VerifiableDecryptions verifiableDecryptions,
-			final List<String> auxiliaryInformation) {
+			final AuxiliaryInformation auxiliaryInformation) {
 		checkNotNull(ciphertexts);
 		checkNotNull(publicKey);
 		checkNotNull(verifiableDecryptions);
-		final List<String> auxiliaryInformationCopy = checkNotNull(auxiliaryInformation).stream()
-				.map(Preconditions::checkNotNull)
-				.toList();
 
-		final List<String> i_aux = auxiliaryInformationCopy;
+		final AuxiliaryInformation i_aux = checkNotNull(auxiliaryInformation);
 		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = ciphertexts;
 		final ElGamalMultiRecipientPublicKey pk = publicKey;
 		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C_prime = verifiableDecryptions.getCiphertexts();
@@ -167,20 +159,20 @@ public class ZeroKnowledgeProofService implements ZeroKnowledgeProof {
 
 	@Override
 	public ExponentiationProof genExponentiationProof(final GroupVector<GqElement, GqGroup> bases, final ZqElement exponent,
-			final GroupVector<GqElement, GqGroup> exponentiations, final List<String> auxiliaryInformation) {
+			final GroupVector<GqElement, GqGroup> exponentiations, final AuxiliaryInformation auxiliaryInformation) {
 		return exponentiationProofService.genExponentiationProof(bases, exponent, exponentiations, auxiliaryInformation);
 	}
 
 	@Override
 	public boolean verifyExponentiation(final GroupVector<GqElement, GqGroup> bases, final GroupVector<GqElement, GqGroup> exponentiations,
-			final ExponentiationProof proof, final List<String> auxiliaryInformation) {
+			final ExponentiationProof proof, final AuxiliaryInformation auxiliaryInformation) {
 		return exponentiationProofService.verifyExponentiation(bases, exponentiations, proof, auxiliaryInformation);
 	}
 
 	@Override
 	public PlaintextEqualityProof genPlaintextEqualityProof(final ElGamalMultiRecipientCiphertext firstCiphertext,
 			final ElGamalMultiRecipientCiphertext secondCiphertext, final GqElement firstPublicKey, final GqElement secondPublicKey,
-			final GroupVector<ZqElement, ZqGroup> randomness, final List<String> auxiliaryInformation) {
+			final GroupVector<ZqElement, ZqGroup> randomness, final AuxiliaryInformation auxiliaryInformation) {
 		return plaintextEqualityProofService
 				.genPlaintextEqualityProof(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey, randomness, auxiliaryInformation);
 	}
@@ -188,18 +180,18 @@ public class ZeroKnowledgeProofService implements ZeroKnowledgeProof {
 	@Override
 	public boolean verifyPlaintextEquality(final ElGamalMultiRecipientCiphertext firstCiphertext,
 			final ElGamalMultiRecipientCiphertext secondCiphertext, final GqElement firstPublicKey, final GqElement secondPublicKey,
-			final PlaintextEqualityProof plaintextEqualityProof, final List<String> auxiliaryInformation) {
+			final PlaintextEqualityProof plaintextEqualityProof, final AuxiliaryInformation auxiliaryInformation) {
 		return plaintextEqualityProofService.verifyPlaintextEquality(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey,
 				plaintextEqualityProof, auxiliaryInformation);
 	}
 
 	@Override
-	public SchnorrProof genSchnorrProof(final ZqElement witness, final GqElement statement, final List<String> auxiliaryInformation) {
+	public SchnorrProof genSchnorrProof(final ZqElement witness, final GqElement statement, final AuxiliaryInformation auxiliaryInformation) {
 		return schnorrProofService.genSchnorrProof(witness, statement, auxiliaryInformation);
 	}
 
 	@Override
-	public boolean verifySchnorrProof(final SchnorrProof proof, final GqElement statement, final List<String> auxiliaryInformation) {
+	public boolean verifySchnorrProof(final SchnorrProof proof, final GqElement statement, final AuxiliaryInformation auxiliaryInformation) {
 		return schnorrProofService.verifySchnorrProof(proof, statement, auxiliaryInformation);
 	}
 

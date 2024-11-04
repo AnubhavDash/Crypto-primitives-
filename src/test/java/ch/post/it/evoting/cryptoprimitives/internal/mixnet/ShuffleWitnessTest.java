@@ -72,7 +72,7 @@ class ShuffleWitnessTest extends TestGroupSetup {
 	@Test
 	@DisplayName("with empty randomness throws IllegalArgumentException")
 	void constructEmptyRandomness() {
-		final GroupVector<ZqElement, ZqGroup> emptyRandomness = GroupVector.of();
+		final GroupVector<ZqElement, ZqGroup> emptyRandomness = GroupVector.empty();
 
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 				() -> new ShuffleWitness(permutation, emptyRandomness));

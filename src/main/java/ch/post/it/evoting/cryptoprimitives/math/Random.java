@@ -16,7 +16,8 @@
 package ch.post.it.evoting.cryptoprimitives.math;
 
 import java.math.BigInteger;
-import java.util.List;
+
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 
 /**
  * Interface exposing all methods that need to be accessed outside of crypto-primitives.
@@ -50,7 +51,7 @@ public interface Random {
 	 * @param numberOfUniqueCodes n, the number of unique codes. Must be strictly positive.
 	 * @return codes &#8712; (&#120120;<sub>10</sub>)<sup>l &times; n</sup> a list of unique decimal strings.
 	 */
-	List<String> genUniqueDecimalStrings(final int desiredCodeLength, final int numberOfUniqueCodes);
+	ImmutableList<String> genUniqueDecimalStrings(final int desiredCodeLength, final int numberOfUniqueCodes);
 
 	/**
 	 * Generates a random string of length &#119897; of the given alphabet.

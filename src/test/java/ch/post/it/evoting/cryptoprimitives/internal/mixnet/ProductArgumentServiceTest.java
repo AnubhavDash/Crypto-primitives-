@@ -48,6 +48,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
@@ -234,7 +236,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 			assertFalse(argument.get_c_b().isPresent());
 			assertFalse(argument.getHadamardArgument().isPresent());
 
-			final SingleValueProductStatement sStatement = new SingleValueProductStatement(smallStatement.get_c_A().get(0),
+			final SingleValueProductStatement sStatement = new SingleValueProductStatement(smallStatement.get_c_A().getFirst(),
 					smallStatement.get_b());
 			assertTrue(new SingleValueProductArgumentService(randomService, hashService, publicKey, commitmentKey)
 					.verifySingleValueProductArgument(sStatement, argument.getSingleValueProductArgument()).verify().isVerified());
@@ -245,7 +247,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 		void getProductArgumentWithBadCommitment() {
 			final List<GqElement> commitmentList = new ArrayList<>(commitmentsA);
 			final GqElement g = commitmentsA.getGroup().getGenerator();
-			GqElement first = commitmentList.get(0);
+			GqElement first = commitmentList.getFirst();
 			first = first.multiply(g);
 			commitmentList.set(0, first);
 			commitmentsA = GroupVector.from(commitmentList);
@@ -317,18 +319,22 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 					four, one, zero, // d_0, d_1, r_d
 					one, two // s_0, s_x
 			).when(productRandomService).genRandomInteger(any());
-			when(productHashService.recursiveHash(any(Hashable[].class)))
-					.thenReturn(new byte[] { 0b10 }, new byte[] { 0b11 }, new byte[] { 0b01 }, new byte[] { 0b10 });
+			when(productHashService.recursiveHash(any(Hashable[].class))).thenReturn(
+					ImmutableByteArray.of((byte) 0b10),
+					ImmutableByteArray.of((byte) 0b11),
+					ImmutableByteArray.of((byte) 0b01),
+					ImmutableByteArray.of((byte) 0b10));
 			final ProductArgumentService specificProductArgumentService = new ProductArgumentService(productRandomService, productHashService,
 					productPublicKey, productCommitmentKey);
 
 			// Create A and r
-			final List<List<ZqElement>> matrixColumns = new ArrayList<>(m);
-			matrixColumns.add(0, Arrays.asList(zqOne, zqThree));
-			matrixColumns.add(1, Arrays.asList(zqTwo, zqFour));
-			matrixColumns.add(2, Arrays.asList(zqZero, zqOne));
+			final GroupVector<GroupVector<ZqElement, ZqGroup>, ZqGroup> matrixColumns = GroupVector.of(
+					GroupVector.of(zqOne, zqThree),
+					GroupVector.of(zqTwo, zqFour),
+					GroupVector.of(zqZero, zqOne));
+
 			final GroupMatrix<ZqElement, ZqGroup> matrix = GroupMatrix.fromColumns(matrixColumns);
-			final GroupVector<ZqElement, ZqGroup> exponents = GroupVector.from(Arrays.asList(zqOne, zqTwo, zqFour));
+			final GroupVector<ZqElement, ZqGroup> exponents = GroupVector.of(zqOne, zqTwo, zqFour);
 
 			final ProductWitness productWitness = new ProductWitness(matrix, exponents);
 
@@ -496,7 +502,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = productArgumentService.verifyProductArgument(longStatement, badArgument).verify();
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify Hadamard Argument.", verificationResult.getErrorMessages().element());
+			assertEquals("Failed to verify Hadamard Argument.", verificationResult.getErrorMessages().get(0));
 		}
 
 		@Test
@@ -511,7 +517,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 					.orElseThrow(() -> new IllegalArgumentException("Missing HadamardArgument"));
 			final GroupVector<GqElement, GqGroup> cUpperB = hadamardArgument.get_c_B();
 
-			final GqElement badcUpperB0 = cUpperB.get(0).multiply(gqGroup.getGenerator());
+			final GqElement badcUpperB0 = cUpperB.getFirst().multiply(gqGroup.getGenerator());
 			final GroupVector<GqElement, GqGroup> badcUpperB = cUpperB.stream().skip(1).collect(toGroupVector()).prepend(badcUpperB0);
 			final HadamardArgument badHadamardArgument = new HadamardArgument(badcUpperB, hadamardArgument.get_zeroArgument());
 			final ProductArgument badArgument = new ProductArgument(
@@ -520,7 +526,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = productArgumentService.verifyProductArgument(longStatement, badArgument).verify();
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify Hadamard Argument.", verificationResult.getErrorMessages().element());
+			assertEquals("Failed to verify Hadamard Argument.", verificationResult.getErrorMessages().get(0));
 		}
 
 		@ParameterizedTest
@@ -549,7 +555,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = productArgumentService.verifyProductArgument(statement, badArgument).verify();
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify Single Value Product Argument.", verificationResult.getErrorMessages().element());
+			assertEquals("Failed to verify Single Value Product Argument.", verificationResult.getErrorMessages().get(0));
 		}
 
 		@ParameterizedTest
@@ -611,7 +617,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 		}
 
 		Stream<Arguments> verifyProductArgumentRealValuesProvider() {
-			final List<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-product-argument.json");
+			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-product-argument.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// TestContextParser.

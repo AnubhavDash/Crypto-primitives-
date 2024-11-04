@@ -15,14 +15,16 @@
  */
 package ch.post.it.evoting.cryptoprimitives.elgamal;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
+import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -71,7 +73,7 @@ public class ElGamalMultiRecipientKeyPair implements HashableList {
 		}
 
 		// Operation.
-		final List<KeyPairI> keyPairElements = IntStream.range(0, N) // Stream equivalent to for-loop.
+		final ImmutableList<KeyPairI> keyPairElements = IntStream.range(0, N) // Stream equivalent to for-loop.
 				.parallel()
 				.mapToObj(i -> {
 					final ZqElement sk_i = ZqElement.create(random.genRandomInteger(q), secretKeyGroup);
@@ -79,15 +81,15 @@ public class ElGamalMultiRecipientKeyPair implements HashableList {
 
 					return new KeyPairI(sk_i, pk_i);
 				})
-				.toList();
+				.collect(toImmutableList());
 
 		// Collect secret and public elements separately.
 		final GroupVector<ZqElement, ZqGroup> secretKeyElements = keyPairElements.stream()
 				.map(KeyPairI::sk_i)
-				.collect(GroupVector.toGroupVector());
+				.collect(toGroupVector());
 		final GroupVector<GqElement, GqGroup> publicKeyElements = keyPairElements.stream()
 				.map(KeyPairI::pk_i)
-				.collect(GroupVector.toGroupVector());
+				.collect(toGroupVector());
 
 		// Construct key pair.
 		final ElGamalMultiRecipientPrivateKey sk = new ElGamalMultiRecipientPrivateKey(secretKeyElements);
@@ -147,7 +149,7 @@ public class ElGamalMultiRecipientKeyPair implements HashableList {
 	}
 
 	@Override
-	public List<? extends Hashable> toHashableForm() {
-		return List.of(publicKey, privateKey);
+	public ImmutableList<Hashable> toHashableForm() {
+		return ImmutableList.of(publicKey, privateKey);
 	}
 }

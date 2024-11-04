@@ -50,23 +50,23 @@ class GqElementTest {
 	@Test
 	void givenAnElementWhenMultipliedWithItsInverseThenResultIsOne() {
 		for (int i = 1; i < group.getQ().intValueExact(); i++) {
-			ZqElement exponent = ZqElement.create(i, ZqGroup.sameOrderAs(group));
-			GqElement element = group.getGenerator().exponentiate(exponent);
+			final ZqElement exponent = ZqElement.create(i, ZqGroup.sameOrderAs(group));
+			final GqElement element = group.getGenerator().exponentiate(exponent);
 			assertEquals(group.getIdentity(), element.multiply(element.invert()));
 		}
 	}
 
 	@Test
 	void givenAnElementWhenInvertedThenSucceeds() {
-		BigInteger value = BigInteger.valueOf(16);
-		BigInteger expectedInverseValue = BigInteger.valueOf(13);
+		final BigInteger value = BigInteger.valueOf(16);
+		final BigInteger expectedInverseValue = BigInteger.valueOf(13);
 		invertAndAssert(value, expectedInverseValue);
 	}
 
 	@Test
 	void givenAnElementWithValueOneWhenInvertedThenResultIsOne() {
-		BigInteger value = BigInteger.ONE;
-		BigInteger expectedInverseValue = BigInteger.ONE;
+		final BigInteger value = BigInteger.ONE;
+		final BigInteger expectedInverseValue = BigInteger.ONE;
 		invertAndAssert(value, expectedInverseValue);
 	}
 
@@ -74,44 +74,44 @@ class GqElementTest {
 
 	@Test
 	void givenNullElementWhenMultiplyThenException() {
-		BigInteger value1 = BigInteger.valueOf(3);
-		GqElement element1 = GqElementFactory.fromValue(value1, group);
+		final BigInteger value1 = BigInteger.valueOf(3);
+		final GqElement element1 = GqElementFactory.fromValue(value1, group);
 		assertThrows(NullPointerException.class, () -> element1.multiply(null));
 	}
 
 	@Test
 	void givenTwoElementsFromDifferentGroupsWhenMultiplyThenException() {
-		BigInteger value1 = BigInteger.valueOf(3);
-		BigInteger value2 = BigInteger.TWO;
+		final BigInteger value1 = BigInteger.valueOf(3);
+		final BigInteger value2 = BigInteger.TWO;
 
-		GqElement element1 = GqElementFactory.fromValue(value1, group);
-		GqElement element2 = GqElementFactory.fromValue(value2, new GqGroup(BigInteger.valueOf(7), BigInteger.valueOf(3), g));
+		final GqElement element1 = GqElementFactory.fromValue(value1, group);
+		final GqElement element2 = GqElementFactory.fromValue(value2, new GqGroup(BigInteger.valueOf(7), BigInteger.valueOf(3), g));
 		assertThrows(IllegalArgumentException.class, () -> element1.multiply(element2));
 	}
 
 	@Test
 	void givenTwoElementsWhenMultipliedThenSucceeds() {
-		BigInteger value1 = BigInteger.valueOf(3);
-		BigInteger value2 = BigInteger.valueOf(4);
-		BigInteger expectedResult = BigInteger.valueOf(12);
+		final BigInteger value1 = BigInteger.valueOf(3);
+		final BigInteger value2 = BigInteger.valueOf(4);
+		final BigInteger expectedResult = BigInteger.valueOf(12);
 
 		multiplyAndAssert(value1, value2, expectedResult);
 	}
 
 	@Test
 	void givenAnElementWithValueOneWhenMultipliedWithASecondElementThenTheResultIsSecondElement() {
-		BigInteger value1 = BigInteger.TWO;
-		BigInteger value2 = BigInteger.ONE;
-		BigInteger expectedResult = BigInteger.TWO;
+		final BigInteger value1 = BigInteger.TWO;
+		final BigInteger value2 = BigInteger.ONE;
+		final BigInteger expectedResult = BigInteger.TWO;
 
 		multiplyAndAssert(value1, value2, expectedResult);
 	}
 
 	@Test
 	void givenTwoElementWhenMultipliedThenTheResultIsGreaterThanP() {
-		BigInteger value1 = BigInteger.valueOf(12);
-		BigInteger value2 = BigInteger.valueOf(13);
-		BigInteger expectedResult = BigInteger.valueOf(18);
+		final BigInteger value1 = BigInteger.valueOf(12);
+		final BigInteger value2 = BigInteger.valueOf(13);
+		final BigInteger expectedResult = BigInteger.valueOf(18);
 
 		multiplyAndAssert(value1, value2, expectedResult);
 	}
@@ -121,8 +121,8 @@ class GqElementTest {
 	@Test
 	void givenElementAndNullExponentWhenExponentiateThenException() {
 
-		BigInteger value1 = BigInteger.valueOf(3);
-		GqElement element = GqElementFactory.fromValue(value1, group);
+		final BigInteger value1 = BigInteger.valueOf(3);
+		final GqElement element = GqElementFactory.fromValue(value1, group);
 
 		assertThrows(NullPointerException.class, () -> element.exponentiate(null));
 	}
@@ -130,61 +130,61 @@ class GqElementTest {
 	@Test
 	void givenElementAndExponentFromDifferentGroupsWhenExponentiateThenException() {
 
-		BigInteger value1 = BigInteger.valueOf(3);
-		GqElement element = GqElementFactory.fromValue(value1, group);
+		final BigInteger value1 = BigInteger.valueOf(3);
+		final GqElement element = GqElementFactory.fromValue(value1, group);
 
-		ZqGroup exponentGroup = new ZqGroup(BigInteger.valueOf(3));
-		BigInteger exponentValue = BigInteger.TWO;
-		ZqElement exponent = ZqElement.create(exponentValue, exponentGroup);
+		final ZqGroup exponentGroup = new ZqGroup(BigInteger.valueOf(3));
+		final BigInteger exponentValue = BigInteger.TWO;
+		final ZqElement exponent = ZqElement.create(exponentValue, exponentGroup);
 
 		assertThrows(IllegalArgumentException.class, () -> element.exponentiate(exponent));
 	}
 
 	@Test
 	void givenAnExponentWithValueZeroWhenExponentiateWithItThenResultIsOne() {
-		BigInteger value = BigInteger.valueOf(16);
-		BigInteger exponentValue = BigInteger.ZERO;
-		BigInteger expectedResult = BigInteger.ONE;
+		final BigInteger value = BigInteger.valueOf(16);
+		final BigInteger exponentValue = BigInteger.ZERO;
+		final BigInteger expectedResult = BigInteger.ONE;
 
 		exponentiateAndAssert(value, exponentValue, expectedResult);
 	}
 
 	@Test
 	void givenElementAndExponentWhenExponentiateThenSucceeds() {
-		BigInteger value = BigInteger.TWO;
-		BigInteger exponentValue = BigInteger.valueOf(4);
-		BigInteger expectedResult = BigInteger.valueOf(16);
+		final BigInteger value = BigInteger.TWO;
+		final BigInteger exponentValue = BigInteger.valueOf(4);
+		final BigInteger expectedResult = BigInteger.valueOf(16);
 
 		exponentiateAndAssert(value, exponentValue, expectedResult);
 	}
 
 	@Test
 	void givenElementAndExponentWhenExponentiationThenResultGreaterThanQ() {
-		BigInteger value = BigInteger.valueOf(13);
-		BigInteger exponentValue = BigInteger.valueOf(5);
-		BigInteger expectedResult = BigInteger.valueOf(4);
+		final BigInteger value = BigInteger.valueOf(13);
+		final BigInteger exponentValue = BigInteger.valueOf(5);
+		final BigInteger expectedResult = BigInteger.valueOf(4);
 
 		exponentiateAndAssert(value, exponentValue, expectedResult);
 	}
 
 	@Test
 	void testExponentiateWithANullElement() {
-		GqElement element = GqElementFactory.fromValue(BigInteger.ONE, group);
+		final GqElement element = GqElementFactory.fromValue(BigInteger.ONE, group);
 
 		assertThrows(NullPointerException.class, () -> element.exponentiate(null));
 	}
 
 	@Test
 	void testDivideByNullArgumentThrows() {
-		GqElement element = GqElementFactory.fromValue(BigInteger.ONE, group);
+		final GqElement element = GqElementFactory.fromValue(BigInteger.ONE, group);
 
 		assertThrows(NullPointerException.class, () -> element.divide(null));
 	}
 
 	@Test
 	void testDivideWithDivisorFromDifferentGroupThrows() {
-		GqElement element = GqElementFactory.fromValue(BigInteger.ONE, group);
-		GqElement element2 = GqElementFactory.fromValue(BigInteger.ONE, new GqGroup(BigInteger.valueOf(7), BigInteger.valueOf(3), g));
+		final GqElement element = GqElementFactory.fromValue(BigInteger.ONE, group);
+		final GqElement element2 = GqElementFactory.fromValue(BigInteger.ONE, new GqGroup(BigInteger.valueOf(7), BigInteger.valueOf(3), g));
 		assertThrows(IllegalArgumentException.class, () -> element.divide(element2));
 	}
 
@@ -213,13 +213,13 @@ class GqElementTest {
 	@Test
 	void testEquals() {
 
-		GqElement element1_value1_q11 = GqElementFactory.fromValue(BigInteger.ONE, group);
-		GqElement element2_value1_q11 = GqElementFactory.fromValue(BigInteger.ONE, group);
+		final GqElement element1_value1_q11 = GqElementFactory.fromValue(BigInteger.ONE, group);
+		final GqElement element2_value1_q11 = GqElementFactory.fromValue(BigInteger.ONE, group);
 
-		GqElement element3_value2_q11 = GqElementFactory.fromValue(BigInteger.TWO, group);
+		final GqElement element3_value2_q11 = GqElementFactory.fromValue(BigInteger.TWO, group);
 
-		GqGroup otherGroup_g4_q3 = new GqGroup(BigInteger.valueOf(7), BigInteger.valueOf(3), BigInteger.TWO);
-		GqElement element4_value1_q13 = GqElementFactory.fromValue(BigInteger.ONE, otherGroup_g4_q3);
+		final GqGroup otherGroup_g4_q3 = new GqGroup(BigInteger.valueOf(7), BigInteger.valueOf(3), BigInteger.TWO);
+		final GqElement element4_value1_q13 = GqElementFactory.fromValue(BigInteger.ONE, otherGroup_g4_q3);
 
 		assertAll(
 				() -> assertEquals(element1_value1_q11, element2_value1_q11),
@@ -237,9 +237,9 @@ class GqElementTest {
 	 * @param expectedResult The expected result of the exponentiation.
 	 */
 	private void exponentiateAndAssert(final BigInteger elementValue, final BigInteger exponentValue, final BigInteger expectedResult) {
-		GqElement element = GqElementFactory.fromValue(elementValue, group);
-		ZqElement exponent = ZqElement.create(exponentValue, ZqGroup.sameOrderAs(group));
-		GqElement result = element.exponentiate(exponent);
+		final GqElement element = GqElementFactory.fromValue(elementValue, group);
+		final ZqElement exponent = ZqElement.create(exponentValue, ZqGroup.sameOrderAs(group));
+		final GqElement result = element.exponentiate(exponent);
 		assertEquals(expectedResult, result.getValue(), "The result of the exponentiation is not the expected.");
 	}
 
@@ -252,9 +252,9 @@ class GqElementTest {
 	 * @param expectedResult The expected result of the {@code value1 * value2}.
 	 */
 	private void multiplyAndAssert(final BigInteger value1, final BigInteger value2, final BigInteger expectedResult) {
-		GqElement element1 = GqElementFactory.fromValue(value1, group);
-		GqElement element2 = GqElementFactory.fromValue(value2, group);
-		GqElement result = element1.multiply(element2);
+		final GqElement element1 = GqElementFactory.fromValue(value1, group);
+		final GqElement element2 = GqElementFactory.fromValue(value2, group);
+		final GqElement result = element1.multiply(element2);
 		assertEquals(expectedResult, result.getValue(), "The multiplication result is not the expected one");
 	}
 
@@ -265,8 +265,8 @@ class GqElementTest {
 	 * @param expectedInverseValue The expected result of the invert operation of the element with value {@code elementValue}.
 	 */
 	private void invertAndAssert(final BigInteger elementValue, final BigInteger expectedInverseValue) {
-		GqElement element = GqElementFactory.fromValue(elementValue, group);
-		GqElement inverse = element.invert();
+		final GqElement element = GqElementFactory.fromValue(elementValue, group);
+		final GqElement inverse = element.invert();
 		assertEquals(expectedInverseValue, inverse.getValue(), "The returned element is not the inverse");
 	}
 

@@ -16,11 +16,12 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.utils;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.stream.Stream;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.utils.VerificationResult;
 
 /**
@@ -30,10 +31,10 @@ import ch.post.it.evoting.cryptoprimitives.utils.VerificationResult;
  */
 public final class VerificationFailure implements VerificationResult {
 
-	private final Deque<String> errorMessages = new LinkedList<>();
+	private final ImmutableList<String> errorMessages;
 
-	private VerificationFailure(final LinkedList<String> errorMessages) {
-		this.errorMessages.addAll(errorMessages);
+	private VerificationFailure(final ImmutableList<String> errorMessages) {
+		this.errorMessages = checkNotNull(errorMessages);
 	}
 
 	/**
@@ -43,7 +44,8 @@ public final class VerificationFailure implements VerificationResult {
 	 */
 	public VerificationFailure(final String initialErrorMessage) {
 		checkNotNull(initialErrorMessage);
-		this.errorMessages.push(initialErrorMessage);
+
+		this.errorMessages = ImmutableList.of(initialErrorMessage);
 	}
 
 	@Override
@@ -52,8 +54,8 @@ public final class VerificationFailure implements VerificationResult {
 	}
 
 	@Override
-	public Deque<String> getErrorMessages() {
-		return new LinkedList<>(this.errorMessages);
+	public ImmutableList<String> getErrorMessages() {
+		return this.errorMessages;
 	}
 
 	/**
@@ -65,9 +67,9 @@ public final class VerificationFailure implements VerificationResult {
 	public VerificationFailure addErrorMessage(final String errorMessage) {
 		checkNotNull(errorMessage);
 
-		final LinkedList<String> copy = new LinkedList<>(errorMessages);
-		copy.push(errorMessage);
-
-		return new VerificationFailure(copy);
+		return new VerificationFailure(Stream.concat(
+				Stream.of(errorMessage),
+				errorMessages.stream()
+		).collect(toImmutableList()));
 	}
 }

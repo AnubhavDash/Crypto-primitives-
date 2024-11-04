@@ -18,6 +18,7 @@ package ch.post.it.evoting.cryptoprimitives.utils;
 
 import java.math.BigInteger;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal;
 
 public interface Conversions {
@@ -28,7 +29,7 @@ public interface Conversions {
 	 * @param bytes B, the byte array to convert. Must be non-null and non-empty.
 	 * @return a BigInteger corresponding to the provided byte array representation.
 	 */
-	static BigInteger byteArrayToInteger(final byte[] bytes) {
+	static BigInteger byteArrayToInteger(final ImmutableByteArray bytes) {
 		return ConversionsInternal.byteArrayToInteger(bytes);
 	}
 
@@ -38,7 +39,7 @@ public interface Conversions {
 	 * @param x the positive BigInteger to convert.
 	 * @return the byte array representation of this BigInteger.
 	 */
-	static byte[] integerToByteArray(final BigInteger x) {
+	static ImmutableByteArray integerToByteArray(final BigInteger x) {
 		return ConversionsInternal.integerToByteArray(x);
 	}
 
@@ -48,7 +49,7 @@ public interface Conversions {
 	 * @param s S, the string to convert.
 	 * @return the byte array representation of the string.
 	 */
-	static byte[] stringToByteArray(final String s) {
+	static ImmutableByteArray stringToByteArray(final String s) {
 		return ConversionsInternal.stringToByteArray(s);
 	}
 
@@ -59,7 +60,7 @@ public interface Conversions {
 	 * @return the string representation of the byte array.
 	 * @throws IllegalArgumentException if the byte array does not correspond to a valid sequence of UTF-8 encoding.
 	 */
-	static String byteArrayToString(final byte[] b) {
+	static String byteArrayToString(final ImmutableByteArray b) {
 		return ConversionsInternal.byteArrayToString(b);
 	}
 
