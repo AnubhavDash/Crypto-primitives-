@@ -32,10 +32,9 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.generator.Generators;
  */
 public class GroupTestData {
 
-	private static final ImmutableList<GqGroup> smallTestGroups;
 	private static final TestRandomService randomService = new TestRandomService();
 
-	static {
+	private static ImmutableList<GqGroup> getSmallTestGroups() {
 		// More groups can be added to this class as needed.
 		final BigInteger p1 = BigInteger.valueOf(11);
 		final BigInteger q1 = BigInteger.valueOf(5);
@@ -57,7 +56,7 @@ public class GroupTestData {
 		final BigInteger g4 = BigInteger.valueOf(3);
 		final GqGroup group4 = new GqGroup(p4, q4, g4);
 
-		smallTestGroups = ImmutableList.of(group1, group2, group3, group4);
+		return ImmutableList.of(group1, group2, group3, group4);
 	}
 
 	private GroupTestData() {
@@ -67,7 +66,7 @@ public class GroupTestData {
 	 * @return a random {@link GqGroup} from the predefined groups.
 	 */
 	public static GqGroup getGqGroup() {
-		return getRandomGqGroupFrom(smallTestGroups);
+		return getRandomGqGroupFrom(getSmallTestGroups());
 	}
 
 	/**
@@ -77,7 +76,7 @@ public class GroupTestData {
 	 * @return a different {@link GqGroup}.
 	 */
 	public static GqGroup getDifferentGqGroup(final GqGroup gqGroup) {
-		final ImmutableList<GqGroup> otherGroups = smallTestGroups.stream().filter(group -> !group.equals(gqGroup)).collect(toImmutableList());
+		final ImmutableList<GqGroup> otherGroups = getSmallTestGroups().stream().filter(group -> !group.equals(gqGroup)).collect(toImmutableList());
 
 		return getRandomGqGroupFrom(otherGroups);
 	}

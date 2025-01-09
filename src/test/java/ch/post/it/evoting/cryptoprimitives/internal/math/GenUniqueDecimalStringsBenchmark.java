@@ -49,35 +49,30 @@ import ch.post.it.evoting.cryptoprimitives.math.Base10Alphabet;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class GenUniqueDecimalStringsBenchmark {
 	@Benchmark
-	public void genUniqueDecimalStringsArrayList(final MyState state, final Blackhole bh) {
-		final ImmutableList<String> strings = state.genUniqueDecimalStringsArrayList(state.desiredCodeLength, state.numberOfUniqueCodes);
-		bh.consume(strings);
+	public ImmutableList<String> genUniqueDecimalStringsArrayList(final MyState state) {
+		return state.genUniqueDecimalStringsArrayList(state.desiredCodeLength, state.numberOfUniqueCodes);
 	}
 
 	@Benchmark
-	public void genUniqueDecimalStringsHashSet(final MyState state, final Blackhole bh) {
-		final ImmutableList<String> strings = state.genUniqueDecimalStringsHashSet(state.desiredCodeLength, state.numberOfUniqueCodes);
-		bh.consume(strings);
+	public ImmutableList<String> genUniqueDecimalStringsHashSet(final MyState state) {
+		return state.genUniqueDecimalStringsHashSet(state.desiredCodeLength, state.numberOfUniqueCodes);
 	}
 
 	@Benchmark
-	public void genUniqueDecimalStringsTreeSet(final MyState state, final Blackhole bh) {
-		final ImmutableList<String> strings = state.genUniqueDecimalStringsTreeSet(state.desiredCodeLength, state.numberOfUniqueCodes);
-		bh.consume(strings);
+	public ImmutableList<String> genUniqueDecimalStringsTreeSet(final MyState state) {
+		return state.genUniqueDecimalStringsTreeSet(state.desiredCodeLength, state.numberOfUniqueCodes);
 	}
 
 	@Benchmark
-	public void genUniqueDecimalStringsConcurrentHashSetParallelized(final MyState state, final Blackhole bh) {
-		final ImmutableList<String> strings = state.genUniqueDecimalStringsConcurrentHashSet(state.desiredCodeLength, state.numberOfUniqueCodes,
+	public ImmutableList<String> genUniqueDecimalStringsConcurrentHashSetParallelized(final MyState state) {
+		return state.genUniqueDecimalStringsConcurrentHashSet(state.desiredCodeLength, state.numberOfUniqueCodes,
 				true);
-		bh.consume(strings);
 	}
 
 	@Benchmark
-	public void genUniqueDecimalStringsConcurrentHashSetNotParallelized(final MyState state, final Blackhole bh) {
-		final ImmutableList<String> strings = state.genUniqueDecimalStringsConcurrentHashSet(state.desiredCodeLength, state.numberOfUniqueCodes,
+	public ImmutableList<String> genUniqueDecimalStringsConcurrentHashSetNotParallelized(final MyState state, final Blackhole bh) {
+		return state.genUniqueDecimalStringsConcurrentHashSet(state.desiredCodeLength, state.numberOfUniqueCodes,
 				false);
-		bh.consume(strings);
 	}
 
 	@State(Scope.Benchmark)

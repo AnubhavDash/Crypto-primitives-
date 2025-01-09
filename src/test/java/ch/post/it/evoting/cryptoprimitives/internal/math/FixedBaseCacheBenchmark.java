@@ -32,7 +32,6 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
-import org.openjdk.jmh.infra.Blackhole;
 
 import com.google.common.base.Preconditions;
 
@@ -59,9 +58,8 @@ public class FixedBaseCacheBenchmark {
 	}
 
 	@Benchmark
-	public void deriveAndSearch(final MyState state, final Blackhole bh) {
-		final String value = state.cache.get(deriveCacheKey(state.knownBase, state.modulus));
-		bh.consume(value);
+	public String deriveAndSearch(final MyState state) {
+		return state.cache.get(deriveCacheKey(state.knownBase, state.modulus));
 	}
 
 	@State(Scope.Benchmark)
