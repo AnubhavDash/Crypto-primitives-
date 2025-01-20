@@ -53,6 +53,14 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator;
 
+/**
+ * This benchmark compares the performance of <i>getShuffleArgument</i> for two cases:
+ * <ul>
+ *     <li><i>(m, n) = getMatrixDimensions(N)</i></li>
+ *     <li><i>(m, n) = (1, N)</i></li>
+ * </ul>
+ * The values for the total number of ciphertexts (N) and the ciphertext size (l) are parameterized and can be easily changed according to the needs.
+ */
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @Fork(value = 1)
@@ -62,7 +70,7 @@ public class GetShuffleArgumentBenchmark {
 
 	@Fork(value = 1, jvmArgs = {"-Xms5g", "-Xmx30g"})
 	@Benchmark
-	public ShuffleArgument getShuffleArgumentFor_m_Equals_n(final BenchmarkState_m_Equals_n state) {
+	public ShuffleArgument getShuffleArgumentFor_m_And_n_Chosen_With_getMatrixDimensions(final BenchmarkState_m_And_n_Chosen_With_getMatrixDimensions state) {
 		return state.getShuffleArgument();
 	}
 
@@ -73,32 +81,39 @@ public class GetShuffleArgumentBenchmark {
 	}
 
 	@State(Scope.Thread)
-	public static class BenchmarkState_m_Equals_n extends BenchmarkState {
+	public static class BenchmarkState_m_And_n_Chosen_With_getMatrixDimensions extends BenchmarkState {
 
-		@Param({ "900", "4900" , "100000"})
+		@Param({ "900", "901", "902", "903", "904", "905", "906", "907", "908", "909", "4900", "10000" })
 		int N;
+		@Param({ "1", "31" })
+		int l;
+		private int m;
 		private int n;
 
 		@Setup(Level.Trial)
 		public void setup() {
-			n = (int) Math.sqrt(N);
-			super.setup(n, N);
+			final int[] dimensions = MatrixUtils.getMatrixDimensions(N);
+			m = dimensions[0];
+			n = dimensions[1];
+			super.setup(n, N, l);
 		}
 
 		public ShuffleArgument getShuffleArgument() {
-			return this.getShuffleArgument(n, n);
+			return this.getShuffleArgument(m, n);
 		}
 	}
 
 	@State(Scope.Thread)
 	public static class BenchmarkState_m_Equals_1 extends BenchmarkState {
 
-		@Param({ "900", "4900", "100000" })
+		@Param({ "900", "901", "902", "903", "904", "905", "906", "907", "908", "909", "4900", "10000" })
 		int N;
+		@Param({ "1", "31"})
+		int l;
 
 		@Setup(Level.Trial)
 		public void setup() {
-			super.setup(N, N);
+			super.setup(N, N, l);
 		}
 
 		public ShuffleArgument getShuffleArgument() {
@@ -112,7 +127,7 @@ public class GetShuffleArgumentBenchmark {
 		private ShuffleStatement shuffleStatement;
 		private ShuffleWitness shuffleWitness;
 
-		public void setup(final int n, final int N) {
+		public void setup(final int n, final int N, final int l) {
 			final TestRandomService randomService = new TestRandomService();
 			final PermutationService permutationService = new PermutationService(randomService);
 			final Permutation permutation = permutationService.genPermutation(N);
@@ -122,7 +137,6 @@ public class GetShuffleArgumentBenchmark {
 
 			shuffleWitness = new ShuffleWitness(permutation, randomness);
 
-			final int l = 31; // Extreme case
 			final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(largeGqGroup);
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator.genRandomCiphertextVector(N, l);
 			final ElGamalMultiRecipientPublicKey publicKey = elGamalGenerator.genRandomPublicKey(l);
