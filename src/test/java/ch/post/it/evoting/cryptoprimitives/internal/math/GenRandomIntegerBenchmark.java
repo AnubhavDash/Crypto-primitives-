@@ -31,7 +31,6 @@ import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
-import org.openjdk.jmh.infra.Blackhole;
 
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
 
@@ -43,15 +42,13 @@ import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelI
 public class GenRandomIntegerBenchmark {
 
 	@Benchmark
-	public void genRandomInteger(final MyState state, final Blackhole bh) {
-		final BigInteger randomInteger = state.randomService.genRandomInteger(state.upperBound);
-		bh.consume(randomInteger);
+	public BigInteger genRandomInteger(final MyState state) {
+		return state.randomService.genRandomInteger(state.upperBound);
 	}
 
 	@Benchmark
-	public void genRandomIntegerWithBigInteger(final MyState state, final Blackhole bh) {
-		final BigInteger randomInteger = MyState.genRandomIntegerWithBigInteger(state.upperBound, state.secureRandom);
-		bh.consume(randomInteger);
+	public BigInteger genRandomIntegerWithBigInteger(final MyState state) {
+		return MyState.genRandomIntegerWithBigInteger(state.upperBound, state.secureRandom);
 	}
 
 	@State(Scope.Benchmark)

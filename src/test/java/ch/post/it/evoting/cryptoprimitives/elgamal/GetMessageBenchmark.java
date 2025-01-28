@@ -41,6 +41,11 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator;
 
+/**
+ * This benchmark compares the performance of the <i>GetMessage</i> implementation with the performance of a suggested improvement, where,
+ * instead of calculating &gamma;<sup>-sk_i</sup> for each <i>i</i>, we calculate &gamma;<sup>-1</sup> once, and use it to calculate
+ * (&gamma;<sup>-1</sup>)<sup>sk_i</sup> for each <i>i</i>.
+ */
 @Warmup(iterations = 1)
 @Measurement(iterations = 5)
 @Fork(value = 1)
