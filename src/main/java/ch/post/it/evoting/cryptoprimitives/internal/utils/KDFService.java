@@ -116,6 +116,7 @@ public class KDFService implements KeyDerivation {
 		checkArgument(l_straight >= L, "The pseudo random key length must be greater than the hash function output length.");
 		checkArgument(ByteArrays.byteLength(q) >= L,
 				"The byte length of the exclusive upper bound must be greater than the hash function output length.");
+		checkArgument(lambda % 4 == 0, "The algorithm assumes that lambda is a multiple of 4");
 
 		final int l_curved = ByteArrays.byteLength(q) + lambda / 4;
 		final ImmutableByteArray h = KDF(PRK, info, l_curved);
