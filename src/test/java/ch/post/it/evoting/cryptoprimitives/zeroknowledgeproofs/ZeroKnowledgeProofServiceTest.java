@@ -238,5 +238,24 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 					() -> zeroKnowledgeProofService.verifyDecryptions(otherCiphertexts, publicKey, otherVerifiableDecryptions, auxiliaryInformation));
 			assertEquals("The ciphertexts must have at least 1 element.", exception.getMessage());
 		}
+
+		@Test
+		@DisplayName("Verifying decryptions with public key size k larger than ciphertext size l does not throw")
+		void verifyDecryptionsWithPublicKeyLargerThanCiphertext() {
+			// Generate a public key with size k larger than the ciphertext size l
+			final int largerKeyLength = ciphertextLength + 1;
+			final ElGamalMultiRecipientKeyPair largerKeyPair = elGamal.genKeyPair(gqGroup, largerKeyLength, randomService);
+			final ElGamalMultiRecipientPublicKey largerPublicKey = largerKeyPair.getPublicKey();
+
+			// Generate verifiable decryptions with the larger public key
+			final VerifiableDecryptions verifiableDecryptions = zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, largerKeyPair, auxiliaryInformation);
+
+			// Verify the decryptions
+			Boolean result = assertDoesNotThrow(
+					() -> zeroKnowledgeProofService.verifyDecryptions(ciphertexts, largerPublicKey, verifiableDecryptions, auxiliaryInformation)
+							.isVerified());
+			assertTrue(result);
+		}
+
 	}
 }
