@@ -33,7 +33,7 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVectorElement;
 
 /**
- * Encapsulates an ElGamal multi recipient public key with N elements, each corresponding to a different recipient. The order of the elements must
+ * Encapsulates an ElGamal multi recipient public key with k elements, each corresponding to a different recipient. The order of the elements must
  * match that of the elements of the associated public key.
  *
  * <p>A recipient ElGamal public key is related to its associated ElGamal private key by the following
