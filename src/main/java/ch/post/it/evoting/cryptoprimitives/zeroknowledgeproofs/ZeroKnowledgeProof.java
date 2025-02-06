@@ -18,6 +18,7 @@ package ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs;
 import ch.post.it.evoting.cryptoprimitives.collection.AuxiliaryInformation;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
+import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
@@ -61,6 +62,19 @@ public interface ZeroKnowledgeProof {
 	VerificationResult verifyDecryptions(final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts,
 			final ElGamalMultiRecipientPublicKey publicKey, final VerifiableDecryptions verifiableDecryptions,
 			final AuxiliaryInformation auxiliaryInformation);
+
+	/**
+	 * Verifies the validity of a given {@link DecryptionProof}.
+	 *
+	 * @param ciphertext           C, the ciphertext that was used to generate the proof. Must be non-null.
+	 * @param publicKey            pk, the public key that was used to generate the proof. Must be non-null.
+	 * @param message              m, the message that was used to generate the proof. Must be non-null.
+	 * @param decryptionProof      (e, z), the decryption proof to be verified. Must be non-null.
+	 * @param auxiliaryInformation i<sub>aux</sub>, auxiliary information that was used during proof generation. Must be non-null.
+	 * @return {@code true} if the decryption proof is valid, {@code false} otherwise.
+	 */
+	boolean verifyDecryption(final ElGamalMultiRecipientCiphertext ciphertext, final ElGamalMultiRecipientPublicKey publicKey,
+			final ElGamalMultiRecipientMessage message, final DecryptionProof decryptionProof, final AuxiliaryInformation auxiliaryInformation);
 
 	/**
 	 * Generates a proof of validity for the provided exponentiations.

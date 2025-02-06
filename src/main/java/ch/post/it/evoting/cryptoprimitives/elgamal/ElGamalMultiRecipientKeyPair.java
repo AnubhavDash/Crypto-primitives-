@@ -35,7 +35,7 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 
 /**
- * A multi-recipient ElGamal key pair consisting of a public and a private key with N elements.
+ * A multi-recipient ElGamal key pair consisting of a public and a private key with k elements.
  *
  * <p>Instances of this class are immutable. </p>
  */
@@ -64,7 +64,7 @@ public class ElGamalMultiRecipientKeyPair implements HashableList {
 		checkNotNull(group);
 		checkArgument(numElements > 0, "Cannot generate an ElGamalMultiRecipient key pair with %s elements.", numElements);
 
-		final int N = numElements;
+		final int k = numElements;
 		final ZqGroup secretKeyGroup = ZqGroup.sameOrderAs(group);
 		final BigInteger q = group.getQ();
 		final GqElement g = group.getGenerator();
@@ -73,7 +73,7 @@ public class ElGamalMultiRecipientKeyPair implements HashableList {
 		}
 
 		// Operation.
-		final ImmutableList<KeyPairI> keyPairElements = IntStream.range(0, N) // Stream equivalent to for-loop.
+		final ImmutableList<KeyPairI> keyPairElements = IntStream.range(0, k) // Stream equivalent to for-loop.
 				.parallel()
 				.mapToObj(i -> {
 					final ZqElement sk_i = ZqElement.create(random.genRandomInteger(q), secretKeyGroup);

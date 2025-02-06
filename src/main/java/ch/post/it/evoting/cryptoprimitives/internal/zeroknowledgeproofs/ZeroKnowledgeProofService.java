@@ -158,6 +158,12 @@ public class ZeroKnowledgeProofService implements ZeroKnowledgeProof {
 	}
 
 	@Override
+	public boolean verifyDecryption(final ElGamalMultiRecipientCiphertext ciphertext, final ElGamalMultiRecipientPublicKey publicKey,
+			final ElGamalMultiRecipientMessage message, final DecryptionProof decryptionProof, final AuxiliaryInformation auxiliaryInformation) {
+		return decryptionProofService.verifyDecryption(ciphertext, publicKey, message, decryptionProof, auxiliaryInformation).verify().isVerified();
+	}
+
+	@Override
 	public ExponentiationProof genExponentiationProof(final GroupVector<GqElement, GqGroup> bases, final ZqElement exponent,
 			final GroupVector<GqElement, GqGroup> exponentiations, final AuxiliaryInformation auxiliaryInformation) {
 		return exponentiationProofService.genExponentiationProof(bases, exponent, exponentiations, auxiliaryInformation);

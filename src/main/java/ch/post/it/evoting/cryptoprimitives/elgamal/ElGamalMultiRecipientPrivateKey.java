@@ -35,7 +35,7 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 
 /**
- * Encapsulates an ElGamal multi recipient private key with N elements, each corresponding to a different recipient. The order of the elements must
+ * Encapsulates an ElGamal multi recipient private key with k elements, each corresponding to a different recipient. The order of the elements must
  * match that of the elements of the associated public key.
  * <p>
  * Instances of this class are immutable.
