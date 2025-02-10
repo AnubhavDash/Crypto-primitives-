@@ -21,6 +21,7 @@ import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInte
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.integerToString;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.stringToByteArray;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.stringToInteger;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -54,9 +55,9 @@ class ConversionsTest {
 		}
 
 		@Test
-		void testConversionOfZeroBigIntegerIsOneZeroByte() {
+		void testConversionOfZeroBigIntegerIsEmptyByte() {
 			final BigInteger zero = BigInteger.ZERO;
-			final ImmutableByteArray expected = ImmutableByteArray.of((byte) 0);
+			final ImmutableByteArray expected = ImmutableByteArray.EMPTY;
 			final ImmutableByteArray converted = integerToByteArray(zero);
 			assertEquals(expected, converted);
 		}
@@ -93,11 +94,9 @@ class ConversionsTest {
 		}
 
 		@Test
-		void testConversionOfEmptyByteArrayToBigIntegerThrows() {
-			final IllegalArgumentException illegalArgumentException =
-					assertThrows(IllegalArgumentException.class, () -> byteArrayToInteger(ImmutableByteArray.EMPTY));
-
-			assertEquals("The byte array to convert must be non-empty.", illegalArgumentException.getMessage());
+		void testConversionOfEmptyByteArrayToBigIntegerIsZero() {
+			final BigInteger result = assertDoesNotThrow(() -> byteArrayToInteger(ImmutableByteArray.EMPTY));
+			assertEquals(BigInteger.ZERO, result);
 		}
 
 		@Test
@@ -235,6 +234,12 @@ class ConversionsTest {
 			assertThrows(NullPointerException.class, () -> stringToByteArray(null));
 		}
 
+		@Test
+		void testConversionOfEmptyStringToByteArrayGivesEmptyByteArray() {
+			final ImmutableByteArray result = assertDoesNotThrow(() -> stringToByteArray(""));
+			assertEquals(ImmutableByteArray.EMPTY, result);
+		}
+
 		Stream<String> invalidUTF8Strings() {
 			return Stream.of(
 					"\uD8E5",
@@ -267,10 +272,9 @@ class ConversionsTest {
 		}
 
 		@Test
-		void testConversionOfZeroLengthByteArrayToStringThrows() {
-			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-					() -> byteArrayToString(ImmutableByteArray.EMPTY));
-			assertEquals("The length of the byte array must be strictly positive.", exception.getMessage());
+		void testConversionOfZeroLengthByteArrayToStringGivesEmptyString() {
+			final String result = assertDoesNotThrow(() -> byteArrayToString(ImmutableByteArray.EMPTY));
+			assertEquals("", result);
 		}
 
 		Stream<ImmutableByteArray> invalidUTF8ByteArrays() {

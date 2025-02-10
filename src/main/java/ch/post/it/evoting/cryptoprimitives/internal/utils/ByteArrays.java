@@ -73,8 +73,6 @@ public final class ByteArrays {
 	public static int byteLength(final BigInteger x) {
 		checkNotNull(x);
 
-		final int n = Math.ceilDivExact(x.bitLength(), Byte.SIZE);
-
-		return Math.max(n, 1);
+		return Math.ceilDivExact(x.bitLength(), Byte.SIZE);
 	}
 }
