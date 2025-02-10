@@ -50,7 +50,6 @@ public final class ConversionsInternal {
 	 */
 	public static BigInteger byteArrayToInteger(final ImmutableByteArray bytes) {
 		checkNotNull(bytes);
-		checkArgument(!bytes.isEmpty(), "The byte array to convert must be non-empty.");
 		return new BigInteger(1, bytes.elements());
 	}
 
@@ -71,7 +70,7 @@ public final class ConversionsInternal {
 		// leading zero depends on the number of bits needed to represent this value).
 		final ImmutableByteArray twosComplement = new ImmutableByteArray(x.toByteArray());
 		final ImmutableByteArray result;
-		if (twosComplement.get(0) == 0 && twosComplement.length() > 1) {
+		if (twosComplement.get(0) == 0) {
 			result = ImmutableByteArray.copyOfRange(twosComplement, 1, twosComplement.length());
 		} else {
 			result = twosComplement;
@@ -108,7 +107,6 @@ public final class ConversionsInternal {
 	 */
 	public static String byteArrayToString(final ImmutableByteArray b) {
 		checkNotNull(b);
-		checkArgument(!b.isEmpty(), "The length of the byte array must be strictly positive.");
 
 		final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder()
 				// Explicitly set the error actions to REPORT to be sure no ignore nor replace action is performed.
