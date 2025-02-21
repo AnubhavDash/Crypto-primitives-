@@ -27,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -40,7 +42,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
@@ -346,9 +347,8 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 		@Test
 		void testStatementWithModified_C_ElementDoesNotVerify() {
 			final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> modifiedCMatrix = GroupMatrix.fromRows(
-					validStatement.get_C_matrix().rowStream()
-							.map(r -> r.stream().map(c -> c.getCiphertextExponentiation(zqTwo)).collect(toGroupVector()))
-							.collect(toGroupVector()));
+					validStatement.get_C_matrix().rowStream().map(r -> r.stream().map(c -> c.getCiphertextExponentiation(
+							zqTwo)).collect(Collectors.toList())).collect(Collectors.toList()));
 			final MultiExponentiationStatement modifiedStatement = new MultiExponentiationStatement(
 					modifiedCMatrix,
 					validStatement.get_C(),
@@ -361,9 +361,8 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 
 		@Test
 		void testStatementWithModified_C_DoesNotVerify() {
-			final ElGamalMultiRecipientCiphertext modifiedC = ElGamalMultiRecipientCiphertext.create(
-					validStatement.get_C().getGamma(),
-					validStatement.get_C().stream().skip(1).map(gqGroupGenerator::otherElement).collect(toGroupVector()));
+			final ElGamalMultiRecipientCiphertext modifiedC = ElGamalMultiRecipientCiphertext.create(validStatement.get_C().getGamma(),
+					validStatement.get_C().stream().skip(1).map(gqGroupGenerator::otherElement).collect(Collectors.toList()));
 			final MultiExponentiationStatement modifiedStatement = new MultiExponentiationStatement(
 					validStatement.get_C_matrix(),
 					modifiedC,
@@ -372,7 +371,7 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 			final VerificationResult verificationResult = argumentService.verifyMultiExponentiationArgument(modifiedStatement, validArgument)
 					.verify();
 			assertFalse(verificationResult.isVerified());
-			assertEquals("E_m must equal C.", verificationResult.getErrorMessages().get(0));
+			assertEquals("E_m must equal C.", verificationResult.getErrorMessages().getFirst());
 		}
 
 		@Test
@@ -503,7 +502,7 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 		}
 
 		Stream<Arguments> verifyMultiExponentiationArgumentRealValueProvider() {
-			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-multiexp-argument.json");
+			final List<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-multiexp-argument.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// TestContextParser.
@@ -525,7 +524,7 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 
 				// Output.
 				final JsonData output = testParameters.getOutput();
-				final boolean outputValue = Boolean.parseBoolean(output.getJsonData("result").toString());
+				final boolean outputValue = Boolean.parseBoolean(output.toString());
 
 				return Arguments.of(publicKey, commitmentKey, multiExpStatement, multiExpArgument, outputValue, testParameters.getDescription());
 			});

@@ -18,10 +18,12 @@ package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
 import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientMessages.getMessage;
 import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
-import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -51,11 +53,7 @@ public class ElGamalMultiRecipientCiphertexts {
 		checkNotNull(group);
 		checkArgument(numPhi > 0, "The neutral ciphertext must have at least one phi.");
 
-		return ElGamalMultiRecipientCiphertext.create(
-				group.getIdentity(),
-				Stream.generate(group::getIdentity)
-						.limit(numPhi)
-						.collect(toGroupVector()));
+		return ElGamalMultiRecipientCiphertext.create(group.getIdentity(), Stream.generate(group::getIdentity).limit(numPhi).toList());
 	}
 
 	/**
@@ -86,11 +84,12 @@ public class ElGamalMultiRecipientCiphertexts {
 		if (ENABLE_PARALLEL_STREAMS) {
 			indices = indices.parallel();
 		}
-		final GroupVector<GqElement, GqGroup> phis = indices
+		final LinkedList<GqElement> phis = indices
+				.parallel()
 				.mapToObj(i -> pk.get(i).exponentiate(r).multiply(m.get(i)))
-				.collect(toGroupVector());
+				.collect(Collectors.toCollection(LinkedList::new));
 
-		return ElGamalMultiRecipientCiphertext.create(gamma, phis);
+		return ElGamalMultiRecipientCiphertext.create(gamma, GroupVector.from(phis));
 	}
 
 	/**
@@ -102,9 +101,9 @@ public class ElGamalMultiRecipientCiphertexts {
 	 *     <li>the ciphertexts and the exponents must belong to groups of same order.</li>
 	 * </ul>
 	 *
-	 * @param ciphertexts A List of {@code ElGamalMultiRecipientCiphertext}s, each element containing the same number of phis. Must be non-null and
+	 * @param ciphertexts A List of {@code ElGamalMultiRecipientCiphertext}s, each element containing the same number of phis. Must be non null and
 	 *                    not empty.
-	 * @param exponents   A List of {@code ZqElement}s, of the same size as the ciphertexts list. Must be non-null and not empty.
+	 * @param exponents   A List of {@code ZqElement}s, of the same size as the ciphertexts list. Must be non null and not empty.
 	 * @return the product of the exponentiated ciphertexts.
 	 */
 	@SuppressWarnings("java:S117")
@@ -120,25 +119,25 @@ public class ElGamalMultiRecipientCiphertexts {
 		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = ciphertexts;
 		final GroupVector<ZqElement, ZqGroup> a = exponents;
 		final int l = C.getElementSize();
-		final int N = a.size();
+		final int n = a.size();
 
 		IntStream indices = IntStream.range(0, l);
 		if (ENABLE_PARALLEL_STREAMS) {
 			indices = indices.parallel();
 		}
 
-		final GqElement gamma_prod = GqElementFactory.multiModExp(IntStream.range(0, N)
+		final GqElement gamma_prod = GqElementFactory.multiModExp(IntStream.range(0, n)
 				.mapToObj(C::get)
 				.map(ElGamalMultiRecipientCiphertext::getGamma)
-				.collect(toGroupVector()), a);
+				.collect(GroupVector.toGroupVector()), a);
 
-		final GroupVector<GqElement, GqGroup> phi_prod = indices
-				.mapToObj(i -> GqElementFactory.multiModExp(IntStream.range(0, N)
+		final List<GqElement> phi_prod = indices
+				.mapToObj(i -> GqElementFactory.multiModExp(IntStream.range(0, n)
 						.mapToObj(C::get)
 						.map(ElGamalMultiRecipientCiphertext::getPhis)
 						.map(phi -> phi.get(i))
-						.collect(toGroupVector()), a))
-				.collect(toGroupVector());
+						.collect(GroupVector.toGroupVector()), a))
+				.toList();
 
 		return ElGamalMultiRecipientCiphertext.create(gamma_prod, phi_prod);
 	}

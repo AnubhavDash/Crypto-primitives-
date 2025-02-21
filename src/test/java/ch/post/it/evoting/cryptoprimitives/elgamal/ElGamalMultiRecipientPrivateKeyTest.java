@@ -43,7 +43,7 @@ class ElGamalMultiRecipientPrivateKeyTest extends TestGroupSetup {
 	static Stream<Arguments> createInvalidArgumentsProvider() {
 		return Stream.of(
 				Arguments.of(null, NullPointerException.class, null),
-				Arguments.of(GroupVector.empty(), IllegalArgumentException.class, "An ElGamal private key cannot be empty.")
+				Arguments.of(GroupVector.of(), IllegalArgumentException.class, "An ElGamal private key cannot be empty.")
 		);
 	}
 

@@ -27,7 +27,6 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal;
 
@@ -43,7 +42,7 @@ public class ConversionServiceBenchmark {
 	@Warmup(iterations = 4, time = 5)
 	@Fork(value = 1)
 	@Measurement(iterations = 4, time = 5)
-	public ImmutableByteArray bigIntegerToByteArrayUsingJdk(final MyState state) {
+	public byte[] bigIntegerToByteArrayUsingJdk(final MyState state) {
 		return ConversionsInternal.integerToByteArray(state.randomBigInteger);
 	}
 
@@ -51,7 +50,7 @@ public class ConversionServiceBenchmark {
 	@Warmup(iterations = 4, time = 5)
 	@Fork(value = 1)
 	@Measurement(iterations = 4, time = 5)
-	public ImmutableByteArray bigIntegerToByteArray(final MyState state) {
+	public byte[] bigIntegerToByteArray(final MyState state) {
 		return ConversionsEquivalenceTest.integerToByteArraySpec(state.randomBigInteger);
 	}
 
@@ -59,7 +58,7 @@ public class ConversionServiceBenchmark {
 	@Warmup(iterations = 4, time = 5)
 	@Fork(value = 1)
 	@Measurement(iterations = 4, time = 5)
-	public ImmutableByteArray bigIntegerToFixedLengthByteArrayUsingJdk(final MyState state) {
+	public byte[] bigIntegerToFixedLengthByteArrayUsingJdk(final MyState state) {
 		return ConversionsInternal.integerToFixedLengthByteArray(state.randomBigInteger, bitLength);
 	}
 
@@ -67,7 +66,7 @@ public class ConversionServiceBenchmark {
 	@Warmup(iterations = 4, time = 5)
 	@Fork(value = 1)
 	@Measurement(iterations = 4, time = 5)
-	public ImmutableByteArray bigIntegerToFixedLengthByteArray(final MyState state) {
+	public byte[] bigIntegerToFixedLengthByteArray(final MyState state) {
 		return ConversionsEquivalenceTest.integerToFixedLengthByteArraySpec(state.randomBigInteger, bitLength);
 	}
 

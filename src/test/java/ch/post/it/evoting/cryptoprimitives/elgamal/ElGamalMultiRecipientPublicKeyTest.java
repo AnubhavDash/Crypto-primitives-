@@ -45,7 +45,7 @@ class ElGamalMultiRecipientPublicKeyTest extends TestGroupSetup {
 	static Stream<Arguments> createInvalidArgumentsProvider() {
 		return Stream.of(
 				Arguments.of(null, NullPointerException.class, null),
-				Arguments.of(GroupVector.empty(), IllegalArgumentException.class, "An ElGamal public key must not be empty.")
+				Arguments.of(GroupVector.of(), IllegalArgumentException.class, "An ElGamal public key must not be empty.")
 		);
 	}
 
@@ -67,7 +67,7 @@ class ElGamalMultiRecipientPublicKeyTest extends TestGroupSetup {
 	@Test
 	@DisplayName("obtained by combining empty list of public keys")
 	void combinePublicKeysWithEmptyList() {
-		final GroupVector<ElGamalMultiRecipientPublicKey, GqGroup> emptyPkList = GroupVector.empty();
+		final GroupVector<ElGamalMultiRecipientPublicKey, GqGroup> emptyPkList = GroupVector.of();
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 				() -> ElGamalMultiRecipientPublicKeys.combinePublicKeys(emptyPkList));
 

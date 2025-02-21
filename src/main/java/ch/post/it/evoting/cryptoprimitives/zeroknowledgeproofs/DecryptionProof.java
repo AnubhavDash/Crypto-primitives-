@@ -18,7 +18,8 @@ package ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import java.util.List;
+
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -48,7 +49,7 @@ public record DecryptionProof(ZqElement e, GroupVector<ZqElement, ZqGroup> z) im
 	}
 
 	@Override
-	public ImmutableList<Hashable> toHashableForm() {
-		return ImmutableList.of(e, z);
+	public List<Hashable> toHashableForm() {
+		return List.of(e, z);
 	}
 }

@@ -17,7 +17,6 @@ package ch.post.it.evoting.cryptoprimitives.signing;
 
 import java.security.SignatureException;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 
 public interface SignatureGeneration {
@@ -30,5 +29,5 @@ public interface SignatureGeneration {
 	 * @return the signature for the message as a byte array
 	 * @throws SignatureException if the message is timestamped at a date the certificate is not valid for.
 	 */
-	ImmutableByteArray genSignature(Hashable message, Hashable additionalContextData) throws SignatureException;
+	byte[] genSignature(Hashable message, Hashable additionalContextData) throws SignatureException;
 }

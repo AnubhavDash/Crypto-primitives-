@@ -123,7 +123,7 @@ public final class ZqElement extends GroupElement<ZqGroup> {
 	 */
 	public ZqElement exponentiate(final BigInteger exponent) {
 		checkNotNull(exponent);
-		checkArgument(exponent.signum() >= 0, "The exponent must be positive.");
+		checkArgument(exponent.compareTo(BigInteger.ZERO) >= 0, "The exponent must be positive.");
 
 		final BigInteger result = BigIntegerOperationsService.modExponentiate(value, exponent, this.group.getQ());
 		return new ZqElement(result, this.group);

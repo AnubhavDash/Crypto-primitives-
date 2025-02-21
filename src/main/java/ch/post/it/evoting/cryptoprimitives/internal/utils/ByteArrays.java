@@ -21,8 +21,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-
 /**
  * Byte array utilities.
  */
@@ -36,31 +34,36 @@ public final class ByteArrays {
 	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.ByteArrays#cutToBitLength}
 	 */
 	@SuppressWarnings("java:S117")
-	public static ImmutableByteArray cutToBitLength(final ImmutableByteArray byteArray, final int requestedLength) {
+	public static byte[] cutToBitLength(final byte[] byteArray, final int requestedLength) {
 		// Input.
-		final ImmutableByteArray B = checkNotNull(byteArray);
-		final int N = B.length();
+		checkNotNull(byteArray);
+
+		final byte[] B = byteArray;
+		final int N = B.length;
 		final int n = requestedLength;
 
-		checkArgument(n >= 0, "The requested length must be positive.");
+		checkArgument(N > 0, "The byte array length must be strictly positive.");
+		checkArgument(n > 0, "The requested length must be strictly positive.");
 
 		// Require.
 		checkArgument(n <= (N * Byte.SIZE), "The requested length must not be greater than the bit length of the byte array.");
 
 		// Operation.
-		final int length = Math.ceilDivExact(n, Byte.SIZE);
+		final int length = (int) Math.ceil(n / (double) Byte.SIZE);
 		final int offset = N - length;
 		final byte[] B_prime = new byte[length];
-		for (int i = 0; i < length; i++) {
-			B_prime[i] = B.get(offset + i);
-		}
 		if (n % Byte.SIZE != 0) {
-			B_prime[0] = (byte) (B.get(offset) & (byte) (Math.pow(2, n % Byte.SIZE) - 1));
+			B_prime[0] = (byte) (B[offset] & (byte) (Math.pow(2, n % Byte.SIZE) - 1));
+		} else {
+			B_prime[0] = B[offset];
 		}
 
+		for (int i = 1; i < length; i++) {
+			B_prime[i] = B[offset + i];
+		}
 
 		// Output.
-		return new ImmutableByteArray(B_prime);
+		return B_prime;
 	}
 
 	/**
@@ -73,6 +76,8 @@ public final class ByteArrays {
 	public static int byteLength(final BigInteger x) {
 		checkNotNull(x);
 
-		return Math.ceilDivExact(x.bitLength(), Byte.SIZE);
+		final int n = (int) Math.ceil(x.bitLength() / (double) Byte.SIZE);
+
+		return Math.max(n, 1);
 	}
 }

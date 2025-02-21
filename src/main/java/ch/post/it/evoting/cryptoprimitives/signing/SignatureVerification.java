@@ -17,7 +17,6 @@ package ch.post.it.evoting.cryptoprimitives.signing;
 
 import java.security.SignatureException;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 
 public interface SignatureVerification {
@@ -33,6 +32,6 @@ public interface SignatureVerification {
 	 * @throws NullPointerException if any argument is null or if the certificate for the authorityId is not found.
 	 * @throws SignatureException   if the message is timestamped at a date the certificate is not valid for.
 	 */
-	boolean verifySignature(String authorityId, Hashable message, Hashable additionalContextData, ImmutableByteArray signature)
+	boolean verifySignature(String authorityId, Hashable message, Hashable additionalContextData, byte[] signature)
 			throws SignatureException;
 }

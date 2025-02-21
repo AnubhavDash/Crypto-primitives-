@@ -17,18 +17,54 @@ package ch.post.it.evoting.cryptoprimitives.hashing;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import java.util.Arrays;
 
 /**
  * An argon2 hash composed of a tag and a salt.
  *
  * <p>Instances of this class are immutable.</p>
  */
-public record Argon2Hash(ImmutableByteArray tag, ImmutableByteArray salt) {
+public record Argon2Hash(byte[] tag, byte[] salt) {
 
-	public Argon2Hash {
+	public Argon2Hash(final byte[] tag, final byte[] salt) {
 		checkNotNull(tag);
 		checkNotNull(salt);
+		this.tag = Arrays.copyOf(tag, tag.length);
+		this.salt = Arrays.copyOf(salt, salt.length);
 	}
 
+	public byte[] getTag() {
+		return Arrays.copyOf(tag, tag.length);
+	}
+
+	public byte[] getSalt() {
+		return Arrays.copyOf(salt, salt.length);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		final Argon2Hash that = (Argon2Hash) o;
+		return Arrays.equals(tag, that.tag) && Arrays.equals(salt, that.salt);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = Arrays.hashCode(tag);
+		result = 31 * result + Arrays.hashCode(salt);
+		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "Argon2Hash{" +
+				"tag=" + Arrays.toString(tag) +
+				", salt=" + Arrays.toString(salt) +
+				'}';
+	}
 }
