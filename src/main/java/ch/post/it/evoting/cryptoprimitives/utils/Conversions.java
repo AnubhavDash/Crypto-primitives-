@@ -26,7 +26,7 @@ public interface Conversions {
 	/**
 	 * Converts a byte array to its BigInteger equivalent.
 	 *
-	 * @param bytes B, the byte array to convert. Must be non-null and non-empty.
+	 * @param bytes B, the byte array to convert. Must be non-null.
 	 * @return a BigInteger corresponding to the provided byte array representation.
 	 */
 	static BigInteger byteArrayToInteger(final ImmutableByteArray bytes) {
@@ -36,7 +36,7 @@ public interface Conversions {
 	/**
 	 * Converts a BigInteger to a byte array representation.
 	 *
-	 * @param x the positive BigInteger to convert.
+	 * @param x the positive BigInteger to convert. Must be non-null.
 	 * @return the byte array representation of this BigInteger.
 	 */
 	static ImmutableByteArray integerToByteArray(final BigInteger x) {
@@ -44,9 +44,21 @@ public interface Conversions {
 	}
 
 	/**
+	 * Converts a BigInteger to a byte array representation of desired length.
+	 *
+	 * @param x the positive BigInteger to convert. Must be non-null.
+	 * @param n the desired length in bytes of the resulting byte array.
+	 * @return the byte array representation of this BigInteger.
+	 * @throws IllegalArgumentException if n is smaller than the byte length of x
+	 */
+	static ImmutableByteArray integerToFixedLengthByteArray(final BigInteger x, final int n) {
+		return ConversionsInternal.integerToFixedLengthByteArray(x, n);
+	}
+
+	/**
 	 * Converts a string to a byte array representation.
 	 *
-	 * @param s S, the string to convert.
+	 * @param s S, the string to convert. Must be non-null.
 	 * @return the byte array representation of the string.
 	 */
 	static ImmutableByteArray stringToByteArray(final String s) {

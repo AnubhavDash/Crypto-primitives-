@@ -57,6 +57,16 @@ class ConversionsEquivalenceTest {
 		assertEquals(expected, result);
 	}
 
+	@RepeatedTest(100)
+	void randomBigIntegerConversionToFixedLengthIsEquivalentWithTwoMethods() {
+		final int BIT_LENGTH = 3072;
+		final BigInteger random = randomService.genRandomIntegerOfLength(BIT_LENGTH);
+		final int desiredLength = BIT_LENGTH + randomService.genRandomInteger(BIT_LENGTH);
+		final ImmutableByteArray expected = integerToFixedLengthByteArraySpec(random, desiredLength);
+		final ImmutableByteArray result = ConversionsInternal.integerToFixedLengthByteArray(random, desiredLength);
+		assertEquals(expected, result);
+	}
+
 	/**
 	 * Implements the specification ByteArrayToInteger algorithm. It is used in tests to show that it is equivalent to the more performant method used
 	 * which is implemented in {@link ConversionsInternal#byteArrayToInteger}.
@@ -82,16 +92,44 @@ class ConversionsEquivalenceTest {
 	 * @param integer x, the positive BigInteger to convert.
 	 * @return the byte array representation of this BigInteger.
 	 **/
+	@SuppressWarnings("java:S117")
 	static ImmutableByteArray integerToByteArraySpec(final BigInteger integer) {
-		final BigInteger TWOHUNDRED_FIFTY_SIX = BigInteger.valueOf(256);
+		final BigInteger twoHundredFiftySix = BigInteger.valueOf(256);
 		BigInteger x = integer;
 
 		// Operation
 		final int n = ByteArrays.byteLength(x);
 		final byte[] B = new byte[n];
 		for (int i = 0; i < n; i++) {
-			B[n - i - 1] = x.mod(TWOHUNDRED_FIFTY_SIX).byteValue();
-			x = x.divide(TWOHUNDRED_FIFTY_SIX);
+			B[n - i - 1] = x.mod(twoHundredFiftySix).byteValue();
+			x = x.divide(twoHundredFiftySix);
+		}
+		return new ImmutableByteArray(B);
+	}
+
+	/**
+	 * Implements the specification IntegerToFixedLengthByteArray algorithm. It is used in tests to show that it is equivalent to the more performant method used
+	 * which is implemented in {@link ConversionsInternal#integerToFixedLengthByteArray}.
+	 *
+	 * @param integer x, the positive BigInteger to convert.
+	 * @param desiredLength n, the desired byte length of the output.
+	 * @return the byte array representation of this BigInteger.
+	 **/
+	@SuppressWarnings("java:S117")
+	static ImmutableByteArray integerToFixedLengthByteArraySpec(final BigInteger integer, final int desiredLength) {
+		final BigInteger twoHundredFiftySix = BigInteger.valueOf(256);
+		BigInteger x = integer;
+		final int n = desiredLength;
+
+		// Operation
+		final int m = ByteArrays.byteLength(x);
+		final byte[] B = new byte[n];
+		for (int i = 0; i < n - m; i++) {
+			B[i] = 0;
+		}
+		for (int i = 0; i < m; i++) {
+			B[n - i - 1] = x.mod(twoHundredFiftySix).byteValue();
+			x = x.divide(twoHundredFiftySix);
 		}
 		return new ImmutableByteArray(B);
 	}

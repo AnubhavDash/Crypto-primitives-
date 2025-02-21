@@ -15,12 +15,13 @@
  */
 package ch.post.it.evoting.cryptoprimitives.utils;
 
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToString;
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.integerToByteArray;
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.integerToString;
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.stringToByteArray;
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.stringToInteger;
+import static ch.post.it.evoting.cryptoprimitives.utils.Conversions.byteArrayToInteger;
+import static ch.post.it.evoting.cryptoprimitives.utils.Conversions.byteArrayToString;
+import static ch.post.it.evoting.cryptoprimitives.utils.Conversions.integerToByteArray;
+import static ch.post.it.evoting.cryptoprimitives.utils.Conversions.integerToFixedLengthByteArray;
+import static ch.post.it.evoting.cryptoprimitives.utils.Conversions.integerToString;
+import static ch.post.it.evoting.cryptoprimitives.utils.Conversions.stringToByteArray;
+import static ch.post.it.evoting.cryptoprimitives.utils.Conversions.stringToInteger;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -82,6 +83,52 @@ class ConversionsTest {
 		void testOfNegativeIntegerThrows() {
 			final BigInteger value = BigInteger.valueOf(-1);
 			assertThrows(IllegalArgumentException.class, () -> integerToByteArray(value));
+		}
+	}
+
+	@Nested
+	@DisplayName("Test BigInteger to byte array conversion")
+	class IntegerToFixedLengthByteArrayTest {
+		@Test
+		void testConversionOfNullBigIntegerToByteArrayThrows() {
+			assertThrows(NullPointerException.class, () -> integerToFixedLengthByteArray(null, 1));
+		}
+
+		@Test
+		void testConversionOfZeroBigIntegerIsEmptyByte() {
+			final BigInteger zero = BigInteger.ZERO;
+			final ImmutableByteArray expected = ImmutableByteArray.EMPTY;
+			final ImmutableByteArray converted = integerToFixedLengthByteArray(zero, 0);
+			assertEquals(expected, converted);
+		}
+
+		@Test
+		void testConversionOf256BigIntegerWithLengthOneThrows() {
+			final BigInteger value = BigInteger.valueOf(256);
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> integerToFixedLengthByteArray(value, 1));
+			assertEquals("The desired length n must be greater than or equal to the byte length of x.", exception.getMessage());
+		}
+
+		@Test
+		void testConversionOf256BigIntegerWithLengthThreeIsThreeBytes() {
+			final BigInteger value = BigInteger.valueOf(256);
+			final ImmutableByteArray expected = ImmutableByteArray.of((byte) 0, (byte) 1, (byte) 0);
+			final ImmutableByteArray converted = integerToFixedLengthByteArray(value, 3);
+			assertEquals(expected, converted);
+		}
+
+		@Test
+		void testConversionOfIntegerMaxValuePlusOneIsCorrect() {
+			final BigInteger value = BigInteger.valueOf(Integer.MAX_VALUE).add(BigInteger.ONE);
+			final ImmutableByteArray expected = ImmutableByteArray.of((byte) 0b10000000, (byte) 0, (byte) 0, (byte) 0);
+			final ImmutableByteArray converted = integerToFixedLengthByteArray(value, expected.length());
+			assertEquals(expected, converted);
+		}
+
+		@Test
+		void testOfNegativeIntegerThrows() {
+			final BigInteger value = BigInteger.valueOf(-1);
+			assertThrows(IllegalArgumentException.class, () -> integerToFixedLengthByteArray(value, 0));
 		}
 	}
 
