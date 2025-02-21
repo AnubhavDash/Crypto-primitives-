@@ -79,6 +79,30 @@ public final class ConversionsInternal {
 	}
 
 	/**
+	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.Conversions#integerToFixedLengthByteArray}.
+	 * <p>
+	 * NOTE: our implementation slightly deviates from the specifications for performance reasons. Benchmarks show that our implementation is orders
+	 * of magnitude faster than the pseudo-code implementation integerToFixedLengthByteArraySpec. Both implementations are equivalent, and we have a unit test
+	 * ensuring it.
+	 * </p>
+	 */
+	@SuppressWarnings("java:S117")
+	public static ImmutableByteArray integerToFixedLengthByteArray(final BigInteger x, final int n) {
+		checkNotNull(x);
+		checkArgument(x.signum() >= 0);
+		checkArgument(Math.ceilDivExact(x.bitLength(), Byte.SIZE) <= n,
+				"The desired length n must be greater than or equal to the byte length of x.");
+
+		// BigInteger#toByteArray gives back a 2s complement representation of the value. Given that we work only with positive BigIntegers, this
+		// representation is equivalent to the binary representation, except for a potential extra leading zero byte. (The presence or not of the
+		// leading zero depends on the number of bits needed to represent this value).
+		final byte[] B = new byte[n];
+		final ImmutableByteArray xAsByteArray = integerToByteArray(x);
+		System.arraycopy(xAsByteArray.elements(), 0, B, n - xAsByteArray.length(), xAsByteArray.length());
+		return ImmutableByteArray.of(B);
+	}
+
+	/**
 	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.Conversions#stringToByteArray}
 	 */
 	public static ImmutableByteArray stringToByteArray(final String s) {

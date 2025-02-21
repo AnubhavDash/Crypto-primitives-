@@ -55,6 +55,22 @@ public class ConversionServiceBenchmark {
 		return ConversionsEquivalenceTest.integerToByteArraySpec(state.randomBigInteger);
 	}
 
+	@Benchmark
+	@Warmup(iterations = 4, time = 5)
+	@Fork(value = 1)
+	@Measurement(iterations = 4, time = 5)
+	public ImmutableByteArray bigIntegerToFixedLengthByteArrayUsingJdk(final MyState state) {
+		return ConversionsInternal.integerToFixedLengthByteArray(state.randomBigInteger, bitLength);
+	}
+
+	@Benchmark
+	@Warmup(iterations = 4, time = 5)
+	@Fork(value = 1)
+	@Measurement(iterations = 4, time = 5)
+	public ImmutableByteArray bigIntegerToFixedLengthByteArray(final MyState state) {
+		return ConversionsEquivalenceTest.integerToFixedLengthByteArraySpec(state.randomBigInteger, bitLength);
+	}
+
 	@State(Scope.Thread)
 	public static class MyState {
 
