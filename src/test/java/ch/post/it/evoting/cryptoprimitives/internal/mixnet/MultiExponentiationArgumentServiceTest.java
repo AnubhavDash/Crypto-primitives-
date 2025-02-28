@@ -50,6 +50,7 @@ import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupMatrix;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
+import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.mixnet.MultiExponentiationArgument;
 import ch.post.it.evoting.cryptoprimitives.mixnet.MultiExponentiationStatement;
 import ch.post.it.evoting.cryptoprimitives.mixnet.MultiExponentiationWitness;
@@ -107,7 +108,7 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 		l = randomService.genRandomInteger(publicKeySize) + 1;
 	}
 
-	////////// Utilities
+	/// /////// Utilities
 	private void assertThrowsIllegalArgumentExceptionWithMessage(final String errorMsg, final Executable executable) {
 		final Exception exception = assertThrows(IllegalArgumentException.class, executable);
 		assertEquals(errorMsg, exception.getMessage());
@@ -344,19 +345,62 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 		}
 
 		@Test
+		@SuppressWarnings("java:S117")
 		void testStatementWithModified_C_ElementDoesNotVerify() {
+			final GqGroup g29 = GroupTestData.getGroupP59();
+			final GqElement gqFour = GqElementFactory.fromValue(BigInteger.valueOf(4), g29);
+			final GqElement gqFive = GqElementFactory.fromValue(BigInteger.valueOf(5), g29);
+			final GqElement gqTwelve = GqElementFactory.fromValue(BigInteger.valueOf(12), g29);
+			final GqElement gqSeventeen = GqElementFactory.fromValue(BigInteger.valueOf(17), g29);
+			final GqElement gqFiftyOne = GqElementFactory.fromValue(BigInteger.valueOf(51), g29);
+			final ZqGroup z29 = ZqGroup.sameOrderAs(g29);
+			final ZqElement two = ZqElement.create(2, z29);
+			final ZqElement three = ZqElement.create(3, z29);
+			final ZqElement four = ZqElement.create(4, z29);
+			final GroupMatrix<ZqElement, ZqGroup> AMatrix = GroupMatrix.fromColumns(
+					GroupVector.of(
+							GroupVector.of(two, three),
+							GroupVector.of(three, four)
+					)
+			);
+			final GroupVector<ZqElement, ZqGroup> rExponents = GroupVector.of(four, ZqElement.create(11, z29));
+			final ZqElement rhoExponents = ZqElement.create(23, z29);
+			final MultiExponentiationWitness witness = new MultiExponentiationWitness(AMatrix, rExponents, rhoExponents);
+
+			final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> CMatrix = GroupMatrix.fromRows(
+					GroupVector.of(
+							GroupVector.of(
+									ElGamalMultiRecipientCiphertext.create(gqFour, GroupVector.of(gqTwelve, gqFive)),
+									ElGamalMultiRecipientCiphertext.create(gqFiftyOne, GroupVector.of(gqFive, gqFour))
+							),
+							GroupVector.of(
+									ElGamalMultiRecipientCiphertext.create(gqSeventeen, GroupVector.of(gqTwelve, gqTwelve)),
+									ElGamalMultiRecipientCiphertext.create(gqFiftyOne, GroupVector.of(gqFive, gqSeventeen))
+							))
+			);
+
+			final ElGamalMultiRecipientPublicKey pk = new ElGamalMultiRecipientPublicKey(GroupVector.of(gqFiftyOne, gqFive));
+			final CommitmentKey ck = new CommitmentKey(gqFive, GroupVector.of(gqTwelve, gqSeventeen));
+			final HashService testHashService = TestHashService.create(g29.getQ());
+			final MultiExponentiationArgumentService testArgumentService = new MultiExponentiationArgumentService(pk, ck, randomService, testHashService);
+			final ElGamalMultiRecipientCiphertext computedC = testArgumentService.multiExponentiation(CMatrix, AMatrix, rhoExponents, 2, 2);
+			final GroupVector<GqElement, GqGroup> commitmentToA = CommitmentService.getCommitmentMatrix(AMatrix, rExponents, ck);
+			final MultiExponentiationStatement statement = new MultiExponentiationStatement(CMatrix, computedC, commitmentToA);
+			final MultiExponentiationArgument argument = testArgumentService.getMultiExponentiationArgument(statement, witness);
+			final VerificationResult verificationResult = testArgumentService.verifyMultiExponentiationArgument(statement, argument).verify();
+			assertTrue(verificationResult.isVerified());
+
 			final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> modifiedCMatrix = GroupMatrix.fromRows(
-					validStatement.get_C_matrix().rowStream()
-							.map(r -> r.stream().map(c -> c.getCiphertextExponentiation(zqTwo)).collect(toGroupVector()))
+					statement.get_C_matrix().rowStream()
+							.map(r -> r.stream().map(c -> c.getCiphertextExponentiation(two)).collect(toGroupVector()))
 							.collect(toGroupVector()));
 			final MultiExponentiationStatement modifiedStatement = new MultiExponentiationStatement(
 					modifiedCMatrix,
-					validStatement.get_C(),
-					validStatement.get_c_A()
+					statement.get_C(),
+					statement.get_c_A()
 			);
-			final VerificationResult verificationResult = argumentService.verifyMultiExponentiationArgument(modifiedStatement, validArgument)
-					.verify();
-			assertFalse(verificationResult.isVerified());
+			final VerificationResult verificationResultModified = testArgumentService.verifyMultiExponentiationArgument(modifiedStatement, argument).verify();
+			assertFalse(verificationResultModified.isVerified());
 		}
 
 		@Test
