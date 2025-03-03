@@ -19,10 +19,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.stream.IntStream;
 
-import com.google.common.base.Preconditions;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 
 /**
  * <p>This class is thread-safe.</p>
@@ -48,7 +47,7 @@ public class BigIntegerOperationsJava implements BigIntegerOperations {
 		checkNotNull(base);
 		checkNotNull(exponent);
 		checkNotNull(modulus);
-		checkArgument(exponent.compareTo(ZERO) >= 0 || base.gcd(modulus).equals(ONE),
+		checkArgument(exponent.signum() >= 0 || base.gcd(modulus).equals(ONE),
 				"When the exponent is negative, base and modulus must be relatively prime");
 		checkArgument(modulus.compareTo(ONE) > 0, MODULUS_CHECK_MESSAGE);
 		checkArgument(modulus.testBit(0), "The modulus must be odd");
@@ -56,27 +55,20 @@ public class BigIntegerOperationsJava implements BigIntegerOperations {
 	}
 
 	@Override
-	public BigInteger multiModExp(final List<BigInteger> bases, final List<BigInteger> exponents, final BigInteger modulus) {
-		final List<BigInteger> basesCopy = checkNotNull(bases).stream()
-				.map(Preconditions::checkNotNull)
-				.toList();
-		checkArgument(!basesCopy.isEmpty(), "Bases must be non empty.");
+	public BigInteger multiModExp(final ImmutableList<BigInteger> bases, final ImmutableList<BigInteger> exponents, final BigInteger modulus) {
+		checkNotNull(bases);
+		checkArgument(!bases.isEmpty(), "Bases must be non empty.");
+		checkNotNull(exponents).forEach(element -> checkArgument(element.signum() >= 0, "Exponents must be positive."));
 
-		final int exponentsSize = exponents.size();
-		final List<BigInteger> exponentsCopy = checkNotNull(exponents).stream()
-				.filter(exponent -> checkNotNull(exponent).signum() >= 0)
-				.toList();
-		checkArgument(exponentsSize == exponentsCopy.size(), "Exponents must be positive");
-
-		// The next check assures also that exponentsCopy is not empty
-		checkArgument(basesCopy.size() == exponentsCopy.size(), "Bases and exponents must have the same size");
+		// The next check assures also that exponents list is not empty.
+		checkArgument(bases.size() == exponents.size(), "Bases and exponents must have the same size");
 		checkArgument(modulus.compareTo(ONE) > 0, MODULUS_CHECK_MESSAGE);
 
-		final int numElements = basesCopy.size();
+		final int numElements = bases.size();
 
 		return IntStream.range(0, numElements)
 				.parallel()
-				.mapToObj(i -> modExponentiate(basesCopy.get(i), exponentsCopy.get(i), modulus))
+				.mapToObj(i -> modExponentiate(bases.get(i), exponents.get(i), modulus))
 				.reduce(ONE, (a, b) -> modMultiply(a, b, modulus));
 	}
 

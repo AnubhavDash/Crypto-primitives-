@@ -16,7 +16,7 @@
 package ch.post.it.evoting.cryptoprimitives.utils;
 
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigInteger;
@@ -24,6 +24,7 @@ import java.math.BigInteger;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal;
@@ -36,14 +37,14 @@ class ConversionsEquivalenceTest {
 	void randomBigIntegerConversionIsEquivalentWithTwoMethods() {
 		final int BIT_LENGTH = 3072;
 		final BigInteger random = randomService.genRandomIntegerOfLength(BIT_LENGTH);
-		final byte[] expected = integerToByteArraySpec(random);
-		final byte[] result = ConversionsInternal.integerToByteArray(random);
-		assertArrayEquals(expected, result);
+		final ImmutableByteArray expected = integerToByteArraySpec(random);
+		final ImmutableByteArray result = ConversionsInternal.integerToByteArray(random);
+		assertEquals(expected, result);
 	}
 
 	@RepeatedTest(1000)
 	void testByteArrayToIntegerIsEquivalentToSpec() {
-		final byte[] byteArray = randomService.randomBytes(32);
+		final ImmutableByteArray byteArray = randomService.randomBytes(32);
 
 		assertEquals(byteArrayToIntegerSpec(byteArray), byteArrayToInteger(byteArray));
 	}
@@ -51,9 +52,9 @@ class ConversionsEquivalenceTest {
 	@Test
 	void sameByteArrayConversionForZero() {
 		final BigInteger x = BigInteger.ZERO;
-		final byte[] expected = integerToByteArraySpec(x);
-		final byte[] result = ConversionsInternal.integerToByteArray(x);
-		assertArrayEquals(expected, result);
+		final ImmutableByteArray expected = integerToByteArraySpec(x);
+		final ImmutableByteArray result = ConversionsInternal.integerToByteArray(x);
+		assertEquals(expected, result);
 	}
 
 	@RepeatedTest(100)
@@ -61,9 +62,9 @@ class ConversionsEquivalenceTest {
 		final int BIT_LENGTH = 3072;
 		final BigInteger random = randomService.genRandomIntegerOfLength(BIT_LENGTH);
 		final int desiredLength = BIT_LENGTH + randomService.genRandomInteger(BIT_LENGTH);
-		final byte[] expected = integerToFixedLengthByteArraySpec(random, desiredLength);
-		final byte[] result = ConversionsInternal.integerToFixedLengthByteArray(random, desiredLength);
-		assertArrayEquals(expected, result);
+		final ImmutableByteArray expected = integerToFixedLengthByteArraySpec(random, desiredLength);
+		final ImmutableByteArray result = ConversionsInternal.integerToFixedLengthByteArray(random, desiredLength);
+		assertEquals(expected, result);
 	}
 
 	/**
@@ -73,9 +74,9 @@ class ConversionsEquivalenceTest {
 	 * @param byteArray B, the byte array to convert.
 	 * @return the BigInteger representation of this byte array.
 	 **/
-	private BigInteger byteArrayToIntegerSpec(final byte[] byteArray) {
-		final byte[] B = byteArray.clone();
-		final int n = byteArray.length;
+	private BigInteger byteArrayToIntegerSpec(final ImmutableByteArray byteArray) {
+		final byte[] B = checkNotNull(byteArray).elements();
+		final int n = byteArray.length();
 
 		BigInteger x = BigInteger.ZERO;
 		for (int i = 0; i < n; i++) {
@@ -92,18 +93,18 @@ class ConversionsEquivalenceTest {
 	 * @return the byte array representation of this BigInteger.
 	 **/
 	@SuppressWarnings("java:S117")
-	static byte[] integerToByteArraySpec(final BigInteger integer) {
-		final BigInteger twohundredFiftySix = BigInteger.valueOf(256);
+	static ImmutableByteArray integerToByteArraySpec(final BigInteger integer) {
+		final BigInteger twoHundredFiftySix = BigInteger.valueOf(256);
 		BigInteger x = integer;
 
 		// Operation
 		final int n = ByteArrays.byteLength(x);
 		final byte[] B = new byte[n];
 		for (int i = 0; i < n; i++) {
-			B[n - i - 1] = x.mod(twohundredFiftySix).byteValue();
-			x = x.divide(twohundredFiftySix);
+			B[n - i - 1] = x.mod(twoHundredFiftySix).byteValue();
+			x = x.divide(twoHundredFiftySix);
 		}
-		return B;
+		return new ImmutableByteArray(B);
 	}
 
 	/**
@@ -115,7 +116,7 @@ class ConversionsEquivalenceTest {
 	 * @return the byte array representation of this BigInteger.
 	 **/
 	@SuppressWarnings("java:S117")
-	static byte[] integerToFixedLengthByteArraySpec(final BigInteger integer, final int desiredLength) {
+	static ImmutableByteArray integerToFixedLengthByteArraySpec(final BigInteger integer, final int desiredLength) {
 		final BigInteger twoHundredFiftySix = BigInteger.valueOf(256);
 		BigInteger x = integer;
 		final int n = desiredLength;
@@ -130,6 +131,6 @@ class ConversionsEquivalenceTest {
 			B[n - i - 1] = x.mod(twoHundredFiftySix).byteValue();
 			x = x.divide(twoHundredFiftySix);
 		}
-		return B;
+		return new ImmutableByteArray(B);
 	}
 }

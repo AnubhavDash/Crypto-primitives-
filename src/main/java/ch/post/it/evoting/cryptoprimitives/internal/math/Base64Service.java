@@ -17,26 +17,24 @@ package ch.post.it.evoting.cryptoprimitives.internal.math;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Arrays;
-
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.math.Base64;
 
 @SuppressWarnings("java:S117")
 public final class Base64Service implements Base64 {
 
 	@Override
-	public String base64Encode(final byte[] byteArray) {
-		checkNotNull(byteArray);
-		final byte[] B = Arrays.copyOf(byteArray, byteArray.length);
-		return java.util.Base64.getEncoder().encodeToString(B);
+	public String base64Encode(final ImmutableByteArray byteArray) {
+		final ImmutableByteArray B = checkNotNull(byteArray);
+		return java.util.Base64.getEncoder().encodeToString(B.elements());
 	}
 
 	@Override
-	public byte[] base64Decode(final String string) {
+	public ImmutableByteArray base64Decode(final String string) {
 		final String S = checkNotNull(string);
 		try {
 			// The method decode checks the given string is a valid Base64 string.
-			return java.util.Base64.getDecoder().decode(S);
+			return new ImmutableByteArray(java.util.Base64.getDecoder().decode(S));
 		} catch (final IllegalArgumentException e) {
 			throw new IllegalArgumentException("The given string is not a valid Base64 string.", e);
 		}

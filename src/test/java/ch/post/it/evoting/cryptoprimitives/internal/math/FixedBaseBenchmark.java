@@ -33,19 +33,17 @@ import org.openjdk.jmh.infra.Blackhole;
 @Warmup(iterations = 0)
 public class FixedBaseBenchmark {
 	@Benchmark
-	public void knownBaseBeforeCache(final MyState state, final Blackhole bh) {
+	public BigInteger knownBaseBeforeCache(final MyState state) {
 		final BigIntegerOperations operations = state.bigIntegerOperationsWithoutTable;
 
-		final BigInteger result = operations.modExponentiate(state.knownBase, state.exponent, state.p);
-		bh.consume(result);
+		return operations.modExponentiate(state.knownBase, state.exponent, state.p);
 	}
 
 	@Benchmark
-	public void randomBaseBeforeCache(final MyState state, final Blackhole bh) {
+	public BigInteger randomBaseBeforeCache(final MyState state, final Blackhole bh) {
 		final BigIntegerOperations operations = state.bigIntegerOperationsWithoutTable;
 
-		final BigInteger result = operations.modExponentiate(state.randomBase, state.exponent, state.p);
-		bh.consume(result);
+		return operations.modExponentiate(state.randomBase, state.exponent, state.p);
 	}
 
 	@Benchmark
@@ -55,19 +53,17 @@ public class FixedBaseBenchmark {
 	}
 
 	@Benchmark
-	public void knownBaseAfterCache(final MyState state, final Blackhole bh) {
+	public BigInteger knownBaseAfterCache(final MyState state) {
 		final BigIntegerOperations operations = state.bigIntegerOperationsWithTable;
 
-		final BigInteger result = operations.modExponentiate(state.knownBase, state.exponent, state.p);
-		bh.consume(result);
+		return operations.modExponentiate(state.knownBase, state.exponent, state.p);
 	}
 
 	@Benchmark
-	public void randomBaseAfterCache(final MyState state, final Blackhole bh) {
+	public BigInteger randomBaseAfterCache(final MyState state) {
 		final BigIntegerOperations operations = state.bigIntegerOperationsWithTable;
 
-		final BigInteger result = operations.modExponentiate(state.randomBase, state.exponent, state.p);
-		bh.consume(result);
+		return operations.modExponentiate(state.randomBase, state.exponent, state.p);
 	}
 
 	@State(Scope.Benchmark)

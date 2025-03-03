@@ -16,8 +16,7 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.utils;
 
-import java.util.Deque;
-
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.utils.VerificationResult;
 
 /**
@@ -39,7 +38,7 @@ public final class VerificationSuccess implements VerificationResult {
 	}
 
 	@Override
-	public Deque<String> getErrorMessages() {
+	public ImmutableList<String> getErrorMessages() {
 		throw new UnsupportedOperationException();
 	}
 }

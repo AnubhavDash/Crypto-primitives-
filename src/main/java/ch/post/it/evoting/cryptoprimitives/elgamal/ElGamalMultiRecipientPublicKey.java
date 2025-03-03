@@ -15,16 +15,16 @@
  */
 package ch.post.it.evoting.cryptoprimitives.elgamal;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 import com.google.common.base.Preconditions;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -33,7 +33,7 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVectorElement;
 
 /**
- * Encapsulates an ElGamal multi recipient public key with N elements, each corresponding to a different recipient. The order of the elements must
+ * Encapsulates an ElGamal multi recipient public key with k elements, each corresponding to a different recipient. The order of the elements must
  * match that of the elements of the associated public key.
  *
  * <p>A recipient ElGamal public key is related to its associated ElGamal private key by the following
@@ -79,8 +79,8 @@ public final class ElGamalMultiRecipientPublicKey implements GroupVectorElement<
 	/**
 	 * @return a copy of the key elements as a list.
 	 */
-	public List<GqElement> getKeyElements() {
-		return new ArrayList<>(publicKeyElements);
+	public ImmutableList<GqElement> getKeyElements() {
+		return publicKeyElements.stream().collect(toImmutableList());
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public final class ElGamalMultiRecipientPublicKey implements GroupVectorElement<
 	}
 
 	@Override
-	public List<? extends Hashable> toHashableForm() {
+	public ImmutableList<Hashable> toHashableForm() {
 		return this.publicKeyElements.toHashableForm();
 	}
 

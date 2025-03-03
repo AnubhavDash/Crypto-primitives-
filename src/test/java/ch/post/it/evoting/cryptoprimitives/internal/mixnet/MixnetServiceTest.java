@@ -84,7 +84,7 @@ class MixnetServiceTest extends TestGroupSetup {
 			final ElGamalMultiRecipientCiphertext cipherText = mock(ElGamalMultiRecipientCiphertext.class);
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> inputCiphertextList = GroupVector.of(cipherText);
 
-			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> emptyCiphertextList = GroupVector.of();
+			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> emptyCiphertextList = GroupVector.empty();
 			IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
 					() -> mixnet.genVerifiableShuffle(emptyCiphertextList, publicKey));
 			assertEquals("N must be >= 2", illegalArgumentException.getMessage());
@@ -211,10 +211,10 @@ class MixnetServiceTest extends TestGroupSetup {
 			final HashService hashService = mock(HashService.class);
 			final Mixnet mixnet = new MixnetService(hashService);
 
-			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> emptyCiphertextList = GroupVector.of();
+			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> emptyCiphertextList = GroupVector.empty();
 			final ShuffleArgument emptyShuffleArgument = mock(ShuffleArgument.class);
 			when(emptyShuffleArgument.getGroup()).thenReturn(gqGroup);
-			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> emptyShuffledCiphertextList = GroupVector.of();
+			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> emptyShuffledCiphertextList = GroupVector.empty();
 			final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
 					() -> mixnet.verifyShuffle(emptyCiphertextList, emptyShuffledCiphertextList, emptyShuffleArgument, publicKey));
 			assertEquals("N must be >= 2", illegalArgumentException.getMessage());
