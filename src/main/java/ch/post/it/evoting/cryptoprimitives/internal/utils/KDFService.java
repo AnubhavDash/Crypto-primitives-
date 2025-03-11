@@ -62,14 +62,14 @@ public class KDFService implements KeyDerivation {
 			final int requiredByteLength) {
 		final int L = this.hashSupplier.get().getDigestSize();
 		final ImmutableByteArray PRK = checkNotNull(pseudoRandomKey);
-		final int l_straight = PRK.length();
+		final int N = PRK.length();
 		final ImmutableList<String> info_vector = checkNotNull(contextInformation);
-		final int l_curved = requiredByteLength;
+		final int n = requiredByteLength;
 
-		checkArgument(l_curved > 0, "Requested byte length must be greater than 0. ");
+		checkArgument(n > 0, "Requested byte length must be greater than 0. ");
 		checkArgument(L > 0, "Requested KeyDerivation byte length is smaller or equal to 0.");
-		checkArgument(l_straight >= L, "The pseudo random key length must be greater than the hash function output length.");
-		checkArgument(l_curved <= 255 * L, "The required byte length must me smaller than 255 times the hash function output length.");
+		checkArgument(N >= L, "The pseudo random key length must be greater than the hash function output length.");
+		checkArgument(n <= 255 * L, "The required byte length must me smaller than 255 times the hash function output length.");
 		info_vector.forEach(info_i -> checkArgument(stringToByteArray(info_i).length() <= 255,
 				"The required length of each additional context information must be smaller or equal to 255."));
 
@@ -80,7 +80,7 @@ public class KDFService implements KeyDerivation {
 						.toArray(ImmutableByteArray[]::new)
 		);
 
-		return HKDFExpand(PRK, info, l_curved);
+		return HKDFExpand(PRK, info, n);
 	}
 
 	//HKDF-Expand as specified in RFC5869 section 2.3
@@ -109,17 +109,17 @@ public class KDFService implements KeyDerivation {
 
 		final int L = this.hashSupplier.get().getDigestSize();
 		final ImmutableByteArray PRK = checkNotNull(pseudoRandomKey);
-		final int l_straight = PRK.length();
+		final int N = PRK.length();
 		final ImmutableList<String> info = checkNotNull(contextInformation);
 		final BigInteger q = exclusiveUpperBound;
 
-		checkArgument(l_straight >= L, "The pseudo random key length must be greater than the hash function output length.");
+		checkArgument(N >= L, "The pseudo random key length must be greater than the hash function output length.");
 		checkArgument(ByteArrays.byteLength(q) >= L,
 				"The byte length of the exclusive upper bound must be greater than the hash function output length.");
 		checkArgument(lambda % 4 == 0, "The algorithm assumes that lambda is a multiple of 4");
 
-		final int l_curved = ByteArrays.byteLength(q) + lambda / 4;
-		final ImmutableByteArray h = KDF(PRK, info, l_curved);
+		final int n = ByteArrays.byteLength(q) + lambda / 4;
+		final ImmutableByteArray h = KDF(PRK, info, n);
 		final BigInteger u = byteArrayToInteger(h).mod(q);
 
 		return ZqElement.create(u, new ZqGroup(q));
