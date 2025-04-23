@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,11 @@ import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImm
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -36,7 +34,6 @@ import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
-import org.openjdk.jmh.infra.Blackhole;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.math.Alphabet;
@@ -54,25 +51,13 @@ public class GenUniqueDecimalStringsBenchmark {
 	}
 
 	@Benchmark
-	public ImmutableList<String> genUniqueDecimalStringsHashSet(final MyState state) {
-		return state.genUniqueDecimalStringsHashSet(state.desiredCodeLength, state.numberOfUniqueCodes);
+	public ImmutableList<String> genUniqueDecimalStringsLinkedList(final MyState state) {
+		return state.genUniqueDecimalStringsLinkedList(state.desiredCodeLength, state.numberOfUniqueCodes);
 	}
 
 	@Benchmark
-	public ImmutableList<String> genUniqueDecimalStringsTreeSet(final MyState state) {
-		return state.genUniqueDecimalStringsTreeSet(state.desiredCodeLength, state.numberOfUniqueCodes);
-	}
-
-	@Benchmark
-	public ImmutableList<String> genUniqueDecimalStringsConcurrentHashSetParallelized(final MyState state) {
-		return state.genUniqueDecimalStringsConcurrentHashSet(state.desiredCodeLength, state.numberOfUniqueCodes,
-				true);
-	}
-
-	@Benchmark
-	public ImmutableList<String> genUniqueDecimalStringsConcurrentHashSetNotParallelized(final MyState state, final Blackhole bh) {
-		return state.genUniqueDecimalStringsConcurrentHashSet(state.desiredCodeLength, state.numberOfUniqueCodes,
-				false);
+	public ImmutableList<String> genUniqueDecimalStringsLinkedHashSet(final MyState state) {
+		return state.genUniqueDecimalStringsLinkedHashSet(state.desiredCodeLength, state.numberOfUniqueCodes);
 	}
 
 	@State(Scope.Benchmark)
@@ -104,7 +89,7 @@ public class GenUniqueDecimalStringsBenchmark {
 			return codes.stream().collect(toImmutableList());
 		}
 
-		public ImmutableList<String> genUniqueDecimalStringsHashSet(final int desiredCodeLength, final int numberOfUniqueCodes) {
+		public ImmutableList<String> genUniqueDecimalStringsLinkedList(final int desiredCodeLength, final int numberOfUniqueCodes) {
 			final int l = desiredCodeLength;
 			final int n = numberOfUniqueCodes;
 			checkArgument(l > 0, "The desired length of the unique codes must be strictly positive.");
@@ -113,7 +98,30 @@ public class GenUniqueDecimalStringsBenchmark {
 			checkArgument(n <= Math.pow(10, l), "There cannot be more than 10^l codes.");
 
 			final Alphabet A_10 = Base10Alphabet.getInstance();
-			final Set<String> codes = HashSet.newHashSet(n);
+
+			final List<String> codes = new LinkedList<>();
+			while (codes.size() < n) {
+				final String c = randomService.genRandomString(l, A_10);
+
+				if (!codes.contains(c)) {
+					codes.add(c);
+				}
+			}
+
+			return codes.stream().collect(toImmutableList());
+		}
+
+		public ImmutableList<String> genUniqueDecimalStringsLinkedHashSet(final int desiredCodeLength, final int numberOfUniqueCodes) {
+			final int l = desiredCodeLength;
+			final int n = numberOfUniqueCodes;
+			checkArgument(l > 0, "The desired length of the unique codes must be strictly positive.");
+			checkArgument(n > 0, "The number of unique codes must be strictly positive.");
+
+			checkArgument(n <= Math.pow(10, l), "There cannot be more than 10^l codes.");
+
+			final Alphabet A_10 = Base10Alphabet.getInstance();
+
+			final Set<String> codes = new LinkedHashSet<>();
 			while (codes.size() < n) {
 				final String c = randomService.genRandomString(l, A_10);
 
@@ -121,50 +129,6 @@ public class GenUniqueDecimalStringsBenchmark {
 			}
 
 			return codes.stream().collect(toImmutableList());
-		}
-
-		public ImmutableList<String> genUniqueDecimalStringsTreeSet(final int desiredCodeLength, final int numberOfUniqueCodes) {
-			final int l = desiredCodeLength;
-			final int n = numberOfUniqueCodes;
-			checkArgument(l > 0, "The desired length of the unique codes must be strictly positive.");
-			checkArgument(n > 0, "The number of unique codes must be strictly positive.");
-
-			checkArgument(n <= Math.pow(10, l), "There cannot be more than 10^l codes.");
-
-			final Alphabet A_10 = Base10Alphabet.getInstance();
-
-			final Set<String> codes = new TreeSet<>();
-			while (codes.size() < n) {
-				final String c = randomService.genRandomString(l, A_10);
-
-				codes.add(c);
-			}
-
-			return codes.stream().collect(toImmutableList());
-		}
-
-		public ImmutableList<String> genUniqueDecimalStringsConcurrentHashSet(final int desiredCodeLength, final int numberOfUniqueCodes,
-				final boolean parallel) {
-			final int l = desiredCodeLength;
-			final int n = numberOfUniqueCodes;
-			checkArgument(l > 0, "The desired length of the unique codes must be strictly positive.");
-			checkArgument(n > 0, "The number of unique codes must be strictly positive.");
-
-			checkArgument(n <= Math.pow(10, l), "There cannot be more than 10^l codes.");
-
-			final Alphabet A_10 = Base10Alphabet.getInstance();
-
-			final Set<String> codes = ConcurrentHashMap.newKeySet();
-
-			return (parallel ? IntStream.range(0, numberOfUniqueCodes).parallel() : IntStream.range(0, numberOfUniqueCodes))
-					.mapToObj(i -> {
-						String c;
-						do {
-							c = randomService.genRandomString(l, A_10);
-						} while (!codes.add(c));
-						return c;
-					})
-					.collect(toImmutableList());
 		}
 	}
 }
