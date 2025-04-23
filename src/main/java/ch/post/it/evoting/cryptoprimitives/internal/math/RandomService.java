@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
-import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays.byteLength;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays.cutToBitLength;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
@@ -25,8 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -110,15 +109,16 @@ public class RandomService implements Random {
 
 		final Alphabet A_10 = Base10Alphabet.getInstance();
 
-		final Set<String> codes = HashSet.newHashSet(n);
+		final List<String> codes = new ArrayList<>(n);
 		while (codes.size() < n) {
 			final String c = genRandomString(l, A_10);
 
-			// The Set#add method is, in this context, equivalent to the if statement in the specification.
-			codes.add(c);
+			if (!codes.contains(c)) {
+				codes.add(c);
+			}
 		}
 
-		return codes.stream().collect(toImmutableList());
+		return ImmutableList.from(codes);
 	}
 
 	/**
