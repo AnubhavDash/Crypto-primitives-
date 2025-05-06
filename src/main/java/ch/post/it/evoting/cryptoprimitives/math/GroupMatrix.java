@@ -15,12 +15,12 @@
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
-import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static ch.post.it.evoting.cryptoprimitives.utils.Validations.allEqual;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -28,7 +28,6 @@ import java.util.stream.Stream;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Streams;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.MathematicalGroup;
@@ -47,24 +46,31 @@ public class GroupMatrix<E extends GroupVectorElement<G> & Hashable, G extends M
 	private static final String OUT_OF_BOUNDS_MESSAGE = "Trying to access index out of bound.";
 
 	private final G group;
-	private final GroupVector<GroupVector<E, G>, G> rows;
+	private final List<GroupVector<E, G>> rows;
 	private final int numRows;
 	private final int numColumns;
 	private final int elementSize;
 
-	private GroupMatrix(final GroupVector<GroupVector<E, G>, G> rows) {
+	private GroupMatrix(final List<GroupVector<E, G>> rows) {
 		// Null checking.
-		checkNotNull(rows);
+		final List<GroupVector<E, G>> rowsCopy = checkNotNull(rows).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 
 		// Size checking.
-		checkArgument(allEqual(rows.stream().flatMap(GroupVector::stream), GroupVectorElement::size), "All matrix elements must have the same size.");
-		checkArgument(!rows.isEmpty() && !rows.get(0).isEmpty(), "Empty matrices are not supported.");
+		checkArgument(allEqual(rowsCopy.stream(), GroupVector::size), "All rows of the matrix must have the same number of columns.");
+		checkArgument(allEqual(rowsCopy.stream().flatMap(GroupVector::stream), GroupVectorElement::size),
+				"All matrix elements must have the same size.");
+		checkArgument(!rowsCopy.isEmpty() && !rowsCopy.get(0).isEmpty(), "Empty matrices are not supported.");
 
-		this.rows = rows;
-		this.numRows = rows.size();
-		this.numColumns = rows.getElementSize();
-		this.group = rows.getGroup();
-		this.elementSize = rows.get(0).getElementSize();
+		// Group checking.
+		checkArgument(allEqual(rowsCopy.stream(), GroupVector::getGroup), "All elements of the matrix must be in the same group.");
+
+		this.rows = rowsCopy;
+		this.numRows = rowsCopy.size();
+		this.numColumns = rowsCopy.get(0).size();
+		this.group = rowsCopy.get(0).get(0).getGroup();
+		this.elementSize = rowsCopy.get(0).get(0).size();
 	}
 
 	/**
@@ -81,11 +87,14 @@ public class GroupMatrix<E extends GroupVectorElement<G> & Hashable, G extends M
 	 *             	<li>all elements must be the same size</li>
 	 *             </ul>
 	 */
-	public static <E extends GroupVectorElement<G> & Hashable, G extends MathematicalGroup<G>> GroupMatrix<E, G> fromRows(
-			final GroupVector<GroupVector<E, G>, G> rows) {
-		checkNotNull(rows).forEach(Preconditions::checkNotNull);
+	public static <L extends List<E>, E extends GroupVectorElement<G> & Hashable, G extends MathematicalGroup<G>> GroupMatrix<E, G> fromRows(
+			final List<L> rows) {
+		final List<GroupVector<E, G>> rowVectors = checkNotNull(rows).stream()
+				.map(Preconditions::checkNotNull)
+				.map(GroupVector::from)
+				.toList();
 
-		return new GroupMatrix<>(rows);
+		return new GroupMatrix<>(rowVectors);
 	}
 
 	/**
@@ -100,13 +109,13 @@ public class GroupMatrix<E extends GroupVectorElement<G> & Hashable, G extends M
 	 *                	<li>all elements must be the same size</li>
 	 *                </ul>
 	 */
-	public static <E extends GroupVectorElement<G> & Hashable, G extends MathematicalGroup<G>> GroupMatrix<E, G> fromColumns(
-			final GroupVector<GroupVector<E, G>, G> columns) {
+	public static <L extends List<E>, E extends GroupVectorElement<G> & Hashable, G extends MathematicalGroup<G>> GroupMatrix<E, G> fromColumns(
+			final List<L> columns) {
 		return fromRows(columns).transpose();
 	}
 
 	private static <E extends GroupVectorElement<G> & Hashable, G extends MathematicalGroup<G>> GroupMatrix<E, G> fromColumnVector(
-			final GroupVector<GroupVector<E, G>, G> columns) {
+			final List<GroupVector<E, G>> columns) {
 		return new GroupMatrix<>(columns).transpose();
 	}
 
@@ -119,11 +128,12 @@ public class GroupMatrix<E extends GroupVectorElement<G> & Hashable, G extends M
 	 * @return the transpose of this matrix
 	 */
 	public GroupMatrix<E, G> transpose() {
-		final int n = this.numColumns;
+		final int n = numColumns;
 		return new GroupMatrix<>(
 				IntStream.range(0, n)
 						.mapToObj(this::getColumn)
-						.collect(toGroupVector()));
+						.toList()
+		);
 	}
 
 	public int numRows() {
@@ -143,9 +153,9 @@ public class GroupMatrix<E extends GroupVectorElement<G> & Hashable, G extends M
 	 */
 	public E get(final int row, final int column) {
 		checkArgument(row >= 0, "The index of a row cannot be negative.");
-		checkArgument(row < this.numRows, "The index of a row cannot be larger than the number of rows of the matrix.");
+		checkArgument(row < numRows, "The index of a row cannot be larger than the number of rows of the matrix.");
 		checkArgument(column >= 0, "The index of a column cannot be negative.");
-		checkArgument(column < this.numColumns, "The index of a column cannot be larger than the number of columns of the matrix.");
+		checkArgument(column < numColumns, "The index of a column cannot be larger than the number of columns of the matrix.");
 		return this.rows.get(row).get(column);
 	}
 
@@ -185,7 +195,7 @@ public class GroupMatrix<E extends GroupVectorElement<G> & Hashable, G extends M
 	 * @return A stream over the matrix' columns.
 	 */
 	public Stream<GroupVector<E, G>> columnStream() {
-		return IntStream.range(0, this.numColumns)
+		return IntStream.range(0, numColumns)
 				.mapToObj(this::getColumn);
 	}
 
@@ -202,14 +212,15 @@ public class GroupMatrix<E extends GroupVectorElement<G> & Hashable, G extends M
 	 */
 	public GroupMatrix<E, G> appendColumn(final GroupVector<E, G> column) {
 		checkNotNull(column);
-		checkArgument(column.size() == this.numRows,
-				String.format("The new column size does not match size of matrix' columns. Size: %d, numRows: %d", column.size(), this.numRows));
+		checkArgument(column.size() == numRows,
+				String.format("The new column size does not match size of matrix' columns. Size: %d, numRows: %d", column.size(), numRows));
 		checkArgument(column.getElementSize() == this.elementSize, "The elements' size does not match this matrix's elements' size.");
 		if (!column.isEmpty()) {
 			checkArgument(column.getGroup().equals(this.getGroup()), "The group of the new column must be equal to the matrix' group");
 		}
 
-		return GroupMatrix.fromColumnVector(Streams.concat(this.columnStream(), Stream.of(column)).collect(toGroupVector()));
+		final List<GroupVector<E, G>> newColumns = Streams.concat(this.columnStream(), Stream.of(column)).toList();
+		return GroupMatrix.fromColumnVector(newColumns);
 	}
 
 	/**
@@ -225,14 +236,15 @@ public class GroupMatrix<E extends GroupVectorElement<G> & Hashable, G extends M
 	 */
 	public GroupMatrix<E, G> prependColumn(final GroupVector<E, G> column) {
 		checkNotNull(column);
-		checkArgument(column.size() == this.numRows,
-				String.format("The new column size does not match size of matrix' columns. Size: %d, numRows: %d", column.size(), this.numRows));
+		checkArgument(column.size() == numRows,
+				String.format("The new column size does not match size of matrix' columns. Size: %d, numRows: %d", column.size(), numRows));
 		checkArgument(column.getElementSize() == this.elementSize, "The elements' size does not match this matrix's elements' size.");
 		if (!column.isEmpty()) {
 			checkArgument(column.getGroup().equals(this.getGroup()), "The group of the new column must be equal to the matrix' group");
 		}
 
-		return GroupMatrix.fromColumnVector(Streams.concat(Stream.of(column), this.columnStream()).collect(toGroupVector()));
+		final List<GroupVector<E, G>> newColumns = Streams.concat(Stream.of(column), this.columnStream()).toList();
+		return GroupMatrix.fromColumnVector(newColumns);
 	}
 
 	public G getGroup() {
@@ -243,7 +255,7 @@ public class GroupMatrix<E extends GroupVectorElement<G> & Hashable, G extends M
 	 * @return the size of the elements. 0 if the matrix is empty.
 	 */
 	public Integer getElementSize() {
-		return this.elementSize;
+		return elementSize;
 	}
 
 	/**
@@ -254,8 +266,7 @@ public class GroupMatrix<E extends GroupVectorElement<G> & Hashable, G extends M
 		checkArgument(fromIdx >= 0);
 		checkArgument(fromIdx <= toIdx);
 		checkArgument(toIdx <= this.numColumns());
-
-		return GroupMatrix.fromColumns(this.transpose().rows.subList(fromIdx, toIdx).stream().collect(toGroupVector()));
+		return GroupMatrix.fromColumns(this.transpose().rows.subList(fromIdx, toIdx));
 	}
 
 	@Override
@@ -272,16 +283,16 @@ public class GroupMatrix<E extends GroupVectorElement<G> & Hashable, G extends M
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.rows);
+		return Objects.hash(rows);
 	}
 
 	@Override
 	public String toString() {
-		return "GroupMatrix{" + "rows=" + this.rows + '}';
+		return "GroupMatrix{" + "rows=" + rows + '}';
 	}
 
 	@Override
-	public ImmutableList<Hashable> toHashableForm() {
-		return this.rows.stream().collect(toImmutableList());
+	public List<? extends Hashable> toHashableForm() {
+		return this.rows;
 	}
 }

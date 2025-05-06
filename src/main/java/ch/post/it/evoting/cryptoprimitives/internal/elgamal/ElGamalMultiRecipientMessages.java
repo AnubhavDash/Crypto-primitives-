@@ -16,7 +16,6 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
-import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -63,7 +62,7 @@ public class ElGamalMultiRecipientMessages {
 
 		return Stream.generate(() -> constant)
 				.limit(size)
-				.collect(collectingAndThen(toGroupVector(), ElGamalMultiRecipientMessage::new));
+				.collect(collectingAndThen(GroupVector.toGroupVector(), ElGamalMultiRecipientMessage::new));
 	}
 
 	/**
@@ -92,7 +91,7 @@ public class ElGamalMultiRecipientMessages {
 		// Algorithm.
 		final GroupVector<GqElement, GqGroup> messageElements = indices
 				.mapToObj(i -> c.get(i).multiply(gamma.exponentiate(sk.get(i).negate())))
-				.collect(toGroupVector());
+				.collect(GroupVector.toGroupVector());
 
 		return new ElGamalMultiRecipientMessage(messageElements);
 	}

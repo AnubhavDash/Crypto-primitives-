@@ -18,9 +18,9 @@ package ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
 import java.util.Objects;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
@@ -117,7 +117,7 @@ public final class VerifiableDecryptions implements HashableList {
 	}
 
 	@Override
-	public ImmutableList<Hashable> toHashableForm() {
-		return ImmutableList.of(ciphertexts, decryptionProofs);
+	public List<? extends Hashable> toHashableForm() {
+		return List.of(ciphertexts, decryptionProofs);
 	}
 }

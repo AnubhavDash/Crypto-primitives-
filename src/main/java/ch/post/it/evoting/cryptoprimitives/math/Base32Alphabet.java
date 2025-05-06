@@ -15,7 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import java.util.List;
 
 /**
  * The Base 32 Alphabet excluding padding "=" of "Table 3: The Base 32 Alphabet" from RFC 4648.
@@ -23,7 +23,7 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 public final class Base32Alphabet extends Alphabet {
 
 	private static final int SIZE = 32;
-	private static final ImmutableList<String> ALPHABET = ImmutableList.of(
+	private static final List<String> ALPHABET = List.of(
 
 			Character.toString(0x0041), // A (U+0041)
 			Character.toString(0x0042), // B (U+0042)
@@ -64,7 +64,7 @@ public final class Base32Alphabet extends Alphabet {
 
 	private static final Base32Alphabet INSTANCE = new Base32Alphabet(SIZE, ALPHABET);
 
-	private Base32Alphabet(final int size, final ImmutableList<String> alphabet) {
+	private Base32Alphabet(final int size, final List<String> alphabet) {
 		super(size, alphabet);
 	}
 

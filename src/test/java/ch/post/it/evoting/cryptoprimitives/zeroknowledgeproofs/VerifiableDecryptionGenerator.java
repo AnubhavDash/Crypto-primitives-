@@ -24,15 +24,15 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator
 public class VerifiableDecryptionGenerator {
 	private final GqGroup group;
 
-	public VerifiableDecryptionGenerator(final GqGroup group) {
+	public VerifiableDecryptionGenerator(GqGroup group) {
 		this.group = group;
 	}
 
-	public VerifiableDecryptions genVerifiableDecryption(final int numCiphertexts, final int ciphertextSize) {
-		final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(group);
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator
+	public VerifiableDecryptions genVerifiableDecryption(int numCiphertexts, int ciphertextSize) {
+		ElGamalGenerator elGamalGenerator = new ElGamalGenerator(group);
+		GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator
 				.genRandomCiphertextVector(numCiphertexts, ciphertextSize);
-		final GroupVector<DecryptionProof, ZqGroup> decryptionProofs = new DecryptionProofGenerator(ZqGroup.sameOrderAs(group))
+		GroupVector<DecryptionProof, ZqGroup> decryptionProofs = new DecryptionProofGenerator(ZqGroup.sameOrderAs(group))
 				.genDecryptionProofVector(numCiphertexts, ciphertextSize);
 		return new VerifiableDecryptions(ciphertexts, decryptionProofs);
 	}

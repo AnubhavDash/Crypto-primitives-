@@ -15,7 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.utils;
 
-import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -29,11 +28,12 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import com.google.common.base.Preconditions;
+
 import ch.post.it.evoting.cryptoprimitives.math.BaseEncodingFactory;
 
 public class LibraryLoader {
@@ -49,7 +49,7 @@ public class LibraryLoader {
 		checkNotNull(hashesResourceFileName);
 
 		final String libraryFilename = System.mapLibraryName(libName);
-		final ImmutableList<String> expectedHash = getAuthorizedHashes(hashesResourceFileName);
+		final List<String> expectedHash = getAuthorizedHashes(hashesResourceFileName);
 		checkState(!expectedHash.isEmpty(), "At least one authorized hash should be defined.");
 
 		for (final String javaLibraryPath : checkNotNull(System.getProperty(JAVA_LIBRARY_PATH_PROPERTY_NAME)).split(File.pathSeparator)) {
@@ -65,13 +65,14 @@ public class LibraryLoader {
 		throw new UnsatisfiedLinkError("library not found");
 	}
 
-	private static void ensureFileHash(final Path filePath, final ImmutableList<String> expectedHashes) {
+	private static void ensureFileHash(final Path filePath, final List<String> expectedHashes) {
 		checkNotNull(filePath);
 		checkNotNull(expectedHashes);
+		expectedHashes.forEach(Preconditions::checkNotNull);
 
 		try {
 			final byte[] digest = MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(filePath));
-			final String calculatedHash = BaseEncodingFactory.createBase16().base16Encode(new ImmutableByteArray(digest));
+			final String calculatedHash = BaseEncodingFactory.createBase16().base16Encode(digest);
 
 			if (expectedHashes.stream().noneMatch(hash -> hash.toUpperCase(Locale.ENGLISH).equals(calculatedHash))) {
 				throw new IllegalArgumentException(
@@ -85,7 +86,7 @@ public class LibraryLoader {
 		}
 	}
 
-	private static ImmutableList<String> getAuthorizedHashes(final String hashesResourceFilename) {
+	private static List<String> getAuthorizedHashes(final String hashesResourceFilename) {
 		final ArrayList<String> hashes = new ArrayList<>();
 		try (final InputStream hashesInputStream = LibraryLoader.class.getResourceAsStream(hashesResourceFilename)) {
 			checkNotNull(hashesInputStream, "Could not find resource. [hashesResourceFilename: {}]", hashesResourceFilename);
@@ -94,11 +95,11 @@ public class LibraryLoader {
 					hashes.add(scanner.next());
 				}
 			}
-		} catch (final IOException e) {
+		} catch (IOException e) {
 			throw new UncheckedIOException(String.format("Unable to read the resource file. [hashesResourceFilename: %s]", hashesResourceFilename),
 					e);
 		}
 
-		return hashes.stream().collect(toImmutableList());
+		return hashes;
 	}
 }

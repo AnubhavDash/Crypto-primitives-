@@ -16,7 +16,6 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
-import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,7 +38,9 @@ public class ElGamalMultiRecipientPublicKeys {
 	 * @see ElGamal#combinePublicKeys(GroupVector)
 	 */
 	public static ElGamalMultiRecipientPublicKey combinePublicKeys(final GroupVector<ElGamalMultiRecipientPublicKey, GqGroup> publicKeyList) {
-		final GroupVector<ElGamalMultiRecipientPublicKey, GqGroup> pk = checkNotNull(publicKeyList);
+		checkNotNull(publicKeyList);
+
+		final GroupVector<ElGamalMultiRecipientPublicKey, GqGroup> pk = publicKeyList;
 		final int s = publicKeyList.size();
 		final int N = publicKeyList.getElementSize();
 
@@ -52,6 +53,6 @@ public class ElGamalMultiRecipientPublicKeys {
 				.mapToObj(i -> IntStream.range(0, s)
 						.mapToObj(j -> pk.get(j).get(i))
 						.reduce(group.getIdentity(), GqElement::multiply))
-				.collect(Collectors.collectingAndThen(toGroupVector(), ElGamalMultiRecipientPublicKey::new));
+				.collect(Collectors.collectingAndThen(GroupVector.toGroupVector(), ElGamalMultiRecipientPublicKey::new));
 	}
 }

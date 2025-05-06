@@ -16,8 +16,7 @@
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
 import java.math.BigInteger;
-
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import java.util.List;
 
 public interface BigIntegerOperations {
 
@@ -37,7 +36,7 @@ public interface BigIntegerOperations {
 	 * @param base    the base
 	 * @param modulus the modulus
 	 */
-	default void generateCache(final BigInteger base, final BigInteger modulus) {
+	default void generateCache(BigInteger base, BigInteger modulus) {
 		throw new UnsupportedOperationException("This implementation does not support fixed base optimizations");
 	}
 
@@ -70,7 +69,7 @@ public interface BigIntegerOperations {
 	 * @param modulus   the modulus &gt; 1
 	 * @return the product of the powers b[0]^e[0] * b[1]^e[1] * ... * b[n-1]^e[n-1] mod modulus
 	 */
-	BigInteger multiModExp(final ImmutableList<BigInteger> bases, final ImmutableList<BigInteger> exponents, final BigInteger modulus);
+	BigInteger multiModExp(final List<BigInteger> bases, final List<BigInteger> exponents, final BigInteger modulus);
 
 	/**
 	 * Inverts an element with respect to a modulus.
@@ -84,14 +83,15 @@ public interface BigIntegerOperations {
 	/**
 	 * Calculates the Legendre symbol (a|p).
 	 * <p>
-	 * The Legendre symbol allows us determining group membership efficiently. An integer a is a quadratic residue modulo p if and only if (a|p) = 1.
-	 * The caller of this method needs to ensure that p is an odd prime number.
+	 *     The Legendre symbol allows us determining group membership efficiently.
+	 *     An integer a is a quadratic residue modulo p if and only if (a|p) = 1.
+	 *     The caller of this method needs to ensure that p is an odd prime number.
 	 * </p>
 	 *
 	 * @param a positive integer
 	 * @param p odd prime.
 	 * @return (a | p) Possible values -1,0,1
-	 * @throws NullPointerException     if any of the arguments is null
+	 * @throws NullPointerException if any of the arguments is null
 	 * @throws IllegalArgumentException if p is not an odd integer strictly greater than 2.
 	 */
 	int getLegendre(BigInteger a, BigInteger p);

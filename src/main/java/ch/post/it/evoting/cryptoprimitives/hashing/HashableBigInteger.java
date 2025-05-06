@@ -19,7 +19,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.Objects;
 
 /**
  * Interface to be implemented by classes whose hashable form is a single {@link BigInteger}.
@@ -38,35 +37,7 @@ public interface HashableBigInteger extends Hashable {
 	static HashableBigInteger from(final BigInteger bigInteger) {
 		checkNotNull(bigInteger);
 		checkArgument(bigInteger.signum() >= 0);
-
-		return new HashableBigInteger() {
-			@Override
-			public BigInteger toHashableForm() {
-				return bigInteger;
-			}
-
-			@Override
-			public String toString() {
-				return bigInteger.toString();
-			}
-
-			@Override
-			public boolean equals(final Object o) {
-				if (this == o) {
-					return true;
-				}
-				if (o == null || getClass() != o.getClass()) {
-					return false;
-				}
-				final HashableBigInteger that = (HashableBigInteger) o;
-				return this.toHashableForm().equals(that.toHashableForm());
-			}
-
-			@Override
-			public int hashCode() {
-				return Objects.hash(bigInteger);
-			}
-		};
+		return () -> bigInteger;
 	}
 
 	/**
