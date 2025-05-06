@@ -57,7 +57,7 @@
 
 		<!-- Project settings -->
 		<maven.compiler.release>21</maven.compiler.release>
-		<maven-enforcer-plugin.requiredJavaVersion>[21.0.5]</maven-enforcer-plugin.requiredJavaVersion>
+		<maven-enforcer-plugin.requiredJavaVersion>[21.0.7]</maven-enforcer-plugin.requiredJavaVersion>
 		<maven-enforcer-plugin.requiredMavenVersion>[3.9.9]</maven-enforcer-plugin.requiredMavenVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.build.outputTimestamp>2024-02-15T13:51:16+02:00</project.build.outputTimestamp>
