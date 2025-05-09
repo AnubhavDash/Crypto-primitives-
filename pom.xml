@@ -65,6 +65,7 @@
 		<!--  Sonar  -->
 		<sonar.scm.disabled>true</sonar.scm.disabled>
 		<sonar.skipDesign>true</sonar.skipDesign>
+		<sonar.scanner.skipJreProvisioning>true</sonar.scanner.skipJreProvisioning>
 		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 		<sonar.junit.reportPaths>${project.basedir}/target/surefire-reports/</sonar.junit.reportPaths>
 		<sonar.coverage.exclusions>**/test/**/*,**/tests/**/*</sonar.coverage.exclusions>
