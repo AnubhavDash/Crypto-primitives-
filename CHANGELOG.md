@@ -1,5 +1,12 @@
 # Changelog
 
+## Release 1.4.5
+
+The following improvements are included in release 1.4.5:
+
+* [Code, Specification] Specify and implement algorithm IntegerToFixedLengthByteArray.
+* [Code] Updated dependencies and third-party libraries.
+
 ## Release 1.4.4
 
 The following improvements are included in release 1.4.4:
