@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mockStatic;
 
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -57,7 +56,7 @@ class CommitmentKeyServiceTest {
 	private GroupVector<GqElement, GqGroup> gs;
 
 	@BeforeAll
-	static void setUpAll() throws NoSuchAlgorithmException {
+	static void setUpAll() {
 		gqGroup = GroupTestData.getGqGroup();
 		generator = new GqGroupGenerator(gqGroup);
 		final HashService hashService = HashService.getInstance();
@@ -113,10 +112,10 @@ class CommitmentKeyServiceTest {
 
 	@Test
 	void constructionWithGeneratorTest() {
-		final GqElement generator = h.getGroup().getGenerator();
-		final GroupVector<GqElement, GqGroup> generatorVector = GroupVector.of(generator);
+		final GqElement singleGenerator = h.getGroup().getGenerator();
+		final GroupVector<GqElement, GqGroup> generatorVector = GroupVector.of(singleGenerator);
 
-		assertThrows(IllegalArgumentException.class, () -> new CommitmentKey(generator, gs));
+		assertThrows(IllegalArgumentException.class, () -> new CommitmentKey(singleGenerator, gs));
 		assertThrows(IllegalArgumentException.class, () -> new CommitmentKey(h, generatorVector));
 	}
 

@@ -170,15 +170,15 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		@Test
 		void withSpecificValues() {
 			final GqGroup gqGroup = GroupTestData.getGroupP59();
-			final ZqElement preimage = ZqElement.create(3, ZqGroup.sameOrderAs(gqGroup));
-			final GroupVector<GqElement, GqGroup> bases = GroupVector.of(GqElementFactory.fromValue(BigInteger.ONE, gqGroup),
+			final ZqElement specificPreimage = ZqElement.create(3, ZqGroup.sameOrderAs(gqGroup));
+			final GroupVector<GqElement, GqGroup> specificBases = GroupVector.of(GqElementFactory.fromValue(BigInteger.ONE, gqGroup),
 					GqElementFactory.fromValue(BigInteger.valueOf(4), gqGroup),
 					GqElementFactory.fromValue(BigInteger.valueOf(9), gqGroup));
 
 			final GroupVector<GqElement, GqGroup> expected = GroupVector.of(GqElementFactory.fromValue(BigInteger.ONE, gqGroup),
 					GqElementFactory.fromValue(BigInteger.valueOf(5), gqGroup),
 					GqElementFactory.fromValue(BigInteger.valueOf(21), gqGroup));
-			assertEquals(expected, computePhiExponentiation(preimage, bases));
+			assertEquals(expected, computePhiExponentiation(specificPreimage, specificBases));
 		}
 	}
 
@@ -258,16 +258,16 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		void specificValuesGiveExpectedResult() {
 			final TestValues testValues = new TestValues();
 			// Input.
-			final GroupVector<GqElement, GqGroup> bases = testValues.bases;
-			final ZqElement exponent = testValues.exponent;
-			final GroupVector<GqElement, GqGroup> exponentiations = testValues.exponentiations;
-			final AuxiliaryInformation auxiliaryInformation = testValues.auxiliaryInformation;
+			final GroupVector<GqElement, GqGroup> specificBases = testValues.bases;
+			final ZqElement specificExponent = testValues.exponent;
+			final GroupVector<GqElement, GqGroup> specificExponentiations = testValues.exponentiations;
+			final AuxiliaryInformation specificAuxiliaryInformation = testValues.auxiliaryInformation;
 
-			final ExponentiationProofService proofService = testValues.createExponentiationProofService();
+			final ExponentiationProofService specificProofService = testValues.createExponentiationProofService();
 
 			final ExponentiationProof expected = testValues.createExponentiationProof();
 
-			assertEquals(expected, proofService.genExponentiationProof(bases, exponent, exponentiations, auxiliaryInformation));
+			assertEquals(expected, specificProofService.genExponentiationProof(specificBases, specificExponent, specificExponentiations, specificAuxiliaryInformation));
 		}
 	}
 
@@ -357,51 +357,51 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		@Test
 		void differentAuxiliaryInformationReturnsFalse() {
 			final TestValues testValues = new TestValues();
-			final GroupVector<GqElement, GqGroup> bases = testValues.bases;
-			final GroupVector<GqElement, GqGroup> exponentiations = testValues.exponentiations;
+			final GroupVector<GqElement, GqGroup> differentAuxiliaryInformationBases = testValues.bases;
+			final GroupVector<GqElement, GqGroup> differentAuxiliaryInformationExponentiations = testValues.exponentiations;
 			final AuxiliaryInformation differentAuxiliaryInformation = AuxiliaryInformation.of("random");
-			final ExponentiationProof proof = testValues.createExponentiationProof();
-			final ExponentiationProofService proofService = testValues.createExponentiationProofService();
-			assertFalse(proofService.verifyExponentiation(bases, exponentiations, proof, differentAuxiliaryInformation));
+			final ExponentiationProof differentAuxiliaryInformationProof = testValues.createExponentiationProof();
+			final ExponentiationProofService differentAuxiliaryInformationProofService = testValues.createExponentiationProofService();
+			assertFalse(differentAuxiliaryInformationProofService.verifyExponentiation(differentAuxiliaryInformationBases, differentAuxiliaryInformationExponentiations, differentAuxiliaryInformationProof, differentAuxiliaryInformation));
 		}
 
 		@Test
 		void invalidProofReturnsFalse() {
 			final TestValues testValues = new TestValues();
-			final GroupVector<GqElement, GqGroup> bases = testValues.bases;
-			final GroupVector<GqElement, GqGroup> exponentiations = testValues.exponentiations;
-			final AuxiliaryInformation auxiliaryInformation = testValues.auxiliaryInformation;
-			final ExponentiationProof proof = testValues.createExponentiationProof();
-			final ZqElement e_prime = proof.get_e().add(testValues.zThree);
-			final ExponentiationProof invalidProof = new ExponentiationProof(e_prime, proof.get_z());
-			final ExponentiationProofService proofService = testValues.createExponentiationProofService();
-			assertFalse(proofService.verifyExponentiation(bases, exponentiations, invalidProof, auxiliaryInformation));
+			final GroupVector<GqElement, GqGroup> invalidProofBases = testValues.bases;
+			final GroupVector<GqElement, GqGroup> invalidProofExponentiations = testValues.exponentiations;
+			final AuxiliaryInformation invalidProofAuxiliaryInformation = testValues.auxiliaryInformation;
+			final ExponentiationProof exponentiationProof = testValues.createExponentiationProof();
+			final ZqElement hashValue = exponentiationProof.get_e().add(testValues.zThree);
+			final ExponentiationProof invalidProof = new ExponentiationProof(hashValue, exponentiationProof.get_z());
+			final ExponentiationProofService invalidProofProofService = testValues.createExponentiationProofService();
+			assertFalse(invalidProofProofService.verifyExponentiation(invalidProofBases, invalidProofExponentiations, invalidProof, invalidProofAuxiliaryInformation));
 		}
 
 		@Test
 		void differentEponentiationsReturnsFalse() {
 			final TestValues testValues = new TestValues();
-			final GroupVector<GqElement, GqGroup> bases = testValues.bases;
-			final GroupVector<GqElement, GqGroup> exponentiations = testValues.exponentiations;
-			final GroupVector<GqElement, GqGroup> differentExponentiations = exponentiations.stream().map(y -> y.multiply(testValues.gNine))
+			final GroupVector<GqElement, GqGroup> differentEponentiationsBases = testValues.bases;
+			final GroupVector<GqElement, GqGroup> testExponentiations = testValues.exponentiations;
+			final GroupVector<GqElement, GqGroup> differentExponentiations = testExponentiations.stream().map(y -> y.multiply(testValues.gNine))
 					.collect(toGroupVector());
-			final AuxiliaryInformation auxiliaryInformation = testValues.auxiliaryInformation;
-			final ExponentiationProof proof = testValues.createExponentiationProof();
-			final ExponentiationProofService proofService = testValues.createExponentiationProofService();
-			assertFalse(proofService.verifyExponentiation(bases, differentExponentiations, proof, auxiliaryInformation));
+			final AuxiliaryInformation differentEponentiationsAuxiliaryInformation = testValues.auxiliaryInformation;
+			final ExponentiationProof exponentiationProof = testValues.createExponentiationProof();
+			final ExponentiationProofService differentEponentiationsProofService = testValues.createExponentiationProofService();
+			assertFalse(differentEponentiationsProofService.verifyExponentiation(differentEponentiationsBases, differentExponentiations, exponentiationProof, differentEponentiationsAuxiliaryInformation));
 		}
 
 		@Test
 		void differentBasesReturnsFalse() {
 			final TestValues testValues = new TestValues();
-			final GroupVector<GqElement, GqGroup> bases = testValues.bases;
-			final GroupVector<GqElement, GqGroup> differentBases = bases.stream().map(g -> g.multiply(testValues.gFive))
+			final GroupVector<GqElement, GqGroup> testBases = testValues.bases;
+			final GroupVector<GqElement, GqGroup> differentBases = testBases.stream().map(g -> g.multiply(testValues.gFive))
 					.collect(toGroupVector());
-			final GroupVector<GqElement, GqGroup> exponentiations = testValues.exponentiations;
-			final AuxiliaryInformation auxiliaryInformation = testValues.auxiliaryInformation;
-			final ExponentiationProof proof = testValues.createExponentiationProof();
-			final ExponentiationProofService proofService = testValues.createExponentiationProofService();
-			assertFalse(proofService.verifyExponentiation(differentBases, exponentiations, proof, auxiliaryInformation));
+			final GroupVector<GqElement, GqGroup> differentBasesExponentiations = testValues.exponentiations;
+			final AuxiliaryInformation differentBasesAuxiliaryInformation = testValues.auxiliaryInformation;
+			final ExponentiationProof differentBasesProof = testValues.createExponentiationProof();
+			final ExponentiationProofService differentBasesProofService = testValues.createExponentiationProofService();
+			assertFalse(differentBasesProofService.verifyExponentiation(differentBases, differentBasesExponentiations, differentBasesProof, differentBasesAuxiliaryInformation));
 		}
 
 		private Stream<Arguments> jsonFileArgumentProvider() {
@@ -424,32 +424,32 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 					// Parse bases parameters.
 
 					final BigInteger[] basesArray = input.get("bases", BigInteger[].class);
-					final GroupVector<GqElement, GqGroup> bases = Arrays.stream(basesArray).map(basesA -> GqElementFactory.fromValue(basesA, gqGroup))
+					final GroupVector<GqElement, GqGroup> realBases = Arrays.stream(basesArray).map(basesA -> GqElementFactory.fromValue(basesA, gqGroup))
 							.collect(toGroupVector());
 
 					// Parse exponentiations parameters
 					final BigInteger[] exponentiationsArray = input.get("statement", BigInteger[].class);
-					final GroupVector<GqElement, GqGroup> exponentiations = Arrays.stream(exponentiationsArray)
+					final GroupVector<GqElement, GqGroup> realExponentiations = Arrays.stream(exponentiationsArray)
 							.map(eA -> GqElementFactory.fromValue(eA, gqGroup))
 							.collect(toGroupVector());
 
 					// Parse decryption proof parameters
-					final JsonData proof = input.getJsonData("proof");
+					final JsonData realProof = input.getJsonData("proof");
 
-					final ZqElement e = ZqElement.create(proof.get("e", BigInteger.class), zqGroup);
-					final ZqElement z = ZqElement.create(proof.get("z", BigInteger.class), zqGroup);
+					final ZqElement e = ZqElement.create(realProof.get("e", BigInteger.class), zqGroup);
+					final ZqElement z = ZqElement.create(realProof.get("z", BigInteger.class), zqGroup);
 					final ExponentiationProof exponentiationProof = new ExponentiationProof(e, z);
 
 					// Parse auxiliary information parameters
 					final String[] auxInformation = input.get("additional_information", String[].class);
-					final AuxiliaryInformation auxiliaryInformation = AuxiliaryInformation.of(auxInformation);
+					final AuxiliaryInformation realAuxiliaryInformation = AuxiliaryInformation.of(auxInformation);
 
 					// Parse output parameters
 					final JsonData output = testParameters.getOutput();
 
 					final Boolean result = output.get("verif_result", Boolean.class);
 
-					return Arguments.of(bases, exponentiations, exponentiationProof, auxiliaryInformation, result, testParameters.getDescription());
+					return Arguments.of(realBases, realExponentiations, exponentiationProof, realAuxiliaryInformation, result, testParameters.getDescription());
 				}
 			});
 

@@ -148,9 +148,9 @@ class EncryptionParametersTest {
 		try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = mockStatic(SecurityLevelConfig.class)) {
 			mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(securityLevel);
 
-			final GqGroup encryptionParameters = new EncryptionParameters().getEncryptionParameters(seed, SMALL_PRIMES);
+			final GqGroup encryptionParametersWithFixedSeed = new EncryptionParameters().getEncryptionParameters(seed, SMALL_PRIMES);
 
-			assertEquals(expectedParameters, encryptionParameters, String.format("assertion failed for: %s", description));
+			assertEquals(expectedParameters, encryptionParametersWithFixedSeed, String.format("assertion failed for: %s", description));
 		}
 	}
 

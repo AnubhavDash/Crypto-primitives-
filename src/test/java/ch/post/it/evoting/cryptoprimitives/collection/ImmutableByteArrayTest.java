@@ -73,8 +73,8 @@ class ImmutableByteArrayTest {
 		final ImmutableByteArray array1 = new ImmutableByteArray(input);
 		final ImmutableByteArray array2 = new ImmutableByteArray(input);
 		assertEquals(array1, array2);
-		assertNotEquals(array1, input);
-		assertNotEquals(array1, null);
+		assertNotEquals(input, array1);
+		assertNotEquals(null, array1);
 	}
 
 	@Test

@@ -46,6 +46,15 @@ class DiagonalProductsTest extends TestGroupSetup {
 
 	private static final int KEY_SIZE = 10;
 
+	private static final BigInteger ZERO = BigInteger.ZERO;
+	private static final BigInteger ONE = BigInteger.ONE;
+	private static final BigInteger THREE = BigInteger.valueOf(3);
+	private static final BigInteger FOUR = BigInteger.valueOf(4);
+	private static final BigInteger FIVE = BigInteger.valueOf(5);
+	private static final BigInteger SIX = BigInteger.valueOf(6);
+	private static final BigInteger EIGHT = BigInteger.valueOf(8);
+	private static final BigInteger NINE = BigInteger.valueOf(9);
+
 	private static MultiExponentiationArgumentService multiExponentiationArgumentService;
 
 	private int n;
@@ -172,16 +181,6 @@ class DiagonalProductsTest extends TestGroupSetup {
 
 		final GqGroup gqGroup = new GqGroup(p, q, g);
 		final ZqGroup zqGroup = new ZqGroup(q);
-
-		// Create BigIntegers
-		final BigInteger ZERO = BigInteger.ZERO;
-		final BigInteger ONE = BigInteger.ONE;
-		final BigInteger THREE = BigInteger.valueOf(3);
-		final BigInteger FOUR = BigInteger.valueOf(4);
-		final BigInteger FIVE = BigInteger.valueOf(5);
-		final BigInteger SIX = BigInteger.valueOf(6);
-		final BigInteger EIGHT = BigInteger.valueOf(8);
-		final BigInteger NINE = BigInteger.valueOf(9);
 
 		// Create GqElements
 		final GqElement gOne = gqGroup.getIdentity();

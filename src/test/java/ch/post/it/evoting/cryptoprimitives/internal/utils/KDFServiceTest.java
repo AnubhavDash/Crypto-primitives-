@@ -48,6 +48,7 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
 
+@SuppressWarnings({ "java:S116", "java:S117" })
 class KDFServiceTest {
 
 	private static final int DEFAULT_HASH_LENGTH_BYTES = 32;
@@ -121,11 +122,11 @@ class KDFServiceTest {
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("KDFRealValuesProvider")
 	@DisplayName("KeyDerivation returns expected output")
-	void testKDFWithRealValues(final Supplier<Digest> hashSupplier, final ImmutableByteArray PRK, final ImmutableList<String> infos,
-			final int requiredByteLength, final ImmutableByteArray OKM, final String description) {
-		final KDFService kdfService = new KDFService(hashSupplier);
-		final ImmutableByteArray actualResult = kdfService.KDF(PRK, infos, requiredByteLength);
-		assertEquals(OKM, actualResult, String.format("assertion failed for: %s", description));
+	void testKDFWithRealValues(final Supplier<Digest> hashSupplier, final ImmutableByteArray realPRK, final ImmutableList<String> infos,
+			final int requiredByteLength, final ImmutableByteArray realOKM, final String description) {
+		final KDFService realKdfService = new KDFService(hashSupplier);
+		final ImmutableByteArray actualResult = realKdfService.KDF(realPRK, infos, requiredByteLength);
+		assertEquals(realOKM, actualResult, String.format("assertion failed for: %s", description));
 	}
 
 	@Test
@@ -180,14 +181,14 @@ class KDFServiceTest {
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("KDFToZqRealValuesProvider")
 	@DisplayName("KDFToZq returns expected output")
-	void testKDFToZqWithRealValues(final Supplier<Digest> hashSupplier, final ImmutableByteArray PRK, final ImmutableList<String> infos,
+	void testKDFToZqWithRealValues(final Supplier<Digest> hashSupplier, final ImmutableByteArray realPRK, final ImmutableList<String> infos,
 			final BigInteger q,
 			final ZqElement u, final String description, final SecurityLevelInternal securityLevel) {
 		try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = mockStatic(SecurityLevelConfig.class)) {
 			mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(securityLevel);
 
-			final KDFService kdfService = new KDFService(hashSupplier);
-			final ZqElement actualResult = kdfService.KDFToZq(PRK, infos, q);
+			final KDFService realKdfService = new KDFService(hashSupplier);
+			final ZqElement actualResult = realKdfService.KDFToZq(realPRK, infos, q);
 			assertEquals(u, actualResult, String.format("assertion failed for: %s", description));
 		}
 	}

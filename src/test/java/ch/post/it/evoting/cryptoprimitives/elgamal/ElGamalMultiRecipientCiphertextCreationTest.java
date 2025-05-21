@@ -114,10 +114,15 @@ class ElGamalMultiRecipientCiphertextCreationTest extends TestGroupSetup {
 
 	@Test
 	void testPublicKeyAndExponentFromDifferentGroupsThrows() {
-		final ZqGroup otherGroup = GroupTestData.getDifferentZqGroup(zqGroup);
-		final ZqElement otherGroupExponent = ZqElement.create(randomService.genRandomInteger(otherGroup.getQ()), otherGroup);
+		final GqGroup differentGqGroup = GroupTestData.getDifferentGqGroup(gqGroup);
+		final ElGamalMultiRecipientPublicKey differentGqGroupPublicKey =
+				ElGamalMultiRecipientKeyPair.genKeyPair(differentGqGroup, 1, randomService).getPublicKey();
 
-		assertThrows(IllegalArgumentException.class, () -> getCiphertext(validMessage, otherGroupExponent, validPK));
+		// Get the ZqGroup with the same order as the different GqGroup.
+		final ZqGroup differentZqGroup = ZqGroup.sameOrderAs(differentGqGroup);
+		final ZqElement differentZqGroupExponent = ZqElement.create(randomService.genRandomInteger(differentZqGroup.getQ()), differentZqGroup);
+
+		assertThrows(IllegalArgumentException.class, () -> getCiphertext(validMessage, differentZqGroupExponent, differentGqGroupPublicKey));
 	}
 
 	@Test

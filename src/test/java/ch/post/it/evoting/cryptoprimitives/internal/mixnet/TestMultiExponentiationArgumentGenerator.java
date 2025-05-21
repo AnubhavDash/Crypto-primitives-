@@ -37,6 +37,7 @@ public class TestMultiExponentiationArgumentGenerator {
 		this.zqGroupGenerator = new ZqGroupGenerator(ZqGroup.sameOrderAs(gqGroup));
 	}
 
+	@SuppressWarnings("java:S117")
 	MultiExponentiationArgument genRandomArgument(final int n, final int m, final int l) {
 		final GqElement cA0 = gqGroupGenerator.genMember();
 		final GroupVector<GqElement, GqGroup> cB = gqGroupGenerator.genRandomGqElementVector(2 * m);

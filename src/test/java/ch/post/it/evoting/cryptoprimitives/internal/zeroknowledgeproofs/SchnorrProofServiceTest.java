@@ -196,9 +196,9 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 
 		@Test
 		@DisplayName("empty auxiliary information returns true")
-		void emptyAux() {
-			final SchnorrProof schnorrProof = schnorrProofService.genSchnorrProof(witness, statement, AuxiliaryInformation.of());
-			assertTrue(schnorrProofService.verifySchnorrProof(schnorrProof, statement, AuxiliaryInformation.of()));
+		void emptyAuxiliary() {
+			final SchnorrProof emptyAuxiliarySchnorrProof = schnorrProofService.genSchnorrProof(witness, statement, AuxiliaryInformation.of());
+			assertTrue(schnorrProofService.verifySchnorrProof(emptyAuxiliarySchnorrProof, statement, AuxiliaryInformation.of()));
 		}
 
 		@Test
@@ -231,18 +231,18 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 
 					// Parse statement (statement) parameter
 					final BigInteger state = input.get("statement", BigInteger.class);
-					final GqElement statement = GqElementFactory.fromValue(state, gqGroup);
+					final GqElement realStatement = GqElementFactory.fromValue(state, gqGroup);
 
 					// Parse SchnorrProof (proof) parameters
 					final JsonData proof = input.getJsonData("proof");
 
 					final ZqElement e = ZqElement.create(proof.get("e", BigInteger.class), zqGroup);
 					final ZqElement z = ZqElement.create(proof.get("z", BigInteger.class), zqGroup);
-					final SchnorrProof schnorrProof = new SchnorrProof(e, z);
+					final SchnorrProof realSchnorrProof = new SchnorrProof(e, z);
 
 					// Parse auxiliaryInformation parameters (i_aux)
 					final String[] auxInformation = input.get("additional_information", String[].class);
-					final AuxiliaryInformation auxiliaryInformation = AuxiliaryInformation.of(auxInformation);
+					final AuxiliaryInformation realAuxiliaryInformation = AuxiliaryInformation.of(auxInformation);
 
 					// Parse output parameters
 					final JsonData output = testParameters.getOutput();
@@ -250,7 +250,7 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 					final Boolean result = output.get("result", Boolean.class);
 
 					return Arguments
-							.of(schnorrProof, statement, auxiliaryInformation,
+							.of(realSchnorrProof, realStatement, realAuxiliaryInformation,
 									result, testParameters.getDescription());
 				}
 			});
@@ -262,9 +262,9 @@ class SchnorrProofServiceTest extends TestGroupSetup {
 		void verifySchnorrProofWithRealValues(final SchnorrProof schnorrProof, final GqElement statement,
 				final AuxiliaryInformation auxiliaryInformation, final boolean expected, final String description) {
 
-			final SchnorrProofService SchnorrProofService = new SchnorrProofService(randomService,
+			final SchnorrProofService realSchnorrProofService = new SchnorrProofService(randomService,
 					HashService.getInstance());
-			final boolean actual = SchnorrProofService.verifySchnorrProof(schnorrProof, statement, auxiliaryInformation);
+			final boolean actual = realSchnorrProofService.verifySchnorrProof(schnorrProof, statement, auxiliaryInformation);
 			assertEquals(expected, actual, String.format("assertion failed for: %s", description));
 		}
 	}

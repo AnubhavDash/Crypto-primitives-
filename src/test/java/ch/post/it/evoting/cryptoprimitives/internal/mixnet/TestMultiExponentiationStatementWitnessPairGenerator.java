@@ -50,16 +50,16 @@ public class TestMultiExponentiationStatementWitnessPairGenerator {
 	}
 
 	StatementWitnessPair genPair(final int n, final int m, final int l) {
-		final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> CMatrix = this.elGamalGenerator.genRandomCiphertextMatrix(m, n, l);
-		final GroupMatrix<ZqElement, ZqGroup> AMatrix = zqGroupGenerator.genRandomZqElementMatrix(n, m);
+		final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> ciphertextMatrix = this.elGamalGenerator.genRandomCiphertextMatrix(m, n, l);
+		final GroupMatrix<ZqElement, ZqGroup> aMatrix = zqGroupGenerator.genRandomZqElementMatrix(n, m);
 		final GroupVector<ZqElement, ZqGroup> rExponents = zqGroupGenerator.genRandomZqElementVector(m);
 		final ZqElement rhoExponents = zqGroupGenerator.genRandomZqElementMember();
 
-		final ElGamalMultiRecipientCiphertext computedC = argumentService.multiExponentiation(CMatrix, AMatrix, rhoExponents, m, l);
+		final ElGamalMultiRecipientCiphertext computedC = argumentService.multiExponentiation(ciphertextMatrix, aMatrix, rhoExponents, m, l);
 		final GroupVector<GqElement, GqGroup> commitmentToA = CommitmentService.getCommitmentMatrix(
-				AMatrix, rExponents, commitmentKey);
-		final MultiExponentiationStatement statement = new MultiExponentiationStatement(CMatrix, computedC, commitmentToA);
-		final MultiExponentiationWitness witness = new MultiExponentiationWitness(AMatrix, rExponents, rhoExponents);
+				aMatrix, rExponents, commitmentKey);
+		final MultiExponentiationStatement statement = new MultiExponentiationStatement(ciphertextMatrix, computedC, commitmentToA);
+		final MultiExponentiationWitness witness = new MultiExponentiationWitness(aMatrix, rExponents, rhoExponents);
 		return new StatementWitnessPair(statement, witness);
 	}
 }

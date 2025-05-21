@@ -106,8 +106,8 @@ class ElGamalMultiRecipientKeyPairTest {
 		final BigInteger g = BigInteger.valueOf(3);
 
 		final GqGroup smallGroup = new GqGroup(p, q, g);
-		final ElGamalMultiRecipientKeyPair keyPair = ElGamalMultiRecipientKeyPair.genKeyPair(smallGroup, 10 * q.intValue(), randomSer);
-		keyPair.getPrivateKey().stream().forEach(sk -> {
+		final ElGamalMultiRecipientKeyPair keyPairWithinBounds = ElGamalMultiRecipientKeyPair.genKeyPair(smallGroup, 10 * q.intValue(), randomSer);
+		keyPairWithinBounds.getPrivateKey().stream().forEach(sk -> {
 			assertTrue(sk.getValue().signum() >= 0);
 			assertTrue(sk.getValue().compareTo(q) < 0);
 		});

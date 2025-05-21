@@ -352,8 +352,6 @@ class HashServiceTest {
 	@Test
 	@DisplayName("calling hashAndSquare with a null argument throws an exception.")
 	void nullCheckTest() {
-
-		final HashService hashService = HashService.getInstance();
 		final BigInteger q = BigInteger.valueOf(11);
 		final BigInteger p = BigInteger.valueOf(23);
 		final BigInteger g = BigInteger.TWO;
@@ -367,7 +365,6 @@ class HashServiceTest {
 	@Test
 	@DisplayName("calling hashAndSquare on a valid element with a hash service with a too big hash length throws an exception.")
 	void hashAndSquareWithIncompatibleHashService() {
-		final HashService hashService = HashService.getInstance();
 		final BigInteger q = BigInteger.valueOf(11);
 		final BigInteger p = BigInteger.valueOf(23);
 		final BigInteger g = BigInteger.TWO;
@@ -404,12 +401,12 @@ class HashServiceTest {
 	@DisplayName("calling hashAndSquare on a valid gqElement with an hash call returning a specific mocked value returns the expected result.")
 	void onValidGqElementReturnsExpectedResultTest(final ZqElement mockedHash, final BigInteger expectedResult) {
 
-		final HashService hashService = spy(HashService.getInstance());
-		doReturn((mockedHash)).when(hashService).recursiveHashToZq(any(), any(), any());
+		final HashService spiedHashService = spy(HashService.getInstance());
+		doReturn((mockedHash)).when(spiedHashService).recursiveHashToZq(any(), any(), any());
 
 		final GqGroup largeGqGroup = GroupTestData.getLargeGqGroup();
 
-		assertEquals(expectedResult, hashService.hashAndSquare(BigInteger.ONE, largeGqGroup).getValue());
+		assertEquals(expectedResult, spiedHashService.hashAndSquare(BigInteger.ONE, largeGqGroup).getValue());
 	}
 
 	static Stream<Arguments> jsonFileRecursiveHashToZqArgumentProvider() {

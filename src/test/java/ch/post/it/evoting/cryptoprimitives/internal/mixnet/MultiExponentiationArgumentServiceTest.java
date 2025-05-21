@@ -189,9 +189,9 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 
 		@Test
 		void testExponentsMatrixNSizeNotSmallerThanCommitmentKeySizeThrows() {
-			final int n = COMMITMENT_KEY_SIZE + 1;
-			final MultiExponentiationStatement statement = statementGenerator.genRandomStatement(n, m, l);
-			final MultiExponentiationWitness witness = witnessGenerator.genRandomWitness(n, m);
+			final int tooLargeN = COMMITMENT_KEY_SIZE + 1;
+			final MultiExponentiationStatement statement = statementGenerator.genRandomStatement(tooLargeN, m, l);
+			final MultiExponentiationWitness witness = witnessGenerator.genRandomWitness(tooLargeN, m);
 			assertThrowsIllegalArgumentExceptionWithMessage(
 					"The number of rows of matrix A must be smaller or equal to the size of the commitment key.",
 					() -> argumentService.getMultiExponentiationArgument(statement, witness));
@@ -248,18 +248,18 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 
 		@Test
 		void sanityCheck() {
-			final MultiExponentiationArgumentService argumentService = new MultiExponentiationArgumentService(
+			final MultiExponentiationArgumentService argumentServiceForSanityCheck = new MultiExponentiationArgumentService(
 					publicKey, commitmentKey, randomService, hashService);
 			final StatementWitnessPair pair = statementWitnessPairGenerator.genPair(n, m, l);
 			final MultiExponentiationStatement statement = pair.statement();
 			final MultiExponentiationWitness witness = pair.witness();
-			assertDoesNotThrow(() -> argumentService.getMultiExponentiationArgument(statement, witness));
+			assertDoesNotThrow(() -> argumentServiceForSanityCheck.getMultiExponentiationArgument(statement, witness));
 		}
 
 		@Test
 		void testThatLongerCiphertextsThanKeyThrows() {
-			final int l = COMMITMENT_KEY_SIZE + 1;
-			final MultiExponentiationStatement statement = statementGenerator.genRandomStatement(n, m, l);
+			final int longerCiphertext_l = COMMITMENT_KEY_SIZE + 1;
+			final MultiExponentiationStatement statement = statementGenerator.genRandomStatement(n, m, longerCiphertext_l);
 			final MultiExponentiationWitness witness = witnessGenerator.genRandomWitness(n, m);
 			assertThrowsIllegalArgumentExceptionWithMessage("The ciphertexts must be smaller than the public key.",
 					() -> argumentService.getMultiExponentiationArgument(statement, witness));
@@ -445,17 +445,19 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 			final MultiExponentiationArgument localValidArgument = localArgumentService.getMultiExponentiationArgument(localValidStatement,
 					localStatementWitnessPair.witness());
 
-			final GroupVector<GqElement, GqGroup> modifiedC_a = localValidStatement.get_c_A().stream()
+			final GroupVector<GqElement, GqGroup> modifiedCommitmentA = localValidStatement.get_c_A().stream()
 					.map(localGqGroupGenerator::otherElement)
 					.collect(toGroupVector());
 			final MultiExponentiationStatement modifiedStatement = new MultiExponentiationStatement(localValidStatement.get_C_matrix(),
-					localValidStatement.get_C(), modifiedC_a);
+					localValidStatement.get_C(), modifiedCommitmentA);
 			final VerificationResult verificationResult = localArgumentService
 					.verifyMultiExponentiationArgument(modifiedStatement, localValidArgument).verify();
 			assertFalse(verificationResult.isVerified());
 		}
 
+
 		@Test
+		@SuppressWarnings("java:S117")
 		void testArgumentWithModified_cA0_ElementDoesNotVerify() {
 			final GqElement modifiedC_A_0 = gqGroupGenerator.otherElement(validArgument.getc_A_0());
 			argumentBuilder.with_c_A_0(modifiedC_A_0);
@@ -537,10 +539,10 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 				final MultiExponentiationStatement statement, final MultiExponentiationArgument argument, final boolean expectedOutput,
 				final String description) {
 
-			final HashService hashService = HashService.getInstance();
+			final HashService realHashService = HashService.getInstance();
 
 			final MultiExponentiationArgumentService service = new MultiExponentiationArgumentService(publicKey, commitmentKey, randomService,
-					hashService);
+					realHashService);
 
 			assertEquals(expectedOutput, service.verifyMultiExponentiationArgument(statement, argument).verify().isVerified(),
 					String.format("assertion failed for: %s", description));
@@ -555,33 +557,33 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 				final TestContextParser context = new TestContextParser(contextData);
 				final GqGroup realGqGroup = context.getGqGroup();
 
-				final ElGamalMultiRecipientPublicKey publicKey = context.parsePublicKey();
-				final CommitmentKey commitmentKey = context.parseCommitmentKey();
+				final ElGamalMultiRecipientPublicKey realPublicKey = context.parsePublicKey();
+				final CommitmentKey realCommitmentKey = context.parseCommitmentKey();
 
 				// Inputs.
 				final JsonData input = testParameters.getInput();
 				final JsonData statement = input.getJsonData("statement");
-				final TestArgumentParser TestArgumentParser = new TestArgumentParser(realGqGroup);
+				final TestArgumentParser testArgumentParser = new TestArgumentParser(realGqGroup);
 
-				final MultiExponentiationArgument multiExpArgument = TestArgumentParser
+				final MultiExponentiationArgument multiExpArgument = testArgumentParser
 						.parseMultiExponentiationArgument(input.getJsonData("argument"));
-				final MultiExponentiationStatement multiExpStatement = parseMultiExpStatement(realGqGroup, statement, TestArgumentParser);
+				final MultiExponentiationStatement multiExpStatement = parseMultiExpStatement(realGqGroup, statement, testArgumentParser);
 
 				// Output.
 				final JsonData output = testParameters.getOutput();
 				final boolean outputValue = Boolean.parseBoolean(output.getJsonData("result").toString());
 
-				return Arguments.of(publicKey, commitmentKey, multiExpStatement, multiExpArgument, outputValue, testParameters.getDescription());
+				return Arguments.of(realPublicKey, realCommitmentKey, multiExpStatement, multiExpArgument, outputValue, testParameters.getDescription());
 			});
 		}
 
 		private MultiExponentiationStatement parseMultiExpStatement(final GqGroup realGqGroup, final JsonData statement,
-				final TestArgumentParser TestArgumentParser) {
+				final TestArgumentParser testArgumentParser) {
 
-			final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> ciphertextMatrix = TestArgumentParser
+			final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> ciphertextMatrix = testArgumentParser
 					.parseCiphertextMatrix(statement.getJsonData("ciphertexts"));
 
-			final ElGamalMultiRecipientCiphertext ciphertextC = TestArgumentParser.parseCiphertext(statement.getJsonData("ciphertext_product"));
+			final ElGamalMultiRecipientCiphertext ciphertextC = testArgumentParser.parseCiphertext(statement.getJsonData("ciphertext_product"));
 
 			final BigInteger[] commitmentAValues = statement.get("c_a", BigInteger[].class);
 			final GroupVector<GqElement, GqGroup> commitmentA = Arrays.stream(commitmentAValues)

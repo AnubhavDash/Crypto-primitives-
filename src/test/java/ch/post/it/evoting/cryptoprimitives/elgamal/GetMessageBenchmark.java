@@ -81,6 +81,7 @@ public class GetMessageBenchmark {
 		private final RandomService randomService = new RandomService();
 		final ElGamalMultiRecipientKeyPair keyPair = ElGamalMultiRecipientKeyPair.genKeyPair(gqGroup, numElements, randomService);
 
+		@SuppressWarnings("java:S117")
 		public ElGamalMultiRecipientMessage getMessageWithExtractedReciprocal(final ElGamalMultiRecipientCiphertext ciphertext,
 				final ElGamalMultiRecipientPrivateKey secretKey) {
 			checkNotNull(ciphertext);

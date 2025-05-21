@@ -499,10 +499,10 @@ class ElGamalMultiRecipientCiphertextTest extends TestGroupSetup {
 		@DisplayName("a ciphertext and a secret key with different order throws an IllegalArgumentException.")
 		void getPartialDecryptionCiphertextAndSecretKeyShouldBePartOfSameGroup() {
 
-			final ElGamalMultiRecipientPrivateKey secretKey = otherGroupElGamalGenerator.genRandomPrivateKey(secretKeySize);
+			final ElGamalMultiRecipientPrivateKey secretKeyWithDifferentOrder = otherGroupElGamalGenerator.genRandomPrivateKey(secretKeySize);
 
 			final IllegalArgumentException illegalArgumentException =
-					assertThrows(IllegalArgumentException.class, () -> getPartialDecryption(ciphertext, secretKey));
+					assertThrows(IllegalArgumentException.class, () -> getPartialDecryption(ciphertext, secretKeyWithDifferentOrder));
 
 			assertEquals("Ciphertext and secret key must belong to groups of same order.", illegalArgumentException.getMessage());
 		}
@@ -511,10 +511,10 @@ class ElGamalMultiRecipientCiphertextTest extends TestGroupSetup {
 		@DisplayName("a ciphertext containing more message elements than private key elements throws an IllegalArgumentException.")
 		void getPartialDecryptionSecretKeySizeShouldBeAtLeastSameAsCiphertextSize() {
 
-			final ElGamalMultiRecipientPrivateKey secretKey = elGamalGenerator.genRandomPrivateKey(ciphertext.size() - 1);
+			final ElGamalMultiRecipientPrivateKey secretKeyWithLessElements = elGamalGenerator.genRandomPrivateKey(ciphertext.size() - 1);
 
 			final IllegalArgumentException illegalArgumentException =
-					assertThrows(IllegalArgumentException.class, () -> getPartialDecryption(ciphertext, secretKey));
+					assertThrows(IllegalArgumentException.class, () -> getPartialDecryption(ciphertext, secretKeyWithLessElements));
 
 			assertEquals("There cannot be more message elements than private key elements.", illegalArgumentException.getMessage());
 		}

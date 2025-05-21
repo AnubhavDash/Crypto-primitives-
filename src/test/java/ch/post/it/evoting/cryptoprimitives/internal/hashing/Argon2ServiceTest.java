@@ -92,14 +92,14 @@ class Argon2ServiceTest {
 
 				// Mocked.
 				final JsonData mocked = testParameters.getMocked();
-				final String mocked_s = mocked.get("s", String.class);
+				final String mockedS = mocked.get("s", String.class);
 
 				// Output.
 				final JsonData output = testParameters.getOutput();
 				final String t = output.get("t", String.class);
 				final String s = output.get("s", String.class);
 
-				return Arguments.of(m, p, i, k, mocked_s, t, s, testParameters.getDescription());
+				return Arguments.of(m, p, i, k, mockedS, t, s, testParameters.getDescription());
 			});
 		}
 
@@ -181,10 +181,10 @@ class Argon2ServiceTest {
 
 			// When
 			final Argon2Service service = new Argon2Service(randomService, config);
-			final ImmutableByteArray actual_t = service.getArgon2id(base64.base64Decode(k), base64.base64Decode(s));
+			final ImmutableByteArray actualT = service.getArgon2id(base64.base64Decode(k), base64.base64Decode(s));
 
 			// Then
-			assertEquals(base64.base64Decode(t), actual_t, String.format("tag assertion failed for: %s", description));
+			assertEquals(base64.base64Decode(t), actualT, String.format("tag assertion failed for: %s", description));
 		}
 
 	}

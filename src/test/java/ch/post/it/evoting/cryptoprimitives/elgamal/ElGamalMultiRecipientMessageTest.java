@@ -60,9 +60,9 @@ class ElGamalMultiRecipientMessageTest extends TestGroupSetup {
 	@Test
 	@DisplayName("contains the correct message")
 	void constructionTest() {
-		final ElGamalMultiRecipientMessage message = new ElGamalMultiRecipientMessage(validMessageElements);
+		final ElGamalMultiRecipientMessage correctMessage = new ElGamalMultiRecipientMessage(validMessageElements);
 
-		assertEquals(validMessageElements, message.stream().collect(toGroupVector()));
+		assertEquals(validMessageElements, correctMessage.stream().collect(toGroupVector()));
 	}
 
 	// Provides parameters for the withInvalidParameters test.

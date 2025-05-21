@@ -154,6 +154,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 	}
 
 	@Nested
+	@SuppressWarnings("java:S116")
 	@DisplayName("calling getShuffleArgument with")
 	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class GetShuffleArgumentTest {
@@ -317,6 +318,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 	}
 
 	@Nested
+	@SuppressWarnings("java:S116")
 	@DisplayName("calling verifyShuffleArgument with")
 	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class VerifyShuffleArgumentTest {
@@ -333,10 +335,10 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 
 		@BeforeAll
 		void setUpAll() {
-			final TestCommitmentKeyGenerator commitmentKeyGenerator = new TestCommitmentKeyGenerator(gqGroup);
+			final TestCommitmentKeyGenerator testCommitmentKeyGenerator = new TestCommitmentKeyGenerator(gqGroup);
 
 			publicKey = elGamalGenerator.genRandomPublicKey(KEY_ELEMENTS_NUMBER);
-			final CommitmentKey commitmentKey = commitmentKeyGenerator.genCommitmentKey(KEY_ELEMENTS_NUMBER);
+			final CommitmentKey commitmentKey = testCommitmentKeyGenerator.genCommitmentKey(KEY_ELEMENTS_NUMBER);
 
 			// Necessary to return a constant value, otherwise some assertFalse tests can return true because of changes compensating each other (due
 			// to small test groups).
@@ -549,6 +551,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 			assertEquals("Failed to verify MultiExponentiation Argument.", verificationResult.getErrorMessages().get(0));
 		}
 
+		@SuppressWarnings("java:S1117")
 		Stream<Arguments> jsonData() {
 			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-shuffle-argument.json");
 
@@ -589,8 +592,8 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 						.build();
 
 				//m and n
-				final int N = ciphertexts.size();
-				final int[] dimensions = MatrixUtils.getMatrixDimensions(N);
+				final int vectorSize = ciphertexts.size();
+				final int[] dimensions = MatrixUtils.getMatrixDimensions(vectorSize);
 				final int m = dimensions[0];
 				final int n = dimensions[1];
 
@@ -609,8 +612,8 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 				final ShuffleArgument argument, final int m, final int n,
 				final Boolean output, final String description) {
 
-			final HashService hashService = HashService.getInstance();
-			final ShuffleArgumentService service = new ShuffleArgumentService(pk, ck, randomService, hashService);
+			final HashService realHashService = HashService.getInstance();
+			final ShuffleArgumentService service = new ShuffleArgumentService(pk, ck, randomService, realHashService);
 			assertEquals(output, service.verifyShuffleArgument(statement, argument, m, n).isVerified(),
 					String.format("assertion failed for: %s", description));
 		}

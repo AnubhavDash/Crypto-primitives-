@@ -94,7 +94,7 @@ class StringsTest {
 		final String string = "string";
 		final int length = 0;
 
-		assertEquals(Strings.truncate(string, length), "");
+		assertEquals("", Strings.truncate(string, length));
 	}
 
 	@ParameterizedTest

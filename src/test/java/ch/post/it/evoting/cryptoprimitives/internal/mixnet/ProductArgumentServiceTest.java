@@ -295,9 +295,8 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 			final ZqElement zqFour = ZqElement.create(BigInteger.valueOf(4), zqGroup);
 
 			// Create HadamardArgumentService
-			final int n = 2;
-			final int m = 3;
-			final ElGamalMultiRecipientKeyPair keyPair = new ElGamalService().genKeyPair(gqGroup, n, randomService);
+			final int numElements = 2;
+			final ElGamalMultiRecipientKeyPair keyPair = new ElGamalService().genKeyPair(gqGroup, numElements, randomService);
 			final ElGamalMultiRecipientPublicKey productPublicKey = keyPair.getPublicKey();
 			final CommitmentKey productCommitmentKey = new CommitmentKey(gqNine, GroupVector.of(gqFour, gqNine));
 			final RandomService productRandomService = spy(RandomService.class);
@@ -339,10 +338,10 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 			final ProductWitness productWitness = new ProductWitness(matrix, exponents);
 
 			// Calculate c_A and b
-			final GroupVector<GqElement, GqGroup> commitmentsA = CommitmentService.getCommitmentMatrix(matrix, exponents, productCommitmentKey);
+			final GroupVector<GqElement, GqGroup> specificCommitmentsA = CommitmentService.getCommitmentMatrix(matrix, exponents, productCommitmentKey);
 			final ZqElement product = matrix.flatStream().reduce(zqOne, ZqElement::multiply);
 
-			final ProductStatement productStatement = new ProductStatement(commitmentsA, product);
+			final ProductStatement productStatement = new ProductStatement(specificCommitmentsA, product);
 
 			// Create the expected zeroArgument
 			final ZeroArgument expectedZeroArgument = new ZeroArgument.Builder().with_c_A_0(gqFive)
@@ -394,16 +393,16 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 		}
 
 		Stream<Arguments> statementArgumentProvider() {
-			final int n = randomService.genRandomInteger(nu - 1) + 2;
+			final int random_n = randomService.genRandomInteger(nu - 1) + 2;
 
 			// Create ProductStatement and ProductArgument for testing with m > 1
 			final int m = randomService.genRandomInteger(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2;
-			final ProductWitness longWitness = genProductWitness(n, m, zqGroupGenerator);
+			final ProductWitness longWitness = genProductWitness(random_n, m, zqGroupGenerator);
 			final ProductStatement longStatement = getProductStatement(longWitness, commitmentKey);
 			final ProductArgument longArgument = productArgumentService.getProductArgument(longStatement, longWitness);
 
 			// Create ProductStatement and ProductArgument for testing with m = 1
-			final ProductWitness shortWitness = genProductWitness(n, 1, zqGroupGenerator);
+			final ProductWitness shortWitness = genProductWitness(random_n, 1, zqGroupGenerator);
 			final ProductStatement shortStatement = getProductStatement(shortWitness, commitmentKey);
 			final ProductArgument shortArgument = productArgumentService.getProductArgument(shortStatement, shortWitness);
 
@@ -607,12 +606,12 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 				final ProductStatement productStatement, final ProductArgument productArgument, final boolean expectedOutput,
 				final String description) {
 
-			final HashService hashService = HashService.getInstance();
+			final HashService realHashService = HashService.getInstance();
 
-			final ProductArgumentService productArgumentService = new ProductArgumentService(randomService, hashService, publicKey,
+			final ProductArgumentService realProductArgumentService = new ProductArgumentService(randomService, realHashService, publicKey,
 					commitmentKey);
 
-			assertEquals(expectedOutput, productArgumentService.verifyProductArgument(productStatement, productArgument).verify().isVerified(),
+			assertEquals(expectedOutput, realProductArgumentService.verifyProductArgument(productStatement, productArgument).verify().isVerified(),
 					String.format("assertion failed for: %s", description));
 		}
 

@@ -77,19 +77,22 @@ public class DecryptionProofService {
 	static GroupVector<GqElement, GqGroup> computePhiDecryption(final GroupVector<ZqElement, ZqGroup> preImage, final GqElement base) {
 		checkNotNull(preImage);
 		checkNotNull(base);
-		checkArgument(preImage.getGroup().hasSameOrderAs(base.getGroup()), "The preImage and base should have the same group order.");
 
-		final GroupVector<ZqElement, ZqGroup> x = preImage;
-		final GqElement gamma = base;
-
+		// Context.
 		final GqElement g = base.getGroup().getGenerator();
 
-		final GroupVector<GqElement, GqGroup> y = Stream.concat(
-						x.stream().map(g::exponentiate),
-						x.stream().map(gamma::exponentiate))
-				.collect(toGroupVector());
+		// Input.
+		final GroupVector<ZqElement, ZqGroup> x = preImage;
+		final GqElement gamma = base;
+		checkArgument(preImage.getGroup().hasSameOrderAs(base.getGroup()), "The preImage and base should have the same group order.");
 
-		return y;
+		// Operation.
+		// Output.
+		// image y
+		return Stream.concat(
+				x.stream().map(g::exponentiate),
+				x.stream().map(gamma::exponentiate)
+		).collect(toGroupVector());
 	}
 
 	/**

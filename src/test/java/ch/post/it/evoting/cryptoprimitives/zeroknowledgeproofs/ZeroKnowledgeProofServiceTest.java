@@ -249,11 +249,11 @@ class ZeroKnowledgeProofServiceTest extends TestGroupSetup {
 			final ElGamalMultiRecipientPublicKey largerPublicKey = largerKeyPair.getPublicKey();
 
 			// Generate verifiable decryptions with the larger public key
-			final VerifiableDecryptions verifiableDecryptions = zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, largerKeyPair, auxiliaryInformation);
+			final VerifiableDecryptions verifiableDecryptionsWithLargerPublicKey = zeroKnowledgeProofService.genVerifiableDecryptions(ciphertexts, largerKeyPair, auxiliaryInformation);
 
 			// Verify the decryptions
 			Boolean result = assertDoesNotThrow(
-					() -> zeroKnowledgeProofService.verifyDecryptions(ciphertexts, largerPublicKey, verifiableDecryptions, auxiliaryInformation)
+					() -> zeroKnowledgeProofService.verifyDecryptions(ciphertexts, largerPublicKey, verifiableDecryptionsWithLargerPublicKey, auxiliaryInformation)
 							.isVerified());
 			assertTrue(result);
 		}

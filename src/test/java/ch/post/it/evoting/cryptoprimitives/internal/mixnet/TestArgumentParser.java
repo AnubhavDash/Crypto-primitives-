@@ -129,6 +129,7 @@ class TestArgumentParser {
 				.build();
 	}
 
+	@SuppressWarnings("java:S117")
 	MultiExponentiationArgument parseMultiExponentiationArgument(final JsonData multiExpArgumentData) {
 		final BigInteger cA0Value = multiExpArgumentData.get("c_a_0", BigInteger.class);
 		final BigInteger[] cBValues = multiExpArgumentData.get("c_b", BigInteger[].class);

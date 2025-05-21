@@ -74,6 +74,7 @@ class ConversionsEquivalenceTest {
 	 * @param byteArray B, the byte array to convert.
 	 * @return the BigInteger representation of this byte array.
 	 **/
+	@SuppressWarnings("java:S117")
 	private BigInteger byteArrayToIntegerSpec(final ImmutableByteArray byteArray) {
 		final byte[] B = checkNotNull(byteArray).elements();
 		final int n = byteArray.length();

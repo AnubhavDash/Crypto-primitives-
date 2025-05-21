@@ -75,6 +75,13 @@ import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.DecryptionProof;
 
 class DecryptionProofServiceTest extends TestGroupSetup {
 
+	private static final BigInteger TWO = BigInteger.valueOf(2);
+	private static final BigInteger THREE = BigInteger.valueOf(3);
+	private static final BigInteger FOUR = BigInteger.valueOf(4);
+	private static final BigInteger FIVE = BigInteger.valueOf(5);
+	private static final BigInteger SEVEN = BigInteger.valueOf(7);
+	private static final BigInteger EIGHT = BigInteger.valueOf(8);
+
 	private static final ElGamal elGamal = new ElGamalService();
 	private static final AuxiliaryInformation auxiliaryInformation = AuxiliaryInformation.of("aux", "1");
 
@@ -243,9 +250,9 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("with the ciphertext and secret key group orders being different throws an IllegalArgumentException")
 		void genDecryptionProofWithCiphertextAndSecretKeyDifferentGroupOrder() {
-			final ElGamalMultiRecipientKeyPair keyPair = elGamal.genKeyPair(otherGqGroup, keyLength, randomService);
+			final ElGamalMultiRecipientKeyPair keyPairWithDifferentGroup = elGamal.genKeyPair(otherGqGroup, keyLength, randomService);
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-					() -> decryptionProofService.genDecryptionProof(ciphertext, keyPair, message, auxiliaryInformation));
+					() -> decryptionProofService.genDecryptionProof(ciphertext, keyPairWithDifferentGroup, message, auxiliaryInformation));
 			assertEquals("The ciphertext and the secret key group must have the same order.", exception.getMessage());
 		}
 	}
@@ -534,21 +541,21 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 					final BigInteger[] phisAArray = ciphertextData.get("phis", BigInteger[].class);
 					final GroupVector<GqElement, GqGroup> phi = Arrays.stream(phisAArray).map(phiA -> GqElementFactory.fromValue(phiA, gqGroup))
 							.collect(toGroupVector());
-					final ElGamalMultiRecipientCiphertext ciphertext = ElGamalMultiRecipientCiphertext.create(gamma, phi);
+					final ElGamalMultiRecipientCiphertext realCiphertext = ElGamalMultiRecipientCiphertext.create(gamma, phi);
 
 					// Parse key pair parameters
 					final BigInteger[] pkArray = input.get("public_key", BigInteger[].class);
 					final GroupVector<GqElement, GqGroup> pkElements = Arrays.stream(pkArray)
 							.map(skA -> GqElementFactory.fromValue(skA, gqGroup))
 							.collect(toGroupVector());
-					final ElGamalMultiRecipientPublicKey publicKey = new ElGamalMultiRecipientPublicKey(pkElements);
+					final ElGamalMultiRecipientPublicKey realPublicKey = new ElGamalMultiRecipientPublicKey(pkElements);
 
 					// Parse message parameters
 					final BigInteger[] messageArray = input.get("message", BigInteger[].class);
 					final GroupVector<GqElement, GqGroup> messageElements = Arrays.stream(messageArray)
 							.map(mA -> GqElementFactory.fromValue(mA, gqGroup))
 							.collect(toGroupVector());
-					final ElGamalMultiRecipientMessage message = new ElGamalMultiRecipientMessage(messageElements);
+					final ElGamalMultiRecipientMessage realMessage = new ElGamalMultiRecipientMessage(messageElements);
 
 					// Parse decryption proof parameters
 					final JsonData proof = input.getJsonData("proof");
@@ -559,11 +566,11 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 					final GroupVector<ZqElement, ZqGroup> z = Arrays.stream(zArray)
 							.map(zA -> ZqElement.create(zA, zqGroup))
 							.collect(toGroupVector());
-					final DecryptionProof decryptionProof = new DecryptionProof(e, z);
+					final DecryptionProof realDecryptionProof = new DecryptionProof(e, z);
 
 					// Parse auxiliary information parameters
 					final String[] auxInformation = input.get("additional_information", String[].class);
-					final AuxiliaryInformation auxiliaryInformation = AuxiliaryInformation.of(auxInformation);
+					final AuxiliaryInformation realAuxiliaryInformation = AuxiliaryInformation.of(auxInformation);
 
 					// Parse output parameters
 					final JsonData output = testParameters.getOutput();
@@ -571,21 +578,13 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 					final Boolean result = output.get("verif_result", Boolean.class);
 
 					return Arguments
-							.of(ciphertext, publicKey, message, decryptionProof, auxiliaryInformation, result, testParameters.getDescription());
+							.of(realCiphertext, realPublicKey, realMessage, realDecryptionProof, realAuxiliaryInformation, result, testParameters.getDescription());
 				}
 			});
 		}
 
+		@SuppressWarnings("java:S125")
 		private static class TestValues {
-			// Create BigIntegers
-			private final BigInteger TWO = BigInteger.valueOf(2);
-			private final BigInteger THREE = BigInteger.valueOf(3);
-			private final BigInteger FOUR = BigInteger.valueOf(4);
-			private final BigInteger FIVE = BigInteger.valueOf(5);
-			private final BigInteger SIX = BigInteger.valueOf(6);
-			private final BigInteger SEVEN = BigInteger.valueOf(7);
-			private final BigInteger EIGHT = BigInteger.valueOf(8);
-			private final BigInteger TEN = BigInteger.TEN;
 			// Create groups
 			private final BigInteger p = BigInteger.valueOf(23);
 			private final BigInteger q = BigInteger.valueOf(11);
@@ -606,17 +605,13 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 			private final ElGamalMultiRecipientPublicKey pk = new ElGamalMultiRecipientPublicKey(GroupVector.of(gEight, gThirteen, gFour));
 			private final ZqGroup zqGroup = new ZqGroup(q);
 			// Create ZqElements
-			private final ZqElement zOne = ZqElement.create(BigInteger.ONE, zqGroup);
 			private final ZqElement zTwo = ZqElement.create(TWO, zqGroup);
 			private final ZqElement zThree = ZqElement.create(THREE, zqGroup);
 			private final ZqElement zFive = ZqElement.create(FIVE, zqGroup);
 			private final ElGamalMultiRecipientCiphertext c = elGamal.getCiphertext(m, zFive, pk);
 			private final ZqElement zSeven = ZqElement.create(SEVEN, zqGroup);
 			private final ElGamalMultiRecipientPrivateKey sk = new ElGamalMultiRecipientPrivateKey(GroupVector.of(zThree, zSeven, zTwo));
-			// Create output arguments
-			private final ZqElement e = zSeven;
-			private final ZqElement zEight = ZqElement.create(EIGHT, zqGroup);
-			private final GroupVector<ZqElement, ZqGroup> z = GroupVector.of(zThree, zOne, zEight);
+
 
 			private final AuxiliaryInformation iAux = AuxiliaryInformation.of("Auxiliary Data");
 			private final List<BigInteger> randomValues = Arrays.asList(FOUR, SEVEN, FIVE);
@@ -653,9 +648,9 @@ class DecryptionProofServiceTest extends TestGroupSetup {
 		void verifyDecryptionProofWithRealValues(final ElGamalMultiRecipientCiphertext ciphertext, final ElGamalMultiRecipientPublicKey publicKey,
 				final ElGamalMultiRecipientMessage message, final DecryptionProof decryptionProof, final AuxiliaryInformation auxiliaryInformation,
 				final boolean expected, final String description) {
-			final DecryptionProofService decryptionProofService = new DecryptionProofService(randomService, HashService.getInstance());
+			final DecryptionProofService realDecryptionProofService = new DecryptionProofService(randomService, HashService.getInstance());
 			final boolean actual = assertDoesNotThrow(
-					() -> decryptionProofService.verifyDecryption(ciphertext, publicKey, message, decryptionProof, auxiliaryInformation).verify()
+					() -> realDecryptionProofService.verifyDecryption(ciphertext, publicKey, message, decryptionProof, auxiliaryInformation).verify()
 							.isVerified());
 			assertEquals(expected, actual, String.format("assertion failed for: %s", description));
 		}

@@ -36,7 +36,7 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
  *
  * <p>Instances of this class are immutable. </p>
  */
-@SuppressWarnings({ "java:S100", "java:S116", "java:S117" })
+@SuppressWarnings({ "java:S100", "java:S116", "java:S117", "java:S107" })
 public class ZeroArgument implements HashableList {
 
 	private final GqElement c_A_0;

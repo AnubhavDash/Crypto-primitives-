@@ -55,8 +55,8 @@ class DecryptionProofTest extends TestGroupSetup {
 	@Test
 	@DisplayName("Constructing a DecryptionProof with e and z from different groups throws an IllegalArgumentException")
 	void constructDecryptionProofWithEAndZDifferentGroups() {
-		final GroupVector<ZqElement, ZqGroup> z = otherZqGroupGenerator.genRandomZqElementVector(l);
-		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new DecryptionProof(e, z));
+		final GroupVector<ZqElement, ZqGroup> zFromOtherZqGroup = otherZqGroupGenerator.genRandomZqElementVector(l);
+		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new DecryptionProof(e, zFromOtherZqGroup));
 		assertEquals("e and z must have the same group.", exception.getMessage());
 	}
 

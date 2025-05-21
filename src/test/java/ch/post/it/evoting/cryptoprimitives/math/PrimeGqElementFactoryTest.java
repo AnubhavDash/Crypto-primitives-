@@ -64,8 +64,8 @@ class PrimeGqElementFactoryTest {
 
 	@Test
 	void whenCreateAPrimeElementEqualToGroupGeneratorError() {
-		final int groupGenerator = group.getGenerator().value.intValueExact();
-		assertThrows(IllegalArgumentException.class, () -> PrimeGqElement.PrimeGqElementFactory.fromValue(groupGenerator, group));
+		final int groupGeneratorEqualToPrimeElement = group.getGenerator().value.intValueExact();
+		assertThrows(IllegalArgumentException.class, () -> PrimeGqElement.PrimeGqElementFactory.fromValue(groupGeneratorEqualToPrimeElement, group));
 	}
 
 	@Test

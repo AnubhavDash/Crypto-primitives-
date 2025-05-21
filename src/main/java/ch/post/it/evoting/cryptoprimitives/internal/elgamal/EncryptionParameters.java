@@ -70,7 +70,7 @@ public final class EncryptionParameters {
 	 * @throws NullPointerException     if any of the inputs is null.
 	 * @throws IllegalArgumentException if any of the numbers in small primes list is not a prime.
 	 */
-	@SuppressWarnings("java:S117")
+	@SuppressWarnings({"java:S117", "java:S3776"})
 	public GqGroup getEncryptionParameters(final String seed, final ImmutableList<Integer> smallPrimes) {
 		checkNotNull(seed);
 		checkNotNull(smallPrimes);

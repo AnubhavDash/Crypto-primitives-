@@ -30,6 +30,7 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.mixnet.MultiExponentiationStatement;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 
+@SuppressWarnings("java:S116")
 class MultiExponentiationStatementTest extends TestGroupSetup {
 
 	private static final int UPPER_BOUND_TEST_SIZE = 10;

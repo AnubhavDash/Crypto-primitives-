@@ -83,9 +83,9 @@ class SignatureKeystoreServiceTest {
 		store1.setCertificateEntry(alias2, store2.getCertificate(alias2));
 
 		final SignatureKeystoreService<Supplier<String>> service1 = new SignatureKeystoreService<>(keyStoreToStream(store1, password1), KEYSTORE_TYPE,
-				password1, (keystore) -> true, () -> alias1, hashService);
+				password1, keystore -> true, () -> alias1, hashService);
 		final SignatureKeystoreService<Supplier<String>> service2 = new SignatureKeystoreService<>(keyStoreToStream(store2, password2), KEYSTORE_TYPE,
-				password2, (keystore) -> true, () -> alias2, hashService);
+				password2, keystore -> true, () -> alias2, hashService);
 
 		final ImmutableByteArray message = randomService.randomBytes(1000);
 
@@ -110,9 +110,9 @@ class SignatureKeystoreServiceTest {
 		final KeyStore store2 = generateNewKeyStore(alias2, password2);
 
 		final SignatureKeystoreService<Supplier<String>> service1 = new SignatureKeystoreService<>(keyStoreToStream(store1, password1), KEYSTORE_TYPE,
-				password1, (keystore) -> true, () -> alias1, hashService);
+				password1, keystore -> true, () -> alias1, hashService);
 		final SignatureKeystoreService<Supplier<String>> service2 = new SignatureKeystoreService<>(keyStoreToStream(store2, password2), KEYSTORE_TYPE,
-				password2, (keystore) -> true, () -> alias2, hashService);
+				password2, keystore -> true, () -> alias2, hashService);
 
 		final ImmutableByteArray message = randomService.randomBytes(1000);
 
@@ -131,7 +131,7 @@ class SignatureKeystoreServiceTest {
 		final char[] password = "password".toCharArray();
 		final KeyStore keyStore = generateNewKeyStore(alias, password);
 		final SignatureKeystoreService<Supplier<String>> service = new SignatureKeystoreService<>(keyStoreToStream(keyStore, password), KEYSTORE_TYPE,
-				password, (keystore) -> true, () -> alias, hashService);
+				password, keystore -> true, () -> alias, hashService);
 
 		// when
 		final String selfAlias = service.getSigningAlias().get();
@@ -149,7 +149,7 @@ class SignatureKeystoreServiceTest {
 
 		// when / then
 		assertDoesNotThrow(
-				() -> new SignatureKeystoreService<>(keyStoreToStream(keyStore, password), KEYSTORE_TYPE, password, (keystore) -> true, () -> alias,
+				() -> new SignatureKeystoreService<>(keyStoreToStream(keyStore, password), KEYSTORE_TYPE, password, keystore -> true, () -> alias,
 						hashService));
 	}
 
@@ -163,7 +163,7 @@ class SignatureKeystoreServiceTest {
 		// when / then
 		try (final InputStream inputStream = keyStoreToStream(keyStore, password)) {
 			assertThrows(IllegalArgumentException.class,
-					() -> new SignatureKeystoreService<>(inputStream, KEYSTORE_TYPE, password, (keystore) -> false, () -> alias, hashService));
+					() -> new SignatureKeystoreService<>(inputStream, KEYSTORE_TYPE, password, keystore -> false, () -> alias, hashService));
 		}
 	}
 

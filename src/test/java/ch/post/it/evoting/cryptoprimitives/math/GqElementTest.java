@@ -213,19 +213,19 @@ class GqElementTest {
 	@Test
 	void testEquals() {
 
-		final GqElement element1_value1_q11 = GqElementFactory.fromValue(BigInteger.ONE, group);
-		final GqElement element2_value1_q11 = GqElementFactory.fromValue(BigInteger.ONE, group);
+		final GqElement element1Value1Q11 = GqElementFactory.fromValue(BigInteger.ONE, group);
+		final GqElement element2Value1Q11 = GqElementFactory.fromValue(BigInteger.ONE, group);
 
-		final GqElement element3_value2_q11 = GqElementFactory.fromValue(BigInteger.TWO, group);
+		final GqElement element3Value2Q11 = GqElementFactory.fromValue(BigInteger.TWO, group);
 
-		final GqGroup otherGroup_g4_q3 = new GqGroup(BigInteger.valueOf(7), BigInteger.valueOf(3), BigInteger.TWO);
-		final GqElement element4_value1_q13 = GqElementFactory.fromValue(BigInteger.ONE, otherGroup_g4_q3);
+		final GqGroup otherGroupG4Q3 = new GqGroup(BigInteger.valueOf(7), BigInteger.valueOf(3), BigInteger.TWO);
+		final GqElement element4Value1Q13 = GqElementFactory.fromValue(BigInteger.ONE, otherGroupG4Q3);
 
 		assertAll(
-				() -> assertEquals(element1_value1_q11, element2_value1_q11),
-				() -> assertNotEquals(element1_value1_q11, element3_value2_q11),
-				() -> assertNotEquals(element1_value1_q11, element4_value1_q13),
-				() -> assertNotEquals(element3_value2_q11, element4_value1_q13)
+				() -> assertEquals(element1Value1Q11, element2Value1Q11),
+				() -> assertNotEquals(element1Value1Q11, element3Value2Q11),
+				() -> assertNotEquals(element1Value1Q11, element4Value1Q13),
+				() -> assertNotEquals(element3Value2Q11, element4Value1Q13)
 		);
 	}
 

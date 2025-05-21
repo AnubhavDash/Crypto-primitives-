@@ -75,11 +75,11 @@ public class GenUniqueDecimalStringsBenchmark {
 
 			checkArgument(n <= Math.pow(10, l), "There cannot be more than 10^l codes.");
 
-			final Alphabet A_10 = Base10Alphabet.getInstance();
+			final Alphabet base10Alphabet = Base10Alphabet.getInstance();
 
 			final List<String> codes = new ArrayList<>(n);
 			while (codes.size() < n) {
-				final String c = randomService.genRandomString(l, A_10);
+				final String c = randomService.genRandomString(l, base10Alphabet);
 
 				if (!codes.contains(c)) {
 					codes.add(c);
@@ -97,11 +97,11 @@ public class GenUniqueDecimalStringsBenchmark {
 
 			checkArgument(n <= Math.pow(10, l), "There cannot be more than 10^l codes.");
 
-			final Alphabet A_10 = Base10Alphabet.getInstance();
+			final Alphabet base10Alphabet = Base10Alphabet.getInstance();
 
 			final List<String> codes = new LinkedList<>();
 			while (codes.size() < n) {
-				final String c = randomService.genRandomString(l, A_10);
+				final String c = randomService.genRandomString(l, base10Alphabet);
 
 				if (!codes.contains(c)) {
 					codes.add(c);
@@ -119,11 +119,11 @@ public class GenUniqueDecimalStringsBenchmark {
 
 			checkArgument(n <= Math.pow(10, l), "There cannot be more than 10^l codes.");
 
-			final Alphabet A_10 = Base10Alphabet.getInstance();
+			final Alphabet base10Alphabet = Base10Alphabet.getInstance();
 
 			final Set<String> codes = new LinkedHashSet<>();
 			while (codes.size() < n) {
-				final String c = randomService.genRandomString(l, A_10);
+				final String c = randomService.genRandomString(l, base10Alphabet);
 
 				codes.add(c);
 			}

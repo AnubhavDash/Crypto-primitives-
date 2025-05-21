@@ -114,7 +114,6 @@ class GqElementFactoryTest {
 
 	@Test
 	void testFromSquareRootWithValidInputReturnsSquaredElement() {
-		final ZqGroup zqGroup = ZqGroup.sameOrderAs(group);
 		final BigInteger one = BigInteger.ONE;
 		final BigInteger two = BigInteger.TWO;
 		final BigInteger five = BigInteger.valueOf(5);

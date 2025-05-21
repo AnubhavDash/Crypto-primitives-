@@ -205,8 +205,8 @@ class ImmutableSetTest {
 		assertNotEquals(set, ImmutableSet.of("a", "b"));
 		assertNotEquals(set, ImmutableSet.of("a", "b", "d"));
 		assertNotEquals(set, ImmutableSet.of("a", "b", "c", "d"));
-		assertFalse(set.equals(ImmutableList.of("a", "b", "c")));
-		assertFalse(set.equals(null));
+		assertNotEquals(set, ImmutableList.of("a", "b", "c"));
+		assertNotEquals(null, set);
 	}
 
 	@Test

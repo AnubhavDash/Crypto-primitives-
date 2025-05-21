@@ -177,10 +177,10 @@ class RSASSA_PSSTest {
 		@DisplayName("with correct signature verifies")
 		void verifyWithCorrectSignatureReturnsTrue() {
 			final KeyPair keyPair = rsassa_pss.genKeyPair();
-			final ImmutableByteArray message = randomService.randomBytes(10);
-			final ImmutableByteArray signature = rsassa_pss.sign(keyPair.getPrivate(), message);
+			final ImmutableByteArray correctMessage = randomService.randomBytes(10);
+			final ImmutableByteArray correctSignature = rsassa_pss.sign(keyPair.getPrivate(), correctMessage);
 
-			assertTrue(rsassa_pss.verify(keyPair.getPublic(), message, signature));
+			assertTrue(rsassa_pss.verify(keyPair.getPublic(), correctMessage, correctSignature));
 		}
 	}
 }

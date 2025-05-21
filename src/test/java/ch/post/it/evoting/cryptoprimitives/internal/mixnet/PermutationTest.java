@@ -146,8 +146,6 @@ class PermutationTest {
 		@Test
 		@DisplayName("valid value does not throw")
 		void getValidValueDoesNotThrow() {
-			final Permutation permutation = permutationService.genPermutation(size + 1);
-
 			assertDoesNotThrow(() -> permutation.get(size - 1));
 		}
 

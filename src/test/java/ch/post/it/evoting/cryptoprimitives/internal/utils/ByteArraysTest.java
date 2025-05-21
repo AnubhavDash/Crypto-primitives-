@@ -43,14 +43,14 @@ class ByteArraysTest {
 	}
 
 	@Test
-	void testCutToBitLengtRequestedLengthNegativeThrows() {
-		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-				() -> ByteArrays.cutToBitLength(ImmutableByteArray.of((byte) 0b10011), -1));
+	void testCutToBitLengthRequestedLengthNegativeThrows() {
+		final ImmutableByteArray immutableByteArray = ImmutableByteArray.of((byte) 0b10011);
+		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> ByteArrays.cutToBitLength(immutableByteArray, -1));
 		assertEquals("The requested length must be positive.", Throwables.getRootCause(exception).getMessage());
 	}
 
 	@Test
-	void testCutToBitLengtRequestedLengthZeroReturnsEmpty() {
+	void testCutToBitLengthRequestedLengthZeroReturnsEmpty() {
 		final ImmutableByteArray expected = ImmutableByteArray.of();
 		final ImmutableByteArray result = assertDoesNotThrow(() -> ByteArrays.cutToBitLength(ImmutableByteArray.of((byte) 0b10011), 0));
 		assertEquals(expected, result);
@@ -58,8 +58,9 @@ class ByteArraysTest {
 
 	@Test
 	void testCutToBitLengthRequestedLengthGreaterThanByteArrayBitLengthThrows() {
+		final ImmutableByteArray immutableByteArray = ImmutableByteArray.of((byte) 0b1001101);
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-				() -> ByteArrays.cutToBitLength(ImmutableByteArray.of((byte) 0b1001101), 9));
+				() -> ByteArrays.cutToBitLength(immutableByteArray, 9));
 		assertEquals("The requested length must not be greater than the bit length of the byte array.",
 				Throwables.getRootCause(exception).getMessage());
 	}

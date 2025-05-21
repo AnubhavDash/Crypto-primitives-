@@ -25,6 +25,7 @@ import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableMap.toImmu
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -301,8 +302,8 @@ class ImmutableMapTest {
 		final ImmutableMap<String, Integer> other = of("one", 1, "two", 2);
 		assertEquals(immutable, other);
 		assertEquals(immutable, immutable);
-		assertFalse(immutable.equals(null));
-		assertFalse(immutable.equals("one"));
+		assertNotEquals(null, immutable);
+		assertNotEquals("one", immutable);
 	}
 
 	@Test

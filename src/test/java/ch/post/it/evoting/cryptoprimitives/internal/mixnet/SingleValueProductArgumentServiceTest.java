@@ -249,19 +249,19 @@ class SingleValueProductArgumentServiceTest extends TestGroupSetup {
 					.build();
 
 			//Mock random integers
-			final TestRandomService randomService = spy(new TestRandomService());
+			final TestRandomService testRandomService = spy(new TestRandomService());
 			doReturn(BigInteger.valueOf(3), BigInteger.valueOf(7), // d_0, d_1
 					BigInteger.TEN,                        // r_d
 					BigInteger.valueOf(4), BigInteger.valueOf(8))  // s_0, s_x
-					.when(randomService).genRandomInteger(specificZqGroup.getQ());
+					.when(testRandomService).genRandomInteger(specificZqGroup.getQ());
 
-			final SingleValueProductStatement statement = new SingleValueProductStatement(commitment, product);
-			final SingleValueProductWitness witness = new SingleValueProductWitness(a, r);
+			final SingleValueProductStatement specificStatement= new SingleValueProductStatement(commitment, product);
+			final SingleValueProductWitness specificWitness = new SingleValueProductWitness(a, r);
 
-			final HashService hashService = mock(HashService.class);
-			when(hashService.recursiveHash(any(Hashable[].class))).thenReturn(ImmutableByteArray.of((byte) 0b1010));
-			final SingleValueProductArgumentService svpArgumentProvider = new SingleValueProductArgumentService(randomService, hashService, pk, ck);
-			assertEquals(expected, svpArgumentProvider.getSingleValueProductArgument(statement, witness));
+			final HashService hashServiceMock = mock(HashService.class);
+			when(hashServiceMock.recursiveHash(any(Hashable[].class))).thenReturn(ImmutableByteArray.of((byte) 0b1010));
+			final SingleValueProductArgumentService svpArgumentProvider = new SingleValueProductArgumentService(testRandomService, hashServiceMock, pk, ck);
+			assertEquals(expected, svpArgumentProvider.getSingleValueProductArgument(specificStatement, specificWitness));
 		}
 	}
 
@@ -342,9 +342,9 @@ class SingleValueProductArgumentServiceTest extends TestGroupSetup {
 				final SingleValueProductStatement singleValueProductStatement, final SingleValueProductArgument singleValueProductArgument,
 				final boolean expectedOutput, final String description) {
 
-			final HashService hashService = HashService.getInstance();
+			final HashService realHashService = HashService.getInstance();
 
-			final SingleValueProductArgumentService service = new SingleValueProductArgumentService(randomService, hashService, publicKey,
+			final SingleValueProductArgumentService service = new SingleValueProductArgumentService(randomService, realHashService, publicKey,
 					commitmentKey);
 
 			assertEquals(expectedOutput,
@@ -363,8 +363,8 @@ class SingleValueProductArgumentServiceTest extends TestGroupSetup {
 				final GqGroup gqGroup = context.getGqGroup();
 				final ZqGroup zqGroup = ZqGroup.sameOrderAs(gqGroup);
 
-				final ElGamalMultiRecipientPublicKey publicKey = context.parsePublicKey();
-				final CommitmentKey commitmentKey = context.parseCommitmentKey();
+				final ElGamalMultiRecipientPublicKey realPublicKey = context.parsePublicKey();
+				final CommitmentKey realCommitmentKey = context.parseCommitmentKey();
 
 				// Inputs.
 				final JsonData input = testParameters.getInput();
@@ -378,7 +378,7 @@ class SingleValueProductArgumentServiceTest extends TestGroupSetup {
 				final JsonData output = testParameters.getOutput();
 				final boolean outputValue = Boolean.parseBoolean(output.getJsonData("result").toString());
 
-				return Arguments.of(publicKey, commitmentKey, singleValueProductStatement, singleValueProductArgument, outputValue,
+				return Arguments.of(realPublicKey, realCommitmentKey, singleValueProductStatement, singleValueProductArgument, outputValue,
 						testParameters.getDescription());
 			});
 		}

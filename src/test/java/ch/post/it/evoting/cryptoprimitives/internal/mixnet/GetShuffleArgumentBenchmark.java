@@ -80,6 +80,7 @@ public class GetShuffleArgumentBenchmark {
 		return state.getShuffleArgument();
 	}
 
+	@SuppressWarnings("java:S116")
 	@State(Scope.Thread)
 	public static class BenchmarkState_m_And_n_Chosen_With_getMatrixDimensions extends BenchmarkState {
 
@@ -103,6 +104,7 @@ public class GetShuffleArgumentBenchmark {
 		}
 	}
 
+	@SuppressWarnings("java:S116")
 	@State(Scope.Thread)
 	public static class BenchmarkState_m_Equals_1 extends BenchmarkState {
 

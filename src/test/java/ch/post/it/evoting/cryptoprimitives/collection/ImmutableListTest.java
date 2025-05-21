@@ -36,7 +36,6 @@ class ImmutableListTest {
 	@Test
 	void testConstructor() {
 		assertThrows(NullPointerException.class, () -> ImmutableList.from(null));
-		assertThrows(NullPointerException.class, () -> ImmutableList.from(List.of(null)));
 	}
 
 	@Test
@@ -73,7 +72,8 @@ class ImmutableListTest {
 	void getFirst() {
 		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
 		assertEquals("a", list.getFirst());
-		final NoSuchElementException noSuchElementException = assertThrows(NoSuchElementException.class, () -> emptyList().getFirst());
+		final ImmutableList<Object> emptyList = emptyList();
+		final NoSuchElementException noSuchElementException = assertThrows(NoSuchElementException.class, emptyList::getFirst);
 		assertEquals("The list is empty.", noSuchElementException.getMessage());
 	}
 
@@ -81,7 +81,8 @@ class ImmutableListTest {
 	void getLast() {
 		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
 		assertEquals("c", list.getLast());
-		final NoSuchElementException noSuchElementException = assertThrows(NoSuchElementException.class, () -> emptyList().getLast());
+		final ImmutableList<Object> emptyList = emptyList();
+		final NoSuchElementException noSuchElementException = assertThrows(NoSuchElementException.class, emptyList::getLast);
 		assertEquals("The list is empty.", noSuchElementException.getMessage());
 	}
 
@@ -113,7 +114,8 @@ class ImmutableListTest {
 
 	@Test
 	void containsThrows() {
-		assertThrows(NullPointerException.class, () -> emptyList().contains(null));
+		final ImmutableList<Object> emptyList = emptyList();
+		assertThrows(NullPointerException.class, () -> emptyList.contains(null));
 	}
 
 	@Test
@@ -155,15 +157,16 @@ class ImmutableListTest {
 
 	@Test
 	void indexOfThrows() {
-		assertThrows(NullPointerException.class, () -> emptyList().indexOf(null));
+		final ImmutableList<Object> emptyList = emptyList();
+		assertThrows(NullPointerException.class, () -> emptyList.indexOf(null));
 	}
 
 	@Test
 	void equals() {
 		final ImmutableList<String> list = ImmutableList.of("a", "b", "c");
-		assertTrue(list.equals(list));
-		assertFalse(list.equals(null));
-		assertFalse(list.equals("a"));
+		assertEquals(list, list);
+		assertNotEquals(null, list);
+		assertNotEquals("a", list);
 		assertEquals(list, ImmutableList.of("a", "b", "c"));
 		assertNotEquals(list, ImmutableList.of("a", "b"));
 		assertNotEquals(list, ImmutableList.of("a", "b", "d"));
@@ -175,7 +178,6 @@ class ImmutableListTest {
 		assertThrows(NullPointerException.class, () -> ImmutableList.of((String[]) null));
 		assertThrows(NullPointerException.class, () -> ImmutableList.of((List<String>) null));
 		assertThrows(NullPointerException.class, () -> ImmutableList.of((Stream<String>) null));
-		assertThrows(NullPointerException.class, () -> ImmutableList.of(Stream.of(null)));
 	}
 
 	@Test
@@ -189,7 +191,12 @@ class ImmutableListTest {
 
 	@Test
 	void collectorThrows() {
-		assertThrows(NullPointerException.class, () -> Stream.of("ignored", null, "ignored").collect(toImmutableList()));
+		final Stream<String> streamOfString = Stream.of("ignored", null, "ignored");
+		assertThrows(NullPointerException.class, () -> collectToImmutableList(streamOfString));
+	}
+
+	private ImmutableList<String> collectToImmutableList(final Stream<String> stream) {
+		return stream.collect(toImmutableList());
 	}
 
 	@Test

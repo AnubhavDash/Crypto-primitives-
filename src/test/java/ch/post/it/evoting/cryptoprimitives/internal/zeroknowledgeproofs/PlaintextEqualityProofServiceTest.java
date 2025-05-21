@@ -345,11 +345,11 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 		@Test
 		@DisplayName("empty auxiliary information returns true")
 		void emptyAux() {
-			final PlaintextEqualityProof plaintextEqualityProof = plaintextEqualityProofService.genPlaintextEqualityProof(firstCiphertext,
+			final PlaintextEqualityProof emptyAuxiliaryPlaintextEqualityProof = plaintextEqualityProofService.genPlaintextEqualityProof(firstCiphertext,
 					secondCiphertext, firstPublicKey, secondPublicKey, randomness, AuxiliaryInformation.of());
 
 			assertTrue(plaintextEqualityProofService.verifyPlaintextEquality(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey,
-					plaintextEqualityProof, AuxiliaryInformation.of()));
+					emptyAuxiliaryPlaintextEqualityProof, AuxiliaryInformation.of()));
 		}
 
 		@Test
@@ -463,7 +463,7 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 					final GroupVector<GqElement, GqGroup> firstPhi = Arrays.stream(input.getJsonData("upper_c").get("phis", BigInteger[].class))
 							.map(upperCA -> GqElementFactory.fromValue(upperCA, gqGroup)).collect(toGroupVector());
 
-					final ElGamalMultiRecipientCiphertext firstCiphertext = ElGamalMultiRecipientCiphertext.create(firstGamma, firstPhi);
+					final ElGamalMultiRecipientCiphertext realFirstCiphertext = ElGamalMultiRecipientCiphertext.create(firstGamma, firstPhi);
 
 					// Parse secondCiphertext (upper_c_prime) parameters
 					final GqElement secondGamma = GqElementFactory.fromValue(input.getJsonData("upper_c_prime").get("gamma", BigInteger.class),
@@ -472,15 +472,15 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 									input.getJsonData("upper_c_prime").get("phis", BigInteger[].class))
 							.map(upperCA -> GqElementFactory.fromValue(upperCA, gqGroup)).collect(toGroupVector());
 
-					final ElGamalMultiRecipientCiphertext secondCiphertext = ElGamalMultiRecipientCiphertext.create(secondGamma, secondPhi);
+					final ElGamalMultiRecipientCiphertext realSecondCiphertext = ElGamalMultiRecipientCiphertext.create(secondGamma, secondPhi);
 
 					// Parse firstPublicKey (h) parameter
 					final BigInteger h = input.get("h", BigInteger.class);
-					final GqElement firstPublicKey = GqElementFactory.fromValue(h, gqGroup);
+					final GqElement realFirstPublicKey = GqElementFactory.fromValue(h, gqGroup);
 
 					// Parse secondPublicKey (h_prime) parameter
 					final BigInteger hPrime = input.get("h_prime", BigInteger.class);
-					final GqElement secondPublicKey = GqElementFactory.fromValue(hPrime, gqGroup);
+					final GqElement realSecondPublicKey = GqElementFactory.fromValue(hPrime, gqGroup);
 
 					// Parse plaintextEqualityProof (proof) parameters
 					final JsonData proof = input.getJsonData("proof");
@@ -491,11 +491,11 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 					final GroupVector<ZqElement, ZqGroup> z = Arrays.stream(zArray)
 							.map(zA -> ZqElement.create(zA, zqGroup))
 							.collect(toGroupVector());
-					final PlaintextEqualityProof plaintextEqualityProof = new PlaintextEqualityProof(e, z);
+					final PlaintextEqualityProof realPlaintextEqualityProof = new PlaintextEqualityProof(e, z);
 
 					// Parse auxiliaryInformation parameters (i_aux)
 					final String[] auxInformation = input.get("i_aux", String[].class);
-					final AuxiliaryInformation auxiliaryInformation = AuxiliaryInformation.of(auxInformation);
+					final AuxiliaryInformation realAuxiliaryInformation = AuxiliaryInformation.of(auxInformation);
 
 					// Parse output parameters
 					final JsonData output = testParameters.getOutput();
@@ -503,7 +503,7 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 					final Boolean result = output.get("output", Boolean.class);
 
 					return Arguments
-							.of(firstCiphertext, secondCiphertext, firstPublicKey, secondPublicKey, plaintextEqualityProof, auxiliaryInformation,
+							.of(realFirstCiphertext, realSecondCiphertext, realFirstPublicKey, realSecondPublicKey, realPlaintextEqualityProof, realAuxiliaryInformation,
 									result, testParameters.getDescription());
 				}
 			});
@@ -517,9 +517,9 @@ class PlaintextEqualityProofServiceTest extends TestGroupSetup {
 				final GqElement firstPublicKey, final GqElement secondPublicKey, final PlaintextEqualityProof plaintextEqualityProof,
 				final AuxiliaryInformation auxiliaryInformation, final boolean expected, final String description) {
 
-			final PlaintextEqualityProofService plaintextEqualityProofService = new PlaintextEqualityProofService(randomService,
+			final PlaintextEqualityProofService realPlaintextEqualityProofService = new PlaintextEqualityProofService(randomService,
 					HashService.getInstance());
-			final boolean actual = plaintextEqualityProofService.verifyPlaintextEquality(firstCiphertext, secondCiphertext, firstPublicKey,
+			final boolean actual = realPlaintextEqualityProofService.verifyPlaintextEquality(firstCiphertext, secondCiphertext, firstPublicKey,
 					secondPublicKey, plaintextEqualityProof, auxiliaryInformation);
 			assertEquals(expected, actual, String.format("assertion failed for: %s", description));
 

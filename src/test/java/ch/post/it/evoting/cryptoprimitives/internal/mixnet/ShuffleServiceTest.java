@@ -47,8 +47,9 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 
 class ShuffleServiceTest extends TestGroupSetup {
 
-	static int NUM_ELEMENTS = 10;
-	static int NUM_CIPHERTEXTS = 10;
+	private static final int NUM_ELEMENTS = 10;
+	private static final int NUM_CIPHERTEXTS = 10;
+
 	static TestRandomService randomService = new TestRandomService();
 	static PermutationService permutationService = new PermutationService(randomService);
 	static ShuffleService shuffleService = new ShuffleService(randomService, permutationService);
@@ -114,14 +115,14 @@ class ShuffleServiceTest extends TestGroupSetup {
 
 		//Mock the permutation
 		final Permutation permutation = new Permutation(ImmutableList.of(1, 2, 0));
-		final PermutationService permutationService = mock(PermutationService.class);
-		when(permutationService.genPermutation(numCiphertexts)).thenReturn(permutation);
+		final PermutationService permutationServiceMock = mock(PermutationService.class);
+		when(permutationServiceMock.genPermutation(numCiphertexts)).thenReturn(permutation);
 
 		//Mock random exponents
-		final RandomService randomService = mock(RandomService.class);
+		final RandomService randomServiceMock = mock(RandomService.class);
 		final ZqGroup exponentGroup = ZqGroup.sameOrderAs(localGroup);
 		final List<BigInteger> randomIntegers = IntStream.range(0, permutation.size()).mapToObj(i -> BigInteger.valueOf(7)).toList();
-		when(randomService.genRandomInteger(exponentGroup.getQ()))
+		when(randomServiceMock.genRandomInteger(exponentGroup.getQ()))
 				.thenReturn(randomIntegers.get(0), randomIntegers.subList(1, randomIntegers.size()).toArray(new BigInteger[] {}));
 
 		//Create public key
@@ -149,8 +150,8 @@ class ShuffleServiceTest extends TestGroupSetup {
 				localGroup);
 
 		//Create shuffle
-		final ShuffleService shuffleService = new ShuffleService(randomService, permutationService);
-		final Shuffle shuffle = shuffleService.genShuffle(ciphertexts, publicKey);
+		final ShuffleService shuffleServiceMock = new ShuffleService(randomServiceMock, permutationServiceMock);
+		final Shuffle shuffle = shuffleServiceMock.genShuffle(ciphertexts, publicKey);
 
 		assertEquals(expectedCiphertexts, shuffle.getCiphertexts());
 		assertEquals(permutation, shuffle.getPermutation());

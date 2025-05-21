@@ -29,7 +29,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelC
  */
 public class TestHashService extends HashService {
 
-	private final static HashService DELEGATE_HASH_SERVICE = HashService.getInstance();
+	private static final HashService DELEGATE_HASH_SERVICE = HashService.getInstance();
 
 	private final BigInteger lowerBound;
 	private final BigInteger upperBound;
