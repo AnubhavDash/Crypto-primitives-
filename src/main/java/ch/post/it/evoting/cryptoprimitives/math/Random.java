@@ -64,4 +64,12 @@ public interface Random {
 	 */
 	@SuppressWarnings("java:S117")
 	String genRandomString(final int length, final Alphabet alphabet);
+
+	/**
+	 * Generates an array of {@code byteLength} random bytes.
+	 *
+	 * @param byteLength The number of bytes to generate.
+	 * @return An array of {@code byteLength} random bytes.
+	 */
+	byte[] randomBytes(final int byteLength);
 }

@@ -4,6 +4,7 @@
 
 The following improvements are included in release 1.4.5:
 
+* [Code] Exposed the randomBytes method with the Random interface.
 * [Code, Specification] Specify and implement algorithm IntegerToFixedLengthByteArray.
 * [Code] Updated dependencies and third-party libraries.
 
