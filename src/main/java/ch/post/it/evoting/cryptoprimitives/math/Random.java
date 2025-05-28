@@ -17,6 +17,7 @@ package ch.post.it.evoting.cryptoprimitives.math;
 
 import java.math.BigInteger;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 
 /**
@@ -65,4 +66,13 @@ public interface Random {
 	 */
 	@SuppressWarnings("java:S117")
 	String genRandomString(final int length, final Alphabet alphabet);
+
+	/**
+	 * Generates an immutable array of {@code byteLength} random bytes.
+	 *
+	 * @param byteLength The number of bytes to generate.
+	 * @return An immutable array of {@code byteLength} random bytes.
+	 * @throws IllegalArgumentException if {@code byteLength} is negative.
+	 */
+	ImmutableByteArray randomBytes(final int byteLength);
 }
