@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientCiphertexts.getCiphertext;
 import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientCiphertexts.getCiphertextVectorExponentiation;
 import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientMessages.constantMessage;
@@ -41,6 +42,8 @@ import java.util.stream.Stream;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
@@ -211,7 +214,7 @@ final class MultiExponentiationArgumentService {
 						.collect(toGroupVector());
 
 		//Compute challenge hash
-		final byte[] x_bytes = hashService.recursiveHash(
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(gqGroup.getP()),
 				HashableBigInteger.from(gqGroup.getQ()),
 				pk,
@@ -228,10 +231,10 @@ final class MultiExponentiationArgumentService {
 		final ZqElement x = ZqElement.create(byteArrayToInteger(x_bytes), zqGroup);
 
 		//Compute as, r, b, s, tau
-		final List<ZqElement> xPowers = LongStream.range(0, 2L * m)
+		final ImmutableList<ZqElement> xPowers = LongStream.range(0, 2L * m)
 				.mapToObj(BigInteger::valueOf)
 				.map(x::exponentiate)
-				.toList();
+				.collect(toImmutableList());
 
 		//For all the next computations we include the first element in the sum by starting at the index 0 instead of 1. This is possible since x^0
 		// is 1.
@@ -349,8 +352,8 @@ final class MultiExponentiationArgumentService {
 		return IntStream.range(0, 2 * m)
 				.parallel()
 				.mapToObj(k -> {
-					int lowerBound;
-					int upperBound;
+					final int lowerBound;
+					final int upperBound;
 					if (k < m) {
 						lowerBound = (m - k) - 1;
 						upperBound = m;
@@ -394,8 +397,8 @@ final class MultiExponentiationArgumentService {
 		checkArgument(argument.get_l() == statement.get_l(), "l dimension doesn't match.");
 
 		//Extract variables from statement and argument
-		int m = statement.get_m();
-		int l = statement.get_l();
+		final int m = statement.get_m();
+		final int l = statement.get_l();
 		final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> C_matrix = statement.get_C_matrix();
 		final ElGamalMultiRecipientCiphertext C = statement.get_C();
 		final GroupVector<GqElement, GqGroup> c_A = statement.get_c_A();
@@ -411,7 +414,7 @@ final class MultiExponentiationArgumentService {
 		final BigInteger q = this.gqGroup.getQ();
 
 		//Algorithm
-		final byte[] x_bytes = hashService.recursiveHash(
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,
@@ -432,12 +435,12 @@ final class MultiExponentiationArgumentService {
 		final Memoizer<ZqElement> xPowers = new Memoizer<>(i -> x.exponentiate(BigInteger.valueOf(i)));
 
 		final GqElement prodCa = GqElementFactory.multiModExp(c_A.prepend(c_A_0),
-				IntStream.range(0, c_A.size() + 1).parallel().mapToObj(xPowers).collect(GroupVector.toGroupVector()));
+				IntStream.range(0, c_A.size() + 1).parallel().mapToObj(xPowers).collect(toGroupVector()));
 		final GqElement commA = getCommitment(a, r, ck);
 		final Verifiable verifA = create(() -> prodCa.equals(commA), "product Ca must equal commitment A.");
 
 		final GqElement prodCb = GqElementFactory.multiModExp(c_B,
-				IntStream.range(0, c_B.size()).parallel().mapToObj(xPowers).collect(GroupVector.toGroupVector()));
+				IntStream.range(0, c_B.size()).parallel().mapToObj(xPowers).collect(toGroupVector()));
 		final GqElement commB = getCommitment(GroupVector.of(b), s, ck);
 		final Verifiable verifB = create(() -> prodCb.equals(commB), "product Cb must equal commitment B.");
 
@@ -495,7 +498,7 @@ final class MultiExponentiationArgumentService {
 		/**
 		 * @param function the function to memoize.
 		 */
-		Memoizer(Function<Integer, R> function) {
+		Memoizer(final Function<Integer, R> function) {
 			this.function = function;
 		}
 

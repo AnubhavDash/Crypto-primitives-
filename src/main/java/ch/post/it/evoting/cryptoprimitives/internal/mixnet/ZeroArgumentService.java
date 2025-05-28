@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import java.util.stream.IntStream;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
@@ -161,7 +162,7 @@ final class ZeroArgumentService {
 		final GroupVector<GqElement, GqGroup> c_d = getCommitmentVector(d, t, ck);
 
 		// Compute x, later used to compute a', b', r', s' and t'.
-		final byte[] x_bytes = hashService.recursiveHash(
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,
@@ -269,7 +270,7 @@ final class ZeroArgumentService {
 		checkArgument(m > 0, "The value of m must be strictly positive.");
 
 		// Computing the d vector.
-		final LinkedList<ZqElement> d = new LinkedList<>();
+		final List<ZqElement> d = new LinkedList<>();
 		for (int k = 0; k <= 2 * m; k++) {
 			ZqElement d_k = group.getIdentity();
 			for (int i = Math.max(0, k - m); i <= m; i++) {
@@ -362,7 +363,7 @@ final class ZeroArgumentService {
 		final BigInteger q = group.getQ();
 
 		//Algorithm
-		final byte[] x_bytes = hashService.recursiveHash(
+		final ImmutableByteArray x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,

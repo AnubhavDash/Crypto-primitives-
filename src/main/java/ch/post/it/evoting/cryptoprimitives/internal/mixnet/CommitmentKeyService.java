@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
 import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
+import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
@@ -85,36 +85,31 @@ public class CommitmentKeyService {
 		int count = 0;
 		int i = 0;
 
-		// Using a Set to prevent duplicates.
-		// A LinkedHashSet has predictable iteration order, which is the order of insertion
-		final LinkedHashSet<BigInteger> v = new LinkedHashSet<>();
-
-		final Predicate<BigInteger> validElement = w -> !w.equals(BigInteger.ONE)
-				&& !w.equals(g)
-				&& !v.contains(w);
-
+		final List<BigInteger> v = new ArrayList<>(nu);
 		while (count <= nu) {
-
-			final ZqElement u = hashService.recursiveHashToZq(q, HashableString.from("commitmentKey"),
-					HashableBigInteger.from(BigInteger.valueOf(i)),
-					HashableBigInteger.from(BigInteger.valueOf(count))).add(one);
+			final ZqElement u = hashService.recursiveHashToZq(
+							q,
+							HashableString.from("commitmentKey"),
+							HashableBigInteger.from(BigInteger.valueOf(i)),
+							HashableBigInteger.from(BigInteger.valueOf(count)))
+					.add(one);
 
 			final BigInteger w = BigIntegerOperationsService.modExponentiate(u.getValue(), BigInteger.TWO, p);
 
-			if (validElement.test(w)) {
-				v.add(w);
+			if (!w.equals(BigInteger.ONE) && !w.equals(g) && !v.contains(w)) {
+				final BigInteger g_count = w;
+				v.add(g_count);
 				count++;
 			}
 			i++;
-
 		}
 
-		final List<GqElement> v_elements = v.stream()
+		final GroupVector<GqElement, GqGroup> v_elements = v.stream()
 				.map(e -> GqElementFactory.fromValue(e, gqGroup))
-				.toList();
+				.collect(toGroupVector());
 
 		final GqElement h = v_elements.get(0);
-		final GroupVector<GqElement, GqGroup> g_vector = GroupVector.from(v_elements.subList(1, v_elements.size()));
+		final GroupVector<GqElement, GqGroup> g_vector = v_elements.subVector(1, v_elements.size());
 		return new CommitmentKey(h, g_vector);
 	}
 }

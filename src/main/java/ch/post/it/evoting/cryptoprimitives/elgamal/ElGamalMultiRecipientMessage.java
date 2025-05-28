@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,10 @@ package ch.post.it.evoting.cryptoprimitives.elgamal;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import com.google.common.base.Preconditions;
-
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -44,11 +42,10 @@ public final class ElGamalMultiRecipientMessage implements GroupVectorElement<Gq
 	/**
 	 * Creates an {@link ElGamalMultiRecipientMessage} object.
 	 *
-	 * @param messageElements the group vector of Gq group message elements. Must be non-null, non-empty and not contain null elements.
+	 * @param messageElements the group vector of Gq group message elements. Must be non-nul and non-empty.
 	 */
 	public ElGamalMultiRecipientMessage(final GroupVector<GqElement, GqGroup> messageElements) {
 		this.messageElements = checkNotNull(messageElements);
-		this.messageElements.forEach(Preconditions::checkNotNull);
 		checkArgument(!this.messageElements.isEmpty(), "An ElGamal message must not be empty.");
 	}
 
@@ -96,7 +93,7 @@ public final class ElGamalMultiRecipientMessage implements GroupVectorElement<Gq
 	}
 
 	@Override
-	public List<? extends Hashable> toHashableForm() {
+	public ImmutableList<Hashable> toHashableForm() {
 		return this.messageElements.toHashableForm();
 	}
 }

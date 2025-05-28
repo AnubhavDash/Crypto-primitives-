@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
+
+import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -118,7 +120,8 @@ public class ZeroArgumentTestData {
 		final List<ZqElement> lastRow = new ArrayList<>(matrixB.getRow(n - 1));
 		lastRow.set(m - 1, matrixBLastElem.get());
 		rows.set(n - 1, lastRow);
-		final GroupMatrix<ZqElement, ZqGroup> updatedMatrixB = GroupMatrix.fromRows(rows);
+		final GroupMatrix<ZqElement, ZqGroup> updatedMatrixB = GroupMatrix.fromRows(
+				rows.stream().map(c -> c.stream().collect(toGroupVector())).collect(toGroupVector()));
 
 		// Construct the remaining parts of the statement.
 		final GroupVector<GqElement, GqGroup> commitmentsCa = CommitmentService

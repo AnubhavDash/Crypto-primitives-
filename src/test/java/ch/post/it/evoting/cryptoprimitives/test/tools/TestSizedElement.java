@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.test.tools;
 
-import java.util.List;
-
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVectorElement;
@@ -27,7 +26,7 @@ public class TestSizedElement implements GroupVectorElement<TestGroup>, Hashable
 	private final int size;
 	private final TestGroup group;
 
-	public TestSizedElement(TestGroup group, int size) {
+	public TestSizedElement(final TestGroup group, final int size) {
 		this.group = group;
 		this.size = size;
 	}
@@ -43,7 +42,7 @@ public class TestSizedElement implements GroupVectorElement<TestGroup>, Hashable
 	}
 
 	@Override
-	public List<? extends Hashable> toHashableForm() {
+	public ImmutableList<Hashable> toHashableForm() {
 		throw new UnsupportedOperationException();
 	}
 }

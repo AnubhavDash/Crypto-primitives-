@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientCiphertexts.getCiphertext;
+import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.stream.IntStream;
 
-import com.google.common.base.Preconditions;
-
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
@@ -60,11 +60,9 @@ public class ShuffleService {
 	 * @param publicKey   the public key with which to re-encrypt the ciphertexts. Must be non null.
 	 * @return a {@link Shuffle} with the result of the re-encrypting shuffle.
 	 */
-	Shuffle genShuffle(final List<ElGamalMultiRecipientCiphertext> ciphertexts, final ElGamalMultiRecipientPublicKey publicKey) {
+	Shuffle genShuffle(final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts, final ElGamalMultiRecipientPublicKey publicKey) {
 		// Input.
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = GroupVector.from(checkNotNull(ciphertexts).stream()
-				.map(Preconditions::checkNotNull)
-				.toList());
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = checkNotNull(ciphertexts);
 		final ElGamalMultiRecipientPublicKey pk = checkNotNull(publicKey);
 		final int N = C.size();
 		final int l = C.getElementSize();
@@ -86,22 +84,22 @@ public class ShuffleService {
 		final Permutation pi = this.permutationService.genPermutation(N);
 
 		final ElGamalMultiRecipientMessage one = ElGamalMultiRecipientMessages.ones(group, l);
-		final List<IntermediaryResult> intermediaryResults = IntStream.range(0, N).parallel()
+		final ImmutableList<IntermediaryResult> intermediaryResults = IntStream.range(0, N).parallel()
 				.mapToObj(i -> {
 					final ZqElement r_i = ZqElement.create(randomService.genRandomInteger(q), exponentGroup);
 					final ElGamalMultiRecipientCiphertext e = getCiphertext(one, r_i, pk);
 					final ElGamalMultiRecipientCiphertext C_i_prime = e.getCiphertextProduct(C.get(pi.get(i)));
 					return new IntermediaryResult(C_i_prime, r_i);
 				})
-				.toList();
+				.collect(toImmutableList());
 
 		// Output.
 		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C_prime = intermediaryResults.stream()
 				.map(IntermediaryResult::C_i_prime)
-				.collect(GroupVector.toGroupVector());
+				.collect(toGroupVector());
 		final GroupVector<ZqElement, ZqGroup> r = intermediaryResults.stream()
 				.map(IntermediaryResult::r_i)
-				.collect(GroupVector.toGroupVector());
+				.collect(toGroupVector());
 		return new Shuffle(C_prime, pi, r);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package ch.post.it.evoting.cryptoprimitives.utils;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+
 public interface ByteArrays {
 
 	/**
@@ -27,7 +29,7 @@ public interface ByteArrays {
 	 * @throws NullPointerException     if the given byte array is null
 	 * @throws IllegalArgumentException if the requested length is not within the required range
 	 */
-	static byte[] cutToBitLength(final byte[] byteArray, final int requestedLength) {
+	static ImmutableByteArray cutToBitLength(final ImmutableByteArray byteArray, final int requestedLength) {
 		return ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays.cutToBitLength(byteArray, requestedLength);
 	}
 }

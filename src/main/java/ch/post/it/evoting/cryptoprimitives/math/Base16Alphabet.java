@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
-import java.util.List;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 
 /**
  * The Base 16 Alphabet of "Table 5: The Base 16 Alphabet" from RFC 4648.
@@ -23,7 +23,7 @@ import java.util.List;
 public final class Base16Alphabet extends Alphabet {
 
 	private static final int SIZE = 16;
-	private static final List<String> ALPHABET = List.of(
+	private static final ImmutableList<String> ALPHABET = ImmutableList.of(
 
 			Character.toString(0x0030), // 0 (U+0030)
 			Character.toString(0x0031), // 1 (U+0031)
@@ -48,7 +48,7 @@ public final class Base16Alphabet extends Alphabet {
 
 	private static final Base16Alphabet INSTANCE = new Base16Alphabet(SIZE, ALPHABET);
 
-	private Base16Alphabet(final int size, final List<String> alphabet) {
+	private Base16Alphabet(final int size, final ImmutableList<String> alphabet) {
 		super(size, alphabet);
 	}
 

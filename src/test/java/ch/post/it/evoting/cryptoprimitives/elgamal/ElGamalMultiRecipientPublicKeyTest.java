@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class ElGamalMultiRecipientPublicKeyTest extends TestGroupSetup {
 	static Stream<Arguments> createInvalidArgumentsProvider() {
 		return Stream.of(
 				Arguments.of(null, NullPointerException.class, null),
-				Arguments.of(GroupVector.of(), IllegalArgumentException.class, "An ElGamal public key must not be empty.")
+				Arguments.of(GroupVector.empty(), IllegalArgumentException.class, "An ElGamal public key must not be empty.")
 		);
 	}
 
@@ -67,7 +67,7 @@ class ElGamalMultiRecipientPublicKeyTest extends TestGroupSetup {
 	@Test
 	@DisplayName("obtained by combining empty list of public keys")
 	void combinePublicKeysWithEmptyList() {
-		final GroupVector<ElGamalMultiRecipientPublicKey, GqGroup> emptyPkList = GroupVector.of();
+		final GroupVector<ElGamalMultiRecipientPublicKey, GqGroup> emptyPkList = GroupVector.empty();
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 				() -> ElGamalMultiRecipientPublicKeys.combinePublicKeys(emptyPkList));
 

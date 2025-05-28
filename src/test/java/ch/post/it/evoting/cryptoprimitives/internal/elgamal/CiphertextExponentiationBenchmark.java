@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
+
+import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 
 import java.math.BigInteger;
 import java.util.HexFormat;
@@ -46,7 +48,7 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 @Warmup(iterations = 0)
 public class CiphertextExponentiationBenchmark {
 	@Benchmark
-	public void ciphertextMultimodExp(CiphertextMultimodExpState state, Blackhole bh) {
+	public void ciphertextMultimodExp(final CiphertextMultimodExpState state, final Blackhole bh) {
 		bh.consume(ElGamalMultiRecipientCiphertexts.getCiphertextVectorExponentiation(state.ciphertexts, state.exponents));
 	}
 
@@ -84,16 +86,16 @@ public class CiphertextExponentiationBenchmark {
 			exponents = Stream.generate(() -> randomService.genRandomInteger(q))
 					.map(v -> ZqElement.create(v, zqGroup))
 					.limit(ciphertextCount)
-					.collect(GroupVector.toGroupVector());
+					.collect(toGroupVector());
 
 			ciphertexts = Stream.generate(() -> ElGamalMultiRecipientCiphertext.create(
 							GqElement.GqElementFactory.fromSquareRoot(randomService.genRandomInteger(q), group),
 							Stream.generate(() -> randomService.genRandomInteger(q))
 									.map(v -> GqElement.GqElementFactory.fromSquareRoot(v, group))
 									.limit(ciphertextSize)
-									.toList()))
+									.collect(toGroupVector())))
 					.limit(ciphertextCount)
-					.collect(GroupVector.toGroupVector());
+					.collect(toGroupVector());
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ public final class ZqGroup implements MathematicalGroup<ZqGroup> {
 
 	@Override
 	public boolean isGroupMember(final BigInteger value) {
-		return value != null && value.compareTo(BigInteger.ZERO) >= 0 && value.compareTo(this.q) < 0;
+		return value != null && value.signum() >= 0 && value.compareTo(this.q) < 0;
 	}
 
 	@Override

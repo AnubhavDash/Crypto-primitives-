@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 package ch.post.it.evoting.cryptoprimitives.math;
 
 import java.math.BigInteger;
-import java.util.List;
+
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 
 /**
  * Interface exposing all methods that need to be accessed outside of crypto-primitives.
@@ -50,7 +52,7 @@ public interface Random {
 	 * @param numberOfUniqueCodes n, the number of unique codes. Must be strictly positive.
 	 * @return codes &#8712; (&#120120;<sub>10</sub>)<sup>l &times; n</sup> a list of unique decimal strings.
 	 */
-	List<String> genUniqueDecimalStrings(final int desiredCodeLength, final int numberOfUniqueCodes);
+	ImmutableList<String> genUniqueDecimalStrings(final int desiredCodeLength, final int numberOfUniqueCodes);
 
 	/**
 	 * Generates a random string of length &#119897; of the given alphabet.
@@ -66,10 +68,11 @@ public interface Random {
 	String genRandomString(final int length, final Alphabet alphabet);
 
 	/**
-	 * Generates an array of {@code byteLength} random bytes.
+	 * Generates an immutable array of {@code byteLength} random bytes.
 	 *
 	 * @param byteLength The number of bytes to generate.
-	 * @return An array of {@code byteLength} random bytes.
+	 * @return An immutable array of {@code byteLength} random bytes.
+	 * @throws IllegalArgumentException if {@code byteLength} is negative.
 	 */
-	byte[] randomBytes(final int byteLength);
+	ImmutableByteArray randomBytes(final int byteLength);
 }

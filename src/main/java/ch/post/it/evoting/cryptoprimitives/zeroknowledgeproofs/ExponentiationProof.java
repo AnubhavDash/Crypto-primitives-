@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
 import java.util.Objects;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVectorElement;
@@ -84,7 +84,7 @@ public final class ExponentiationProof implements GroupVectorElement<ZqGroup>, H
 	}
 
 	@Override
-	public List<Hashable> toHashableForm() {
-		return List.of(e, z);
+	public ImmutableList<Hashable> toHashableForm() {
+		return ImmutableList.of(e, z);
 	}
 }

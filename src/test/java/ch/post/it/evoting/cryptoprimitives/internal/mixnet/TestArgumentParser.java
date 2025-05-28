@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,9 @@ package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toList;
 
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.StreamSupport;
 
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
@@ -131,6 +129,7 @@ class TestArgumentParser {
 				.build();
 	}
 
+	@SuppressWarnings("java:S117")
 	MultiExponentiationArgument parseMultiExponentiationArgument(final JsonData multiExpArgumentData) {
 		final BigInteger cA0Value = multiExpArgumentData.get("c_a_0", BigInteger.class);
 		final BigInteger[] cBValues = multiExpArgumentData.get("c_b", BigInteger[].class);
@@ -189,9 +188,9 @@ class TestArgumentParser {
 		final BigInteger[] phisValues = ciphertextData.get("phis", BigInteger[].class);
 
 		final GqElement gamma = GqElementFactory.fromValue(gammaValue, gqGroup);
-		final List<GqElement> phis = Arrays.stream(phisValues)
+		final GroupVector<GqElement, GqGroup> phis = Arrays.stream(phisValues)
 				.map(bi -> GqElementFactory.fromValue(bi, gqGroup))
-				.toList();
+				.collect(toGroupVector());
 
 		return ElGamalMultiRecipientCiphertext.create(gamma, phis);
 	}
@@ -213,7 +212,7 @@ class TestArgumentParser {
 
 		return StreamSupport.stream(ciphertextDataMatrix.jsonNode().spliterator(), false)
 				.map(node -> parseCiphertextVector(new JsonData(node)))
-				.collect(collectingAndThen(toList(), GroupMatrix::fromRows));
+				.collect(collectingAndThen(toGroupVector(), GroupMatrix::fromRows));
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
  */
 package ch.post.it.evoting.cryptoprimitives.utils;
 
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToString;
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.integerToByteArray;
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.integerToString;
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.stringToByteArray;
-import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.stringToInteger;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static ch.post.it.evoting.cryptoprimitives.utils.Conversions.byteArrayToInteger;
+import static ch.post.it.evoting.cryptoprimitives.utils.Conversions.byteArrayToString;
+import static ch.post.it.evoting.cryptoprimitives.utils.Conversions.integerToByteArray;
+import static ch.post.it.evoting.cryptoprimitives.utils.Conversions.integerToFixedLengthByteArray;
+import static ch.post.it.evoting.cryptoprimitives.utils.Conversions.integerToString;
+import static ch.post.it.evoting.cryptoprimitives.utils.Conversions.stringToByteArray;
+import static ch.post.it.evoting.cryptoprimitives.utils.Conversions.stringToInteger;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,6 +39,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
 
@@ -54,33 +56,79 @@ class ConversionsTest {
 		}
 
 		@Test
-		void testConversionOfZeroBigIntegerIsOneZeroByte() {
+		void testConversionOfZeroBigIntegerIsEmptyByte() {
 			final BigInteger zero = BigInteger.ZERO;
-			final byte[] expected = new byte[] { 0 };
-			final byte[] converted = integerToByteArray(zero);
-			assertArrayEquals(expected, converted);
+			final ImmutableByteArray expected = ImmutableByteArray.EMPTY;
+			final ImmutableByteArray converted = integerToByteArray(zero);
+			assertEquals(expected, converted);
 		}
 
 		@Test
 		void testConversionOf256BigIntegerIsTwoBytes() {
 			final BigInteger value = BigInteger.valueOf(256);
-			final byte[] expected = new byte[] { 1, 0 };
-			final byte[] converted = integerToByteArray(value);
-			assertArrayEquals(expected, converted);
+			final ImmutableByteArray expected = ImmutableByteArray.of((byte) 1, (byte) 0);
+			final ImmutableByteArray converted = integerToByteArray(value);
+			assertEquals(expected, converted);
 		}
 
 		@Test
 		void testConversionOfIntegerMaxValuePlusOneIsCorrect() {
 			final BigInteger value = BigInteger.valueOf(Integer.MAX_VALUE).add(BigInteger.ONE);
-			final byte[] expected = new byte[] { (byte) 0b10000000, 0, 0, 0 };
-			final byte[] converted = integerToByteArray(value);
-			assertArrayEquals(expected, converted);
+			final ImmutableByteArray expected = ImmutableByteArray.of((byte) 0b10000000, (byte) 0, (byte) 0, (byte) 0);
+			final ImmutableByteArray converted = integerToByteArray(value);
+			assertEquals(expected, converted);
 		}
 
 		@Test
 		void testOfNegativeIntegerThrows() {
 			final BigInteger value = BigInteger.valueOf(-1);
 			assertThrows(IllegalArgumentException.class, () -> integerToByteArray(value));
+		}
+	}
+
+	@Nested
+	@DisplayName("Test BigInteger to byte array conversion")
+	class IntegerToFixedLengthByteArrayTest {
+		@Test
+		void testConversionOfNullBigIntegerToByteArrayThrows() {
+			assertThrows(NullPointerException.class, () -> integerToFixedLengthByteArray(null, 1));
+		}
+
+		@Test
+		void testConversionOfZeroBigIntegerIsEmptyByte() {
+			final BigInteger zero = BigInteger.ZERO;
+			final ImmutableByteArray expected = ImmutableByteArray.EMPTY;
+			final ImmutableByteArray converted = integerToFixedLengthByteArray(zero, 0);
+			assertEquals(expected, converted);
+		}
+
+		@Test
+		void testConversionOf256BigIntegerWithLengthOneThrows() {
+			final BigInteger value = BigInteger.valueOf(256);
+			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> integerToFixedLengthByteArray(value, 1));
+			assertEquals("The desired length n must be greater than or equal to the byte length of x.", exception.getMessage());
+		}
+
+		@Test
+		void testConversionOf256BigIntegerWithLengthThreeIsThreeBytes() {
+			final BigInteger value = BigInteger.valueOf(256);
+			final ImmutableByteArray expected = ImmutableByteArray.of((byte) 0, (byte) 1, (byte) 0);
+			final ImmutableByteArray converted = integerToFixedLengthByteArray(value, 3);
+			assertEquals(expected, converted);
+		}
+
+		@Test
+		void testConversionOfIntegerMaxValuePlusOneIsCorrect() {
+			final BigInteger value = BigInteger.valueOf(Integer.MAX_VALUE).add(BigInteger.ONE);
+			final ImmutableByteArray expected = ImmutableByteArray.of((byte) 0b10000000, (byte) 0, (byte) 0, (byte) 0);
+			final ImmutableByteArray converted = integerToFixedLengthByteArray(value, expected.length());
+			assertEquals(expected, converted);
+		}
+
+		@Test
+		void testOfNegativeIntegerThrows() {
+			final BigInteger value = BigInteger.valueOf(-1);
+			assertThrows(IllegalArgumentException.class, () -> integerToFixedLengthByteArray(value, 0));
 		}
 	}
 
@@ -93,23 +141,21 @@ class ConversionsTest {
 		}
 
 		@Test
-		void testConversionOfEmptyByteArrayToBigIntegerThrows() {
-			final IllegalArgumentException illegalArgumentException =
-					assertThrows(IllegalArgumentException.class, () -> byteArrayToInteger(new byte[] {}));
-
-			assertEquals("The byte array to convert must be non-empty.", illegalArgumentException.getMessage());
+		void testConversionOfEmptyByteArrayToBigIntegerIsZero() {
+			final BigInteger result = assertDoesNotThrow(() -> byteArrayToInteger(ImmutableByteArray.EMPTY));
+			assertEquals(BigInteger.ZERO, result);
 		}
 
 		@Test
 		void testConversionOfByteArrayWithLeading1ToBigIntegerIsPositive() {
-			final byte[] bytes = new byte[] { (byte) 0x80 };
+			final ImmutableByteArray bytes = ImmutableByteArray.of((byte) 0x80);
 			final BigInteger converted = byteArrayToInteger(bytes);
-			assertTrue(converted.compareTo(BigInteger.ZERO) > 0);
+			assertTrue(converted.signum() > 0);
 		}
 
 		@Test
 		void testConversionOf256ByteArrayRepresentationIs256() {
-			final byte[] bytes = new byte[] { 1, 0 };
+			final ImmutableByteArray bytes = ImmutableByteArray.of((byte) 1, (byte) 0);
 			final BigInteger converted = byteArrayToInteger(bytes);
 			assertEquals(0, converted.compareTo(BigInteger.valueOf(256)));
 		}
@@ -235,6 +281,12 @@ class ConversionsTest {
 			assertThrows(NullPointerException.class, () -> stringToByteArray(null));
 		}
 
+		@Test
+		void testConversionOfEmptyStringToByteArrayGivesEmptyByteArray() {
+			final ImmutableByteArray result = assertDoesNotThrow(() -> stringToByteArray(""));
+			assertEquals(ImmutableByteArray.EMPTY, result);
+		}
+
 		Stream<String> invalidUTF8Strings() {
 			return Stream.of(
 					"\uD8E5",
@@ -252,8 +304,8 @@ class ConversionsTest {
 
 		@Test
 		void testConversionWithSpecificStringReturnsExpectedValue() {
-			final byte[] expected = new byte[] { -30, -126, -84 };
-			assertArrayEquals(expected, stringToByteArray("€"));
+			final ImmutableByteArray expected = ImmutableByteArray.of((byte) -30, (byte) -126, (byte) -84);
+			assertEquals(expected, stringToByteArray("€"));
 		}
 	}
 
@@ -267,22 +319,21 @@ class ConversionsTest {
 		}
 
 		@Test
-		void testConversionOfZeroLengthByteArrayToStringThrows() {
-			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> byteArrayToString(new byte[] {}));
-			assertEquals("The length of the byte array must be strictly positive.", exception.getMessage());
+		void testConversionOfZeroLengthByteArrayToStringGivesEmptyString() {
+			final String result = assertDoesNotThrow(() -> byteArrayToString(ImmutableByteArray.EMPTY));
+			assertEquals("", result);
 		}
 
-		Stream<byte[]> invalidUTF8ByteArrays() {
+		Stream<ImmutableByteArray> invalidUTF8ByteArrays() {
 			return Stream.of(
-					new byte[] { -37, -10 },
-					new byte[] { -50, -29, 48 },
-					new byte[] { 107, -93, 75, 41 }
-			);
+					ImmutableByteArray.of((byte) -37, (byte) -10),
+					ImmutableByteArray.of((byte) -50, (byte) -29, (byte) 48),
+					ImmutableByteArray.of((byte) 107, (byte) -93, (byte) 75, (byte) 41));
 		}
 
 		@ParameterizedTest(name = "byteArray = \"{0}\"")
 		@MethodSource("invalidUTF8ByteArrays")
-		void testConversionOfInvalidUTF8ByteArrayToStringThrows(final byte[] byteArray) {
+		void testConversionOfInvalidUTF8ByteArrayToStringThrows(final ImmutableByteArray byteArray) {
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> byteArrayToString(byteArray));
 			assertEquals("The byte array does not correspond to a valid sequence of UTF-8 encoding.", exception.getMessage());
 		}
@@ -290,7 +341,7 @@ class ConversionsTest {
 		@Test
 		void testConversionWithSpecificByteArrayReturnsExpectedValue() {
 			final String expected = "€";
-			assertEquals(expected, byteArrayToString(new byte[] { -30, -126, -84 }));
+			assertEquals(expected, byteArrayToString(ImmutableByteArray.of((byte) -30, (byte) -126, (byte) -84)));
 		}
 
 	}
@@ -303,7 +354,7 @@ class ConversionsTest {
 		@RepeatedTest(10)
 		void testRandomStringToByteArrayAndBackIsOriginalValue() {
 			final String value = randomService.genRandomString(randomService.genRandomInteger(10) + 1, Base64Alphabet.getInstance());
-			final byte[] bytes = stringToByteArray(value);
+			final ImmutableByteArray bytes = stringToByteArray(value);
 			final String cycledValue = byteArrayToString(bytes);
 			assertEquals(value, cycledValue);
 		}

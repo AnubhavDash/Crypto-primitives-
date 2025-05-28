@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,11 +83,8 @@ public final class MixnetService implements Mixnet {
 	@Override
 	public VerifiableShuffle genVerifiableShuffle(final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> inputCiphertexts,
 			final ElGamalMultiRecipientPublicKey publicKey) {
-		checkNotNull(inputCiphertexts);
-		checkNotNull(publicKey);
-
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = GroupVector.from(inputCiphertexts);
-		final ElGamalMultiRecipientPublicKey pk = publicKey;
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = checkNotNull(inputCiphertexts);
+		final ElGamalMultiRecipientPublicKey pk = checkNotNull(publicKey);
 		final int N = C.size();
 		final int l = C.getElementSize();
 		final int k = pk.size();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Objects;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
@@ -83,7 +83,7 @@ public final class GqGroup implements MathematicalGroup<GqGroup>, HashableList {
 
 		//Validate q
 		checkArgument(millerRabin(q, lambda / 2), "Group Gq parameter q must be prime");
-		checkArgument(q.compareTo(BigInteger.ZERO) > 0);
+		checkArgument(q.signum() > 0);
 		checkArgument(q.compareTo(p) < 0);
 		final BigInteger computedP = q.multiply(BigInteger.TWO).add(BigInteger.ONE);
 		checkArgument(computedP.equals(p), "Group Gq parameter p must be equal to 2q + 1");
@@ -105,7 +105,7 @@ public final class GqGroup implements MathematicalGroup<GqGroup>, HashableList {
 	@Override
 	public boolean isGroupMember(final BigInteger value) {
 		return value != null &&
-				value.compareTo(BigInteger.ZERO) > 0 &&
+				value.signum() > 0 &&
 				value.compareTo(this.p) < 0 &&
 				BigIntegerOperationsService.getLegendre(value, this.p) == 1;
 	}
@@ -151,7 +151,7 @@ public final class GqGroup implements MathematicalGroup<GqGroup>, HashableList {
 	}
 
 	@Override
-	public List<? extends Hashable> toHashableForm() {
-		return List.of(HashableBigInteger.from(p), HashableBigInteger.from(q), generator);
+	public ImmutableList<Hashable> toHashableForm() {
+		return ImmutableList.of(HashableBigInteger.from(p), HashableBigInteger.from(q), generator);
 	}
 }

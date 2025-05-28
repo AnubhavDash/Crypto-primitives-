@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
+import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -62,7 +63,7 @@ public class ElGamalMultiRecipientMessages {
 
 		return Stream.generate(() -> constant)
 				.limit(size)
-				.collect(collectingAndThen(GroupVector.toGroupVector(), ElGamalMultiRecipientMessage::new));
+				.collect(collectingAndThen(toGroupVector(), ElGamalMultiRecipientMessage::new));
 	}
 
 	/**
@@ -91,7 +92,7 @@ public class ElGamalMultiRecipientMessages {
 		// Algorithm.
 		final GroupVector<GqElement, GqGroup> messageElements = indices
 				.mapToObj(i -> c.get(i).multiply(gamma.exponentiate(sk.get(i).negate())))
-				.collect(GroupVector.toGroupVector());
+				.collect(toGroupVector());
 
 		return new ElGamalMultiRecipientMessage(messageElements);
 	}

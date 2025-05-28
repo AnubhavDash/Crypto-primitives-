@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.stream.Stream;
@@ -26,6 +25,8 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 
 class Base16ServiceTest {
 
@@ -40,24 +41,23 @@ class Base16ServiceTest {
 
 	private static Stream<Arguments> getInputsAndOutputs() {
 		return Stream.of(
-				Arguments.of(new byte[] {}, ""),
-				Arguments.of(new byte[] { 65 }, "41"),
-				Arguments.of(new byte[] { 96 }, "60"),
-				Arguments.of(new byte[] { 0 }, "00"),
-				Arguments.of(new byte[] { 127 }, "7F"),
-				Arguments.of(new byte[] { -128 }, "80"),
-				Arguments.of(new byte[] { -1 }, "FF"),
-				Arguments.of(new byte[] { 65, 0 }, "4100"),
-				Arguments.of(new byte[] { 1, 1, 1 }, "010101"),
-				Arguments.of(new byte[] { 127, 0, -2, 3 }, "7F00FE03")
-
+				Arguments.of(ImmutableByteArray.EMPTY, ""),
+				Arguments.of(ImmutableByteArray.of((byte) 65), "41"),
+				Arguments.of(ImmutableByteArray.of((byte) 96), "60"),
+				Arguments.of(ImmutableByteArray.of((byte) 0), "00"),
+				Arguments.of(ImmutableByteArray.of((byte) 127), "7F"),
+				Arguments.of(ImmutableByteArray.of((byte) -128), "80"),
+				Arguments.of(ImmutableByteArray.of((byte) -1), "FF"),
+				Arguments.of(ImmutableByteArray.of((byte) 65, (byte) 0), "4100"),
+				Arguments.of(ImmutableByteArray.of((byte) 1, (byte) 1, (byte) 1), "010101"),
+				Arguments.of(ImmutableByteArray.of((byte) 127, (byte) 0, (byte) -2, (byte) 3), "7F00FE03")
 		);
 	}
 
 	@ParameterizedTest
 	@MethodSource("getInputsAndOutputs")
 	@DisplayName("base16Encode with valid input gives expected output")
-	void base16EncodeWithValidInputGivesExpectedResult(final byte[] input, final String expectedOutput) {
+	void base16EncodeWithValidInputGivesExpectedResult(final ImmutableByteArray input, final String expectedOutput) {
 		final String result = base16Service.base16Encode(input);
 
 		assertEquals(expectedOutput, result);
@@ -66,19 +66,19 @@ class Base16ServiceTest {
 	@ParameterizedTest
 	@MethodSource("getInputsAndOutputs")
 	@DisplayName("base16Decode with valid inputs gives expected output")
-	void base16DecodeWithValidInputGivesExpectedResult(final byte[] expectedOutput, final String input) {
-		final byte[] result = base16Service.base16Decode(input);
+	void base16DecodeWithValidInputGivesExpectedResult(final ImmutableByteArray expectedOutput, final String input) {
+		final ImmutableByteArray result = base16Service.base16Decode(input);
 
-		assertArrayEquals(expectedOutput, result);
+		assertEquals(expectedOutput, result);
 	}
 
 	@RepeatedTest(10)
 	@DisplayName("base16Encode then base16Decode returns initial value")
 	void base16EncodeThenBase16DecodeReturnsInitialValue() {
-		final byte[] randomBytes = randomService.randomBytes(16);
+		final ImmutableByteArray randomBytes = randomService.randomBytes(16);
 
 		final String string = base16Service.base16Encode(randomBytes);
-		final byte[] result = base16Service.base16Decode(string);
-		assertArrayEquals(randomBytes, result);
+		final ImmutableByteArray result = base16Service.base16Decode(string);
+		assertEquals(randomBytes, result);
 	}
 }

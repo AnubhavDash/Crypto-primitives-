@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hash;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
@@ -49,7 +50,7 @@ public class SignatureGenerationService implements SignatureGeneration {
 	 * See {@link SignatureGeneration#genSignature}
 	 */
 	@Override
-	public byte[] genSignature(final Hashable message, final Hashable additionalContextData) throws SignatureException {
+	public ImmutableByteArray genSignature(final Hashable message, final Hashable additionalContextData) throws SignatureException {
 		checkNotNull(message);
 		checkNotNull(additionalContextData);
 
@@ -60,7 +61,7 @@ public class SignatureGenerationService implements SignatureGeneration {
 		final Instant validFrom = certificate.getNotBefore().toInstant();
 		final Instant validUntil = certificate.getNotAfter().toInstant();
 		if (validFrom.compareTo(t) <= 0 && t.compareTo(validUntil) < 0) {
-			final byte[] h = hash.recursiveHash(HashableList.of(m, c));
+			final ImmutableByteArray h = hash.recursiveHash(HashableList.of(m, c));
 			return signatureSupportingAlgorithm.sign(privKey, h);
 		} else {
 			final String errorMessage = String.format(

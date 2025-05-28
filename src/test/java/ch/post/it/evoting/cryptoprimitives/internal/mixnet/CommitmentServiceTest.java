@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,14 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
+import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +31,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -89,7 +88,7 @@ class CommitmentServiceTest {
 		@Test
 		@DisplayName("with empty list of values to commit to does not throw")
 		void getCommitmentOfEmptyList() {
-			final GroupVector<ZqElement, ZqGroup> values = GroupVector.of();
+			final GroupVector<ZqElement, ZqGroup> values = GroupVector.empty();
 			assertThrows(IllegalArgumentException.class, () -> CommitmentService.getCommitment(values, randomValue, validCommitmentKey));
 		}
 
@@ -98,12 +97,13 @@ class CommitmentServiceTest {
 		void withEmptyListResultIsMultiModExpWithPadding() {
 			final GroupVector<ZqElement, ZqGroup> values = Stream.generate(() -> ZqElement.create(BigInteger.ZERO, zqGroup))
 					.limit(KEY_LENGTH)
-					.collect(GroupVector.toGroupVector());
-			final List<BigInteger> aPrime = Stream.generate(() -> BigInteger.ZERO).limit(KEY_LENGTH).collect(Collectors.toList());
-			aPrime.add(0, randomValue.getValue());
+					.collect(toGroupVector());
+			final ImmutableList<BigInteger> aPrime = Stream.concat(
+							Stream.of(randomValue.getValue()),
+							Stream.generate(() -> BigInteger.ZERO).limit(KEY_LENGTH))
+					.collect(toImmutableList());
 			final BigInteger expected = BigIntegerOperationsService.multiModExp(
-					validCommitmentKey.stream().map(GqElement::getValue)
-							.collect(Collectors.toList()),
+					validCommitmentKey.stream().map(GqElement::getValue).collect(toImmutableList()),
 					aPrime,
 					gqGroup.getP());
 			assertEquals(expected, CommitmentService.getCommitment(values, randomValue, validCommitmentKey).getValue());
@@ -147,7 +147,7 @@ class CommitmentServiceTest {
 			final CommitmentKey longerCommitmentKey = ckGenerator.genCommitmentKey(2 * KEY_LENGTH);
 			final CommitmentKey exactCommitmentKey =
 					new CommitmentKey(longerCommitmentKey.stream().limit(1).toList().get(0),
-							longerCommitmentKey.stream().skip(1).limit(KEY_LENGTH).collect(GroupVector.toGroupVector()));
+							longerCommitmentKey.stream().skip(1).limit(KEY_LENGTH).collect(toGroupVector()));
 			final GqElement commitmentExactCK = CommitmentService.getCommitment(validElements, randomValue, exactCommitmentKey);
 			final GqElement commitmentLongerCK = CommitmentService.getCommitment(validElements, randomValue, longerCommitmentKey);
 			assertEquals(commitmentExactCK, commitmentLongerCK);
@@ -160,21 +160,23 @@ class CommitmentServiceTest {
 			final GqGroup specificGqGroup = new GqGroup(BigInteger.valueOf(23), BigInteger.valueOf(11), BigInteger.valueOf(6));
 			final ZqGroup specificZqGroup = ZqGroup.sameOrderAs(specificGqGroup);
 			// a = (2, 10)
-			final List<ZqElement> a = new ArrayList<>();
-			a.add(ZqElement.create(BigInteger.TWO, specificZqGroup));
-			a.add(ZqElement.create(BigInteger.TEN, specificZqGroup));
+			final GroupVector<ZqElement, ZqGroup> a = GroupVector.of(
+					ZqElement.create(BigInteger.TWO, specificZqGroup),
+					ZqElement.create(BigInteger.TEN, specificZqGroup)
+			);
 			// r = 5
 			final ZqElement r = ZqElement.create(BigInteger.valueOf(5), specificZqGroup);
 			// ck = (2, 3, 4)
-			final List<GqElement> gElements = new ArrayList<>(2);
 			final GqElement h = GqElementFactory.fromValue(BigInteger.TWO, specificGqGroup);
-			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup));
-			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(4), specificGqGroup));
-			final CommitmentKey ck = new CommitmentKey(h, GroupVector.from(gElements));
+			final GroupVector<GqElement, GqGroup> gElements = GroupVector.of(
+					GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup),
+					GqElementFactory.fromValue(BigInteger.valueOf(4), specificGqGroup)
+			);
+			final CommitmentKey ck = new CommitmentKey(h, gElements);
 			// c = 3
 			final GqElement expected = GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup);
 
-			assertEquals(expected, CommitmentService.getCommitment(GroupVector.from(a), r, ck));
+			assertEquals(expected, CommitmentService.getCommitment(a, r, ck));
 		}
 	}
 
@@ -253,7 +255,7 @@ class CommitmentServiceTest {
 			final CommitmentKey longerCommitmentKey = ckGenerator.genCommitmentKey(2 * n);
 			final CommitmentKey exactCommitmentKey =
 					new CommitmentKey(longerCommitmentKey.stream().limit(1).toList().get(0),
-							longerCommitmentKey.stream().skip(1).limit(KEY_LENGTH).collect(GroupVector.toGroupVector()));
+							longerCommitmentKey.stream().skip(1).limit(KEY_LENGTH).collect(toGroupVector()));
 			final GroupVector<GqElement, GqGroup> commitmentExactCK = CommitmentService
 					.getCommitmentMatrix(validMatrix, validRandomValues, exactCommitmentKey);
 			final GroupVector<GqElement, GqGroup> commitmentLongerCK = CommitmentService
@@ -267,32 +269,34 @@ class CommitmentServiceTest {
 			final GqGroup specificGqGroup = new GqGroup(BigInteger.valueOf(23), BigInteger.valueOf(11), BigInteger.valueOf(6));
 			final ZqGroup specificZqGroup = ZqGroup.sameOrderAs(specificGqGroup);
 			// a0 = (2, 10)
-			final List<ZqElement> a0 = new ArrayList<>(2);
-			a0.add(ZqElement.create(BigInteger.TWO, specificZqGroup));
-			a0.add(ZqElement.create(BigInteger.TEN, specificZqGroup));
+			final GroupVector<ZqElement, ZqGroup> a0 = GroupVector.of(
+					ZqElement.create(BigInteger.TWO, specificZqGroup),
+					ZqElement.create(BigInteger.TEN, specificZqGroup));
 			// a1 = (3, 4)
-			final List<ZqElement> a1 = new ArrayList<>(2);
-			a1.add(ZqElement.create(BigInteger.valueOf(8), specificZqGroup));
-			a1.add(ZqElement.create(BigInteger.valueOf(9), specificZqGroup));
+			final GroupVector<ZqElement, ZqGroup> a1 = GroupVector.of(
+					ZqElement.create(BigInteger.valueOf(8), specificZqGroup),
+					ZqElement.create(BigInteger.valueOf(9), specificZqGroup));
 			// a = (a0, a1)
-			final GroupMatrix<ZqElement, ZqGroup> a = GroupMatrix.fromColumns(Arrays.asList(a0, a1));
+			final GroupMatrix<ZqElement, ZqGroup> a = GroupMatrix.fromColumns(GroupVector.of(a0, a1));
 			// r = (5, 8)
-			final List<ZqElement> rValues = new ArrayList<>(2);
-			rValues.add(ZqElement.create(BigInteger.valueOf(5), specificZqGroup));
-			rValues.add(ZqElement.create(BigInteger.valueOf(8), specificZqGroup));
-			final GroupVector<ZqElement, ZqGroup> r = GroupVector.from(rValues);
+			final GroupVector<ZqElement, ZqGroup> r = GroupVector.of(
+					ZqElement.create(BigInteger.valueOf(5), specificZqGroup),
+					ZqElement.create(BigInteger.valueOf(8), specificZqGroup)
+			);
 			// ck = (2, 3, 4)
-			final List<GqElement> gElements = new ArrayList<>();
+			final GroupVector<GqElement, GqGroup> gElements = GroupVector.of(
+					GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup),
+					GqElementFactory.fromValue(BigInteger.valueOf(4), specificGqGroup)
+			);
 			final GqElement h = GqElementFactory.fromValue(BigInteger.TWO, specificGqGroup);
-			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup));
-			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(4), specificGqGroup));
-			final CommitmentKey ck = new CommitmentKey(h, GroupVector.from(gElements));
+			final CommitmentKey ck = new CommitmentKey(h, gElements);
 			// c = (3, 4)
-			final List<GqElement> expected = new ArrayList<>(2);
-			expected.add(GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup));
-			expected.add(GqElementFactory.fromValue(BigInteger.valueOf(4), specificGqGroup));
+			final GroupVector<GqElement, GqGroup> expected = GroupVector.of(
+					GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup),
+					GqElementFactory.fromValue(BigInteger.valueOf(4), specificGqGroup)
+			);
 
-			assertEquals(GroupVector.from(expected), CommitmentService.getCommitmentMatrix(a, r, ck));
+			assertEquals(expected, CommitmentService.getCommitmentMatrix(a, r, ck));
 		}
 	}
 
@@ -369,7 +373,7 @@ class CommitmentServiceTest {
 			final CommitmentKey longerCommitmentKey = ckGenerator.genCommitmentKey(2 * KEY_LENGTH);
 			final CommitmentKey exactCommitmentKey =
 					new CommitmentKey(longerCommitmentKey.stream().limit(1).toList().get(0),
-							longerCommitmentKey.stream().skip(1).limit(KEY_LENGTH).collect(GroupVector.toGroupVector()));
+							longerCommitmentKey.stream().skip(1).limit(KEY_LENGTH).collect(toGroupVector()));
 			final GroupVector<GqElement, GqGroup> commitmentExactCK = CommitmentService
 					.getCommitmentVector(validElements, validRandomElements, exactCommitmentKey);
 			final GroupVector<GqElement, GqGroup> commitmentLongerCK = CommitmentService
@@ -384,29 +388,32 @@ class CommitmentServiceTest {
 			final GqGroup specificGqGroup = new GqGroup(BigInteger.valueOf(23), BigInteger.valueOf(11), BigInteger.valueOf(6));
 			final ZqGroup specificZqGroup = ZqGroup.sameOrderAs(specificGqGroup);
 			// a = (2, 10, 8)
-			final List<ZqElement> a = new ArrayList<>(3);
-			a.add(ZqElement.create(BigInteger.TWO, specificZqGroup));
-			a.add(ZqElement.create(BigInteger.TEN, specificZqGroup));
-			a.add(ZqElement.create(BigInteger.valueOf(8), specificZqGroup));
+			final ImmutableList<ZqElement> a = ImmutableList.of(
+					ZqElement.create(BigInteger.TWO, specificZqGroup),
+					ZqElement.create(BigInteger.TEN, specificZqGroup),
+					ZqElement.create(BigInteger.valueOf(8), specificZqGroup)
+			);
 			// r = (5, 8, 3)
-			final List<ZqElement> r = new ArrayList<>(3);
-			r.add(ZqElement.create(BigInteger.valueOf(5), specificZqGroup));
-			r.add(ZqElement.create(BigInteger.valueOf(8), specificZqGroup));
-			r.add(ZqElement.create(BigInteger.valueOf(3), specificZqGroup));
+			final ImmutableList<ZqElement> r = ImmutableList.of(
+					ZqElement.create(BigInteger.valueOf(5), specificZqGroup),
+					ZqElement.create(BigInteger.valueOf(8), specificZqGroup),
+					ZqElement.create(BigInteger.valueOf(3), specificZqGroup)
+			);
 			// ck = (2, 3, 8)
-			final List<GqElement> gElements = new ArrayList<>(3);
 			final GqElement h = GqElementFactory.fromValue(BigInteger.TWO, specificGqGroup);
-			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup));
-			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(8), specificGqGroup));
+			final ImmutableList<GqElement> gElements = ImmutableList.of(
+					GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup),
+					GqElementFactory.fromValue(BigInteger.valueOf(8), specificGqGroup)
+			);
 			final CommitmentKey ck = new CommitmentKey(h, GroupVector.from(gElements));
 			// c = (12, 1, 2)
-			final List<GqElement> expected = new ArrayList<>(3);
-			expected.add(GqElementFactory.fromValue(BigInteger.valueOf(12), specificGqGroup));
-			expected.add(GqElementFactory.fromValue(BigInteger.ONE, specificGqGroup));
-			expected.add(GqElementFactory.fromValue(BigInteger.TWO, specificGqGroup));
+			final ImmutableList<GqElement> expected = ImmutableList.of(
+					GqElementFactory.fromValue(BigInteger.valueOf(12), specificGqGroup),
+					GqElementFactory.fromValue(BigInteger.ONE, specificGqGroup),
+					GqElementFactory.fromValue(BigInteger.TWO, specificGqGroup)
+			);
 
-			assertEquals(GroupVector.from(expected),
-					CommitmentService.getCommitmentVector(GroupVector.from(a), GroupVector.from(r), ck));
+			assertEquals(GroupVector.from(expected), CommitmentService.getCommitmentVector(GroupVector.from(a), GroupVector.from(r), ck));
 		}
 	}
 }

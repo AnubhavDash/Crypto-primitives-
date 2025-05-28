@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.hashing;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray.concat;
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.integerToByteArray;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.stringToByteArray;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.primitives.Bytes.concat;
 
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Stream;
 
 import org.bouncycastle.crypto.digests.SHAKEDigest;
@@ -32,12 +32,12 @@ import org.bouncycastle.crypto.digests.SHAKEDigest;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Streams;
-import com.google.common.primitives.Bytes;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hash;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
-import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.HashFunction;
@@ -60,11 +60,10 @@ public class HashService implements Hash {
 	private static final HashService INSTANCE = new HashService(SecurityLevelConfig.getSystemSecurityLevel().getRecursiveHashHashFunction(),
 			SecurityLevelConfig.getSystemSecurityLevel().getRecursiveHashToZqXOF());
 
-	private static final byte[] BYTE_ARRAY_PREFIX = new byte[] { 0x00 };
-	private static final byte[] BIG_INTEGER_PREFIX = new byte[] { 0x01 };
-	private static final byte[] STRING_PREFIX = new byte[] { 0x02 };
-
-	private static final byte[] ARRAY_PREFIX = new byte[] { 0x03 };
+	private static final ImmutableByteArray BYTE_ARRAY_PREFIX = ImmutableByteArray.of((byte) 0x00);
+	private static final ImmutableByteArray BIG_INTEGER_PREFIX = ImmutableByteArray.of((byte) 0x01);
+	private static final ImmutableByteArray STRING_PREFIX = ImmutableByteArray.of((byte) 0x02);
+	private static final ImmutableByteArray ARRAY_PREFIX = ImmutableByteArray.of((byte) 0x03);
 
 	private static final String NO_VALUES = "Cannot hash no values.";
 	private final HashFunction hashFunction;
@@ -84,41 +83,38 @@ public class HashService implements Hash {
 	 * See {@link Hash#recursiveHash}
 	 */
 	@Override
-	public byte[] recursiveHash(final Hashable... values) {
-		checkNotNull(values);
-		Arrays.stream(values).forEach(Preconditions::checkNotNull);
-		checkArgument(values.length != 0, NO_VALUES);
+	public ImmutableByteArray recursiveHash(final Hashable... values) {
+		final ImmutableList<Hashable> v = Arrays.stream(checkNotNull(values))
+				.map(Preconditions::checkNotNull)
+				.collect(toImmutableList());
+		checkArgument(!v.isEmpty(), NO_VALUES);
 
-		if (values.length > 1) {
-			final HashableList v = HashableList.from(List.of(values));
-			return recursiveHash(v);
+		if (v.size() > 1) {
+			return recursiveHash(HashableList.from(v));
 		} else {
-			final Hashable value = values[0];
+			final Hashable value = v.get(0);
 
 			switch (value) {
-			case HashableByteArray hashableByteArray -> {
-				final byte[] w = hashableByteArray.toHashableForm();
+			case final ImmutableByteArray w -> {
 				return hashFunction.hash(concat(BYTE_ARRAY_PREFIX, w));
 			}
-			case HashableBigInteger hashableBigInteger -> {
+			case final HashableBigInteger hashableBigInteger -> {
 				final BigInteger w = hashableBigInteger.toHashableForm();
-				checkArgument(w.compareTo(BigInteger.ZERO) >= 0);
+				checkArgument(w.signum() >= 0);
 				return hashFunction.hash(concat(BIG_INTEGER_PREFIX, integerToByteArray(w)));
 			}
-			case HashableString hashableString -> {
+			case final HashableString hashableString -> {
 				final String w = hashableString.toHashableForm();
 				return hashFunction.hash(concat(STRING_PREFIX, stringToByteArray(w)));
 			}
-			case HashableList hashableList -> {
-				final List<? extends Hashable> w = hashableList.toHashableForm();
-				return hashFunction.hash(
-						concat(
-								Stream.concat(
-										Stream.of(ARRAY_PREFIX),
-										w.stream().parallel().map(this::recursiveHash)
-								).toArray(byte[][]::new)
-						)
-				);
+			case final HashableList hashableList -> {
+				final ImmutableList<? extends Hashable> w = hashableList.toHashableForm();
+				return hashFunction.hash(concat(
+						Stream.concat(
+								Stream.of(ARRAY_PREFIX),
+								w.stream().parallel().map(this::recursiveHash)
+						).toArray(ImmutableByteArray[]::new)
+				));
 			}
 			default -> throw new IllegalArgumentException(String.format("Object of type %s cannot be hashed.", value.getClass()));
 			}
@@ -160,7 +156,7 @@ public class HashService implements Hash {
 		final BigInteger q = exclusiveUpperBound;
 		final Hashable[] v = values;
 		checkArgument(k > 0, NO_VALUES);
-		checkArgument(q.compareTo(BigInteger.ZERO) > 0, "The upper bound must be strictly positive.");
+		checkArgument(q.signum() > 0, "The upper bound must be strictly positive.");
 		checkArgument(q.bitLength() >= 512, "The exclusive upper bound must have a bit length of at least 512.");
 
 		final BigInteger h_prime = byteArrayToInteger(recursiveHashOfLength(q.bitLength() + 2 * lambda,
@@ -187,40 +183,44 @@ public class HashService implements Hash {
 	 */
 	@SuppressWarnings("java:S117")
 	@VisibleForTesting
-	byte[] recursiveHashOfLength(final int requestedBitLength, final Hashable... values) {
-		checkNotNull(values);
-		Arrays.stream(values).forEach(Preconditions::checkNotNull);
+	ImmutableByteArray recursiveHashOfLength(final int requestedBitLength, final Hashable... values) {
+		final ImmutableList<Hashable> v = Arrays.stream(checkNotNull(values))
+				.map(Preconditions::checkNotNull)
+				.collect(toImmutableList());
 
 		final int k = values.length;
 		final int l = requestedBitLength;
 		checkArgument(k > 0, NO_VALUES);
 		checkArgument(l >= xof.getMinimumOutputLengthBits(), "The requested bit length must be at least %s.", xof.getMinimumOutputLengthBits());
 
-		final int L = (int) Math.ceil(l / 8.0);
+		final int L = Math.ceilDivExact(l, Byte.SIZE);
 		if (k > 1) {
-			final HashableList v = HashableList.from(Arrays.asList(values));
-			return recursiveHashOfLength(l, v);
+			return recursiveHashOfLength(l, HashableList.from(v));
 		} else {
 			final Hashable value = values[0];
 
 			switch (value) {
-			case HashableByteArray hashableByteArray -> {
-				final byte[] w = hashableByteArray.toHashableForm();
-				return ByteArrays.cutToBitLength(shake256(L, concat(BYTE_ARRAY_PREFIX, w)), l);
+			case final ImmutableByteArray w -> {
+				final ImmutableByteArray h = concat(BYTE_ARRAY_PREFIX, w);
+				return ByteArrays.cutToBitLength(shake256(L, h), l);
 			}
-			case HashableBigInteger hashableBigInteger -> {
+			case final HashableBigInteger hashableBigInteger -> {
 				final BigInteger w = hashableBigInteger.toHashableForm();
-				checkArgument(w.compareTo(BigInteger.ZERO) >= 0);
-				return ByteArrays.cutToBitLength(shake256(L, concat(BIG_INTEGER_PREFIX, integerToByteArray(w))), l);
+				checkArgument(w.signum() >= 0);
+				final ImmutableByteArray h = concat(BIG_INTEGER_PREFIX, integerToByteArray(w));
+				return ByteArrays.cutToBitLength(shake256(L, h), l);
 			}
-			case HashableString hashableString -> {
+			case final HashableString hashableString -> {
 				final String w = hashableString.toHashableForm();
-				return ByteArrays.cutToBitLength(shake256(L, concat(STRING_PREFIX, stringToByteArray(w))), l);
+				final ImmutableByteArray h = concat(STRING_PREFIX, stringToByteArray(w));
+				return ByteArrays.cutToBitLength(shake256(L, h), l);
 			}
-			case HashableList hashableList -> {
-				final List<? extends Hashable> w = hashableList.toHashableForm();
-				final byte[] h = Stream.concat(Stream.of(ARRAY_PREFIX), w.parallelStream().map(w_i -> recursiveHashOfLength(l, w_i)))
-						.reduce(new byte[] {}, Bytes::concat);
+			case final HashableList hashableList -> {
+				final ImmutableList<? extends Hashable> w = hashableList.toHashableForm();
+				final ImmutableByteArray h = Stream.concat(
+								Stream.of(ARRAY_PREFIX),
+								w.stream().parallel().map(w_i -> recursiveHashOfLength(l, w_i)))
+						.reduce(ImmutableByteArray.EMPTY, ImmutableByteArray::concat);
 				return ByteArrays.cutToBitLength(shake256(L, h), l);
 			}
 			default -> throw new IllegalArgumentException(String.format("Object of type %s cannot be hashed.", value.getClass()));
@@ -235,13 +235,13 @@ public class HashService implements Hash {
 		return HASH_LENGTH_BYTES;
 	}
 
-	private byte[] shake256(final int outputLength, final byte[] message) {
+	private ImmutableByteArray shake256(final int outputLength, final ImmutableByteArray message) {
 		final byte[] result = new byte[outputLength];
 		final SHAKEDigest shakeDigest = new SHAKEDigest(256);
 
-		shakeDigest.update(message, 0, message.length);
+		shakeDigest.update(message.elements(), 0, message.length());
 		shakeDigest.doFinal(result, 0, outputLength);
 
-		return result;
+		return new ImmutableByteArray(result);
 	}
 }

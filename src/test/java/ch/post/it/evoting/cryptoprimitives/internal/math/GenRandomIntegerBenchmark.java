@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
-import org.openjdk.jmh.infra.Blackhole;
 
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
 
@@ -43,15 +42,13 @@ import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelI
 public class GenRandomIntegerBenchmark {
 
 	@Benchmark
-	public void genRandomInteger(final MyState state, final Blackhole bh) {
-		final BigInteger randomInteger = state.randomService.genRandomInteger(state.upperBound);
-		bh.consume(randomInteger);
+	public BigInteger genRandomInteger(final MyState state) {
+		return state.randomService.genRandomInteger(state.upperBound);
 	}
 
 	@Benchmark
-	public void genRandomIntegerWithBigInteger(final MyState state, final Blackhole bh) {
-		final BigInteger randomInteger = MyState.genRandomIntegerWithBigInteger(state.upperBound, state.secureRandom);
-		bh.consume(randomInteger);
+	public BigInteger genRandomIntegerWithBigInteger(final MyState state) {
+		return MyState.genRandomIntegerWithBigInteger(state.upperBound, state.secureRandom);
 	}
 
 	@State(Scope.Benchmark)
@@ -64,7 +61,7 @@ public class GenRandomIntegerBenchmark {
 		public static BigInteger genRandomIntegerWithBigInteger(final BigInteger upperBound, final SecureRandom secureRandom) {
 			// Input.
 			checkNotNull(upperBound);
-			checkArgument(upperBound.compareTo(BigInteger.ZERO) > 0, "The upper bound must be a positive integer greater than 0.");
+			checkArgument(upperBound.signum() > 0, "The upper bound must be a positive integer greater than 0.");
 			final BigInteger m = upperBound;
 
 			// Operation.

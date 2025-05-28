@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ class ShuffleWitnessTest extends TestGroupSetup {
 	@Test
 	@DisplayName("with empty randomness throws IllegalArgumentException")
 	void constructEmptyRandomness() {
-		final GroupVector<ZqElement, ZqGroup> emptyRandomness = GroupVector.of();
+		final GroupVector<ZqElement, ZqGroup> emptyRandomness = GroupVector.empty();
 
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 				() -> new ShuffleWitness(permutation, emptyRandomness));
