@@ -62,7 +62,7 @@ public class ElGamalMultiRecipientKeyPair implements HashableList {
 	public static ElGamalMultiRecipientKeyPair genKeyPair(final GqGroup group, final int numElements, final Random random) {
 		checkNotNull(random);
 		checkNotNull(group);
-		checkArgument(numElements > 0, "Cannot generate an ElGamalMultiRecipient key pair with %s elements.", numElements);
+		checkArgument(numElements > 0, "Cannot generate an ElGamalMultiRecipientKeyPair with %s elements.", numElements);
 
 		final int k = numElements;
 		final ZqGroup secretKeyGroup = ZqGroup.sameOrderAs(group);

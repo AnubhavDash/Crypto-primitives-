@@ -72,14 +72,17 @@ public class ElGamalMultiRecipientMessages {
 	public static ElGamalMultiRecipientMessage getMessage(final ElGamalMultiRecipientCiphertext ciphertext,
 			final ElGamalMultiRecipientPrivateKey secretKey) {
 
-		checkNotNull(ciphertext);
-		checkNotNull(secretKey);
+		// Input.
+		final ElGamalMultiRecipientCiphertext c = checkNotNull(ciphertext);
+		final ElGamalMultiRecipientPrivateKey sk = checkNotNull(secretKey);
+
+		// Cross-group checks.
 		checkArgument(ciphertext.getGroup().hasSameOrderAs(secretKey.getGroup()), "Ciphertext and secret key must be of the same order");
 		checkArgument(0 < ciphertext.size(), "A ciphertext must not be empty");
+
+		// Require.
 		checkArgument(ciphertext.size() <= secretKey.size(), "There cannot be more message elements than private key elements.");
 
-		final ElGamalMultiRecipientCiphertext c = ciphertext;
-		final ElGamalMultiRecipientPrivateKey sk = secretKey;
 
 		final int l = c.size();
 		final GqElement gamma = c.getGamma();
@@ -89,7 +92,7 @@ public class ElGamalMultiRecipientMessages {
 			indices = indices.parallel();
 		}
 
-		// Algorithm.
+		// Operation.
 		final GroupVector<GqElement, GqGroup> messageElements = indices
 				.mapToObj(i -> c.get(i).multiply(gamma.exponentiate(sk.get(i).negate())))
 				.collect(toGroupVector());

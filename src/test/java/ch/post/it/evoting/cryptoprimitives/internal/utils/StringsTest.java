@@ -55,7 +55,7 @@ class StringsTest {
 
 		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
 				() -> Strings.truncate(string, length));
-		assertEquals(String.format("The input length must be positive. [l: %s]", length),
+		assertEquals(String.format("The input length must be non-negative. [l: %s]", length),
 				Throwables.getRootCause(illegalArgumentException).getMessage());
 	}
 
@@ -120,7 +120,10 @@ class StringsTest {
 	}
 
 	private String truncateFromSpecification(final String S, final int l) {
-		final int m = Math.min(S.length(), l);
+		final int u = S.length();
+
+		// Operation.
+		final int m = Math.min(u, l);
 		return IntStream.range(0, m)
 				.mapToObj(S::charAt)
 				.map(String::valueOf)

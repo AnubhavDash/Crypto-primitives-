@@ -49,6 +49,8 @@ public class SymmetricAuthenticatedEncryptionService {
 		checkArgument(1 <= K.length() && K.length() <= 255, "The encryption key must have a length between 1 and 255 bytes. [length: %s]",
 				K.length());
 		final ImmutableByteArray P = checkNotNull(plaintext);
+
+		// Require.
 		final ImmutableList<ImmutableByteArray> associated_bytes = checkNotNull(associatedData).stream()
 				.map(associated_i -> {
 					checkNotNull(associated_i);
@@ -81,6 +83,10 @@ public class SymmetricAuthenticatedEncryptionService {
 				K.length());
 		final ImmutableByteArray C = checkNotNull(ciphertext);
 		checkNotNull(nonce);
+		checkArgument(nonce.length() == aead.getNonceLengthBytes(), "The nonce must have a length of %s bytes. [length: %s]",
+				aead.getNonceLengthBytes(), nonce.length());
+
+		// Require.
 		final ImmutableList<ImmutableByteArray> associated_bytes = checkNotNull(associatedData).stream()
 				.map(associated_i -> {
 					checkNotNull(associated_i);

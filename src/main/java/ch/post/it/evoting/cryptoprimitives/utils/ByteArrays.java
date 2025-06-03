@@ -24,7 +24,7 @@ public interface ByteArrays {
 	 * Cuts the given byte array to the requested bit length
 	 *
 	 * @param byteArray       the byte array to be cut
-	 * @param requestedLength the length in bits to which the array is to be cut. Greater than 0 and not greater than the byte array's bit length.
+	 * @param requestedLength the length in bits to which the array is to be cut. Non-negative and not greater than the byte array's bit length.
 	 * @return the byte array cut to the requested length
 	 * @throws NullPointerException     if the given byte array is null
 	 * @throws IllegalArgumentException if the requested length is not within the required range

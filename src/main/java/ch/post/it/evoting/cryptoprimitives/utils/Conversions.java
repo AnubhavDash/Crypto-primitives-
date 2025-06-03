@@ -28,16 +28,19 @@ public interface Conversions {
 	 *
 	 * @param bytes B, the byte array to convert. Must be non-null.
 	 * @return a BigInteger corresponding to the provided byte array representation.
+	 * @throws NullPointerException     if the byte array is null
 	 */
 	static BigInteger byteArrayToInteger(final ImmutableByteArray bytes) {
 		return ConversionsInternal.byteArrayToInteger(bytes);
 	}
 
 	/**
-	 * Converts a BigInteger to a byte array representation.
+	 * Converts a {@link BigInteger} to a byte array representation.
 	 *
-	 * @param x the positive BigInteger to convert. Must be non-null.
+	 * @param x the non-negative BigInteger to convert. Must be non-null.
 	 * @return the byte array representation of this BigInteger.
+	 * @throws NullPointerException     if x is null
+	 * @throws IllegalArgumentException if x is negative.
 	 */
 	static ImmutableByteArray integerToByteArray(final BigInteger x) {
 		return ConversionsInternal.integerToByteArray(x);
@@ -46,7 +49,7 @@ public interface Conversions {
 	/**
 	 * Converts a BigInteger to a byte array representation of desired length.
 	 *
-	 * @param x the positive BigInteger to convert. Must be non-null.
+	 * @param x the non-negative BigInteger to convert. Must be non-null.
 	 * @param n the desired length in bytes of the resulting byte array.
 	 * @return the byte array representation of this BigInteger.
 	 * @throws IllegalArgumentException if n is smaller than the byte length of x
@@ -60,6 +63,8 @@ public interface Conversions {
 	 *
 	 * @param s S, the string to convert. Must be non-null.
 	 * @return the byte array representation of the string.
+	 * @throws NullPointerException     if the string s is null
+	 * @throws IllegalArgumentException if the string s is not a valid UTF-8.
 	 */
 	static ImmutableByteArray stringToByteArray(final String s) {
 		return ConversionsInternal.stringToByteArray(s);
@@ -70,6 +75,7 @@ public interface Conversions {
 	 *
 	 * @param b B, the byte array to convert.
 	 * @return the string representation of the byte array.
+	 * @throws NullPointerException     if the byte array is null.
 	 * @throws IllegalArgumentException if the byte array does not correspond to a valid sequence of UTF-8 encoding.
 	 */
 	static String byteArrayToString(final ImmutableByteArray b) {
@@ -91,10 +97,10 @@ public interface Conversions {
 	/**
 	 * Converts a {@link BigInteger} representation to a decimal {@link String} representation.
 	 *
-	 * @param x, the {@link BigInteger} representation to convert. Not Null, positive (including 0).
+	 * @param x, the {@link BigInteger} representation to convert. Not Null, non-negative.
 	 * @return S, the decimal {@link String} representation of the bigInteger.
 	 * @throws NullPointerException     if the bigInteger is null
-	 * @throws IllegalArgumentException if the bigInteger is not positive
+	 * @throws IllegalArgumentException if the bigInteger is negative
 	 */
 	static String integerToString(final BigInteger x) {
 		return ConversionsInternal.integerToString(x);
@@ -103,10 +109,10 @@ public interface Conversions {
 	/**
 	 * Converts an {@link Integer} representation to a decimal {@link String} representation.
 	 *
-	 * @param x, the {@link Integer} representation to convert. Not Null, positive (including 0).
+	 * @param x, the {@link Integer} representation to convert. Not Null, non-negative.
 	 * @return S, the decimal {@link String} representation of the Integer.
 	 * @throws NullPointerException     if x is null.
-	 * @throws IllegalArgumentException if x is not positive.
+	 * @throws IllegalArgumentException if x is negative.
 	 */
 	static String integerToString(final Integer x) {
 		return ConversionsInternal.integerToString(x);

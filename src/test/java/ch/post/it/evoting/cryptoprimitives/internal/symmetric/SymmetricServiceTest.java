@@ -111,7 +111,7 @@ class SymmetricServiceTest extends TestGroupSetup {
 		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
 				() -> symmetricEncryptionService.getPlaintextSymmetric(encryptionKey, ciphertext, nonce, associatedData));
 
-		assertEquals("Invalid nonce length, expected 12", Throwables.getRootCause(illegalArgumentException).getMessage());
+		assertEquals("The nonce must have a length of 12 bytes. [length: %s]".formatted(DIFFERENT_NONCE_LENGTH), Throwables.getRootCause(illegalArgumentException).getMessage());
 	}
 
 	@Test

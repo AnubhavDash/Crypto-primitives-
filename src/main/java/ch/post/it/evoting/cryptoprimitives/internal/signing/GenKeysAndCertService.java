@@ -49,7 +49,7 @@ public class GenKeysAndCertService implements GenKeysAndCert {
 	public KeysAndCert genKeysAndCert(final LocalDate validFrom, final LocalDate validUntil) throws IllegalArgumentException {
 		checkNotNull(validFrom);
 		checkNotNull(validUntil);
-		checkArgument(validUntil.isAfter(validFrom), "Date validFrom is after validUntil");
+		checkArgument(validFrom.isBefore(validUntil), "Date validFrom is after validUntil");
 
 		final KeyPair keyPair = signatureSupportingAlgorithm.genKeyPair();
 

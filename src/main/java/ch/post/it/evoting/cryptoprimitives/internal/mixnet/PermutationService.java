@@ -41,7 +41,7 @@ class PermutationService {
 	/**
 	 * Generates a permutation of integers [0, size).
 	 *
-	 * @param size N, the positive number of values being permuted.
+	 * @param size N, the number of values being permuted.
 	 * @return a {@link Permutation} representing an individual permutation.
 	 */
 	Permutation genPermutation(final int size) {

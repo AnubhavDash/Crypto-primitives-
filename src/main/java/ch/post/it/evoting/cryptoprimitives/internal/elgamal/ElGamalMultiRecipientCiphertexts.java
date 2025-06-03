@@ -110,18 +110,19 @@ public class ElGamalMultiRecipientCiphertexts {
 	@SuppressWarnings("java:S117")
 	public static ElGamalMultiRecipientCiphertext getCiphertextVectorExponentiation(
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts, final GroupVector<ZqElement, ZqGroup> exponents) {
+		// Input.
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = checkNotNull(ciphertexts);
+		final GroupVector<ZqElement, ZqGroup> a = checkNotNull(exponents);
 
-		checkNotNull(ciphertexts);
-		checkNotNull(exponents);
+		// Require.
 		checkArgument(!ciphertexts.isEmpty(), "Ciphertexts should not be empty");
 		checkArgument(ciphertexts.size() == exponents.size(), "There should be a matching ciphertext for every exponent.");
 		checkArgument(ciphertexts.getGroup().hasSameOrderAs(exponents.getGroup()), "Ciphertexts and exponents must be of the same group.");
 
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = ciphertexts;
-		final GroupVector<ZqElement, ZqGroup> a = exponents;
 		final int l = C.getElementSize();
 		final int N = a.size();
 
+		// Operation.
 		IntStream indices = IntStream.range(0, l);
 		if (ENABLE_PARALLEL_STREAMS) {
 			indices = indices.parallel();
@@ -144,7 +145,7 @@ public class ElGamalMultiRecipientCiphertexts {
 	}
 
 	/**
-	 * Partially decrypts the ciphertext.
+	 * Partially decrypts a provided ciphertext.
 	 * <p>
 	 * The {@code secretKey} parameter must comply with the following:
 	 * <ul>
@@ -157,15 +158,14 @@ public class ElGamalMultiRecipientCiphertexts {
 	 */
 	public static ElGamalMultiRecipientCiphertext getPartialDecryption(final ElGamalMultiRecipientCiphertext ciphertext,
 			final ElGamalMultiRecipientPrivateKey secretKey) {
-		checkNotNull(secretKey);
+		final ElGamalMultiRecipientCiphertext c = checkNotNull(ciphertext);
+		final ElGamalMultiRecipientPrivateKey sk = checkNotNull(secretKey);
+
 		checkArgument(ciphertext.getGroup().hasSameOrderAs(secretKey.getGroup()), "Ciphertext and secret key must belong to groups of same order.");
 		final int l = ciphertext.size();
 		final int k = secretKey.size();
-		checkArgument(0 < l, "The ciphertext must not be empty.");
 		checkArgument(l <= k, "There cannot be more message elements than private key elements.");
 
-		final ElGamalMultiRecipientCiphertext c = ciphertext;
-		final ElGamalMultiRecipientPrivateKey sk = secretKey;
 
 		final GqElement gamma = c.getGamma();
 		final GroupVector<GqElement, GqGroup> m = getMessage(c, sk).getElements();

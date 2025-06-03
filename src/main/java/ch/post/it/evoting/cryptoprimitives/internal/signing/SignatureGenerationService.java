@@ -51,12 +51,11 @@ public class SignatureGenerationService implements SignatureGeneration {
 	 */
 	@Override
 	public ImmutableByteArray genSignature(final Hashable message, final Hashable additionalContextData) throws SignatureException {
-		checkNotNull(message);
-		checkNotNull(additionalContextData);
+		// Input.
+		final Hashable m = checkNotNull(message);
+		final Hashable c = checkNotNull(additionalContextData);
 
-		final Hashable m = message;
-		final Hashable c = additionalContextData;
-
+		// Operation.
 		final Instant t = getTimeStamp();
 		final Instant validFrom = certificate.getNotBefore().toInstant();
 		final Instant validUntil = certificate.getNotAfter().toInstant();

@@ -64,24 +64,29 @@ public class CommitmentKeyService {
 	}
 
 	/**
-	 * Creates a commitment key, with the {@code numberOfCommitmentElements} specifying the commitment key's desired number of elements.
-	 *
+	 * Creates a commitment key, with the {@code numberOfElements} specifying the commitment key's desired number of elements.
+	 * <p>
+	 *     Repeated calls to this method with the same parameters will return the same commitment key.
+	 * </p>
 	 * @param numberOfElements ν, the desired number of elements of the commitment key. Must be strictly positive and smaller or equal to q - 3, where
 	 *                         q is the order of the {@code gqGroup}.
-	 * @param gqGroup          the quadratic residue group to which the commitment key belongs. Must be non null.
+	 * @param gqGroup          the quadratic residue group to which the commitment key belongs. Must be non-null.
 	 * @return the created commitment key.
 	 */
 	CommitmentKey getVerifiableCommitmentKey(final int numberOfElements, final GqGroup gqGroup) {
 		checkNotNull(gqGroup);
 
+		// Input.
 		final int nu = numberOfElements;
 		final BigInteger p = gqGroup.getP();
 		final BigInteger q = gqGroup.getQ();
 		final BigInteger g = gqGroup.getGenerator().getValue();
 		final ZqElement one = ZqElement.create(1, ZqGroup.sameOrderAs(gqGroup));
 
+		// Require.
 		checkArgument(canGenerateKey(nu, gqGroup), "The desired number of commitment elements must be in the range (0, q - 3]");
 
+		// Operation.
 		int count = 0;
 		int i = 0;
 
@@ -105,7 +110,7 @@ public class CommitmentKeyService {
 		}
 
 		final GroupVector<GqElement, GqGroup> v_elements = v.stream()
-				.map(e -> GqElementFactory.fromValue(e, gqGroup))
+				.map(g_j -> GqElementFactory.fromValue(g_j, gqGroup))
 				.collect(toGroupVector());
 
 		final GqElement h = v_elements.get(0);
