@@ -27,7 +27,7 @@ public interface SignatureGeneration {
 	 *
 	 * @param message               m, the message to be signed. Must be non-null.
 	 * @param additionalContextData c, additional context data. Must be non-null. May be empty.
-	 * @return the signature for the message as a byte array
+	 * @return the signature for the message as an {@code ImmutableByteArray}.
 	 * @throws SignatureException if the message is timestamped at a date the certificate is not valid for.
 	 */
 	ImmutableByteArray genSignature(Hashable message, Hashable additionalContextData) throws SignatureException;

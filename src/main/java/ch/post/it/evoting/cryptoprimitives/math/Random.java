@@ -26,10 +26,21 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 public interface Random {
 
 	/**
+	 * Generates an immutable array of {@code byteLength} random bytes.
+	 *
+	 * @param byteLength The number of bytes to generate.
+	 * @return An immutable array of {@code byteLength} random bytes.
+	 * @throws IllegalArgumentException if {@code byteLength} is negative.
+	 */
+	ImmutableByteArray randomBytes(final int byteLength);
+
+	/**
 	 * Generates a random BigInteger between 0 (incl.) and {@code upperBound} (excl.).
 	 *
 	 * @param upperBound m, the upper bound. Must be non null and strictly positive.
 	 * @return A random BigInteger <code>r s.t. 0 &le; r &lt; m</code>.
+	 * @throws NullPointerException if m is null.
+	 * @throws IllegalArgumentException if m is not strictly positive.
 	 */
 	BigInteger genRandomInteger(final BigInteger upperBound);
 
@@ -38,8 +49,31 @@ public interface Random {
 	 *
 	 * @param upperBound m, the upper bound. Must be strictly positive.
 	 * @return A random int <code>r s.t. 0 &le; r &lt; m</code>.
+	 * @throws IllegalArgumentException if m is not strictly positive.
 	 */
 	int genRandomInteger(final int upperBound);
+
+	/**
+	 * Generates a vector (collection) of random {@link ZqElement}s between 0 (incl.) and {@code upperBound} (excl.).
+	 *
+	 * @param upperBound q, the exclusive upper bound. Must be non-null and strictly positive.
+	 * @param length     n, the desired length. Must be non-negative.
+	 * @return A random {@code GroupVector<ZqElement, ZqGroup>} of {@code length} elements.
+	 */
+	GroupVector<ZqElement, ZqGroup> genRandomVector(final BigInteger upperBound, final int length);
+
+	/**
+	 * Generates a random string of length &#119897; of the given alphabet.
+	 *
+	 * @param length   &#119897; &#8712; &#8469;, the desired length of string. Must be non-negative.
+	 * @param alphabet &#120120;=(&#119878;<sub>0</sub>,...,&#119878;<sub>&#119896;-1</sub>), the alphabet from which to choose the string. Must be
+	 *                 non-null.
+	 * @return &#119878;' &#8712; (&#120120;)<sup>&#119897;</sup>, a random string of length &#119897; of the given alphabet.
+	 * @throws NullPointerException     if &#120120; is null.
+	 * @throws IllegalArgumentException if &#119897; is negative.
+	 */
+	@SuppressWarnings("java:S117")
+	String genRandomString(final int length, final Alphabet alphabet);
 
 	/**
 	 * Generates a list of unique decimal strings.
@@ -48,31 +82,9 @@ public interface Random {
 	 * same value.
 	 * </p>
 	 *
-	 * @param desiredCodeLength   l, the desired length of each code. Must be strictly positive.
+	 * @param desiredCodeLength   l, the desired length of each code. Must be non-negative.
 	 * @param numberOfUniqueCodes n, the number of unique codes. Must be strictly positive.
 	 * @return codes &#8712; (&#120120;<sub>10</sub>)<sup>l &times; n</sup> a list of unique decimal strings.
 	 */
 	ImmutableList<String> genUniqueDecimalStrings(final int desiredCodeLength, final int numberOfUniqueCodes);
-
-	/**
-	 * Generates a random string of length &#119897; of the given alphabet.
-	 *
-	 * @param length   &#119897; &#8712; &#8469;<sup>+</sup>, the desired length of string. Must be strictly positive.
-	 * @param alphabet &#120120;=(&#119878;<sub>0</sub>,...,&#119878;<sub>&#119896;-1</sub>), the alphabet from which to choose the string. Must be
-	 *                 non-null.
-	 * @return &#119878;' &#8712; (&#120120;)<sup>&#119897;</sup>, a random string of length &#119897; of the given alphabet.
-	 * @throws NullPointerException     if &#120120; is null.
-	 * @throws IllegalArgumentException if &#119897; is not strictly positive.
-	 */
-	@SuppressWarnings("java:S117")
-	String genRandomString(final int length, final Alphabet alphabet);
-
-	/**
-	 * Generates an immutable array of {@code byteLength} random bytes.
-	 *
-	 * @param byteLength The number of bytes to generate.
-	 * @return An immutable array of {@code byteLength} random bytes.
-	 * @throws IllegalArgumentException if {@code byteLength} is negative.
-	 */
-	ImmutableByteArray randomBytes(final int byteLength);
 }

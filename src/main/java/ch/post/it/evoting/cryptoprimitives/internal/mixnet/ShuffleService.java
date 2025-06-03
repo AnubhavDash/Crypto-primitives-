@@ -56,8 +56,8 @@ public class ShuffleService {
 	/**
 	 * Shuffles and re-encrypts a list of ciphertext with the given key.
 	 *
-	 * @param ciphertexts the ciphertexts to re-encrypt and shuffle. Must be non null.
-	 * @param publicKey   the public key with which to re-encrypt the ciphertexts. Must be non null.
+	 * @param ciphertexts the ciphertexts to re-encrypt and shuffle. Must be non-null.
+	 * @param publicKey   the public key with which to re-encrypt the ciphertexts. Must be non-null.
 	 * @return a {@link Shuffle} with the result of the re-encrypting shuffle.
 	 */
 	Shuffle genShuffle(final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts, final ElGamalMultiRecipientPublicKey publicKey) {
@@ -78,7 +78,7 @@ public class ShuffleService {
 		final BigInteger q = exponentGroup.getQ();
 
 		// Require.
-		checkArgument(0 < l && l <= k, "The ciphertexts element size must be positive and at most the public key size. [l: %s, k: %s]", l, k);
+		checkArgument(l <= k, "The ciphertexts element size must at most the public key size. [l: %s, k: %s]", l, k);
 
 		// Operation.
 		final Permutation pi = this.permutationService.genPermutation(N);

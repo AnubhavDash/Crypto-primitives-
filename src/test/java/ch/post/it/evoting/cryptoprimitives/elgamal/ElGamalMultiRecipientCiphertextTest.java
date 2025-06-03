@@ -490,8 +490,9 @@ class ElGamalMultiRecipientCiphertextTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("a null secret key parameter throws a NullPointerException.")
+		@DisplayName("null parameters throws a NullPointerException.")
 		void getPartialDecryptionParametersShouldBeNotNull() {
+			assertThrows(NullPointerException.class, () -> getPartialDecryption(null, secretKey));
 			assertThrows(NullPointerException.class, () -> getPartialDecryption(ciphertext, null));
 		}
 

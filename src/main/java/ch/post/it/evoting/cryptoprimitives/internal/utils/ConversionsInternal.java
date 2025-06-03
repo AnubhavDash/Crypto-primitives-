@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.utils;
 
+import static ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays.byteLength;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -57,7 +58,7 @@ public final class ConversionsInternal {
 	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.Conversions#integerToByteArray}.
 	 * <p>
 	 * NOTE: our implementation slightly deviates from the specifications for performance reasons. Benchmarks show that our implementation is orders
-	 * of magnitude faster than the pseudo-code implementation integerToByteArraySpec. Both implementations are equivalent, and we have a unit test
+	 * of magnitude faster than the pseudocode implementation integerToByteArraySpec. Both implementations are equivalent, and we have a unit test
 	 * ensuring it.
 	 * </p>
 	 */
@@ -82,7 +83,7 @@ public final class ConversionsInternal {
 	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.Conversions#integerToFixedLengthByteArray}.
 	 * <p>
 	 * NOTE: our implementation slightly deviates from the specifications for performance reasons. Benchmarks show that our implementation is orders
-	 * of magnitude faster than the pseudo-code implementation integerToFixedLengthByteArraySpec. Both implementations are equivalent, and we have a unit test
+	 * of magnitude faster than the pseudocode implementation integerToFixedLengthByteArraySpec. Both implementations are equivalent, and we have a unit test
 	 * ensuring it.
 	 * </p>
 	 */
@@ -90,8 +91,7 @@ public final class ConversionsInternal {
 	public static ImmutableByteArray integerToFixedLengthByteArray(final BigInteger x, final int n) {
 		checkNotNull(x);
 		checkArgument(x.signum() >= 0);
-		checkArgument(Math.ceilDivExact(x.bitLength(), Byte.SIZE) <= n,
-				"The desired length n must be greater than or equal to the byte length of x.");
+		checkArgument(byteLength(x) <= n, "The desired length n must be greater than or equal to the byte length of x.");
 
 		// BigInteger#toByteArray gives back a 2s complement representation of the value. Given that we work only with positive BigIntegers, this
 		// representation is equivalent to the binary representation, except for a potential extra leading zero byte. (The presence or not of the
@@ -137,7 +137,7 @@ public final class ConversionsInternal {
 				.onMalformedInput(CodingErrorAction.REPORT)
 				.onUnmappableCharacter(CodingErrorAction.REPORT);
 
-		// The try-catch clause implements the pseudo-code's if statement
+		// The try-catch clause implements the pseudocode's if statement
 		try {
 			// Corresponds to UTF-8^-1(B)
 			return decoder.decode(ByteBuffer.wrap(b.elements())).toString();

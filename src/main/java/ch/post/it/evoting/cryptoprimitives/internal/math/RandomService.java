@@ -96,6 +96,45 @@ public class RandomService implements Random {
 	}
 
 	/**
+	 * @see Random#genRandomVector(BigInteger, int)
+	 */
+	public GroupVector<ZqElement, ZqGroup> genRandomVector(final BigInteger upperBound, final int length) {
+		final BigInteger q = checkNotNull(upperBound);
+		final int n = length;
+
+		checkArgument(q.signum() > 0, "The upper bound must be strictly greater than zero");
+		checkArgument(length >= 0, "The length must be greater than or equal to zero");
+
+		final ZqGroup zqGroup = new ZqGroup(q);
+
+		return Stream.generate(() -> ZqElement.create(genRandomInteger(q), zqGroup))
+				.limit(n)
+				.collect(toGroupVector());
+	}
+
+	/**
+	 * @see Random#genRandomString(int, Alphabet)
+	 */
+	@SuppressWarnings("java:S117")
+	public String genRandomString(final int length, final Alphabet alphabet) {
+
+		checkArgument(length >= 0, "The desired length of string must be greater than or equal to 0. [length: %s]", length);
+
+		// Input
+		final int l = length;
+		final Alphabet A = checkNotNull(alphabet);
+		final int k = A.size();
+
+		// Operation
+		return IntStream.range(0, l)
+				.mapToObj(i -> {
+					final int m = genRandomInteger(k);
+					return A.get(m);
+				})
+				.collect(Collectors.joining());
+	}
+
+	/**
 	 * @see Random#genUniqueDecimalStrings(int, int)
 	 */
 	@SuppressWarnings("java:S117")
@@ -122,27 +161,6 @@ public class RandomService implements Random {
 	}
 
 	/**
-	 * Generates a vector (collection) of random {@link ZqElement}s between 0 (incl.) and {@code upperBound} (excl.).
-	 *
-	 * @param upperBound q, the exclusive upper bound. Must be non-null and strictly positive.
-	 * @param length     n, the desired length. Must be positive.
-	 * @return A random {@code GroupVector<ZqElement, ZqGroup>} of {@code length} elements.
-	 */
-	public GroupVector<ZqElement, ZqGroup> genRandomVector(final BigInteger upperBound, final int length) {
-		final BigInteger q = checkNotNull(upperBound);
-		final int n = length;
-
-		checkArgument(q.signum() > 0, "The upper bound must be strictly greater than zero");
-		checkArgument(length >= 0, "The length must be greater than or equal to zero");
-
-		final ZqGroup zqGroup = new ZqGroup(q);
-
-		return Stream.generate(() -> ZqElement.create(genRandomInteger(q), zqGroup))
-				.limit(n)
-				.collect(toGroupVector());
-	}
-
-	/**
 	 * Generates an immutable array of {@code byteLength} random bytes.
 	 *
 	 * @param byteLength The number of bytes to generate.
@@ -155,27 +173,5 @@ public class RandomService implements Random {
 		secureRandom.nextBytes(randomBytes);
 
 		return new ImmutableByteArray(randomBytes);
-	}
-
-	/**
-	 * @see Random#genRandomString(int, Alphabet)
-	 */
-	@SuppressWarnings("java:S117")
-	public String genRandomString(final int length, final Alphabet alphabet) {
-
-		checkArgument(length >= 0, "The desired length of string must be greater than or equal to 0. [length: %s]", length);
-
-		// Input
-		final int l = length;
-		final Alphabet A = checkNotNull(alphabet);
-		final int k = A.size();
-
-		// Operation
-		return IntStream.range(0, l)
-				.mapToObj(i -> {
-					final int m = genRandomInteger(k);
-					return A.get(m);
-				})
-				.collect(Collectors.joining());
 	}
 }

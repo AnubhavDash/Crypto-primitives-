@@ -48,13 +48,6 @@ public class SignatureVerificationService implements SignatureVerification {
 
 	/**
 	 * See {@link SignatureVerification#verifySignature}
-	 *
-	 * @param authorityId           The identifier of the authority. Must be non-null.
-	 * @param message               The message that was signed. Must be non-null.
-	 * @param additionalContextData Additional context data. Must be non-null. May be empty.
-	 * @param signature             The signature of the message. Must be non-null.
-	 * @return true if the signature is valid, false otherwise.
-	 * @throws SignatureException if the timestamp is outside the signing certificate's validity.
 	 */
 	@Override
 	public boolean verifySignature(final String authorityId, final Hashable message, final Hashable additionalContextData,

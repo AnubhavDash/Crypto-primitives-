@@ -90,7 +90,7 @@ class ConversionsEquivalenceTest {
 	 * Implements the specification IntegerToByteArray algorithm. It is used in tests to show that it is equivalent to the more performant method used
 	 * which is implemented in {@link ConversionsInternal#integerToByteArray}.
 	 *
-	 * @param integer x, the positive BigInteger to convert.
+	 * @param integer x, the non-negative BigInteger to convert.
 	 * @return the byte array representation of this BigInteger.
 	 **/
 	@SuppressWarnings("java:S117")
@@ -112,17 +112,18 @@ class ConversionsEquivalenceTest {
 	 * Implements the specification IntegerToFixedLengthByteArray algorithm. It is used in tests to show that it is equivalent to the more performant method used
 	 * which is implemented in {@link ConversionsInternal#integerToFixedLengthByteArray}.
 	 *
-	 * @param integer x, the positive BigInteger to convert.
+	 * @param integer x, the non-negative BigInteger to convert.
 	 * @param desiredLength n, the desired byte length of the output.
 	 * @return the byte array representation of this BigInteger.
 	 **/
 	@SuppressWarnings("java:S117")
 	static ImmutableByteArray integerToFixedLengthByteArraySpec(final BigInteger integer, final int desiredLength) {
 		final BigInteger twoHundredFiftySix = BigInteger.valueOf(256);
+		// Input.
 		BigInteger x = integer;
 		final int n = desiredLength;
 
-		// Operation
+		// Operation.
 		final int m = ByteArrays.byteLength(x);
 		final byte[] B = new byte[n];
 		for (int i = 0; i < n - m; i++) {

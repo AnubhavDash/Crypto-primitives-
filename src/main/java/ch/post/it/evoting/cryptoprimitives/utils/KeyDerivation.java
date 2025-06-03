@@ -27,7 +27,7 @@ public interface KeyDerivation {
 	 * Derives a key from a cryptographically strong pseudo-random key. Uses SHA-256 as a hash function.
 	 *
 	 * @param pseudoRandomKey    a cryptographically strong pseudo-random key, of byte length greater or equal to 32.
-	 * @param contextInformation optional additional context information
+	 * @param contextInformation optional additional context information.
 	 * @param requiredByteLength the required byte length of the output key, in range 0 (exclusive) to 8160 (inclusive).
 	 * @return a cryptographically strong key of length {@code requiredByteLength}
 	 * @throws NullPointerException     if any input is null or contains nulls

@@ -66,13 +66,16 @@ public class KDFService implements KeyDerivation {
 		final ImmutableList<String> info_vector = checkNotNull(contextInformation);
 		final int n = requiredByteLength;
 
-		checkArgument(n > 0, "Requested byte length must be greater than 0. ");
 		checkArgument(L > 0, "Requested KeyDerivation byte length is smaller or equal to 0.");
+		checkArgument(n > 0, "Requested byte length must be greater than 0. ");
+
+		// Require.
 		checkArgument(N >= L, "The pseudo random key length must be greater than the hash function output length.");
 		checkArgument(n <= 255 * L, "The required byte length must me smaller than 255 times the hash function output length.");
 		info_vector.forEach(info_i -> checkArgument(stringToByteArray(info_i).length() <= 255,
 				"The required length of each additional context information must be smaller or equal to 255."));
 
+		// Operation.
 		final ImmutableByteArray info = ImmutableByteArray.concat(
 				info_vector.stream()
 						.map(Conversions::stringToByteArray)
@@ -113,11 +116,13 @@ public class KDFService implements KeyDerivation {
 		final ImmutableList<String> info = checkNotNull(contextInformation);
 		final BigInteger q = exclusiveUpperBound;
 
+		// Require.
 		checkArgument(N >= L, "The pseudo random key length must be greater than the hash function output length.");
 		checkArgument(ByteArrays.byteLength(q) >= L,
 				"The byte length of the exclusive upper bound must be greater than the hash function output length.");
 		checkArgument(lambda % 4 == 0, "The algorithm assumes that lambda is a multiple of 4");
 
+		// Operation.
 		final int n = ByteArrays.byteLength(q) + lambda / 4;
 		final ImmutableByteArray h = KDF(PRK, info, n);
 		final BigInteger u = byteArrayToInteger(h).mod(q);
