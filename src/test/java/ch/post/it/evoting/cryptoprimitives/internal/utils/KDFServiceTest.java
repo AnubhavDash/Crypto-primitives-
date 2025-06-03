@@ -97,7 +97,7 @@ class KDFServiceTest {
 	}
 
 	static Stream<Arguments> KDFRealValuesProvider() {
-		final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/utils/hkdf-expand.json");
+		final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/utils/kdf.json");
 
 		return parametersList.stream().parallel().map(testParameters -> {
 			// Context.
@@ -156,7 +156,7 @@ class KDFServiceTest {
 	}
 
 	static Stream<Arguments> KDFToZqRealValuesProvider() {
-		final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/utils/hkdf-expand-to-zq.json");
+		final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/utils/kdf-to-zq.json");
 
 		return parametersList.stream().map(testParameters -> {
 			// Context.
