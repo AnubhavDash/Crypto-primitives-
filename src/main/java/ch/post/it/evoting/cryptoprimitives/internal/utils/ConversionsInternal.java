@@ -56,27 +56,13 @@ public final class ConversionsInternal {
 
 	/**
 	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.Conversions#integerToByteArray}.
-	 * <p>
-	 * NOTE: our implementation slightly deviates from the specifications for performance reasons. Benchmarks show that our implementation is orders
-	 * of magnitude faster than the pseudocode implementation integerToByteArraySpec. Both implementations are equivalent, and we have a unit test
-	 * ensuring it.
-	 * </p>
 	 */
 	public static ImmutableByteArray integerToByteArray(final BigInteger x) {
 		checkNotNull(x);
 		checkArgument(x.signum() >= 0);
 
-		// BigInteger#toByteArray gives back a 2s complement representation of the value. Given that we work only with positive BigIntegers, this
-		// representation is equivalent to the binary representation, except for a potential extra leading zero byte. (The presence or not of the
-		// leading zero depends on the number of bits needed to represent this value).
-		final ImmutableByteArray twosComplement = new ImmutableByteArray(x.toByteArray());
-		final ImmutableByteArray result;
-		if (twosComplement.get(0) == 0) {
-			result = ImmutableByteArray.copyOfRange(twosComplement, 1, twosComplement.length());
-		} else {
-			result = twosComplement;
-		}
-		return result;
+		final int n = byteLength(x);
+		return integerToFixedLengthByteArray(x, n);
 	}
 
 	/**
@@ -88,17 +74,27 @@ public final class ConversionsInternal {
 	 * </p>
 	 */
 	@SuppressWarnings("java:S117")
-	public static ImmutableByteArray integerToFixedLengthByteArray(final BigInteger x, final int n) {
+	public static ImmutableByteArray integerToFixedLengthByteArray(final BigInteger x, final int m) {
 		checkNotNull(x);
 		checkArgument(x.signum() >= 0);
-		checkArgument(byteLength(x) <= n, "The desired length n must be greater than or equal to the byte length of x.");
+		checkArgument(byteLength(x) <= m, "The desired length m must be greater than or equal to the byte length of x.");
 
 		// BigInteger#toByteArray gives back a 2s complement representation of the value. Given that we work only with positive BigIntegers, this
 		// representation is equivalent to the binary representation, except for a potential extra leading zero byte. (The presence or not of the
 		// leading zero depends on the number of bits needed to represent this value).
-		final byte[] B = new byte[n];
-		final ImmutableByteArray xAsByteArray = integerToByteArray(x);
-		System.arraycopy(xAsByteArray.elements(), 0, B, n - xAsByteArray.length(), xAsByteArray.length());
+		final ImmutableByteArray twosComplement = new ImmutableByteArray(x.toByteArray());
+		final ImmutableByteArray xAsByteArray;
+		if (twosComplement.get(0) == 0) {
+			xAsByteArray = ImmutableByteArray.copyOfRange(twosComplement, 1, twosComplement.length());
+		} else {
+			xAsByteArray = twosComplement;
+		}
+		if (byteLength(x) == m) {
+			// If the byte length of x is equal to m, we can return the byte array as it is.
+			return xAsByteArray;
+		}
+		final byte[] B = new byte[m];
+		System.arraycopy(xAsByteArray.elements(), 0, B, m - xAsByteArray.length(), xAsByteArray.length());
 		return ImmutableByteArray.of(B);
 	}
 
