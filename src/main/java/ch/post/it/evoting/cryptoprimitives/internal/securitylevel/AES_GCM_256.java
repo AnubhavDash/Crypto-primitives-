@@ -37,7 +37,7 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 /**
  * This class is thread safe.
  */
-@SuppressWarnings("java:S101")
+@SuppressWarnings({"java:S101", "java:S6548"})
 public class AES_GCM_256 implements AEAD {
 
 	private static final AES_GCM_256 INSTANCE = new AES_GCM_256();
