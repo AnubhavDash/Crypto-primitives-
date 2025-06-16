@@ -27,6 +27,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.signing.GenKeysAndCertServic
 import ch.post.it.evoting.cryptoprimitives.internal.signing.SignatureGenerationService;
 import ch.post.it.evoting.cryptoprimitives.internal.signing.SignatureVerificationService;
 
+@SuppressWarnings({"java:S6548"})
 public class SignatureFactory {
 
 	private static final SecurityLevelInternal SECURITY_LEVEL = SecurityLevelConfig.getSystemSecurityLevel();

@@ -26,6 +26,7 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 /**
  * This class is thread safe.
  */
+@SuppressWarnings({"java:S6548"})
 public class SHAKE256 implements XOF {
 
 	private static final SHAKE256 INSTANCE = new SHAKE256();

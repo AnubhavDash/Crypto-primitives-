@@ -24,6 +24,7 @@ import ch.post.it.evoting.cryptoprimitives.utils.VerificationResult;
  * <p>
  * This class is immutable.
  */
+@SuppressWarnings({"java:S6548"})
 public final class VerificationSuccess implements VerificationResult {
 
 	public static final VerificationSuccess INSTANCE = new VerificationSuccess();

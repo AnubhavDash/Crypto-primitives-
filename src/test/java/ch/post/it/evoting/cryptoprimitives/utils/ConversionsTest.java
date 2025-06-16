@@ -106,7 +106,7 @@ class ConversionsTest {
 		void testConversionOf256BigIntegerWithLengthOneThrows() {
 			final BigInteger value = BigInteger.valueOf(256);
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> integerToFixedLengthByteArray(value, 1));
-			assertEquals("The desired length n must be greater than or equal to the byte length of x.", exception.getMessage());
+			assertEquals("The desired length m must be greater than or equal to the byte length of x.", exception.getMessage());
 		}
 
 		@Test

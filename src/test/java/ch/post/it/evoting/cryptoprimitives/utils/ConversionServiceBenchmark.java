@@ -43,16 +43,8 @@ public class ConversionServiceBenchmark {
 	@Warmup(iterations = 4, time = 5)
 	@Fork(value = 1)
 	@Measurement(iterations = 4, time = 5)
-	public ImmutableByteArray bigIntegerToByteArrayUsingJdk(final MyState state) {
-		return ConversionsInternal.integerToByteArray(state.randomBigInteger);
-	}
-
-	@Benchmark
-	@Warmup(iterations = 4, time = 5)
-	@Fork(value = 1)
-	@Measurement(iterations = 4, time = 5)
 	public ImmutableByteArray bigIntegerToByteArray(final MyState state) {
-		return ConversionsEquivalenceTest.integerToByteArraySpec(state.randomBigInteger);
+		return ConversionsInternal.integerToByteArray(state.randomBigInteger);
 	}
 
 	@Benchmark

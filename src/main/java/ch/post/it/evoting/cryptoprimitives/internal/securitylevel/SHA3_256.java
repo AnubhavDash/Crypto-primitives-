@@ -30,7 +30,7 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 /*
 	This class is thread safe.
  */
-@SuppressWarnings("java:S101")
+@SuppressWarnings({"java:S101", "java:S6548"})
 public class SHA3_256 implements HashFunction {
 
 	private static final SHA3_256 INSTANCE = new SHA3_256();
