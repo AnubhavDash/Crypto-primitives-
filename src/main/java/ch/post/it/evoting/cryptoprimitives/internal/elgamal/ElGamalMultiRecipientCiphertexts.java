@@ -123,25 +123,14 @@ public class ElGamalMultiRecipientCiphertexts {
 		final int N = a.size();
 
 		// Operation.
-		IntStream indices = IntStream.range(0, l);
+		final ElGamalMultiRecipientCiphertext neutralElement = neutralElement(l, C.getGroup());
+		IntStream indices = IntStream.range(0, N);
 		if (ENABLE_PARALLEL_STREAMS) {
 			indices = indices.parallel();
 		}
-
-		final GqElement gamma_prod = GqElementFactory.multiModExp(IntStream.range(0, N)
-				.mapToObj(C::get)
-				.map(ElGamalMultiRecipientCiphertext::getGamma)
-				.collect(toGroupVector()), a);
-
-		final GroupVector<GqElement, GqGroup> phi_prod = indices
-				.mapToObj(i -> GqElementFactory.multiModExp(IntStream.range(0, N)
-						.mapToObj(C::get)
-						.map(ElGamalMultiRecipientCiphertext::getPhis)
-						.map(phi -> phi.get(i))
-						.collect(toGroupVector()), a))
-				.collect(toGroupVector());
-
-		return ElGamalMultiRecipientCiphertext.create(gamma_prod, phi_prod);
+		return indices
+				.mapToObj(i -> C.get(i).getCiphertextExponentiation(a.get(i)))
+				.reduce(neutralElement, ElGamalMultiRecipientCiphertext::getCiphertextProduct);
 	}
 
 	/**
