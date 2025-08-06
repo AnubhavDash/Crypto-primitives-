@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,7 +90,10 @@ class Base10AlphabetTest {
 	@DisplayName("contains with a null character behaves as expected")
 	@Test
 	void containsWithNullCharacter() {
-		assertThrows(NullPointerException.class, () -> base10Alphabet.contains(null));
+		final boolean expected = false;
+
+		final boolean isContained = assertDoesNotThrow(() -> base10Alphabet.contains(null));
+		assertEquals(expected, isContained);
 	}
 
 	@DisplayName("contains with a character part of the alphabet behaves as expected")
@@ -161,7 +164,11 @@ class Base10AlphabetTest {
 	@DisplayName("indexOf with a null character behaves as expected")
 	@Test
 	void indexOfNullHappyPath() {
-		assertThrows(NullPointerException.class, () -> base10Alphabet.indexOf(null));
+		final int expected = -1;
+
+		final int index = assertDoesNotThrow(() -> base10Alphabet.indexOf(null));
+
+		assertEquals(expected, index);
 	}
 
 	@DisplayName("indexOf with a character part of the alphabet behaves as expected")

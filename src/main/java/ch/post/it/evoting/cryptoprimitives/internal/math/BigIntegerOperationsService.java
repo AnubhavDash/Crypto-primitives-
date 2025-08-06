@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,13 @@ import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TWO;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.verificatum.vmgj.VMG;
-
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 
 /**
  * <p>This class is thread-safe.</p>
@@ -63,7 +62,7 @@ public class BigIntegerOperationsService {
 		return bigIntegerOperations.modExponentiate(base, exponent, modulus);
 	}
 
-	public static BigInteger multiModExp(final ImmutableList<BigInteger> bases, final ImmutableList<BigInteger> exponents, final BigInteger modulus) {
+	public static BigInteger multiModExp(final List<BigInteger> bases, final List<BigInteger> exponents, final BigInteger modulus) {
 		return bigIntegerOperations.multiModExp(bases, exponents, modulus);
 	}
 
@@ -124,7 +123,9 @@ public class BigIntegerOperationsService {
 					}
 					j = j + 1;
 				}
-				return y.equals(n_minus_one);
+				if (!y.equals(n_minus_one)) {
+					return false;
+				}
 			}
 			return true;
 		});

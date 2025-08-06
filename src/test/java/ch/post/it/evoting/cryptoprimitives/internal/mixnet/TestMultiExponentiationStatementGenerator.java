@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,15 +28,15 @@ public class TestMultiExponentiationStatementGenerator {
 	private final GqGroupGenerator gqGroupGenerator;
 	private final ElGamalGenerator elGamalGenerator;
 
-	TestMultiExponentiationStatementGenerator(final GqGroup gqGroup) {
+	TestMultiExponentiationStatementGenerator(GqGroup gqGroup) {
 		this.gqGroupGenerator = new GqGroupGenerator(gqGroup);
 		this.elGamalGenerator = new ElGamalGenerator(gqGroup);
 	}
 
-	MultiExponentiationStatement genRandomStatement(final int n, final int m, final int l) {
-		final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> ciphertextMatrix = elGamalGenerator.genRandomCiphertextMatrix(m, n, l);
-		final ElGamalMultiRecipientCiphertext ciphertextC = elGamalGenerator.genRandomCiphertext(l);
-		final GroupVector<GqElement, GqGroup> commitmentA = gqGroupGenerator.genRandomGqElementVector(m);
-		return new MultiExponentiationStatement(ciphertextMatrix, ciphertextC, commitmentA);
+	MultiExponentiationStatement genRandomStatement(int n, int m, int l) {
+		GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> CMatrix = elGamalGenerator.genRandomCiphertextMatrix(m, n, l);
+		ElGamalMultiRecipientCiphertext C = elGamalGenerator.genRandomCiphertext(l);
+		GroupVector<GqElement, GqGroup> cA = gqGroupGenerator.genRandomGqElementVector(m);
+		return new MultiExponentiationStatement(CMatrix, C, cA);
 	}
 }

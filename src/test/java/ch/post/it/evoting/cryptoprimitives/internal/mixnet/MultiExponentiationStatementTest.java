@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.mixnet.MultiExponentiationStatement;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
 
-@SuppressWarnings("java:S116")
 class MultiExponentiationStatementTest extends TestGroupSetup {
 
 	private static final int UPPER_BOUND_TEST_SIZE = 10;

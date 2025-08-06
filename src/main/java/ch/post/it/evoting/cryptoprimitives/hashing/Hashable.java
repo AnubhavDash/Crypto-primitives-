@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,18 @@
  */
 package ch.post.it.evoting.cryptoprimitives.hashing;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 
 /**
- * Represents an object which can be hashed by the recursive hash algorithm {@link HashService#recursiveHash(Hashable...)}. This interface must NOT be
- * implemented directly. Instead, classes should implement one of the sub-interfaces representing the particular hashable type. The collection of
+ * Represents an object which can by hashed by the recursive hash algorithm {@link HashService#recursiveHash(Hashable...)}. This interface must NOT be
+ * implemented directly. Instead classes should implement one of the sub-interfaces representing the particular hashable type. The collection of
  * sub-interfaces represent the types supported by the recursive hash, which is akin to a union type. These sub-interfaces map one to one to a Java
  * type. The supported types by the recursive hash and their respective Hashable form are:
  * <ul>
- *     <li>{@code ImmutableByteArray}, see {@link ImmutableByteArray}</li>
+ *     <li>{@code byte[]}, see {@link HashableByteArray}</li>
  *     <li>{@code String}, see {@link HashableString}</li>
  *     <li>{@code BigInteger}, see {@link HashableBigInteger}</li>
- *     <li>{@code ImmutableList<Hashable>}, see {@link HashableList}</li>
+ *     <li>{@code List<Hashable>}, see {@link HashableList}</li>
  * </ul>
  */
 public interface Hashable {

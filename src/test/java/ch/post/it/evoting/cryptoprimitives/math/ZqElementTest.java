@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,35 +78,35 @@ class ZqElementTest {
 
 	@Test
 	void givenANonRandomExponentValueLessThanQGetExponentValue() {
-		final BigInteger exponentValue = BigInteger.ONE;
-		final ZqElement exponent = ZqElement.create(exponentValue, smallQGroup);
+		BigInteger exponentValue = BigInteger.ONE;
+		ZqElement exponent = ZqElement.create(exponentValue, smallQGroup);
 
 		assertEquals(exponentValue, exponent.getValue(), "The exponent value is not the expected one");
 	}
 
 	@Test
 	void givenANegativeValueShouldThrow() {
-		final BigInteger value = BigInteger.valueOf(-1);
+		BigInteger value = BigInteger.valueOf(-1);
 		assertThrows(IllegalArgumentException.class, () -> ZqElement.create(value, smallQGroup));
 	}
 
 	@Test
 	void givenAValueEqualToQShouldThrow() {
-		final BigInteger value = smallQGroup.getQ();
+		BigInteger value = smallQGroup.getQ();
 		assertThrows(IllegalArgumentException.class, () -> ZqElement.create(value, smallQGroup));
 	}
 
 	@Test
 	void givenAValueAboveQShouldThrow() {
-		final BigInteger value = smallQGroup.getQ().add(BigInteger.TEN);
+		BigInteger value = smallQGroup.getQ().add(BigInteger.TEN);
 		assertThrows(IllegalArgumentException.class, () -> ZqElement.create(value, smallQGroup));
 	}
 
 	@Test
 	void givenAnExponentWhenGetQThenExpectedQReturned() {
-		final BigInteger exponentValue = BigInteger.TWO;
-		final BigInteger expectedQ = BigInteger.valueOf(11);
-		final ZqElement exponent = ZqElement.create(exponentValue, smallQGroup);
+		BigInteger exponentValue = BigInteger.TWO;
+		BigInteger expectedQ = BigInteger.valueOf(11);
+		ZqElement exponent = ZqElement.create(exponentValue, smallQGroup);
 
 		assertEquals(expectedQ, exponent.getGroup().getQ(), "The q is not the expected one");
 	}
@@ -165,148 +165,148 @@ class ZqElementTest {
 
 	@Test
 	void givenExponentsDifferentGroupsWhenAddThenException() {
-		final ZqElement exponent1 = ZqElement.create(smallQGroupMember, smallQGroup);
-		final ZqElement exponent2 = ZqElement.create(largeQGoupMember, largeQGroup);
+		ZqElement exponent1 = ZqElement.create(smallQGroupMember, smallQGroup);
+		ZqElement exponent2 = ZqElement.create(largeQGoupMember, largeQGroup);
 
 		assertThrows(IllegalArgumentException.class, () -> exponent1.add(exponent2));
 	}
 
 	@Test
 	void givenNullExponentsWhenAddThenException() {
-		final ZqElement exponent1 = ZqElement.create(smallQGroupMember, smallQGroup);
+		ZqElement exponent1 = ZqElement.create(smallQGroupMember, smallQGroup);
 
 		assertThrows(NullPointerException.class, () -> exponent1.add(null));
 	}
 
 	@Test
 	void givenTwoExponentsWhenAddedThenLessThanQ() {
-		final BigInteger exponent1Value = BigInteger.TWO;
-		final BigInteger exponent2Value = BigInteger.valueOf(3);
-		final BigInteger expectedResult = BigInteger.valueOf(5);
+		BigInteger exponent1Value = BigInteger.TWO;
+		BigInteger exponent2Value = BigInteger.valueOf(3);
+		BigInteger expectedResult = BigInteger.valueOf(5);
 
 		addExponentsAndAssert(exponent1Value, exponent2Value, expectedResult);
 	}
 
 	@Test
 	void givenTwoExponentsWhenAddedThenEqualsToQ() {
-		final BigInteger exponent1Value = BigInteger.valueOf(5);
-		final BigInteger exponent2Value = BigInteger.valueOf(6);
-		final BigInteger expectedResult = BigInteger.ZERO;
+		BigInteger exponent1Value = BigInteger.valueOf(5);
+		BigInteger exponent2Value = BigInteger.valueOf(6);
+		BigInteger expectedResult = BigInteger.ZERO;
 
 		addExponentsAndAssert(exponent1Value, exponent2Value, expectedResult);
 	}
 
 	@Test
 	void givenTwoExponentsWhenAddedThenGreaterThanQ() {
-		final BigInteger exponent1Value = BigInteger.TEN;
-		final BigInteger exponent2Value = BigInteger.TWO;
-		final BigInteger expectedResult = BigInteger.ONE;
+		BigInteger exponent1Value = BigInteger.TEN;
+		BigInteger exponent2Value = BigInteger.TWO;
+		BigInteger expectedResult = BigInteger.ONE;
 
 		addExponentsAndAssert(exponent1Value, exponent2Value, expectedResult);
 	}
 
 	@Test
 	void givenTwoEqualExponentsWhenAddedThenGreaterThanQ() {
-		final BigInteger exponent1Value = BigInteger.TEN;
-		final BigInteger exponent2Value = BigInteger.TEN;
-		final BigInteger expectedResult = BigInteger.valueOf(9);
+		BigInteger exponent1Value = BigInteger.TEN;
+		BigInteger exponent2Value = BigInteger.TEN;
+		BigInteger expectedResult = BigInteger.valueOf(9);
 
 		addExponentsAndAssert(exponent1Value, exponent2Value, expectedResult);
 	}
 
 	@Test
 	void givenTwoExponentsOneEqualToZeroWhenAddedThenSucceeds() {
-		final BigInteger exponent1Value = BigInteger.ZERO;
-		final BigInteger exponent2Value = BigInteger.valueOf(4);
-		final BigInteger expectedResult = BigInteger.valueOf(4);
+		BigInteger exponent1Value = BigInteger.ZERO;
+		BigInteger exponent2Value = BigInteger.valueOf(4);
+		BigInteger expectedResult = BigInteger.valueOf(4);
 
 		addExponentsAndAssert(exponent1Value, exponent2Value, expectedResult);
 	}
 
 	@Test
 	void givenAnExponentWithValueZeroWhenNegatedThenResultIsZero() {
-		final BigInteger exponentValue = BigInteger.ZERO;
-		final BigInteger expectedResult = BigInteger.ZERO;
+		BigInteger exponentValue = BigInteger.ZERO;
+		BigInteger expectedResult = BigInteger.ZERO;
 
 		negateExponentAndAssert(exponentValue, expectedResult);
 	}
 
 	@Test
 	void givenAnExponentLessThanQWhenNegatedThenSucceeds() {
-		final BigInteger exponentValue = BigInteger.valueOf(9);
-		final BigInteger expectedResult = BigInteger.TWO;
+		BigInteger exponentValue = BigInteger.valueOf(9);
+		BigInteger expectedResult = BigInteger.TWO;
 
 		negateExponentAndAssert(exponentValue, expectedResult);
 	}
 
 	@Test
 	void givenTwoExponentsWhenSubtractedResultIsPositive() {
-		final BigInteger exponent1Value = BigInteger.valueOf(3);
-		final BigInteger exponent2Value = BigInteger.TWO;
-		final BigInteger expectedResult = BigInteger.ONE;
+		BigInteger exponent1Value = BigInteger.valueOf(3);
+		BigInteger exponent2Value = BigInteger.TWO;
+		BigInteger expectedResult = BigInteger.ONE;
 
 		subtractExponentsAndAssert(exponent1Value, exponent2Value, expectedResult);
 	}
 
 	@Test
 	void givenTwoExponentsWhenSubtractedResultIsZero() {
-		final BigInteger exponent1Value = BigInteger.TEN;
-		final BigInteger exponent2Value = BigInteger.TEN;
-		final BigInteger expectedResult = BigInteger.ZERO;
+		BigInteger exponent1Value = BigInteger.TEN;
+		BigInteger exponent2Value = BigInteger.TEN;
+		BigInteger expectedResult = BigInteger.ZERO;
 
 		subtractExponentsAndAssert(exponent1Value, exponent2Value, expectedResult);
 	}
 
 	@Test
 	void givenTwoExponentsWhenSubtractedResultIsNegative() {
-		final BigInteger exponent1Value = BigInteger.TWO;
-		final BigInteger exponent2Value = BigInteger.valueOf(3);
-		final BigInteger expectedResult = BigInteger.TEN;
+		BigInteger exponent1Value = BigInteger.TWO;
+		BigInteger exponent2Value = BigInteger.valueOf(3);
+		BigInteger expectedResult = BigInteger.TEN;
 
 		subtractExponentsAndAssert(exponent1Value, exponent2Value, expectedResult);
 	}
 
 	@Test
 	void givenAnExponentWhenSubtractedZeroThenResultIsTheExponent() {
-		final BigInteger exponent1Value = BigInteger.valueOf(4);
-		final BigInteger exponent2Value = BigInteger.ZERO;
-		final BigInteger expectedResult = BigInteger.valueOf(4);
+		BigInteger exponent1Value = BigInteger.valueOf(4);
+		BigInteger exponent2Value = BigInteger.ZERO;
+		BigInteger expectedResult = BigInteger.valueOf(4);
 
 		subtractExponentsAndAssert(exponent1Value, exponent2Value, expectedResult);
 	}
 
 	@Test
 	void givenAnExponentWhenMultipliedSmallThenResultIsCorrect() {
-		final BigInteger exponent1Value = BigInteger.TWO;
-		final BigInteger exponent2Value = BigInteger.valueOf(3);
-		final BigInteger expectedResult = BigInteger.valueOf(6);
+		BigInteger exponent1Value = BigInteger.TWO;
+		BigInteger exponent2Value = BigInteger.valueOf(3);
+		BigInteger expectedResult = BigInteger.valueOf(6);
 
 		multiplyExponentsAndAssert(exponent1Value, exponent2Value, expectedResult);
 	}
 
 	@Test
 	void givenAnExponentWhenMultipliedBigThenResultIsCorrect() {
-		final BigInteger exponent1Value = BigInteger.TWO;
-		final BigInteger exponent2Value = BigInteger.valueOf(6);
-		final BigInteger expectedResult = BigInteger.ONE;
+		BigInteger exponent1Value = BigInteger.TWO;
+		BigInteger exponent2Value = BigInteger.valueOf(6);
+		BigInteger expectedResult = BigInteger.ONE;
 
 		multiplyExponentsAndAssert(exponent1Value, exponent2Value, expectedResult);
 	}
 
 	@Test
 	void givenAnExponentWhenMultipliedOneThenResultIsZero() {
-		final BigInteger exponent1Value = BigInteger.TWO;
-		final BigInteger exponent2Value = BigInteger.ONE;
-		final BigInteger expectedResult = BigInteger.TWO;
+		BigInteger exponent1Value = BigInteger.TWO;
+		BigInteger exponent2Value = BigInteger.ONE;
+		BigInteger expectedResult = BigInteger.TWO;
 
 		multiplyExponentsAndAssert(exponent1Value, exponent2Value, expectedResult);
 	}
 
 	@Test
 	void givenAnExponentWhenMultipliedZeroThenResultIsZero() {
-		final BigInteger exponent1Value = BigInteger.TWO;
-		final BigInteger exponent2Value = BigInteger.ZERO;
-		final BigInteger expectedResult = BigInteger.ZERO;
+		BigInteger exponent1Value = BigInteger.TWO;
+		BigInteger exponent2Value = BigInteger.ZERO;
+		BigInteger expectedResult = BigInteger.ZERO;
 
 		multiplyExponentsAndAssert(exponent1Value, exponent2Value, expectedResult);
 	}
@@ -336,15 +336,15 @@ class ZqElementTest {
 
 	@Test
 	void testEquals() {
-		final ZqGroup groupOrder11 = new ZqGroup(BigInteger.valueOf(11));
-		final ZqGroup groupOrder12 = new ZqGroup(BigInteger.valueOf(12));
-		final BigInteger value = BigInteger.TEN;
+		ZqGroup groupOrder11 = new ZqGroup(BigInteger.valueOf(11));
+		ZqGroup groupOrder12 = new ZqGroup(BigInteger.valueOf(12));
+		BigInteger value = BigInteger.TEN;
 
-		final ZqElement same1 = ZqElement.create(value, groupOrder11);
-		final ZqElement same2 = ZqElement.create(value, groupOrder11);
+		ZqElement same1 = ZqElement.create(value, groupOrder11);
+		ZqElement same2 = ZqElement.create(value, groupOrder11);
 
-		final ZqElement differentValueSameQ = ZqElement.create(BigInteger.valueOf(7), groupOrder11);
-		final ZqElement sameValueDifferentQ = ZqElement.create(value, groupOrder12);
+		ZqElement differentValueSameQ = ZqElement.create(BigInteger.valueOf(7), groupOrder11);
+		ZqElement sameValueDifferentQ = ZqElement.create(value, groupOrder12);
 
 		assertAll(
 				() -> assertEquals(same1, same2),
@@ -364,7 +364,7 @@ class ZqElementTest {
 	private void addExponentsAndAssert(final BigInteger exponent1Value, final BigInteger exponent2Value, final BigInteger expectedResult) {
 
 		ZqElement exponent1 = ZqElement.create(exponent1Value, smallQGroup);
-		final ZqElement exponent2 = ZqElement.create(exponent2Value, smallQGroup);
+		ZqElement exponent2 = ZqElement.create(exponent2Value, smallQGroup);
 
 		exponent1 = exponent1.add(exponent2);
 
@@ -382,7 +382,7 @@ class ZqElementTest {
 	private void subtractExponentsAndAssert(final BigInteger exponent1Value, final BigInteger exponent2Value, final BigInteger expectedResult) {
 
 		ZqElement exponent1 = ZqElement.create(exponent1Value, smallQGroup);
-		final ZqElement exponent2 = ZqElement.create(exponent2Value, smallQGroup);
+		ZqElement exponent2 = ZqElement.create(exponent2Value, smallQGroup);
 
 		exponent1 = exponent1.subtract(exponent2);
 
@@ -399,7 +399,7 @@ class ZqElementTest {
 	 */
 	private void multiplyExponentsAndAssert(final BigInteger exponent1Value, final BigInteger exponent2Value, final BigInteger expectedResult) {
 		ZqElement exponent1 = ZqElement.create(exponent1Value, smallQGroup);
-		final ZqElement exponent2 = ZqElement.create(exponent2Value, smallQGroup);
+		ZqElement exponent2 = ZqElement.create(exponent2Value, smallQGroup);
 
 		exponent1 = exponent1.multiply(exponent2);
 
@@ -429,8 +429,8 @@ class ZqElementTest {
 	 * @param expectedValue The expected value for the negated exponent.
 	 */
 	private void negateExponentAndAssert(final BigInteger exponentValue, final BigInteger expectedValue) {
-		final ZqElement exponent = ZqElement.create(exponentValue, smallQGroup);
-		final ZqElement negated = exponent.negate();
+		ZqElement exponent = ZqElement.create(exponentValue, smallQGroup);
+		ZqElement negated = exponent.negate();
 
 		assertEquals(expectedValue, negated.getValue(), "The negated exponent has not the expected value");
 	}

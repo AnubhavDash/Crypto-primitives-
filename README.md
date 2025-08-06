@@ -4,7 +4,7 @@
 
 Cryptographic algorithms play a pivotal role in the Swiss Post Voting System: ensuring their faithful implementation is crucially important. The
 crypto-primitives library provides a robust and misuse-resistant library implementing some of the Swiss Post Voting System's cryptographic algorithms.
-We base our library upon a mathematically [precise and unambiguous specification](Crypto-Primitives-Specification.pdf). Our pseudocode description of
+We base our library upon a mathematically [precise and unambiguous specification](Crypto-Primitives-Specification.pdf). Our pseudo-code description of
 the cryptographic algorithms - inspired by [Haenni et al.](https://arbor.bfh.ch/13834/) – aims to bridge the representational gap between mathematics
 and code.
 
@@ -15,7 +15,7 @@ consists of a sequence of mixers, each of which shuffles and re-encrypts an inpu
 same plaintexts. Each mixer proves knowledge of the permutation and the randomness (without revealing them to the verifier). The verifier checks these
 proofs to guarantee that no mixer added, deleted, or modified a vote.
 
-We augment our specification with test values obtained from an independent implementation of the pseudocode algorithms: our code validates
+We augment our specification with test values obtained from an independent implementation of the pseudo-code algorithms: our code validates
 against [these test values](./src/test/resources) to increase our confidence in the implementation's correctness. The specification embeds the test
 values as JSON files within the document.
 

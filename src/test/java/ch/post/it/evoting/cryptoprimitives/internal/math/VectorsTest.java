@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,19 +104,19 @@ class VectorsTest extends TestGroupSetup {
 			final BigInteger q = BigInteger.valueOf(5);
 			final ZqGroup zqGroup = new ZqGroup(q);
 
-			final GroupVector<ZqElement, ZqGroup> firstVectorAddition = GroupVector.of(ZqElement.create(1, zqGroup), ZqElement.create(4, zqGroup));
-			final GroupVector<ZqElement, ZqGroup> secondVectorAddition = GroupVector.of(ZqElement.create(3, zqGroup), ZqElement.create(2, zqGroup));
+			final GroupVector<ZqElement, ZqGroup> firstVector = GroupVector.of(ZqElement.create(1, zqGroup), ZqElement.create(4, zqGroup));
+			final GroupVector<ZqElement, ZqGroup> secondVector = GroupVector.of(ZqElement.create(3, zqGroup), ZqElement.create(2, zqGroup));
 			final GroupVector<ZqElement, ZqGroup> zeroVector = GroupVector.of(ZqElement.create(0, zqGroup), ZqElement.create(0, zqGroup));
-			final GroupVector<ZqElement, ZqGroup> firstVectorNegated = firstVectorAddition.stream()
+			final GroupVector<ZqElement, ZqGroup> firstVectorNegated = firstVector.stream()
 					.map(ZqElement::negate)
 					.collect(toGroupVector());
 
 			final GroupVector<ZqElement, ZqGroup> expected = GroupVector.of(ZqElement.create(4, zqGroup), ZqElement.create(1, zqGroup));
 
 			return Stream.of(
-					arguments(firstVectorAddition, secondVectorAddition, expected),
-					arguments(firstVectorAddition, zeroVector, firstVectorAddition),
-					arguments(firstVectorAddition, firstVectorNegated, zeroVector)
+					arguments(firstVector, secondVector, expected),
+					arguments(firstVector, zeroVector, firstVector),
+					arguments(firstVector, firstVectorNegated, zeroVector)
 			);
 		}
 
@@ -195,28 +195,28 @@ class VectorsTest extends TestGroupSetup {
 
 			final GqGroup gqGroup = new GqGroup(p, q, g);
 
-			final GroupVector<GqElement, GqGroup> specificFirstVector = GroupVector.of(GqElementFactory.fromValue(BigInteger.ONE, gqGroup),
+			final GroupVector<GqElement, GqGroup> firstVector = GroupVector.of(GqElementFactory.fromValue(BigInteger.ONE, gqGroup),
 					GqElementFactory.fromValue(BigInteger.valueOf(4), gqGroup));
-			final GroupVector<GqElement, GqGroup> specificSecondVector = GroupVector.of(GqElementFactory.fromValue(BigInteger.valueOf(3), gqGroup),
+			final GroupVector<GqElement, GqGroup> secondVector = GroupVector.of(GqElementFactory.fromValue(BigInteger.valueOf(3), gqGroup),
 					GqElementFactory.fromValue(BigInteger.valueOf(4), gqGroup));
 			final GroupVector<GqElement, GqGroup> oneVector = GroupVector.of(GqElementFactory.fromValue(BigInteger.ONE, gqGroup),
 					GqElementFactory.fromValue(BigInteger.ONE, gqGroup));
-			final GroupVector<GqElement, GqGroup> firstVectorInverted = specificFirstVector.stream()
+			final GroupVector<GqElement, GqGroup> firstVectorInverted = firstVector.stream()
 					.map(GqElement::invert)
 					.collect(toGroupVector());
 
 			final GroupVector<GqElement, GqGroup> expected = GroupVector.of(GqElementFactory.fromValue(BigInteger.valueOf(3), gqGroup),
 					GqElementFactory.fromValue(BigInteger.valueOf(5), gqGroup));
 
-			final GroupVector<GqElement, GqGroup> firstVectorMultiplySecondVector = vectorMultiplication(specificFirstVector, specificSecondVector);
-			final GroupVector<GqElement, GqGroup> firstVectorMultiplyOneVector = vectorMultiplication(specificFirstVector, oneVector);
-			final GroupVector<GqElement, GqGroup> firstVectorMultiplyFirstVectorInverted = vectorMultiplication(specificFirstVector, firstVectorInverted);
-			final GroupVector<GqElement, GqGroup> oneVectorMultiplyOneVector = vectorMultiplication(oneVector, oneVector);
+			final GroupVector<GqElement, GqGroup> firstVector_multiply_secondVector = vectorMultiplication(firstVector, secondVector);
+			final GroupVector<GqElement, GqGroup> firstVector_multiply_oneVector = vectorMultiplication(firstVector, oneVector);
+			final GroupVector<GqElement, GqGroup> firstVector_multiply_firstVectorInverted = vectorMultiplication(firstVector, firstVectorInverted);
+			final GroupVector<GqElement, GqGroup> oneVector_multiply_oneVector = vectorMultiplication(oneVector, oneVector);
 
-			assertEquals(firstVectorMultiplySecondVector, expected);
-			assertEquals(firstVectorMultiplyOneVector, specificFirstVector);
-			assertEquals(firstVectorMultiplyFirstVectorInverted, oneVector);
-			assertEquals(oneVectorMultiplyOneVector, oneVector);
+			assertEquals(firstVector_multiply_secondVector, expected);
+			assertEquals(firstVector_multiply_oneVector, firstVector);
+			assertEquals(firstVector_multiply_firstVectorInverted, oneVector);
+			assertEquals(oneVector_multiply_oneVector, oneVector);
 		}
 
 	}
@@ -338,18 +338,18 @@ class VectorsTest extends TestGroupSetup {
 			final BigInteger q = BigInteger.valueOf(5);
 			final ZqGroup zqGroup = new ZqGroup(q);
 
-			final ZqElement scalarMultiplication = ZqElement.create(3, zqGroup);
+			final ZqElement scalar = ZqElement.create(3, zqGroup);
 			final ZqElement zeroScalar = ZqElement.create(0, zqGroup);
 			final ZqElement oneScalar = ZqElement.create(1, zqGroup);
-			final GroupVector<ZqElement, ZqGroup> vectorMultiplication = GroupVector.of(ZqElement.create(1, zqGroup), ZqElement.create(2, zqGroup));
+			final GroupVector<ZqElement, ZqGroup> vector = GroupVector.of(ZqElement.create(1, zqGroup), ZqElement.create(2, zqGroup));
 			final GroupVector<ZqElement, ZqGroup> zeroVector = GroupVector.of(ZqElement.create(0, zqGroup), ZqElement.create(0, zqGroup));
 
 			final GroupVector<ZqElement, ZqGroup> expected = GroupVector.of(ZqElement.create(3, zqGroup), ZqElement.create(1, zqGroup));
 
 			return Stream.of(
-					arguments(scalarMultiplication, vectorMultiplication, expected),
-					arguments(zeroScalar, vectorMultiplication, zeroVector),
-					arguments(oneScalar, vectorMultiplication, vectorMultiplication)
+					arguments(scalar, vector, expected),
+					arguments(zeroScalar, vector, zeroVector),
+					arguments(oneScalar, vector, vector)
 			);
 		}
 

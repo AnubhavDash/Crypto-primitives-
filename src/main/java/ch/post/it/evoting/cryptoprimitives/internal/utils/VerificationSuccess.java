@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.utils;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import java.util.Deque;
+
 import ch.post.it.evoting.cryptoprimitives.utils.VerificationResult;
 
 /**
@@ -24,7 +25,6 @@ import ch.post.it.evoting.cryptoprimitives.utils.VerificationResult;
  * <p>
  * This class is immutable.
  */
-@SuppressWarnings({"java:S6548"})
 public final class VerificationSuccess implements VerificationResult {
 
 	public static final VerificationSuccess INSTANCE = new VerificationSuccess();
@@ -39,7 +39,7 @@ public final class VerificationSuccess implements VerificationResult {
 	}
 
 	@Override
-	public ImmutableList<String> getErrorMessages() {
+	public Deque<String> getErrorMessages() {
 		throw new UnsupportedOperationException();
 	}
 }

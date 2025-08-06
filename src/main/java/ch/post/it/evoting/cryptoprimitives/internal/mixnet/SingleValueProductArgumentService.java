@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
-import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.mixnet.CommitmentService.getCommitment;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.Verifiable.create;
@@ -28,8 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
@@ -121,9 +118,9 @@ class SingleValueProductArgumentService {
 
 		// Algorithm
 		// Calculate b_0, ..., b_(n-1)
-		final ImmutableList<ZqElement> b_vector = IntStream.range(0, n)
+		final List<ZqElement> b_vector = IntStream.range(0, n)
 				.mapToObj(k -> a.stream().limit(k + 1L).reduce(one, ZqElement::multiply))
-				.collect(toImmutableList());
+				.toList();
 
 		// Calculate d and r_d
 		final GroupVector<ZqElement, ZqGroup> d = randomService.genRandomVector(q, n);
@@ -136,7 +133,7 @@ class SingleValueProductArgumentService {
 			delta_mutable.addAll(1, randomService.genRandomVector(q, n - 2));
 		}
 		delta_mutable.add(n - 1, zqGroup.getIdentity());
-		final GroupVector<ZqElement, ZqGroup> delta = delta_mutable.stream().collect(toGroupVector());
+		final GroupVector<ZqElement, ZqGroup> delta = GroupVector.from(delta_mutable);
 
 		// Calculate s_0 and s_x
 		final ZqElement s_0 = ZqElement.create(randomService.genRandomInteger(q), zqGroup);
@@ -158,7 +155,7 @@ class SingleValueProductArgumentService {
 		final GqElement c_Delta = getCommitment(Delta, s_x, ck);
 
 		// Calculate x
-		final ImmutableByteArray x_bytes = hashService.recursiveHash(
+		final byte[] x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,
@@ -226,7 +223,7 @@ class SingleValueProductArgumentService {
 		final ZqGroup zqGroup = b.getGroup();
 
 		// Calculate x
-		final ImmutableByteArray x_bytes = hashService.recursiveHash(
+		final byte[] x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,

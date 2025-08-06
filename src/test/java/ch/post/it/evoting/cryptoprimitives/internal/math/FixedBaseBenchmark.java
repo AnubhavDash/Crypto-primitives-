@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,17 +33,19 @@ import org.openjdk.jmh.infra.Blackhole;
 @Warmup(iterations = 0)
 public class FixedBaseBenchmark {
 	@Benchmark
-	public BigInteger knownBaseBeforeCache(final MyState state) {
+	public void knownBaseBeforeCache(final MyState state, final Blackhole bh) {
 		final BigIntegerOperations operations = state.bigIntegerOperationsWithoutTable;
 
-		return operations.modExponentiate(state.knownBase, state.exponent, state.p);
+		final BigInteger result = operations.modExponentiate(state.knownBase, state.exponent, state.p);
+		bh.consume(result);
 	}
 
 	@Benchmark
-	public BigInteger randomBaseBeforeCache(final MyState state, final Blackhole bh) {
+	public void randomBaseBeforeCache(final MyState state, final Blackhole bh) {
 		final BigIntegerOperations operations = state.bigIntegerOperationsWithoutTable;
 
-		return operations.modExponentiate(state.randomBase, state.exponent, state.p);
+		final BigInteger result = operations.modExponentiate(state.randomBase, state.exponent, state.p);
+		bh.consume(result);
 	}
 
 	@Benchmark
@@ -53,17 +55,19 @@ public class FixedBaseBenchmark {
 	}
 
 	@Benchmark
-	public BigInteger knownBaseAfterCache(final MyState state) {
+	public void knownBaseAfterCache(final MyState state, final Blackhole bh) {
 		final BigIntegerOperations operations = state.bigIntegerOperationsWithTable;
 
-		return operations.modExponentiate(state.knownBase, state.exponent, state.p);
+		final BigInteger result = operations.modExponentiate(state.knownBase, state.exponent, state.p);
+		bh.consume(result);
 	}
 
 	@Benchmark
-	public BigInteger randomBaseAfterCache(final MyState state) {
+	public void randomBaseAfterCache(final MyState state, final Blackhole bh) {
 		final BigIntegerOperations operations = state.bigIntegerOperationsWithTable;
 
-		return operations.modExponentiate(state.randomBase, state.exponent, state.p);
+		final BigInteger result = operations.modExponentiate(state.randomBase, state.exponent, state.p);
+		bh.consume(result);
 	}
 
 	@State(Scope.Benchmark)

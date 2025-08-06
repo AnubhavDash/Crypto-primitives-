@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import java.util.List;
 
 /**
  * A user-friendly Base32 alphabet. The alphabet corresponds to the Base32 lowercase version excluding padding "=" of "Table 3: The Base 32 Alphabet"
@@ -24,7 +24,7 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 public final class UsabilityBase32Alphabet extends Alphabet {
 
 	private static final int SIZE = 32;
-	private static final ImmutableList<String> ALPHABET = ImmutableList.of(
+	private static final List<String> ALPHABET = List.of(
 
 			Character.toString(0x0061), // a (U+0061)
 			Character.toString(0x0062), // b (U+0062)
@@ -68,7 +68,7 @@ public final class UsabilityBase32Alphabet extends Alphabet {
 
 	private static final UsabilityBase32Alphabet INSTANCE = new UsabilityBase32Alphabet(SIZE, ALPHABET);
 
-	private UsabilityBase32Alphabet(final int size, final ImmutableList<String> alphabet) {
+	private UsabilityBase32Alphabet(final int size, final List<String> alphabet) {
 		super(size, alphabet);
 	}
 

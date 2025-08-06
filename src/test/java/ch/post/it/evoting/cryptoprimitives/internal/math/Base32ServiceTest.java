@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -26,8 +27,6 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 
 class Base32ServiceTest {
 
@@ -42,23 +41,24 @@ class Base32ServiceTest {
 
 	private static Stream<Arguments> getInputsAndOutputs() {
 		return Stream.of(
-				Arguments.of(ImmutableByteArray.EMPTY, ""),
-				Arguments.of(ImmutableByteArray.of((byte) 65), "IE======"),
-				Arguments.of(ImmutableByteArray.of((byte) 96), "MA======"),
-				Arguments.of(ImmutableByteArray.of((byte) 0), "AA======"),
-				Arguments.of(ImmutableByteArray.of((byte) 127), "P4======"),
-				Arguments.of(ImmutableByteArray.of((byte) -128), "QA======"),
-				Arguments.of(ImmutableByteArray.of((byte) -1), "74======"),
-				Arguments.of(ImmutableByteArray.of((byte) 65, (byte) 0), "IEAA===="),
-				Arguments.of(ImmutableByteArray.of((byte) 1, (byte) 1, (byte) 1), "AEAQC==="),
-				Arguments.of(ImmutableByteArray.of((byte) 127, (byte) 0, (byte) -2, (byte) 3), "P4AP4AY=")
+				Arguments.of(new byte[] {}, ""),
+				Arguments.of(new byte[] { 65 }, "IE======"),
+				Arguments.of(new byte[] { 96 }, "MA======"),
+				Arguments.of(new byte[] { 0 }, "AA======"),
+				Arguments.of(new byte[] { 127 }, "P4======"),
+				Arguments.of(new byte[] { -128 }, "QA======"),
+				Arguments.of(new byte[] { -1 }, "74======"),
+				Arguments.of(new byte[] { 65, 0 }, "IEAA===="),
+				Arguments.of(new byte[] { 1, 1, 1 }, "AEAQC==="),
+				Arguments.of(new byte[] { 127, 0, -2, 3 }, "P4AP4AY=")
+
 		);
 	}
 
 	@ParameterizedTest
 	@MethodSource("getInputsAndOutputs")
 	@DisplayName("base32Encode with valid input gives expected output")
-	void base32EncodeWithValidInputGivesExpectedResult(final ImmutableByteArray input, final String expectedOutput) {
+	void base32EncodeWithValidInputGivesExpectedResult(final byte[] input, final String expectedOutput) {
 		final String result = base32Service.base32Encode(input);
 
 		assertEquals(expectedOutput, result);
@@ -67,10 +67,10 @@ class Base32ServiceTest {
 	@ParameterizedTest
 	@MethodSource("getInputsAndOutputs")
 	@DisplayName("base32Decode with valid inputs gives expected output")
-	void base32DecodeWithValidInputGivesExpectedResult(final ImmutableByteArray expectedOutput, final String input) {
-		final ImmutableByteArray result = base32Service.base32Decode(input);
+	void base32DecodeWithValidInputGivesExpectedResult(final byte[] expectedOutput, final String input) {
+		final byte[] result = base32Service.base32Decode(input);
 
-		assertEquals(expectedOutput, result);
+		assertArrayEquals(expectedOutput, result);
 	}
 
 	static Stream<String> getInvalidStrings() {
@@ -90,10 +90,10 @@ class Base32ServiceTest {
 	@RepeatedTest(10)
 	@DisplayName("base32Encode then base32Decode returns initial value")
 	void base32EncodeThenBase32DecodeReturnsInitialValue() {
-		final ImmutableByteArray randomBytes = randomService.randomBytes(16);
+		final byte[] randomBytes = randomService.randomBytes(16);
 
 		final String string = base32Service.base32Encode(randomBytes);
-		final ImmutableByteArray result = base32Service.base32Decode(string);
-		assertEquals(randomBytes, result);
+		final byte[] result = base32Service.base32Decode(string);
+		assertArrayEquals(randomBytes, result);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
-import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -63,7 +62,7 @@ public class ElGamalMultiRecipientMessages {
 
 		return Stream.generate(() -> constant)
 				.limit(size)
-				.collect(collectingAndThen(toGroupVector(), ElGamalMultiRecipientMessage::new));
+				.collect(collectingAndThen(GroupVector.toGroupVector(), ElGamalMultiRecipientMessage::new));
 	}
 
 	/**
@@ -72,17 +71,14 @@ public class ElGamalMultiRecipientMessages {
 	public static ElGamalMultiRecipientMessage getMessage(final ElGamalMultiRecipientCiphertext ciphertext,
 			final ElGamalMultiRecipientPrivateKey secretKey) {
 
-		// Input.
-		final ElGamalMultiRecipientCiphertext c = checkNotNull(ciphertext);
-		final ElGamalMultiRecipientPrivateKey sk = checkNotNull(secretKey);
-
-		// Cross-group checks.
+		checkNotNull(ciphertext);
+		checkNotNull(secretKey);
 		checkArgument(ciphertext.getGroup().hasSameOrderAs(secretKey.getGroup()), "Ciphertext and secret key must be of the same order");
 		checkArgument(0 < ciphertext.size(), "A ciphertext must not be empty");
-
-		// Require.
 		checkArgument(ciphertext.size() <= secretKey.size(), "There cannot be more message elements than private key elements.");
 
+		final ElGamalMultiRecipientCiphertext c = ciphertext;
+		final ElGamalMultiRecipientPrivateKey sk = secretKey;
 
 		final int l = c.size();
 		final GqElement gamma = c.getGamma();
@@ -92,10 +88,10 @@ public class ElGamalMultiRecipientMessages {
 			indices = indices.parallel();
 		}
 
-		// Operation.
+		// Algorithm.
 		final GroupVector<GqElement, GqGroup> messageElements = indices
 				.mapToObj(i -> c.get(i).multiply(gamma.exponentiate(sk.get(i).negate())))
-				.collect(toGroupVector());
+				.collect(GroupVector.toGroupVector());
 
 		return new ElGamalMultiRecipientMessage(messageElements);
 	}

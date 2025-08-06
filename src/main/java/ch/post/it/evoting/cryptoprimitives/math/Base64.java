@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.math.Base64Service;
 
 public sealed interface Base64 permits Base64Service {
@@ -26,7 +25,7 @@ public sealed interface Base64 permits Base64Service {
 	 * @param byteArray B, the byte array to be encoded.
 	 * @return the Base64 string representing the byte array.
 	 */
-	String base64Encode(final ImmutableByteArray byteArray);
+	String base64Encode(final byte[] byteArray);
 
 	/**
 	 * Decodes a given Base64 string to a byte array.
@@ -35,5 +34,5 @@ public sealed interface Base64 permits Base64Service {
 	 * @return the byte array represented by the given Base64 string.
 	 * @throws IllegalArgumentException if the given string is not a valid Base64 string.
 	 */
-	ImmutableByteArray base64Decode(final String string);
+	byte[] base64Decode(final String string);
 }

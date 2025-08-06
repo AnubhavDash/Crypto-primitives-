@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,14 @@ public final class Strings {
 		// Intentionally left blank.
 	}
 
-	/**
-	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.Strings#truncate(String, int)}
-	 */
 	public static String truncate(final String string, final int length) {
 
 		final String S = checkNotNull(string);
 		final int u = S.length();
 		final int l = length;
 
-		checkArgument(l >= 0, "The input length must be non-negative. [l: %s]", l);
+		checkArgument(u > 0, "The input string must be non-empty. [u: %s]", u);
+		checkArgument(l > 0, "The input length must be strictly positive. [l: %s]", l);
 
 		// Operation. This implementation yields the same result as the specification's pseudocode,
 		// and we have a corresponding unit test that asserts the equivalence of the two implementations.

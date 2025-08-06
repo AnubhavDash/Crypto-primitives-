@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package ch.post.it.evoting.cryptoprimitives.symmetric;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import java.util.List;
+
 
 /**
  * Provides methods for symmetric encryption/decryption.
@@ -32,8 +32,7 @@ public interface Symmetric {
 	 * @return The authenticated ciphertext C ∈ B<sup>c</sup> and the nonce ∈ B<sup>n</sup>.
 	 * @throws IllegalArgumentException if the given encryptionKey is invalid for this underlying algorithm.
 	 */
-	SymmetricCiphertext genCiphertextSymmetric(final ImmutableByteArray encryptionKey, final ImmutableByteArray plaintext,
-			final ImmutableList<String> associatedData);
+	SymmetricCiphertext genCiphertextSymmetric(final byte[] encryptionKey, final byte[] plaintext, final List<String> associatedData);
 
 	/**
 	 * Symmetric authenticated decryption scheme based on authenticated Decryption with Associated Data (AEAD)
@@ -49,8 +48,8 @@ public interface Symmetric {
 	 *                                      <li>the nonce does not match the expected format.</li>
 	 *                                  </ul>
 	 */
-	ImmutableByteArray getPlaintextSymmetric(final ImmutableByteArray encryptionKey, final ImmutableByteArray ciphertext,
-			final ImmutableByteArray nonce, final ImmutableList<String> associatedData);
+	byte[] getPlaintextSymmetric(final byte[] encryptionKey, final byte[] ciphertext, final byte[] nonce, final List<String> associatedData);
+
 
 	/**
 	 * Gets the byte length of the nonce for this algorithm

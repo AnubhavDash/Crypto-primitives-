@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,16 @@
  */
 package ch.post.it.evoting.cryptoprimitives.elgamal;
 
-import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -74,11 +73,12 @@ public final class ElGamalMultiRecipientCiphertext implements GroupVectorElement
 	 *              </ul>
 	 * @return A new ElGamalMultiRecipientCiphertext with the specified gamma and phis
 	 */
-	public static ElGamalMultiRecipientCiphertext create(final GqElement gamma, final GroupVector<GqElement, GqGroup> phis) {
+	public static ElGamalMultiRecipientCiphertext create(final GqElement gamma, final List<GqElement> phis) {
 		checkNotNull(gamma);
-		checkNotNull(phis);
 
-		return new ElGamalMultiRecipientCiphertext(gamma, phis);
+		final GroupVector<GqElement, GqGroup> phisVector = GroupVector.from(checkNotNull(phis));
+
+		return new ElGamalMultiRecipientCiphertext(gamma, phisVector);
 	}
 
 	/**
@@ -139,14 +139,14 @@ public final class ElGamalMultiRecipientCiphertext implements GroupVectorElement
 
 		final GqElement gamma = this.gamma.exponentiate(a);
 
-		final Stream<GqElement> elementStream;
+		Stream<GqElement> elementStream;
 
 		if (ENABLE_PARALLEL_STREAMS) {
 			elementStream = this.phis.parallelStream();
 		} else {
 			elementStream = this.phis.stream();
 		}
-		final GroupVector<GqElement, GqGroup> phi = elementStream
+		GroupVector<GqElement, GqGroup> phi = elementStream
 				.map(phi_i -> phi_i.exponentiate(a))
 				.collect(toGroupVector());
 
@@ -209,13 +209,13 @@ public final class ElGamalMultiRecipientCiphertext implements GroupVectorElement
 
 	@Override
 	public String toString() {
-		return "ElGamalMultiRecipientCiphertext{" + "gamma=" + gamma + ", phis=" + phis.stream().map(GqElement::getValue).map(BigInteger::toString)
-				.toList() + '}';
+		final List<String> simplePhis = phis.stream().map(GqElement::getValue).map(BigInteger::toString).toList();
+		return "ElGamalMultiRecipientCiphertext{" + "gamma=" + gamma + ", phis=" + simplePhis + '}';
 	}
 
 	@Override
-	public ImmutableList<Hashable> toHashableForm() {
-		return this.stream().collect(toImmutableList());
+	public List<? extends Hashable> toHashableForm() {
+		return this.stream().toList();
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.math.Base16Service;
 
 public sealed interface Base16 permits Base16Service {
@@ -26,7 +25,7 @@ public sealed interface Base16 permits Base16Service {
 	 * @param byteArray B, the byte array to be encoded.
 	 * @return the Base16 string representing the byte array.
 	 */
-	String base16Encode(final ImmutableByteArray byteArray);
+	String base16Encode(final byte[] byteArray);
 
 	/**
 	 * Decodes a given Base16 string to a byte array.
@@ -34,5 +33,5 @@ public sealed interface Base16 permits Base16Service {
 	 * @param string S, the Base16 string to be decoded. Must have a valid Base16 format.
 	 * @return the byte array represented by the given Base16 string.
 	 */
-	ImmutableByteArray base16Decode(final String string);
+	byte[] base16Decode(final String string);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -43,8 +45,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamal;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
@@ -210,58 +210,58 @@ class SingleValueProductArgumentServiceTest extends TestGroupSetup {
 			// product = 9
 			final ZqElement product = ZqElement.create(BigInteger.valueOf(9), specificZqGroup);
 			// a = (2, 10)
-			final GroupVector<ZqElement, ZqGroup> a = GroupVector.of(
-					ZqElement.create(BigInteger.TWO, specificZqGroup),
-					ZqElement.create(BigInteger.TEN, specificZqGroup));
+			final List<ZqElement> a = new ArrayList<>();
+			a.add(ZqElement.create(BigInteger.TWO, specificZqGroup));
+			a.add(ZqElement.create(BigInteger.TEN, specificZqGroup));
 			// r = 5
 			final ZqElement r = ZqElement.create(BigInteger.valueOf(5), specificZqGroup);
 			// pk = (8, 16)
-			final GroupVector<GqElement, GqGroup> pkElements = GroupVector.of(
-					GqElementFactory.fromValue(BigInteger.valueOf(8), specificGqGroup),
-					GqElementFactory.fromValue(BigInteger.valueOf(16), specificGqGroup));
-			final ElGamalMultiRecipientPublicKey pk = new ElGamalMultiRecipientPublicKey(pkElements);
+			final List<GqElement> pkElements = new ArrayList<>(2);
+			pkElements.add(GqElementFactory.fromValue(BigInteger.valueOf(8), specificGqGroup));
+			pkElements.add(GqElementFactory.fromValue(BigInteger.valueOf(16), specificGqGroup));
+			final ElGamalMultiRecipientPublicKey pk = new ElGamalMultiRecipientPublicKey(GroupVector.from(pkElements));
 			// ck = (2, 3, 4)
-			final GroupVector<GqElement, GqGroup> gElements = GroupVector.of(
-					GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup),
-					GqElementFactory.fromValue(BigInteger.valueOf(4), specificGqGroup));
+			final List<GqElement> gElements = new ArrayList<>(2);
 			final GqElement h = GqElementFactory.fromValue(BigInteger.TWO, specificGqGroup);
-			final CommitmentKey ck = new CommitmentKey(h, gElements);
+			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup));
+			gElements.add(GqElementFactory.fromValue(BigInteger.valueOf(4), specificGqGroup));
+			final CommitmentKey ck = new CommitmentKey(h, GroupVector.from(gElements));
 			// expected = (16, 2, 3, (1, 8), (1, 2), 5, 7)
 			final GqElement cd = GqElementFactory.fromValue(BigInteger.valueOf(16), specificGqGroup);
 			final GqElement cdelta = GqElementFactory.fromValue(BigInteger.TWO, specificGqGroup);
 			final GqElement cDelta = GqElementFactory.fromValue(BigInteger.valueOf(3), specificGqGroup);
-			final GroupVector<ZqElement, ZqGroup> aTilde = GroupVector.of(
-					ZqElement.create(BigInteger.ONE, specificZqGroup),
-					ZqElement.create(BigInteger.valueOf(8), specificZqGroup));
-			final GroupVector<ZqElement, ZqGroup> bTilde = GroupVector.of(
-					ZqElement.create(BigInteger.ONE, specificZqGroup),
-					ZqElement.create(BigInteger.TWO, specificZqGroup));
+			final List<ZqElement> aTilde = new ArrayList<>(2);
+			aTilde.add(ZqElement.create(BigInteger.ONE, specificZqGroup));
+			aTilde.add(ZqElement.create(BigInteger.valueOf(8), specificZqGroup));
+			final List<ZqElement> bTilde = new ArrayList<>(2);
+			bTilde.add(ZqElement.create(BigInteger.ONE, specificZqGroup));
+			bTilde.add(ZqElement.create(BigInteger.TWO, specificZqGroup));
 			final ZqElement rTilde = ZqElement.create(BigInteger.valueOf(5), specificZqGroup);
 			final ZqElement sTilde = ZqElement.create(BigInteger.valueOf(7), specificZqGroup);
 			final SingleValueProductArgument expected = new SingleValueProductArgument.Builder()
 					.with_c_d(cd)
 					.with_c_delta(cdelta)
 					.with_c_Delta(cDelta)
-					.with_a_tilde(aTilde)
-					.with_b_tilde(bTilde)
+					.with_a_tilde(GroupVector.from(aTilde))
+					.with_b_tilde(GroupVector.from(bTilde))
 					.with_r_tilde(rTilde)
 					.with_s_tilde(sTilde)
 					.build();
 
 			//Mock random integers
-			final TestRandomService testRandomService = spy(new TestRandomService());
+			final TestRandomService randomService = spy(new TestRandomService());
 			doReturn(BigInteger.valueOf(3), BigInteger.valueOf(7), // d_0, d_1
 					BigInteger.TEN,                        // r_d
 					BigInteger.valueOf(4), BigInteger.valueOf(8))  // s_0, s_x
-					.when(testRandomService).genRandomInteger(specificZqGroup.getQ());
+					.when(randomService).genRandomInteger(specificZqGroup.getQ());
 
-			final SingleValueProductStatement specificStatement= new SingleValueProductStatement(commitment, product);
-			final SingleValueProductWitness specificWitness = new SingleValueProductWitness(a, r);
+			final SingleValueProductStatement statement = new SingleValueProductStatement(commitment, product);
+			final SingleValueProductWitness witness = new SingleValueProductWitness(GroupVector.from(a), r);
 
-			final HashService hashServiceMock = mock(HashService.class);
-			when(hashServiceMock.recursiveHash(any(Hashable[].class))).thenReturn(ImmutableByteArray.of((byte) 0b1010));
-			final SingleValueProductArgumentService svpArgumentProvider = new SingleValueProductArgumentService(testRandomService, hashServiceMock, pk, ck);
-			assertEquals(expected, svpArgumentProvider.getSingleValueProductArgument(specificStatement, specificWitness));
+			final HashService hashService = mock(HashService.class);
+			when(hashService.recursiveHash(any(Hashable[].class))).thenReturn(new byte[] { 0b1010 });
+			final SingleValueProductArgumentService svpArgumentProvider = new SingleValueProductArgumentService(randomService, hashService, pk, ck);
+			assertEquals(expected, svpArgumentProvider.getSingleValueProductArgument(statement, witness));
 		}
 	}
 
@@ -342,9 +342,9 @@ class SingleValueProductArgumentServiceTest extends TestGroupSetup {
 				final SingleValueProductStatement singleValueProductStatement, final SingleValueProductArgument singleValueProductArgument,
 				final boolean expectedOutput, final String description) {
 
-			final HashService realHashService = HashService.getInstance();
+			final HashService hashService = HashService.getInstance();
 
-			final SingleValueProductArgumentService service = new SingleValueProductArgumentService(randomService, realHashService, publicKey,
+			final SingleValueProductArgumentService service = new SingleValueProductArgumentService(randomService, hashService, publicKey,
 					commitmentKey);
 
 			assertEquals(expectedOutput,
@@ -353,7 +353,7 @@ class SingleValueProductArgumentServiceTest extends TestGroupSetup {
 		}
 
 		Stream<Arguments> verifySingleValueProductArgumentRealValuesProvider() {
-			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-single-value-product-argument.json");
+			final List<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-single-value-product-argument.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// Context.
@@ -363,8 +363,8 @@ class SingleValueProductArgumentServiceTest extends TestGroupSetup {
 				final GqGroup gqGroup = context.getGqGroup();
 				final ZqGroup zqGroup = ZqGroup.sameOrderAs(gqGroup);
 
-				final ElGamalMultiRecipientPublicKey realPublicKey = context.parsePublicKey();
-				final CommitmentKey realCommitmentKey = context.parseCommitmentKey();
+				final ElGamalMultiRecipientPublicKey publicKey = context.parsePublicKey();
+				final CommitmentKey commitmentKey = context.parseCommitmentKey();
 
 				// Inputs.
 				final JsonData input = testParameters.getInput();
@@ -378,7 +378,7 @@ class SingleValueProductArgumentServiceTest extends TestGroupSetup {
 				final JsonData output = testParameters.getOutput();
 				final boolean outputValue = Boolean.parseBoolean(output.getJsonData("result").toString());
 
-				return Arguments.of(realPublicKey, realCommitmentKey, singleValueProductStatement, singleValueProductArgument, outputValue,
+				return Arguments.of(publicKey, commitmentKey, singleValueProductStatement, singleValueProductArgument, outputValue,
 						testParameters.getDescription());
 			});
 		}

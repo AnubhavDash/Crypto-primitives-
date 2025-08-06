@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ public class GenKeysAndCertService implements GenKeysAndCert {
 	public KeysAndCert genKeysAndCert(final LocalDate validFrom, final LocalDate validUntil) throws IllegalArgumentException {
 		checkNotNull(validFrom);
 		checkNotNull(validUntil);
-		checkArgument(validFrom.isBefore(validUntil), "Date validFrom is after validUntil");
+		checkArgument(validUntil.isAfter(validFrom), "Date validFrom is after validUntil");
 
 		final KeyPair keyPair = signatureSupportingAlgorithm.genKeyPair();
 

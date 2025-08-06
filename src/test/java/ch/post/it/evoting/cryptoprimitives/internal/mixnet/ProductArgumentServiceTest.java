@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,8 +48,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
@@ -236,7 +234,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 			assertFalse(argument.get_c_b().isPresent());
 			assertFalse(argument.getHadamardArgument().isPresent());
 
-			final SingleValueProductStatement sStatement = new SingleValueProductStatement(smallStatement.get_c_A().getFirst(),
+			final SingleValueProductStatement sStatement = new SingleValueProductStatement(smallStatement.get_c_A().get(0),
 					smallStatement.get_b());
 			assertTrue(new SingleValueProductArgumentService(randomService, hashService, publicKey, commitmentKey)
 					.verifySingleValueProductArgument(sStatement, argument.getSingleValueProductArgument()).verify().isVerified());
@@ -247,7 +245,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 		void getProductArgumentWithBadCommitment() {
 			final List<GqElement> commitmentList = new ArrayList<>(commitmentsA);
 			final GqElement g = commitmentsA.getGroup().getGenerator();
-			GqElement first = commitmentList.getFirst();
+			GqElement first = commitmentList.get(0);
 			first = first.multiply(g);
 			commitmentList.set(0, first);
 			commitmentsA = GroupVector.from(commitmentList);
@@ -295,8 +293,9 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 			final ZqElement zqFour = ZqElement.create(BigInteger.valueOf(4), zqGroup);
 
 			// Create HadamardArgumentService
-			final int numElements = 2;
-			final ElGamalMultiRecipientKeyPair keyPair = new ElGamalService().genKeyPair(gqGroup, numElements, randomService);
+			final int n = 2;
+			final int m = 3;
+			final ElGamalMultiRecipientKeyPair keyPair = new ElGamalService().genKeyPair(gqGroup, n, randomService);
 			final ElGamalMultiRecipientPublicKey productPublicKey = keyPair.getPublicKey();
 			final CommitmentKey productCommitmentKey = new CommitmentKey(gqNine, GroupVector.of(gqFour, gqNine));
 			final RandomService productRandomService = spy(RandomService.class);
@@ -318,30 +317,26 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 					four, one, zero, // d_0, d_1, r_d
 					one, two // s_0, s_x
 			).when(productRandomService).genRandomInteger(any());
-			when(productHashService.recursiveHash(any(Hashable[].class))).thenReturn(
-					ImmutableByteArray.of((byte) 0b10),
-					ImmutableByteArray.of((byte) 0b11),
-					ImmutableByteArray.of((byte) 0b01),
-					ImmutableByteArray.of((byte) 0b10));
+			when(productHashService.recursiveHash(any(Hashable[].class)))
+					.thenReturn(new byte[] { 0b10 }, new byte[] { 0b11 }, new byte[] { 0b01 }, new byte[] { 0b10 });
 			final ProductArgumentService specificProductArgumentService = new ProductArgumentService(productRandomService, productHashService,
 					productPublicKey, productCommitmentKey);
 
 			// Create A and r
-			final GroupVector<GroupVector<ZqElement, ZqGroup>, ZqGroup> matrixColumns = GroupVector.of(
-					GroupVector.of(zqOne, zqThree),
-					GroupVector.of(zqTwo, zqFour),
-					GroupVector.of(zqZero, zqOne));
-
+			final List<List<ZqElement>> matrixColumns = new ArrayList<>(m);
+			matrixColumns.add(0, Arrays.asList(zqOne, zqThree));
+			matrixColumns.add(1, Arrays.asList(zqTwo, zqFour));
+			matrixColumns.add(2, Arrays.asList(zqZero, zqOne));
 			final GroupMatrix<ZqElement, ZqGroup> matrix = GroupMatrix.fromColumns(matrixColumns);
-			final GroupVector<ZqElement, ZqGroup> exponents = GroupVector.of(zqOne, zqTwo, zqFour);
+			final GroupVector<ZqElement, ZqGroup> exponents = GroupVector.from(Arrays.asList(zqOne, zqTwo, zqFour));
 
 			final ProductWitness productWitness = new ProductWitness(matrix, exponents);
 
 			// Calculate c_A and b
-			final GroupVector<GqElement, GqGroup> specificCommitmentsA = CommitmentService.getCommitmentMatrix(matrix, exponents, productCommitmentKey);
+			final GroupVector<GqElement, GqGroup> commitmentsA = CommitmentService.getCommitmentMatrix(matrix, exponents, productCommitmentKey);
 			final ZqElement product = matrix.flatStream().reduce(zqOne, ZqElement::multiply);
 
-			final ProductStatement productStatement = new ProductStatement(specificCommitmentsA, product);
+			final ProductStatement productStatement = new ProductStatement(commitmentsA, product);
 
 			// Create the expected zeroArgument
 			final ZeroArgument expectedZeroArgument = new ZeroArgument.Builder().with_c_A_0(gqFive)
@@ -393,16 +388,16 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 		}
 
 		Stream<Arguments> statementArgumentProvider() {
-			final int random_n = randomService.genRandomInteger(nu - 1) + 2;
+			final int n = randomService.genRandomInteger(nu - 1) + 2;
 
 			// Create ProductStatement and ProductArgument for testing with m > 1
 			final int m = randomService.genRandomInteger(BOUND_FOR_RANDOM_ELEMENTS - 2) + 2;
-			final ProductWitness longWitness = genProductWitness(random_n, m, zqGroupGenerator);
+			final ProductWitness longWitness = genProductWitness(n, m, zqGroupGenerator);
 			final ProductStatement longStatement = getProductStatement(longWitness, commitmentKey);
 			final ProductArgument longArgument = productArgumentService.getProductArgument(longStatement, longWitness);
 
 			// Create ProductStatement and ProductArgument for testing with m = 1
-			final ProductWitness shortWitness = genProductWitness(random_n, 1, zqGroupGenerator);
+			final ProductWitness shortWitness = genProductWitness(n, 1, zqGroupGenerator);
 			final ProductStatement shortStatement = getProductStatement(shortWitness, commitmentKey);
 			final ProductArgument shortArgument = productArgumentService.getProductArgument(shortStatement, shortWitness);
 
@@ -501,7 +496,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = productArgumentService.verifyProductArgument(longStatement, badArgument).verify();
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify Hadamard Argument.", verificationResult.getErrorMessages().get(0));
+			assertEquals("Failed to verify Hadamard Argument.", verificationResult.getErrorMessages().element());
 		}
 
 		@Test
@@ -516,7 +511,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 					.orElseThrow(() -> new IllegalArgumentException("Missing HadamardArgument"));
 			final GroupVector<GqElement, GqGroup> cUpperB = hadamardArgument.get_c_B();
 
-			final GqElement badcUpperB0 = cUpperB.getFirst().multiply(gqGroup.getGenerator());
+			final GqElement badcUpperB0 = cUpperB.get(0).multiply(gqGroup.getGenerator());
 			final GroupVector<GqElement, GqGroup> badcUpperB = cUpperB.stream().skip(1).collect(toGroupVector()).prepend(badcUpperB0);
 			final HadamardArgument badHadamardArgument = new HadamardArgument(badcUpperB, hadamardArgument.get_zeroArgument());
 			final ProductArgument badArgument = new ProductArgument(
@@ -525,7 +520,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = productArgumentService.verifyProductArgument(longStatement, badArgument).verify();
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify Hadamard Argument.", verificationResult.getErrorMessages().get(0));
+			assertEquals("Failed to verify Hadamard Argument.", verificationResult.getErrorMessages().element());
 		}
 
 		@ParameterizedTest
@@ -554,7 +549,7 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = productArgumentService.verifyProductArgument(statement, badArgument).verify();
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify Single Value Product Argument.", verificationResult.getErrorMessages().get(0));
+			assertEquals("Failed to verify Single Value Product Argument.", verificationResult.getErrorMessages().element());
 		}
 
 		@ParameterizedTest
@@ -606,17 +601,17 @@ class ProductArgumentServiceTest extends TestGroupSetup {
 				final ProductStatement productStatement, final ProductArgument productArgument, final boolean expectedOutput,
 				final String description) {
 
-			final HashService realHashService = HashService.getInstance();
+			final HashService hashService = HashService.getInstance();
 
-			final ProductArgumentService realProductArgumentService = new ProductArgumentService(randomService, realHashService, publicKey,
+			final ProductArgumentService productArgumentService = new ProductArgumentService(randomService, hashService, publicKey,
 					commitmentKey);
 
-			assertEquals(expectedOutput, realProductArgumentService.verifyProductArgument(productStatement, productArgument).verify().isVerified(),
+			assertEquals(expectedOutput, productArgumentService.verifyProductArgument(productStatement, productArgument).verify().isVerified(),
 					String.format("assertion failed for: %s", description));
 		}
 
 		Stream<Arguments> verifyProductArgumentRealValuesProvider() {
-			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-product-argument.json");
+			final List<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-product-argument.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// TestContextParser.

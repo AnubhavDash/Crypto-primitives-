@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,14 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator
 class TestMultiExponentiationWitnessGenerator {
 	private final ZqGroupGenerator zqGroupGenerator;
 
-	TestMultiExponentiationWitnessGenerator(final ZqGroup group) {
+	TestMultiExponentiationWitnessGenerator(ZqGroup group) {
 		this.zqGroupGenerator = new ZqGroupGenerator(group);
 	}
 
-	MultiExponentiationWitness genRandomWitness(final int n, final int m) {
-		final GroupMatrix<ZqElement, ZqGroup> matrixA = zqGroupGenerator.genRandomZqElementMatrix(n, m);
-		final GroupVector<ZqElement, ZqGroup> exponentsR = zqGroupGenerator.genRandomZqElementVector(m);
-		final ZqElement exponentsRho = zqGroupGenerator.genRandomZqElementMember();
+	MultiExponentiationWitness genRandomWitness(int n, int m) {
+		GroupMatrix<ZqElement, ZqGroup> matrixA = zqGroupGenerator.genRandomZqElementMatrix(n, m);
+		GroupVector<ZqElement, ZqGroup> exponentsR = zqGroupGenerator.genRandomZqElementVector(m);
+		ZqElement exponentsRho = zqGroupGenerator.genRandomZqElementMember();
 		return new MultiExponentiationWitness(matrixA, exponentsR, exponentsRho);
 	}
 }

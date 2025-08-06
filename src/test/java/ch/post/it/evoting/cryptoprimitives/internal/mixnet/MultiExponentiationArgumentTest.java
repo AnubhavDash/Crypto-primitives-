@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,6 @@ class MultiExponentiationArgumentTest extends TestGroupSetup {
 
 	private static GqElement cA0;
 	private static GroupVector<GqElement, GqGroup> cBVector;
-	@SuppressWarnings("java:S3008")
 	private static GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> EVector;
 	private static GroupVector<ZqElement, ZqGroup> aVector;
 	private static ZqElement r;
@@ -102,7 +101,6 @@ class MultiExponentiationArgumentTest extends TestGroupSetup {
 		);
 	}
 
-	@SuppressWarnings("java:S117")
 	@ParameterizedTest
 	@MethodSource("nullArgumentsProvider")
 	void builtWithNullFields(final GqElement cA0, final GroupVector<GqElement, GqGroup> cBVector,

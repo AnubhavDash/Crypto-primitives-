@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import ch.post.it.evoting.cryptoprimitives.collection.AuxiliaryInformation;
+import com.google.common.base.Preconditions;
+
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientKeyPair;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
@@ -54,7 +56,7 @@ import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.DecryptionProof;
 @SuppressWarnings("java:S117")
 public class DecryptionProofService {
 
-	private static final HashableString DECRYPTION_PROOF = HashableString.from("DecryptionProof");
+	private static final String DECRYPTION_PROOF = "DecryptionProof";
 
 	private final ElGamalService elGamalService = new ElGamalService();
 	private final RandomService randomService;
@@ -77,22 +79,19 @@ public class DecryptionProofService {
 	static GroupVector<GqElement, GqGroup> computePhiDecryption(final GroupVector<ZqElement, ZqGroup> preImage, final GqElement base) {
 		checkNotNull(preImage);
 		checkNotNull(base);
-
-		// Context.
-		final GqElement g = base.getGroup().getGenerator();
-
-		// Input.
-		final GroupVector<ZqElement, ZqGroup> x = preImage;
-		final GqElement gamma = base;
 		checkArgument(preImage.getGroup().hasSameOrderAs(base.getGroup()), "The preImage and base should have the same group order.");
 
-		// Operation.
-		// Output.
-		// image y
-		return Stream.concat(
-				x.stream().map(g::exponentiate),
-				x.stream().map(gamma::exponentiate)
-		).collect(toGroupVector());
+		final GroupVector<ZqElement, ZqGroup> x = preImage;
+		final GqElement gamma = base;
+
+		final GqElement g = base.getGroup().getGenerator();
+
+		final GroupVector<GqElement, GqGroup> y = Stream.concat(
+						x.stream().map(g::exponentiate),
+						x.stream().map(gamma::exponentiate))
+				.collect(toGroupVector());
+
+		return GroupVector.from(y);
 	}
 
 	/**
@@ -105,19 +104,21 @@ public class DecryptionProofService {
 	 *     <li>the ciphertext and the secret key must have the same group order</li>
 	 * </ul>
 	 *
-	 * @param ciphertext           c, an ElGamal ciphertext for which correct decryption is to be proved. Must be non-null.
-	 * @param keyPair              (pk, sk), the pair of public key and secret key used for encryption and decryption. Must be non-null.
-	 * @param message              m, the message that is obtained by decrypting c with the secret key {@code sk}. Must be non-null.
-	 * @param auxiliaryInformation i<sub>aux</sub>, auxiliary information to be used for the hash. Must be non-null. Can be empty.
+	 * @param ciphertext           c, an ElGamal ciphertext for which correct decryption is to be proved. Must be non null.
+	 * @param keyPair              (pk, sk), the pair of public key and secret key used for encryption and decryption. Must be non null.
+	 * @param message              m, the message that is obtained by decrypting c with the secret key {@code sk}. Must be non null.
+	 * @param auxiliaryInformation i<sub>aux</sub>, auxiliary information to be used for the hash. Must be non null. Can be empty.
 	 * @return a decryption proof.
 	 */
 	public DecryptionProof genDecryptionProof(final ElGamalMultiRecipientCiphertext ciphertext, final ElGamalMultiRecipientKeyPair keyPair,
-			final ElGamalMultiRecipientMessage message, final AuxiliaryInformation auxiliaryInformation) {
+			final ElGamalMultiRecipientMessage message, final List<String> auxiliaryInformation) {
 		checkNotNull(ciphertext);
 		checkNotNull(keyPair);
 		checkNotNull(message);
 
-		final AuxiliaryInformation i_aux = checkNotNull(auxiliaryInformation);
+		final List<String> i_aux = checkNotNull(auxiliaryInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 		final ElGamalMultiRecipientCiphertext C = ciphertext;
 		final ElGamalMultiRecipientPrivateKey sk = keyPair.getPrivateKey();
 		final ElGamalMultiRecipientPublicKey pk = keyPair.getPublicKey();
@@ -152,9 +153,14 @@ public class DecryptionProofService {
 				.collect(toGroupVector());
 		final HashableList h_aux;
 		if (!i_aux.isEmpty()) {
-			h_aux = HashableList.of(DECRYPTION_PROOF, phi, m, i_aux);
+			h_aux = HashableList.of(HashableString.from(DECRYPTION_PROOF),
+					phi,
+					m,
+					HashableList.from(i_aux.stream()
+							.map(HashableString::from)
+							.toList()));
 		} else {
-			h_aux = HashableList.of(DECRYPTION_PROOF, phi, m);
+			h_aux = HashableList.of(HashableString.from(DECRYPTION_PROOF), phi, m);
 		}
 		final BigInteger e_value = byteArrayToInteger(hashService.recursiveHash(f, y, c, h_aux));
 		final ZqElement e = ZqElement.create(e_value, ZqGroup.sameOrderAs(gqGroup));
@@ -175,21 +181,23 @@ public class DecryptionProofService {
 	 *     <li>The ciphertext must be smaller than or equal to the public key.</li>
 	 * </ul>
 	 *
-	 * @param ciphertext           C, the ciphertext that was used to generate the proof. Must be non-null.
-	 * @param publicKey            pk, the public key that was used to generate the proof. Must be non-null.
-	 * @param message              m, the message that was used to generate the proof. Must be non-null.
-	 * @param decryptionProof      (e, z), the decryption proof to be verified. Must be non-null.
-	 * @param auxiliaryInformation i<sub>aux</sub>, auxiliary information that was used during proof generation. Must be non-null.
+	 * @param ciphertext           C, the ciphertext that was used to generate the proof. Must be non null.
+	 * @param publicKey            pk, the public key that was used to generate the proof. Must be non null.
+	 * @param message              m, the message that was used to generate the proof. Must be non null.
+	 * @param decryptionProof      (e, z), the decryption proof to be verified. Must be non null.
+	 * @param auxiliaryInformation i<sub>aux</sub>, auxiliary information that was used during proof generation. Must be non null.
 	 * @return {@code true} if the decryption proof is valid, {@code false} otherwise.
 	 */
 	public Verifiable verifyDecryption(final ElGamalMultiRecipientCiphertext ciphertext, final ElGamalMultiRecipientPublicKey publicKey,
-			final ElGamalMultiRecipientMessage message, final DecryptionProof decryptionProof, final AuxiliaryInformation auxiliaryInformation) {
+			final ElGamalMultiRecipientMessage message, final DecryptionProof decryptionProof, final List<String> auxiliaryInformation) {
 		checkNotNull(ciphertext);
 		checkNotNull(publicKey);
 		checkNotNull(message);
 		checkNotNull(decryptionProof);
 
-		final AuxiliaryInformation i_aux = checkNotNull(auxiliaryInformation);
+		final List<String> i_aux = checkNotNull(auxiliaryInformation).stream()
+				.map(Preconditions::checkNotNull)
+				.toList();
 		final ElGamalMultiRecipientCiphertext C = ciphertext;
 		final ElGamalMultiRecipientPublicKey pk = publicKey;
 		final ElGamalMultiRecipientMessage m = message;
@@ -232,9 +240,14 @@ public class DecryptionProofService {
 				.collect(toGroupVector());
 		final HashableList h_aux;
 		if (!i_aux.isEmpty()) {
-			h_aux = HashableList.of(DECRYPTION_PROOF, phi, m, i_aux);
+			h_aux = HashableList.of(HashableString.from(DECRYPTION_PROOF),
+					phi,
+					m,
+					HashableList.from(i_aux.stream()
+							.map(HashableString::from)
+							.toList()));
 		} else {
-			h_aux = HashableList.of(DECRYPTION_PROOF, phi, m);
+			h_aux = HashableList.of(HashableString.from(DECRYPTION_PROOF), phi, m);
 		}
 		final BigInteger e_prime_value = byteArrayToInteger(hashService.recursiveHash(f, y, c_prime, h_aux));
 		final ZqElement e_prime = ZqElement.create(e_prime_value, zqGroup);

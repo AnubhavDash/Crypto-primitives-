@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,11 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.securitylevel;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.bouncycastle.crypto.digests.SHAKEDigest;
-
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 
 /**
  * This class is thread safe.
  */
-@SuppressWarnings({"java:S6548"})
 public class SHAKE256 implements XOF {
 
 	private static final SHAKE256 INSTANCE = new SHAKE256();
@@ -40,17 +34,14 @@ public class SHAKE256 implements XOF {
 	}
 
 	@Override
-	public ImmutableByteArray xof(final Integer outputLength, final ImmutableByteArray message) {
-		checkArgument(outputLength > 0, "The output length must be strictly positive.");
-		checkNotNull(message);
-
+	public byte[] xof(final Integer outputLength, final byte[] message) {
 		final byte[] result = new byte[outputLength];
 		final SHAKEDigest shakeDigest = new SHAKEDigest(256);
 
-		shakeDigest.update(message.elements(), 0, message.length());
+		shakeDigest.update(message, 0, message.length);
 		shakeDigest.doFinal(result, 0, outputLength);
 
-		return new ImmutableByteArray(result);
+		return result;
 	}
 
 	@Override

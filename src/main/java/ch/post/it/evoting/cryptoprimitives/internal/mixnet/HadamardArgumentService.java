@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import java.util.stream.Stream;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
@@ -182,11 +181,11 @@ public class HadamardArgumentService {
 		final GroupVector<GqElement, GqGroup> c_B = GroupVector.from(c_B_mutable);
 
 		// Calculate x
-		final ImmutableByteArray x_bytes = hashService.recursiveHash(HashableBigInteger.from(p), HashableBigInteger.from(q), pk, ck, c_A, c_b, c_B);
+		final byte[] x_bytes = hashService.recursiveHash(HashableBigInteger.from(p), HashableBigInteger.from(q), pk, ck, c_A, c_b, c_B);
 		final ZqElement x = ZqElement.create(ConversionsInternal.byteArrayToInteger(x_bytes), zqGroup);
 
 		// Calculate y
-		final ImmutableByteArray y_bytes = hashService.recursiveHash(
+		final byte[] y_bytes = hashService.recursiveHash(
 				HashableString.from("1"),
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
@@ -298,7 +297,7 @@ public class HadamardArgumentService {
 
 		// Algorithm
 		// Calculate x
-		final ImmutableByteArray x_bytes = hashService.recursiveHash(
+		final byte[] x_bytes = hashService.recursiveHash(
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),
 				pk,
@@ -310,7 +309,7 @@ public class HadamardArgumentService {
 		final ZqElement x = ZqElement.create(ConversionsInternal.byteArrayToInteger(x_bytes), zqGroup);
 
 		// Calculate y
-		final ImmutableByteArray y_bytes = hashService.recursiveHash(
+		final byte[] y_bytes = hashService.recursiveHash(
 				HashableString.from("1"),
 				HashableBigInteger.from(p),
 				HashableBigInteger.from(q),

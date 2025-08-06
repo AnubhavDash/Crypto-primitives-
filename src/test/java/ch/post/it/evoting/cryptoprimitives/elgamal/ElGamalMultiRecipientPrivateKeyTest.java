@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ class ElGamalMultiRecipientPrivateKeyTest extends TestGroupSetup {
 	static Stream<Arguments> createInvalidArgumentsProvider() {
 		return Stream.of(
 				Arguments.of(null, NullPointerException.class, null),
-				Arguments.of(GroupVector.empty(), IllegalArgumentException.class, "An ElGamal private key cannot be empty.")
+				Arguments.of(GroupVector.of(), IllegalArgumentException.class, "An ElGamal private key cannot be empty.")
 		);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.symmetric;
 
+import java.util.List;
+
 import com.google.common.annotations.VisibleForTesting;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.AEAD;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
@@ -46,14 +46,12 @@ public class SymmetricService implements Symmetric {
 	}
 
 	@Override
-	public SymmetricCiphertext genCiphertextSymmetric(final ImmutableByteArray encryptionKey, final ImmutableByteArray plaintext,
-			final ImmutableList<String> associatedData) {
+	public SymmetricCiphertext genCiphertextSymmetric(final byte[] encryptionKey, final byte[] plaintext, final List<String> associatedData) {
 		return symmetricAuthenticatedEncryptionService.genCiphertextSymmetric(encryptionKey, plaintext, associatedData);
 	}
 
 	@Override
-	public ImmutableByteArray getPlaintextSymmetric(final ImmutableByteArray encryptionKey, final ImmutableByteArray ciphertext,
-			final ImmutableByteArray nonce, final ImmutableList<String> associatedData) {
+	public byte[] getPlaintextSymmetric(final byte[] encryptionKey, final byte[] ciphertext, final byte[] nonce, final List<String> associatedData) {
 		return symmetricAuthenticatedEncryptionService.getPlaintextSymmetric(encryptionKey, ciphertext, nonce, associatedData);
 	}
 

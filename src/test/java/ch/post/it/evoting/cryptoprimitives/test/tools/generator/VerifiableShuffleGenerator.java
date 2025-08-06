@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,19 +27,19 @@ public class VerifiableShuffleGenerator {
 
 	private final GqGroup group;
 
-	public VerifiableShuffleGenerator(final GqGroup group) {
+	public VerifiableShuffleGenerator(GqGroup group) {
 		this.group = group;
 	}
 
-	public VerifiableShuffle genVerifiableShuffle(final int numCiphertexts, final int ciphertextSize) {
+	public VerifiableShuffle genVerifiableShuffle(int numCiphertexts, int ciphertextSize) {
 		final int[] matrixDimensions = MatrixUtils.getMatrixDimensions(numCiphertexts);
 		final int m = matrixDimensions[0];
 		final int n = matrixDimensions[1];
 
-		final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(group);
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator
+		ElGamalGenerator elGamalGenerator = new ElGamalGenerator(group);
+		GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator
 				.genRandomCiphertextVector(numCiphertexts, ciphertextSize);
-		final ShuffleArgument shuffleArgument = new TestArgumentGenerator(group).genShuffleArgument(m, n, ciphertextSize);
+		ShuffleArgument shuffleArgument = new TestArgumentGenerator(group).genShuffleArgument(m, n, ciphertextSize);
 		return new VerifiableShuffle(ciphertexts, shuffleArgument);
 	}
 }

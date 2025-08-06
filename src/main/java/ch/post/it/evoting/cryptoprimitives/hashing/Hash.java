@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package ch.post.it.evoting.cryptoprimitives.hashing;
 
 import java.math.BigInteger;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
@@ -38,7 +37,7 @@ public interface Hash {
 	 * </ul>
 	 * @throws IllegalStateException if the creation of the underlying message digest failed.
 	 */
-	ImmutableByteArray recursiveHash(Hashable... values);
+	byte[] recursiveHash(Hashable... values);
 
 	/**
 	 * Hashes a value and squares the result.

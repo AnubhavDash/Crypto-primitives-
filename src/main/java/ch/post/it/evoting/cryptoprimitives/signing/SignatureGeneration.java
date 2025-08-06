@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package ch.post.it.evoting.cryptoprimitives.signing;
 
 import java.security.SignatureException;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 
 public interface SignatureGeneration {
@@ -27,8 +26,8 @@ public interface SignatureGeneration {
 	 *
 	 * @param message               m, the message to be signed. Must be non-null.
 	 * @param additionalContextData c, additional context data. Must be non-null. May be empty.
-	 * @return the signature for the message as an {@code ImmutableByteArray}.
+	 * @return the signature for the message as a byte array
 	 * @throws SignatureException if the message is timestamped at a date the certificate is not valid for.
 	 */
-	ImmutableByteArray genSignature(Hashable message, Hashable additionalContextData) throws SignatureException;
+	byte[] genSignature(Hashable message, Hashable additionalContextData) throws SignatureException;
 }

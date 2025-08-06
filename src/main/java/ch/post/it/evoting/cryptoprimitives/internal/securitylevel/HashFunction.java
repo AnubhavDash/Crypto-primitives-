@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,9 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.securitylevel;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-
 /**
  * Cryptographic hash function
  */
 public interface HashFunction {
-	ImmutableByteArray hash(final ImmutableByteArray input);
+	byte[] hash(final byte[] input);
 }

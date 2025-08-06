@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ public class ZqGroupGenerator {
 	 * @return a vector of {@code numElements} random {@link ZqElement}.
 	 */
 	public GroupVector<ZqElement, ZqGroup> genRandomZqElementVector(final int numElements) {
-		return generateElementList(numElements, this::genRandomZqElementMember);
+		return GroupVector.from(generateElementList(numElements, this::genRandomZqElementMember));
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class ZqGroupGenerator {
 	 * @return a vector of {@code numElements} defined {@link ZqElement}.
 	 */
 	public GroupVector<ZqElement, ZqGroup> initializeElementVectorWithElement(final int numElements, final ZqElement element) {
-		return generateElementList(numElements, () -> element);
+		return GroupVector.from(generateElementList(numElements, () -> element));
 	}
 
 	/**

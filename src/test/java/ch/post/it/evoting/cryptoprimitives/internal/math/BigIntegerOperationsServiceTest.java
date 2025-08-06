@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,15 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
-import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -33,7 +35,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -59,13 +60,18 @@ class BigIntegerOperationsServiceTest {
 	private static final BigInteger ELEVEN = BigInteger.valueOf(11L);
 	private static final BigInteger TWENTY_ONE = BigInteger.valueOf(21L);
 
-	private static ImmutableList<BigInteger> bases;
-	private static ImmutableList<BigInteger> exponents;
+	private static List<BigInteger> bases;
+	private static List<BigInteger> exponents;
 
 	@BeforeAll
 	static void setUpAll() {
-		bases = ImmutableList.of(TWO, THREE);
-		exponents = ImmutableList.of(FIVE, SIX);
+		bases = new ArrayList<>();
+		bases.add(TWO);
+		bases.add(THREE);
+
+		exponents = new ArrayList<>();
+		exponents.add(FIVE);
+		exponents.add(SIX);
 	}
 
 	// provides arguments for null tests
@@ -87,7 +93,7 @@ class BigIntegerOperationsServiceTest {
 	@ParameterizedTest(name = "n1 = {0}, n2 = {1} and modulus = {2} throws NullPointerException")
 	@MethodSource("createArgumentsProvider")
 	@DisplayName("modMultiply with null parameters")
-	void modMultiplyNullArguments(final BigInteger n1, final BigInteger n2, final BigInteger modulus) {
+	void modMultiplyNullArguments(BigInteger n1, BigInteger n2, BigInteger modulus) {
 		assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.modMultiply(n1, n2, modulus));
 	}
 
@@ -112,7 +118,7 @@ class BigIntegerOperationsServiceTest {
 	@ParameterizedTest(name = "base = {0}, exponent = {1} and modulus = {2} throws NullPointerException")
 	@MethodSource("createArgumentsProvider")
 	@DisplayName("modExponentiate with null parameters")
-	void modExponentiateNullArguments(final BigInteger base, final BigInteger exponent, final BigInteger modulus) {
+	void modExponentiateNullArguments(BigInteger base, BigInteger exponent, BigInteger modulus) {
 		assertThrows(NullPointerException.class, () -> BigIntegerOperationsService.modExponentiate(base, exponent, modulus));
 	}
 
@@ -135,14 +141,13 @@ class BigIntegerOperationsServiceTest {
 
 	@Test
 	void checkMultiModExp() {
-		final ImmutableList<BigInteger> basesOneNegative = ImmutableList.of(TWO, THREE.negate());
+		final List<BigInteger> basesOneNegative = List.of(TWO, THREE.negate());
 
 		assertAll(
 				() -> assertEquals(FOUR, BigIntegerOperationsService.multiModExp(bases, exponents, SEVEN)),
 				() -> assertEquals(FOUR, BigIntegerOperationsService.multiModExp(basesOneNegative, exponents, SEVEN)),
-				() -> assertEquals(NINE, BigIntegerOperationsService.multiModExp(ImmutableList.of(FOUR, FIVE), ImmutableList.of(TWO, THREE), ELEVEN)),
-				() -> assertEquals(FIVE,
-						BigIntegerOperationsService.multiModExp(ImmutableList.of(FIVE, TWO.negate()), ImmutableList.of(THREE, TWO), ELEVEN))
+				() -> assertEquals(NINE, BigIntegerOperationsService.multiModExp(List.of(FOUR, FIVE), List.of(TWO, THREE), ELEVEN)),
+				() -> assertEquals(FIVE, BigIntegerOperationsService.multiModExp(List.of(FIVE, TWO.negate()), List.of(THREE, TWO), ELEVEN))
 		);
 	}
 
@@ -159,9 +164,8 @@ class BigIntegerOperationsServiceTest {
 				.mapToObj(i -> basesLargeGroup.get(i).exponentiate(exponentsLargeGroup.get(i)))
 				.reduce(largeGqGroup.getIdentity(), GqElement::multiply);
 
-		assertEquals(expected.getValue(),
-				BigIntegerOperationsService.multiModExp(basesLargeGroup.stream().map(GqElement::getValue).collect(toImmutableList()),
-						exponentsLargeGroup.stream().map(ZqElement::getValue).collect(toImmutableList()), largeGqGroup.getP()));
+		assertEquals(expected.getValue(), BigIntegerOperationsService.multiModExp(basesLargeGroup.stream().map(GqElement::getValue).toList(),
+				exponentsLargeGroup.stream().map(ZqElement::getValue).toList(), largeGqGroup.getP()));
 	}
 
 	@Test
@@ -184,25 +188,26 @@ class BigIntegerOperationsServiceTest {
 
 	@Test
 	void multiModExpEmptyBases() {
-		final ImmutableList<BigInteger> emptyList = ImmutableList.emptyList();
+		final List<BigInteger> emptyList = Collections.emptyList();
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.multiModExp(emptyList, exponents, SEVEN));
 	}
 
 	@Test
 	void multiModExpEmptyExponents() {
-		final ImmutableList<BigInteger> emptyList = ImmutableList.emptyList();
+		final List<BigInteger> emptyList = Collections.emptyList();
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.multiModExp(bases, emptyList, SEVEN));
 	}
 
 	@Test
 	void multiModExpNegativeExponents() {
-		final ImmutableList<BigInteger> exponentsOneNegative = ImmutableList.of(FIVE, SIX.negate());
+		final List<BigInteger> exponentsOneNegative = List.of(FIVE, SIX.negate());
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.multiModExp(bases, exponentsOneNegative, SEVEN));
 	}
 
 	@Test
 	void multiModExpBasesDifferentSizeExponents() {
-		final ImmutableList<BigInteger> arguments = Stream.concat(bases.stream(), Stream.of(FIVE)).collect(toImmutableList());
+		final List<BigInteger> arguments = new ArrayList<>(bases);
+		arguments.add(FIVE);
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.multiModExp(arguments, exponents, SEVEN));
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.multiModExp(bases, arguments, SEVEN));
 	}
@@ -255,8 +260,8 @@ class BigIntegerOperationsServiceTest {
 	void millerRabinInvalidArguments() {
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.millerRabin(BigInteger.ZERO, 1));
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.millerRabin(FIVE, 0));
-		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.millerRabin(ONE, 3));
-		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.millerRabin(EIGHT, 3));
+		assertThrows(IllegalArgumentException.class, () ->	BigIntegerOperationsService.millerRabin(ONE, 3));
+		assertThrows(IllegalArgumentException.class, () ->	BigIntegerOperationsService.millerRabin(EIGHT, 3));
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import java.util.List;
 
 /**
  * An extended latin alphabet including common european special characters.
@@ -23,7 +23,7 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 public final class LatinAlphabet extends Alphabet {
 
 	private static final int SIZE = 141;
-	private static final ImmutableList<String> ALPHABET = ImmutableList.of(
+	private static final List<String> ALPHABET = List.of(
 
 			Character.toString(0x0023), // # (U+0023)
 			Character.toString(0x0020), //   (U+0020)
@@ -184,7 +184,7 @@ public final class LatinAlphabet extends Alphabet {
 
 	private static final LatinAlphabet INSTANCE = new LatinAlphabet(SIZE, ALPHABET);
 
-	private LatinAlphabet(final int size, final ImmutableList<String> alphabet) {
+	private LatinAlphabet(final int size, final List<String> alphabet) {
 		super(size, alphabet);
 	}
 

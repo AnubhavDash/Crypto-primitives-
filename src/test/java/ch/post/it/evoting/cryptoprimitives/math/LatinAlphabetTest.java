@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,8 +89,11 @@ class LatinAlphabetTest {
 
 	@DisplayName("contains with a null character behaves as expected")
 	@Test
-	void containsWithNullCharacterThrows() {
-		assertThrows(NullPointerException.class, () -> latinAlphabet.contains(null));
+	void containsWithNullCharacter() {
+		final boolean expected = false;
+
+		final boolean isContained = assertDoesNotThrow(() -> latinAlphabet.contains(null));
+		assertEquals(expected, isContained);
 	}
 
 	@DisplayName("contains with a character part of the alphabet behaves as expected")
@@ -160,8 +163,12 @@ class LatinAlphabetTest {
 
 	@DisplayName("indexOf with a null character behaves as expected")
 	@Test
-	void indexOfNullThrows() {
-		assertThrows(NullPointerException.class, () -> latinAlphabet.indexOf(null));
+	void indexOfNullHappyPath() {
+		final int expected = -1;
+
+		final int index = assertDoesNotThrow(() -> latinAlphabet.indexOf(null));
+
+		assertEquals(expected, index);
 	}
 
 	@DisplayName("indexOf with a character part of the alphabet behaves as expected")

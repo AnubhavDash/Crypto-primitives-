@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.zeroknowledgeproofs;
 
-import static ch.post.it.evoting.cryptoprimitives.internal.zeroknowledgeproofs.ExponentiationProofService.computePhiExponentiation;
 import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -27,7 +26,9 @@ import static org.mockito.Mockito.mockStatic;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -42,8 +43,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 
-import ch.post.it.evoting.cryptoprimitives.collection.AuxiliaryInformation;
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
@@ -103,8 +102,8 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		private final ZqElement zThree = ZqElement.create(BigInteger.valueOf(3), zqGroup);
 		private final ZqElement exponent = zThree;
 		private final ZqElement z = zThree;
-		private final AuxiliaryInformation auxiliaryInformation = AuxiliaryInformation.of("specific", "test", "values");
-		private final ImmutableList<BigInteger> randomValues = ImmutableList.of(BigInteger.TWO);
+		private final List<String> auxiliaryInformation = Arrays.asList("specific", "test", "values");
+		private final List<BigInteger> randomValues = Collections.singletonList(BigInteger.TWO);
 
 		private TestRandomService getSpecificRandomService() {
 			return new TestRandomService() {
@@ -142,15 +141,15 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 
 		@Test
 		void notNullChecks() {
-			assertThrows(NullPointerException.class, () -> computePhiExponentiation(null, bases));
-			assertThrows(NullPointerException.class, () -> computePhiExponentiation(preimage, null));
+			assertThrows(NullPointerException.class, () -> ExponentiationProofService.computePhiExponentiation(null, bases));
+			assertThrows(NullPointerException.class, () -> ExponentiationProofService.computePhiExponentiation(preimage, null));
 		}
 
 		@Test
 		void basesNotEmptyCheck() {
-			final GroupVector<GqElement, GqGroup> emptyBases = GroupVector.empty();
+			final GroupVector<GqElement, GqGroup> emptyBases = GroupVector.of();
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-					() -> computePhiExponentiation(preimage, emptyBases));
+					() -> ExponentiationProofService.computePhiExponentiation(preimage, emptyBases));
 			assertEquals("The vector of bases must contain at least 1 element.", exception.getMessage());
 		}
 
@@ -158,34 +157,34 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		void sameGroupOrderCheck() {
 			final ZqElement otherpreimage = otherZqGroupGenerator.genRandomZqElementMember();
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-					() -> computePhiExponentiation(otherpreimage, bases));
+					() -> ExponentiationProofService.computePhiExponentiation(otherpreimage, bases));
 			assertEquals("The preimage and the bases must have the same group order.", exception.getMessage());
 		}
 
 		@RepeatedTest(10)
 		void phiFunctionSize() {
-			assertEquals(bases.size(), computePhiExponentiation(preimage, bases).size());
+			assertEquals(bases.size(), ExponentiationProofService.computePhiExponentiation(preimage, bases).size());
 		}
 
 		@Test
 		void withSpecificValues() {
 			final GqGroup gqGroup = GroupTestData.getGroupP59();
-			final ZqElement specificPreimage = ZqElement.create(3, ZqGroup.sameOrderAs(gqGroup));
-			final GroupVector<GqElement, GqGroup> specificBases = GroupVector.of(GqElementFactory.fromValue(BigInteger.ONE, gqGroup),
+			final ZqElement preimage = ZqElement.create(3, ZqGroup.sameOrderAs(gqGroup));
+			final GroupVector<GqElement, GqGroup> bases = GroupVector.of(GqElementFactory.fromValue(BigInteger.ONE, gqGroup),
 					GqElementFactory.fromValue(BigInteger.valueOf(4), gqGroup),
 					GqElementFactory.fromValue(BigInteger.valueOf(9), gqGroup));
 
 			final GroupVector<GqElement, GqGroup> expected = GroupVector.of(GqElementFactory.fromValue(BigInteger.ONE, gqGroup),
 					GqElementFactory.fromValue(BigInteger.valueOf(5), gqGroup),
 					GqElementFactory.fromValue(BigInteger.valueOf(21), gqGroup));
-			assertEquals(expected, computePhiExponentiation(specificPreimage, specificBases));
+			assertEquals(expected, ExponentiationProofService.computePhiExponentiation(preimage, bases));
 		}
 	}
 
 	@Nested
 	class GenExponentiationProofTest {
 
-		private final AuxiliaryInformation auxiliaryInformation = AuxiliaryInformation.of("aux", "1");
+		private final List<String> auxiliaryInformation = Arrays.asList("aux", "1");
 		private int n;
 		private GroupVector<GqElement, GqGroup> bases;
 		private ZqElement exponent;
@@ -196,7 +195,7 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 			n = randomService.genRandomInteger(MAX_NUMBER_EXPONENTIATIONS) + 1;
 			bases = gqGroupGenerator.genRandomGqElementVector(n);
 			exponent = zqGroupGenerator.genRandomZqElementMember();
-			exponentiations = computePhiExponentiation(exponent, bases);
+			exponentiations = ExponentiationProofService.computePhiExponentiation(exponent, bases);
 		}
 
 		@Test
@@ -211,7 +210,7 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		@Test
 		void validArguments() {
 			assertDoesNotThrow(() -> proofService.genExponentiationProof(bases, exponent, exponentiations, auxiliaryInformation));
-			assertDoesNotThrow(() -> proofService.genExponentiationProof(bases, exponent, exponentiations, AuxiliaryInformation.of()));
+			assertDoesNotThrow(() -> proofService.genExponentiationProof(bases, exponent, exponentiations, Collections.emptyList()));
 		}
 
 		@Test
@@ -223,8 +222,15 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		}
 
 		@Test
+		void auxiliaryInformationDoesNotContainNullCheck() {
+			final List<String> auxiliaryInformationWithNull = Arrays.asList("test", null);
+			assertThrows(NullPointerException.class,
+					() -> proofService.genExponentiationProof(bases, exponent, exponentiations, auxiliaryInformationWithNull));
+		}
+
+		@Test
 		void basesNotEmptyCheck() {
-			final GroupVector<GqElement, GqGroup> emptyBases = GroupVector.empty();
+			final GroupVector<GqElement, GqGroup> emptyBases = GroupVector.of();
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> proofService.genExponentiationProof(emptyBases, exponent, exponentiations, auxiliaryInformation));
 			assertEquals("The bases must contain at least 1 element.", exception.getMessage());
@@ -258,16 +264,16 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		void specificValuesGiveExpectedResult() {
 			final TestValues testValues = new TestValues();
 			// Input.
-			final GroupVector<GqElement, GqGroup> specificBases = testValues.bases;
-			final ZqElement specificExponent = testValues.exponent;
-			final GroupVector<GqElement, GqGroup> specificExponentiations = testValues.exponentiations;
-			final AuxiliaryInformation specificAuxiliaryInformation = testValues.auxiliaryInformation;
+			final GroupVector<GqElement, GqGroup> bases = testValues.bases;
+			final ZqElement exponent = testValues.exponent;
+			final GroupVector<GqElement, GqGroup> exponentiations = testValues.exponentiations;
+			final List<String> auxiliaryInformation = testValues.auxiliaryInformation;
 
-			final ExponentiationProofService specificProofService = testValues.createExponentiationProofService();
+			final ExponentiationProofService proofService = testValues.createExponentiationProofService();
 
 			final ExponentiationProof expected = testValues.createExponentiationProof();
 
-			assertEquals(expected, specificProofService.genExponentiationProof(specificBases, specificExponent, specificExponentiations, specificAuxiliaryInformation));
+			assertEquals(expected, proofService.genExponentiationProof(bases, exponent, exponentiations, auxiliaryInformation));
 		}
 	}
 
@@ -275,7 +281,7 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class VerifyExponentiationProofTest {
 
-		private final AuxiliaryInformation auxiliaryInformation = AuxiliaryInformation.of("aux", "2");
+		private final List<String> auxiliaryInformation = Arrays.asList("aux", "2");
 		private int n;
 		private GroupVector<GqElement, GqGroup> bases;
 		private GroupVector<GqElement, GqGroup> exponentiations;
@@ -311,7 +317,7 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 
 		@Test
 		void basesNotEmptyCheck() {
-			final GroupVector<GqElement, GqGroup> emptyBases = GroupVector.empty();
+			final GroupVector<GqElement, GqGroup> emptyBases = GroupVector.of();
 			final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 					() -> proofService.verifyExponentiation(emptyBases, exponentiations, proof, auxiliaryInformation));
 			assertEquals("The bases must contain at least 1 element.", exception.getMessage());
@@ -346,66 +352,67 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		@Test
 		void validProofReturnsTrue() {
 			final ZqElement exponent = zqGroupGenerator.genRandomZqElementMember();
-			exponentiations = computePhiExponentiation(exponent, bases);
+			exponentiations = ExponentiationProofService.computePhiExponentiation(exponent, bases);
 			proof = proofService.genExponentiationProof(bases, exponent, exponentiations, auxiliaryInformation);
 			assertTrue(proofService.verifyExponentiation(bases, exponentiations, proof, auxiliaryInformation));
 
-			proof = proofService.genExponentiationProof(bases, exponent, exponentiations, AuxiliaryInformation.of());
-			assertTrue(proofService.verifyExponentiation(bases, exponentiations, proof, AuxiliaryInformation.of()));
+			proof = proofService.genExponentiationProof(bases, exponent, exponentiations, Collections.emptyList());
+			assertTrue(proofService.verifyExponentiation(bases, exponentiations, proof, Collections.emptyList()));
 		}
 
 		@Test
 		void differentAuxiliaryInformationReturnsFalse() {
 			final TestValues testValues = new TestValues();
-			final GroupVector<GqElement, GqGroup> differentAuxiliaryInformationBases = testValues.bases;
-			final GroupVector<GqElement, GqGroup> differentAuxiliaryInformationExponentiations = testValues.exponentiations;
-			final AuxiliaryInformation differentAuxiliaryInformation = AuxiliaryInformation.of("random");
-			final ExponentiationProof differentAuxiliaryInformationProof = testValues.createExponentiationProof();
-			final ExponentiationProofService differentAuxiliaryInformationProofService = testValues.createExponentiationProofService();
-			assertFalse(differentAuxiliaryInformationProofService.verifyExponentiation(differentAuxiliaryInformationBases, differentAuxiliaryInformationExponentiations, differentAuxiliaryInformationProof, differentAuxiliaryInformation));
+			final GroupVector<GqElement, GqGroup> bases = testValues.bases;
+			final GroupVector<GqElement, GqGroup> exponentiations = testValues.exponentiations;
+			final List<String> auxiliaryInformation = testValues.auxiliaryInformation;
+			auxiliaryInformation.set(0, "random");
+			final ExponentiationProof proof = testValues.createExponentiationProof();
+			final ExponentiationProofService proofService = testValues.createExponentiationProofService();
+			assertFalse(proofService.verifyExponentiation(bases, exponentiations, proof, auxiliaryInformation));
 		}
 
 		@Test
 		void invalidProofReturnsFalse() {
 			final TestValues testValues = new TestValues();
-			final GroupVector<GqElement, GqGroup> invalidProofBases = testValues.bases;
-			final GroupVector<GqElement, GqGroup> invalidProofExponentiations = testValues.exponentiations;
-			final AuxiliaryInformation invalidProofAuxiliaryInformation = testValues.auxiliaryInformation;
-			final ExponentiationProof exponentiationProof = testValues.createExponentiationProof();
-			final ZqElement hashValue = exponentiationProof.get_e().add(testValues.zThree);
-			final ExponentiationProof invalidProof = new ExponentiationProof(hashValue, exponentiationProof.get_z());
-			final ExponentiationProofService invalidProofProofService = testValues.createExponentiationProofService();
-			assertFalse(invalidProofProofService.verifyExponentiation(invalidProofBases, invalidProofExponentiations, invalidProof, invalidProofAuxiliaryInformation));
+			final GroupVector<GqElement, GqGroup> bases = testValues.bases;
+			final GroupVector<GqElement, GqGroup> exponentiations = testValues.exponentiations;
+			final List<String> auxiliaryInformation = testValues.auxiliaryInformation;
+			final ExponentiationProof proof = testValues.createExponentiationProof();
+			final ZqElement e_prime = proof.get_e().add(testValues.zThree);
+			final ExponentiationProof invalidProof = new ExponentiationProof(e_prime, proof.get_z());
+			final ExponentiationProofService proofService = testValues.createExponentiationProofService();
+			assertFalse(proofService.verifyExponentiation(bases, exponentiations, invalidProof, auxiliaryInformation));
 		}
 
 		@Test
 		void differentEponentiationsReturnsFalse() {
 			final TestValues testValues = new TestValues();
-			final GroupVector<GqElement, GqGroup> differentEponentiationsBases = testValues.bases;
-			final GroupVector<GqElement, GqGroup> testExponentiations = testValues.exponentiations;
-			final GroupVector<GqElement, GqGroup> differentExponentiations = testExponentiations.stream().map(y -> y.multiply(testValues.gNine))
-					.collect(toGroupVector());
-			final AuxiliaryInformation differentEponentiationsAuxiliaryInformation = testValues.auxiliaryInformation;
-			final ExponentiationProof exponentiationProof = testValues.createExponentiationProof();
-			final ExponentiationProofService differentEponentiationsProofService = testValues.createExponentiationProofService();
-			assertFalse(differentEponentiationsProofService.verifyExponentiation(differentEponentiationsBases, differentExponentiations, exponentiationProof, differentEponentiationsAuxiliaryInformation));
+			final GroupVector<GqElement, GqGroup> bases = testValues.bases;
+			final GroupVector<GqElement, GqGroup> exponentiations = testValues.exponentiations;
+			final GroupVector<GqElement, GqGroup> differentExponentiations = exponentiations.stream().map(y -> y.multiply(testValues.gNine))
+					.collect(GroupVector.toGroupVector());
+			final List<String> auxiliaryInformation = testValues.auxiliaryInformation;
+			final ExponentiationProof proof = testValues.createExponentiationProof();
+			final ExponentiationProofService proofService = testValues.createExponentiationProofService();
+			assertFalse(proofService.verifyExponentiation(bases, differentExponentiations, proof, auxiliaryInformation));
 		}
 
 		@Test
 		void differentBasesReturnsFalse() {
 			final TestValues testValues = new TestValues();
-			final GroupVector<GqElement, GqGroup> testBases = testValues.bases;
-			final GroupVector<GqElement, GqGroup> differentBases = testBases.stream().map(g -> g.multiply(testValues.gFive))
-					.collect(toGroupVector());
-			final GroupVector<GqElement, GqGroup> differentBasesExponentiations = testValues.exponentiations;
-			final AuxiliaryInformation differentBasesAuxiliaryInformation = testValues.auxiliaryInformation;
-			final ExponentiationProof differentBasesProof = testValues.createExponentiationProof();
-			final ExponentiationProofService differentBasesProofService = testValues.createExponentiationProofService();
-			assertFalse(differentBasesProofService.verifyExponentiation(differentBases, differentBasesExponentiations, differentBasesProof, differentBasesAuxiliaryInformation));
+			final GroupVector<GqElement, GqGroup> bases = testValues.bases;
+			final GroupVector<GqElement, GqGroup> differentBases = bases.stream().map(g -> g.multiply(testValues.gFive))
+					.collect(GroupVector.toGroupVector());
+			final GroupVector<GqElement, GqGroup> exponentiations = testValues.exponentiations;
+			final List<String> auxiliaryInformation = testValues.auxiliaryInformation;
+			final ExponentiationProof proof = testValues.createExponentiationProof();
+			final ExponentiationProofService proofService = testValues.createExponentiationProofService();
+			assertFalse(proofService.verifyExponentiation(differentBases, exponentiations, proof, auxiliaryInformation));
 		}
 
 		private Stream<Arguments> jsonFileArgumentProvider() {
-			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/zeroknowledgeproofs/verify-exponentiation.json");
+			final List<TestParameters> parametersList = TestParameters.fromResource("/zeroknowledgeproofs/verify-exponentiation.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// Context.
@@ -424,32 +431,32 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 					// Parse bases parameters.
 
 					final BigInteger[] basesArray = input.get("bases", BigInteger[].class);
-					final GroupVector<GqElement, GqGroup> realBases = Arrays.stream(basesArray).map(basesA -> GqElementFactory.fromValue(basesA, gqGroup))
+					final GroupVector<GqElement, GqGroup> bases = Arrays.stream(basesArray).map(basesA -> GqElementFactory.fromValue(basesA, gqGroup))
 							.collect(toGroupVector());
 
 					// Parse exponentiations parameters
 					final BigInteger[] exponentiationsArray = input.get("statement", BigInteger[].class);
-					final GroupVector<GqElement, GqGroup> realExponentiations = Arrays.stream(exponentiationsArray)
+					final GroupVector<GqElement, GqGroup> exponentiations = Arrays.stream(exponentiationsArray)
 							.map(eA -> GqElementFactory.fromValue(eA, gqGroup))
 							.collect(toGroupVector());
 
 					// Parse decryption proof parameters
-					final JsonData realProof = input.getJsonData("proof");
+					final JsonData proof = input.getJsonData("proof");
 
-					final ZqElement e = ZqElement.create(realProof.get("e", BigInteger.class), zqGroup);
-					final ZqElement z = ZqElement.create(realProof.get("z", BigInteger.class), zqGroup);
+					final ZqElement e = ZqElement.create(proof.get("e", BigInteger.class), zqGroup);
+					final ZqElement z = ZqElement.create(proof.get("z", BigInteger.class), zqGroup);
 					final ExponentiationProof exponentiationProof = new ExponentiationProof(e, z);
 
 					// Parse auxiliary information parameters
 					final String[] auxInformation = input.get("additional_information", String[].class);
-					final AuxiliaryInformation realAuxiliaryInformation = AuxiliaryInformation.of(auxInformation);
+					final List<String> auxiliaryInformation = Arrays.asList(auxInformation);
 
 					// Parse output parameters
 					final JsonData output = testParameters.getOutput();
 
 					final Boolean result = output.get("verif_result", Boolean.class);
 
-					return Arguments.of(realBases, realExponentiations, exponentiationProof, realAuxiliaryInformation, result, testParameters.getDescription());
+					return Arguments.of(bases, exponentiations, exponentiationProof, auxiliaryInformation, result, testParameters.getDescription());
 				}
 			});
 
@@ -460,7 +467,7 @@ class ExponentiationProofServiceTest extends TestGroupSetup {
 		@DisplayName("with real values gives expected result")
 		void verifyExponentiationProofWithRealValues(final GroupVector<GqElement, GqGroup> bases,
 				final GroupVector<GqElement, GqGroup> exponentiations, final ExponentiationProof exponentiationProof,
-				final AuxiliaryInformation auxiliaryInformation,
+				final List<String> auxiliaryInformation,
 				final boolean expected, final String description) {
 			final ExponentiationProofService exponentiationProofService = new ExponentiationProofService(randomService, HashService.getInstance());
 			final boolean actual = assertDoesNotThrow(

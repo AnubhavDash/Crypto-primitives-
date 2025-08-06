@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,8 +61,8 @@ public interface ElGamal {
 	 *     <li>the ciphertext size must be at most the secret key size.</li>
 	 * </ul>
 	 *
-	 * @param ciphertext c,	the ciphertext to be decrypted. Must be non-null.
-	 * @param secretKey  sk, the secret key to be used for decrypting. Must be non-null and not empty.
+	 * @param ciphertext c,	the ciphertext to be decrypted. Must be non null.
+	 * @param secretKey  sk, the secret key to be used for decrypting. Must be non null and not empty.
 	 * @return the decrypted plaintext message
 	 */
 	ElGamalMultiRecipientMessage getMessage(final ElGamalMultiRecipientCiphertext ciphertext, final ElGamalMultiRecipientPrivateKey secretKey);
@@ -88,8 +88,8 @@ public interface ElGamal {
 	 * Generates a key pair in the specified group and with the specified number of elements.
 	 *
 	 * @param group        The {@link GqGroup} in which to generate the public keys. Not null.
-	 * @param numElements, k, the number of elements that each key (the public key and the private key) should be composed of. This value must be
-	 *                     strictly greater than 0.
+	 * @param numElements, N, the number of elements that each key (the public key and the private key) should be composed of. This value must be
+	 *                     greater than 0.
 	 * @param random       a service providing randomness. Not null.
 	 * @return the generated key pair.
 	 */

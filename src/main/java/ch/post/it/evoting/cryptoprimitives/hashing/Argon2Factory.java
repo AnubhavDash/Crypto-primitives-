@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.hashing;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.Argon2Service;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 
@@ -29,9 +27,7 @@ public class Argon2Factory {
 		randomService = new RandomService();
 	}
 
-	public static Argon2 createArgon2(final Argon2Profile config) {
-		checkNotNull(config);
-
+	public static Argon2 createArgon2(Argon2Profile config) {
 		return new Argon2Service(INSTANCE.randomService, config);
 	}
 }

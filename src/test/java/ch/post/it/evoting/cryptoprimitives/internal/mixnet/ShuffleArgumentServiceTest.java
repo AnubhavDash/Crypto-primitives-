@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@ import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiR
 import static ch.post.it.evoting.cryptoprimitives.internal.mixnet.TestParser.parseCiphertexts;
 import static ch.post.it.evoting.cryptoprimitives.internal.mixnet.TestParser.parseCommitment;
 import static ch.post.it.evoting.cryptoprimitives.internal.mixnet.TestShuffleArgumentGenerator.ShuffleArgumentPair;
-import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,8 +47,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
@@ -154,7 +153,6 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 	}
 
 	@Nested
-	@SuppressWarnings("java:S116")
 	@DisplayName("calling getShuffleArgument with")
 	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class GetShuffleArgumentTest {
@@ -202,7 +200,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> shuffledCiphertexts = IntStream.range(0, N)
 					.mapToObj(i -> getCiphertext(ones, randomness.get(i), publicKey)
 							.getCiphertextProduct(ciphertexts.get(permutation.get(i))))
-					.collect(toGroupVector());
+					.collect(collectingAndThen(toList(), GroupVector::from));
 
 			shuffleStatement = new ShuffleStatement(ciphertexts, shuffledCiphertexts);
 		}
@@ -277,7 +275,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> shuffledCiphertexts = IntStream.range(0, N)
 					.mapToObj(i -> getCiphertext(ones, shuffleWitness.get_rho().get(i), longerPublicKey)
 							.getCiphertextProduct(longerCiphertexts.get(shuffleWitness.get_pi().get(i))))
-					.collect(toGroupVector());
+					.collect(collectingAndThen(toList(), GroupVector::from));
 
 			final ShuffleStatement longerCiphertextsStatement = new ShuffleStatement(longerCiphertexts, shuffledCiphertexts);
 
@@ -291,12 +289,13 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 		void getShuffleArgumentCiphertextsShuffledCiphertextsDiff() {
 			// Modify the shuffled ciphertexts by replacing its first element by a different ciphertext.
 			final List<ElGamalMultiRecipientCiphertext> shuffledCiphertexts = new ArrayList<>(shuffleStatement.get_C_prime());
-			final ElGamalMultiRecipientCiphertext first = shuffledCiphertexts.getFirst();
+			final ElGamalMultiRecipientCiphertext first = shuffledCiphertexts.get(0);
 			final ElGamalMultiRecipientCiphertext otherFirst = Generators.genWhile(() -> elGamalGenerator.genRandomCiphertext(l), first::equals);
 			shuffledCiphertexts.set(0, otherFirst);
 
 			// Recreate shuffled ciphertexts and statement.
-			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> differentShuffledCiphertexts = GroupVector.from(shuffledCiphertexts);
+			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> differentShuffledCiphertexts = GroupVector.from(
+					shuffledCiphertexts);
 			final ShuffleStatement differentShuffleStatement = new ShuffleStatement(this.shuffleStatement.get_C(),
 					differentShuffledCiphertexts);
 
@@ -318,7 +317,6 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 	}
 
 	@Nested
-	@SuppressWarnings("java:S116")
 	@DisplayName("calling verifyShuffleArgument with")
 	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class VerifyShuffleArgumentTest {
@@ -335,15 +333,15 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 
 		@BeforeAll
 		void setUpAll() {
-			final TestCommitmentKeyGenerator testCommitmentKeyGenerator = new TestCommitmentKeyGenerator(gqGroup);
+			final TestCommitmentKeyGenerator commitmentKeyGenerator = new TestCommitmentKeyGenerator(gqGroup);
 
 			publicKey = elGamalGenerator.genRandomPublicKey(KEY_ELEMENTS_NUMBER);
-			final CommitmentKey commitmentKey = testCommitmentKeyGenerator.genCommitmentKey(KEY_ELEMENTS_NUMBER);
+			final CommitmentKey commitmentKey = commitmentKeyGenerator.genCommitmentKey(KEY_ELEMENTS_NUMBER);
 
 			// Necessary to return a constant value, otherwise some assertFalse tests can return true because of changes compensating each other (due
 			// to small test groups).
 			final HashService hashServiceMock = mock(HashService.class);
-			when(hashServiceMock.recursiveHash(any(Hashable[].class))).thenReturn(ImmutableByteArray.of((byte) 0b10));
+			when(hashServiceMock.recursiveHash(any(Hashable[].class))).thenReturn(new byte[] { 0b10 });
 
 			shuffleArgumentService = new ShuffleArgumentService(publicKey, commitmentKey, randomService, hashServiceMock);
 		}
@@ -444,7 +442,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = shuffleArgumentService.verifyShuffleArgument(badShuffleStatement, shuffleArgument, m, n);
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify MultiExponentiation Argument.", verificationResult.getErrorMessages().get(0));
+			assertEquals("Failed to verify MultiExponentiation Argument.", verificationResult.getErrorMessages().element());
 		}
 
 		@Test
@@ -452,7 +450,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 		void verifyShuffleArgumentIncorrectCA() {
 			final GroupVector<GqElement, GqGroup> commitmentA = shuffleArgument.get_c_A();
 
-			final GqElement badCA0 = commitmentA.getFirst().multiply(gqGroup.getGenerator());
+			final GqElement badCA0 = commitmentA.get(0).multiply(gqGroup.getGenerator());
 			final GroupVector<GqElement, GqGroup> badCommitmentA = GroupVectors.set(commitmentA, 0, badCA0);
 			final ShuffleArgument badShuffleArgument = new ShuffleArgument.Builder()
 					.with_c_A(badCommitmentA)
@@ -463,7 +461,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = shuffleArgumentService.verifyShuffleArgument(shuffleStatement, badShuffleArgument, m, n);
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify Product Argument.", verificationResult.getErrorMessages().get(0));
+			assertEquals("Failed to verify Product Argument.", verificationResult.getErrorMessages().getFirst());
 		}
 
 		@Test
@@ -471,7 +469,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 		void verifyShuffleArgumentIncorrectCB() {
 			final GroupVector<GqElement, GqGroup> commitmentB = shuffleArgument.get_c_B();
 
-			final GqElement badCBm = commitmentB.getFirst().multiply(gqGroup.getGenerator());
+			final GqElement badCBm = commitmentB.get(0).multiply(gqGroup.getGenerator());
 			final GroupVector<GqElement, GqGroup> badCommitmentB = GroupVectors.set(commitmentB, 0, badCBm);
 			final ShuffleArgument badShuffleArgument = new ShuffleArgument.Builder()
 					.with_c_A(shuffleArgument.get_c_A())
@@ -482,7 +480,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = shuffleArgumentService.verifyShuffleArgument(shuffleStatement, badShuffleArgument, m, n);
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify Product Argument.", verificationResult.getErrorMessages().get(0));
+			assertEquals("Failed to verify Product Argument.", verificationResult.getErrorMessages().getFirst());
 		}
 
 		@Test
@@ -519,7 +517,7 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = shuffleArgumentService.verifyShuffleArgument(shuffleStatement, badShuffleArgument, m, n);
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify Product Argument.", verificationResult.getErrorMessages().get(0));
+			assertEquals("Failed to verify Product Argument.", verificationResult.getErrorMessages().element());
 		}
 
 		@Test
@@ -548,12 +546,11 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 
 			final VerificationResult verificationResult = shuffleArgumentService.verifyShuffleArgument(shuffleStatement, badShuffleArgument, m, n);
 			assertFalse(verificationResult.isVerified());
-			assertEquals("Failed to verify MultiExponentiation Argument.", verificationResult.getErrorMessages().get(0));
+			assertEquals("Failed to verify MultiExponentiation Argument.", verificationResult.getErrorMessages().getFirst());
 		}
 
-		@SuppressWarnings("java:S1117")
 		Stream<Arguments> jsonData() {
-			final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-shuffle-argument.json");
+			final List<TestParameters> parametersList = TestParameters.fromResource("/mixnet/verify-shuffle-argument.json");
 
 			return parametersList.stream().parallel().map(testParameters -> {
 				// Context.
@@ -592,14 +589,14 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 						.build();
 
 				//m and n
-				final int vectorSize = ciphertexts.size();
-				final int[] dimensions = MatrixUtils.getMatrixDimensions(vectorSize);
+				final int N = ciphertexts.size();
+				final int[] dimensions = MatrixUtils.getMatrixDimensions(N);
 				final int m = dimensions[0];
 				final int n = dimensions[1];
 
 				//Output
 				final JsonData output = testParameters.getOutput();
-				final boolean outputValue = Boolean.parseBoolean(output.getJsonData("result").toString());
+				final boolean outputValue = Boolean.parseBoolean(output.toString());
 
 				return Arguments.of(publicKey, commitmentKey, statement, argument, m, n, outputValue, testParameters.getDescription());
 			});
@@ -612,8 +609,8 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 				final ShuffleArgument argument, final int m, final int n,
 				final Boolean output, final String description) {
 
-			final HashService realHashService = HashService.getInstance();
-			final ShuffleArgumentService service = new ShuffleArgumentService(pk, ck, randomService, realHashService);
+			final HashService hashService = HashService.getInstance();
+			final ShuffleArgumentService service = new ShuffleArgumentService(pk, ck, randomService, hashService);
 			assertEquals(output, service.verifyShuffleArgument(statement, argument, m, n).isVerified(),
 					String.format("assertion failed for: %s", description));
 		}

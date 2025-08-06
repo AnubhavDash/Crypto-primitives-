@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
-import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.stream.Stream;
@@ -45,7 +44,7 @@ public class TestCommitmentKeyGenerator {
 		final GqElement h = generator.genNonIdentityNonGeneratorMember();
 		final GroupVector<GqElement, GqGroup> gList = Stream.generate(generator::genNonIdentityNonGeneratorMember)
 				.limit(nu)
-				.collect(toGroupVector());
+				.collect(GroupVector.toGroupVector());
 		return new CommitmentKey(h, gList);
 	}
 }

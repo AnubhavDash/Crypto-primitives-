@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,14 @@
  */
 package ch.post.it.evoting.cryptoprimitives.test.tools.generator;
 
-import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.internal.math.MathematicalGroup;
-import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVectorElement;
 
 public class GroupVectorElementGenerator {
@@ -38,16 +36,9 @@ public class GroupVectorElementGenerator {
 	 * @param <G>         the element group
 	 * @return a list of elements
 	 */
-	public static <E extends GroupVectorElement<G> & Hashable, G extends MathematicalGroup<G>> GroupVector<E, G> generateElementList(
-			final int numElements, final Supplier<E> s) {
-		checkNotNull(s);
-		checkArgument(numElements >= 0, "The number of elements must be non-negative.");
-
-		if (numElements == 0) {
-			return GroupVector.empty();
-		}
-
-		return Stream.generate(s).limit(numElements).collect(toGroupVector());
+	public static <E extends GroupVectorElement<G>, G extends MathematicalGroup<G>> List<E> generateElementList(final int numElements,
+			final Supplier<E> s) {
+		return Stream.generate(s).limit(numElements).collect(Collectors.toList());
 	}
 
 	/**
@@ -60,16 +51,9 @@ public class GroupVectorElementGenerator {
 	 * @param <G>        the element group type
 	 * @return a matrix of elements, row by row.
 	 */
-	public static <E extends GroupVectorElement<G> & Hashable, G extends MathematicalGroup<G>> GroupVector<GroupVector<E, G>, G> generateElementMatrix(
-			final int numRows, final int numColumns, final Supplier<E> s) {
+	public static <E extends GroupVectorElement<G>, G extends MathematicalGroup<G>>
+	List<List<E>> generateElementMatrix(final int numRows, final int numColumns, final Supplier<E> s) {
 		checkNotNull(s);
-		checkArgument(numRows >= 0, "The number of rows must be non-negative.");
-		checkArgument(numColumns >= 0, "The number of columns must be non-negative.");
-
-		if (numRows == 0) {
-			return GroupVector.empty();
-		}
-
-		return Stream.generate(() -> generateElementList(numColumns, s)).limit(numRows).collect(toGroupVector());
+		return Stream.generate(() -> generateElementList(numColumns, s)).limit(numRows).collect(Collectors.toList());
 	}
 }

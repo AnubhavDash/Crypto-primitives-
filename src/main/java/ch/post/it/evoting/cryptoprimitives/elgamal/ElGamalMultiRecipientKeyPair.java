@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,14 @@
  */
 package ch.post.it.evoting.cryptoprimitives.elgamal;
 
-import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
-import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -35,7 +33,7 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 
 /**
- * A multi-recipient ElGamal key pair consisting of a public and a private key with k elements.
+ * A multi-recipient ElGamal key pair consisting of a public and a private key with N elements.
  *
  * <p>Instances of this class are immutable. </p>
  */
@@ -62,9 +60,9 @@ public class ElGamalMultiRecipientKeyPair implements HashableList {
 	public static ElGamalMultiRecipientKeyPair genKeyPair(final GqGroup group, final int numElements, final Random random) {
 		checkNotNull(random);
 		checkNotNull(group);
-		checkArgument(numElements > 0, "Cannot generate an ElGamalMultiRecipientKeyPair with %s elements.", numElements);
+		checkArgument(numElements > 0, "Cannot generate an ElGamalMultiRecipient key pair with %s elements.", numElements);
 
-		final int k = numElements;
+		final int N = numElements;
 		final ZqGroup secretKeyGroup = ZqGroup.sameOrderAs(group);
 		final BigInteger q = group.getQ();
 		final GqElement g = group.getGenerator();
@@ -73,7 +71,7 @@ public class ElGamalMultiRecipientKeyPair implements HashableList {
 		}
 
 		// Operation.
-		final ImmutableList<KeyPairI> keyPairElements = IntStream.range(0, k) // Stream equivalent to for-loop.
+		final List<KeyPairI> keyPairElements = IntStream.range(0, N) // Stream equivalent to for-loop.
 				.parallel()
 				.mapToObj(i -> {
 					final ZqElement sk_i = ZqElement.create(random.genRandomInteger(q), secretKeyGroup);
@@ -81,15 +79,15 @@ public class ElGamalMultiRecipientKeyPair implements HashableList {
 
 					return new KeyPairI(sk_i, pk_i);
 				})
-				.collect(toImmutableList());
+				.toList();
 
 		// Collect secret and public elements separately.
 		final GroupVector<ZqElement, ZqGroup> secretKeyElements = keyPairElements.stream()
 				.map(KeyPairI::sk_i)
-				.collect(toGroupVector());
+				.collect(GroupVector.toGroupVector());
 		final GroupVector<GqElement, GqGroup> publicKeyElements = keyPairElements.stream()
 				.map(KeyPairI::pk_i)
-				.collect(toGroupVector());
+				.collect(GroupVector.toGroupVector());
 
 		// Construct key pair.
 		final ElGamalMultiRecipientPrivateKey sk = new ElGamalMultiRecipientPrivateKey(secretKeyElements);
@@ -149,7 +147,7 @@ public class ElGamalMultiRecipientKeyPair implements HashableList {
 	}
 
 	@Override
-	public ImmutableList<Hashable> toHashableForm() {
-		return ImmutableList.of(publicKey, privateKey);
+	public List<? extends Hashable> toHashableForm() {
+		return List.of(publicKey, privateKey);
 	}
 }

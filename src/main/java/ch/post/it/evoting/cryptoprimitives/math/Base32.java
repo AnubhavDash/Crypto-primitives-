@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.math.Base32Service;
 
 public sealed interface Base32 permits Base32Service {
@@ -26,7 +25,7 @@ public sealed interface Base32 permits Base32Service {
 	 * @param byteArray B, the byte array to be encoded.
 	 * @return the Base32 string representing the byte array.
 	 */
-	String base32Encode(final ImmutableByteArray byteArray);
+	String base32Encode(final byte[] byteArray);
 
 	/**
 	 * Decodes a given Base32 string to a byte array.
@@ -35,5 +34,5 @@ public sealed interface Base32 permits Base32Service {
 	 * @return the byte array represented by the given Base32 string.
 	 * @throws IllegalArgumentException if the given string is not a valid Base32 string.
 	 */
-	ImmutableByteArray base32Decode(final String string);
+	byte[] base32Decode(final String string);
 }

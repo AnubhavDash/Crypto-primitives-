@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,12 @@ package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
 import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientMessages.getMessage;
 import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
-import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -51,11 +53,7 @@ public class ElGamalMultiRecipientCiphertexts {
 		checkNotNull(group);
 		checkArgument(numPhi > 0, "The neutral ciphertext must have at least one phi.");
 
-		return ElGamalMultiRecipientCiphertext.create(
-				group.getIdentity(),
-				Stream.generate(group::getIdentity)
-						.limit(numPhi)
-						.collect(toGroupVector()));
+		return ElGamalMultiRecipientCiphertext.create(group.getIdentity(), Stream.generate(group::getIdentity).limit(numPhi).toList());
 	}
 
 	/**
@@ -86,11 +84,12 @@ public class ElGamalMultiRecipientCiphertexts {
 		if (ENABLE_PARALLEL_STREAMS) {
 			indices = indices.parallel();
 		}
-		final GroupVector<GqElement, GqGroup> phis = indices
+		final LinkedList<GqElement> phis = indices
+				.parallel()
 				.mapToObj(i -> pk.get(i).exponentiate(r).multiply(m.get(i)))
-				.collect(toGroupVector());
+				.collect(Collectors.toCollection(LinkedList::new));
 
-		return ElGamalMultiRecipientCiphertext.create(gamma, phis);
+		return ElGamalMultiRecipientCiphertext.create(gamma, GroupVector.from(phis));
 	}
 
 	/**
@@ -102,39 +101,49 @@ public class ElGamalMultiRecipientCiphertexts {
 	 *     <li>the ciphertexts and the exponents must belong to groups of same order.</li>
 	 * </ul>
 	 *
-	 * @param ciphertexts A List of {@code ElGamalMultiRecipientCiphertext}s, each element containing the same number of phis. Must be non-null and
+	 * @param ciphertexts A List of {@code ElGamalMultiRecipientCiphertext}s, each element containing the same number of phis. Must be non null and
 	 *                    not empty.
-	 * @param exponents   A List of {@code ZqElement}s, of the same size as the ciphertexts list. Must be non-null and not empty.
+	 * @param exponents   A List of {@code ZqElement}s, of the same size as the ciphertexts list. Must be non null and not empty.
 	 * @return the product of the exponentiated ciphertexts.
 	 */
 	@SuppressWarnings("java:S117")
 	public static ElGamalMultiRecipientCiphertext getCiphertextVectorExponentiation(
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts, final GroupVector<ZqElement, ZqGroup> exponents) {
-		// Input.
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = checkNotNull(ciphertexts);
-		final GroupVector<ZqElement, ZqGroup> a = checkNotNull(exponents);
 
-		// Require.
+		checkNotNull(ciphertexts);
+		checkNotNull(exponents);
 		checkArgument(!ciphertexts.isEmpty(), "Ciphertexts should not be empty");
 		checkArgument(ciphertexts.size() == exponents.size(), "There should be a matching ciphertext for every exponent.");
 		checkArgument(ciphertexts.getGroup().hasSameOrderAs(exponents.getGroup()), "Ciphertexts and exponents must be of the same group.");
 
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C = ciphertexts;
+		final GroupVector<ZqElement, ZqGroup> a = exponents;
 		final int l = C.getElementSize();
-		final int N = a.size();
+		final int n = a.size();
 
-		// Operation.
-		final ElGamalMultiRecipientCiphertext neutralElement = neutralElement(l, C.getGroup());
-		IntStream indices = IntStream.range(0, N);
+		IntStream indices = IntStream.range(0, l);
 		if (ENABLE_PARALLEL_STREAMS) {
 			indices = indices.parallel();
 		}
-		return indices
-				.mapToObj(i -> C.get(i).getCiphertextExponentiation(a.get(i)))
-				.reduce(neutralElement, ElGamalMultiRecipientCiphertext::getCiphertextProduct);
+
+		final GqElement gamma_prod = GqElementFactory.multiModExp(IntStream.range(0, n)
+				.mapToObj(C::get)
+				.map(ElGamalMultiRecipientCiphertext::getGamma)
+				.collect(GroupVector.toGroupVector()), a);
+
+		final List<GqElement> phi_prod = indices
+				.mapToObj(i -> GqElementFactory.multiModExp(IntStream.range(0, n)
+						.mapToObj(C::get)
+						.map(ElGamalMultiRecipientCiphertext::getPhis)
+						.map(phi -> phi.get(i))
+						.collect(GroupVector.toGroupVector()), a))
+				.toList();
+
+		return ElGamalMultiRecipientCiphertext.create(gamma_prod, phi_prod);
 	}
 
 	/**
-	 * Partially decrypts a provided ciphertext.
+	 * Partially decrypts the ciphertext.
 	 * <p>
 	 * The {@code secretKey} parameter must comply with the following:
 	 * <ul>
@@ -147,14 +156,15 @@ public class ElGamalMultiRecipientCiphertexts {
 	 */
 	public static ElGamalMultiRecipientCiphertext getPartialDecryption(final ElGamalMultiRecipientCiphertext ciphertext,
 			final ElGamalMultiRecipientPrivateKey secretKey) {
-		final ElGamalMultiRecipientCiphertext c = checkNotNull(ciphertext);
-		final ElGamalMultiRecipientPrivateKey sk = checkNotNull(secretKey);
-
+		checkNotNull(secretKey);
 		checkArgument(ciphertext.getGroup().hasSameOrderAs(secretKey.getGroup()), "Ciphertext and secret key must belong to groups of same order.");
 		final int l = ciphertext.size();
 		final int k = secretKey.size();
+		checkArgument(0 < l, "The ciphertext must not be empty.");
 		checkArgument(l <= k, "There cannot be more message elements than private key elements.");
 
+		final ElGamalMultiRecipientCiphertext c = ciphertext;
+		final ElGamalMultiRecipientPrivateKey sk = secretKey;
 
 		final GqElement gamma = c.getGamma();
 		final GroupVector<GqElement, GqGroup> m = getMessage(c, sk).getElements();

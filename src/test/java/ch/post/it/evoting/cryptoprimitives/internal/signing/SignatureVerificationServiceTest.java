@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 
 import org.bouncycastle.asn1.x509.KeyUsage;
@@ -41,7 +42,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
@@ -54,9 +54,9 @@ import ch.post.it.evoting.cryptoprimitives.signing.AuthorityInformation;
 class SignatureVerificationServiceTest {
 
 	private static final Hashable message = HashableString.from("message");
-	private static final ImmutableByteArray signature = new ImmutableByteArray("signature".getBytes());
-	private static final Hashable additionalContextData = HashableList.of(HashableString.from("context"),
-			HashableBigInteger.from(BigInteger.ONE), HashableString.from("1234"));
+	private static final byte[] signature = "signature".getBytes();
+	private static final Hashable additionalContextData = HashableList.of(HashableString.from("context"), HashableBigInteger.from(BigInteger.ONE),
+			HashableString.from("1234"));
 	private static String authorityId;
 	private static KeyStore trustStore;
 	private static HashService hashService;
@@ -90,7 +90,7 @@ class SignatureVerificationServiceTest {
 				.setState("")
 				.setOrganisation("")
 				.build();
-		final CertificateInfo certificateInfo = new CertificateInfo(authorityInformation);
+		CertificateInfo certificateInfo = new CertificateInfo(authorityInformation);
 		certificateInfo.setValidFrom(from);
 		certificateInfo.setValidUntil(until);
 		certificateInfo.setUsage(new KeyUsage(KeyUsage.keyCertSign | KeyUsage.digitalSignature));
@@ -98,10 +98,8 @@ class SignatureVerificationServiceTest {
 	}
 
 	private static Stream<Arguments> getNullArguments() {
-		return Stream.of(
-				Arguments.of(null, message, additionalContextData, signature),
-				Arguments.of(authorityId, null, additionalContextData, signature),
-				Arguments.of(authorityId, message, null, signature),
+		return Stream.of(Arguments.of(null, message, additionalContextData, signature),
+				Arguments.of(authorityId, null, additionalContextData, signature), Arguments.of(authorityId, message, null, signature),
 				Arguments.of(authorityId, message, additionalContextData, null));
 	}
 
@@ -109,7 +107,7 @@ class SignatureVerificationServiceTest {
 	@MethodSource("getNullArguments")
 	@DisplayName("null parameters throws a NullPointerException")
 	void verifySignatureWithNullParametersThrows(final String authorityId, final Hashable message, final Hashable additionalContextData,
-			final ImmutableByteArray signature) {
+			final byte[] signature) {
 		assertThrows(NullPointerException.class,
 				() -> signatureVerificationService.verifySignature(authorityId, message, additionalContextData, signature));
 	}
@@ -117,47 +115,47 @@ class SignatureVerificationServiceTest {
 	@Test
 	@DisplayName("too early timestamp throws a SignatureException")
 	void verifySignatureWithTooEarlyTimestampThrows() throws KeyStoreException {
-		final Hashable tooEarlyMessage = HashableString.from("tooEarlyMessage");
-		final Hashable tooEarlyAdditionalContextData = HashableString.from("tooEarly");
+		final Hashable message = HashableString.from("tooEarlyMessage");
+		final Hashable additionalContextData = HashableString.from("tooEarly");
 		final KeyPair keyPair = SecurityLevelConfig.getSystemSecurityLevel().getSignatureAlgorithm().genKeyPair();
 		final LocalDate from = LocalDate.now().plusDays(1);
 		final LocalDate until = from.plusDays(365);
 		final X509Certificate certificate = getCertificate(from, until, keyPair);
 		final SignatureVerificationService signatureVerificationServiceNotYetValid = new SignatureVerificationService(trustStore, hashService,
 				SecurityLevelConfig.getSystemSecurityLevel().getSignatureAlgorithm());
-		final String tooEarlyAuthorityId = "oldAuthorityId";
-		trustStore.setCertificateEntry(tooEarlyAuthorityId, certificate);
+		final String authorityId = "oldAuthorityId";
+		trustStore.setCertificateEntry(authorityId, certificate);
 
 		final SignatureException exception = assertThrows(SignatureException.class,
-				() -> signatureVerificationServiceNotYetValid.verifySignature(tooEarlyAuthorityId, tooEarlyMessage, tooEarlyAdditionalContextData, signature));
+				() -> signatureVerificationServiceNotYetValid.verifySignature(authorityId, message, additionalContextData, signature));
 		assertTrue(exception.getMessage().startsWith("The timestamp is outside the signing certificate's validity"));
 	}
 
 	@Test
 	@DisplayName("too late timestamp throws a SignatureException")
 	void verifySignatureWithTooLateTimestampThrows() throws KeyStoreException {
-		final Hashable tooLateMessage = HashableString.from("tooLateMessage");
-		final Hashable tooLateAdditionalContextData = HashableString.from("tooLate");
+		final Hashable message = HashableString.from("tooLateMessage");
+		final Hashable additionalContextData = HashableString.from("tooLate");
 		final KeyPair keyPair = SecurityLevelConfig.getSystemSecurityLevel().getSignatureAlgorithm().genKeyPair();
 		final LocalDate now = LocalDate.now();
-		final LocalDate from = now.minusDays(365);
-		final LocalDate until = now.minusDays(1);
+		final LocalDate from = now.minus(365, ChronoUnit.DAYS);
+		final LocalDate until = now.minus(1, ChronoUnit.DAYS);
 		final X509Certificate certificate = getCertificate(from, until, keyPair);
 		final SignatureVerificationService signatureVerificationServiceNotYetValid = new SignatureVerificationService(trustStore, hashService,
 				SecurityLevelConfig.getSystemSecurityLevel().getSignatureAlgorithm());
-		final String tooLateAuthorityId = "newAuthorityId";
-		trustStore.setCertificateEntry(tooLateAuthorityId, certificate);
+		final String authorityId = "newAuthorityId";
+		trustStore.setCertificateEntry(authorityId, certificate);
 
 		final SignatureException exception = assertThrows(SignatureException.class,
-				() -> signatureVerificationServiceNotYetValid.verifySignature(tooLateAuthorityId, tooLateMessage, tooLateAdditionalContextData, signature));
+				() -> signatureVerificationServiceNotYetValid.verifySignature(authorityId, message, additionalContextData, signature));
 		assertTrue(exception.getMessage().startsWith("The timestamp is outside the signing certificate's validity"));
 	}
 
 	@Test
 	@DisplayName("correct signature returns true")
 	void verifySignatureWithCorrectSignatureVerifiesCorrectly() throws SignatureException {
-		final ImmutableByteArray correctSignature = signatureGenerationService.genSignature(message, additionalContextData);
-		assertTrue(signatureVerificationService.verifySignature(authorityId, message, additionalContextData, correctSignature));
+		final byte[] signature = signatureGenerationService.genSignature(message, additionalContextData);
+		assertTrue(signatureVerificationService.verifySignature(authorityId, message, additionalContextData, signature));
 	}
 
 	@Test
@@ -168,15 +166,15 @@ class SignatureVerificationServiceTest {
 		final LocalDate until = LocalDate.of(2035, 1, 1);
 		final X509Certificate certificate = getCertificate(from, until, keyPair);
 		final KeyStore uninitializedTrustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-		final SignatureGenerationService keyStoreNotInitializedSignatureGenerationService = new SignatureGenerationService(keyPair.getPrivate(), certificate, hashService,
+		final SignatureGenerationService signatureGenerationService = new SignatureGenerationService(keyPair.getPrivate(), certificate, hashService,
 				SecurityLevelConfig.getSystemSecurityLevel().getSignatureAlgorithm());
-		final SignatureVerificationService keyStoreNotInitializedSignatureVerificationService = new SignatureVerificationService(uninitializedTrustStore, hashService,
+		final SignatureVerificationService signatureVerificationService = new SignatureVerificationService(uninitializedTrustStore, hashService,
 				SecurityLevelConfig.getSystemSecurityLevel().getSignatureAlgorithm());
 
-		final HashableString keyStoreNotInitializedMmessage = HashableString.from("Good to go!");
-		final ImmutableByteArray keyStoreNotInitializedSignature = keyStoreNotInitializedSignatureGenerationService.genSignature(keyStoreNotInitializedMmessage, additionalContextData);
+		final HashableString message = HashableString.from("Good to go!");
+		final byte[] signature = signatureGenerationService.genSignature(message, additionalContextData);
 		final IllegalStateException exception = assertThrows(IllegalStateException.class,
-				() -> keyStoreNotInitializedSignatureVerificationService.verifySignature(authorityId, keyStoreNotInitializedMmessage, additionalContextData, keyStoreNotInitializedSignature));
+				() -> signatureVerificationService.verifySignature(authorityId, message, additionalContextData, signature));
 		assertEquals("The trust store has not been initialized correctly.", exception.getMessage());
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package ch.post.it.evoting.cryptoprimitives.internal.securitylevel;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -32,12 +31,10 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-
 /**
  * This class is thread safe.
  */
-@SuppressWarnings({"java:S101", "java:S6548"})
+@SuppressWarnings("java:S101")
 public class AES_GCM_256 implements AEAD {
 
 	private static final AES_GCM_256 INSTANCE = new AES_GCM_256();
@@ -55,21 +52,14 @@ public class AES_GCM_256 implements AEAD {
 	}
 
 	@Override
-	public ImmutableByteArray authenticatedEncryption(final ImmutableByteArray secretKey, final ImmutableByteArray nonce,
-			final ImmutableByteArray plaintext, final ImmutableByteArray associatedData) {
-		checkNotNull(secretKey);
-		checkArgument(1 <= secretKey.length() && secretKey.length() <= 255, "The secret key must have a length between 1 and 255 bytes. [length: %s]",
-				secretKey.length());
-		checkNotNull(nonce);
-		checkNotNull(plaintext);
-		checkNotNull(associatedData);
-		checkArgument(nonce.length() == getNonceLengthBytes(), String.format("Invalid nonce length, expected %s", getNonceLengthBytes()));
+	public byte[] authenticatedEncryption(final byte[] secretKey, final byte[] nonce, final byte[] plaintext, final byte[] associatedData) {
+		checkArgument(nonce.length == getNonceLengthBytes(), String.format("Invalid nonce length, expected %s", getNonceLengthBytes()));
 
 		final Cipher cipher = getCipher(secretKey, nonce, Cipher.ENCRYPT_MODE);
-		cipher.updateAAD(associatedData.elements());
+		cipher.updateAAD(associatedData);
 
 		try {
-			return new ImmutableByteArray(cipher.doFinal(plaintext.elements()));
+			return cipher.doFinal(plaintext);
 		} catch (final BadPaddingException e) {
 			throw new IllegalStateException("We should never get this exception since it is only thrown in decryption mode.");
 		} catch (final IllegalBlockSizeException e) {
@@ -78,21 +68,14 @@ public class AES_GCM_256 implements AEAD {
 	}
 
 	@Override
-	public ImmutableByteArray authenticatedDecryption(final ImmutableByteArray secretKey, final ImmutableByteArray nonce,
-			final ImmutableByteArray associatedData, final ImmutableByteArray ciphertext) {
-		checkNotNull(secretKey);
-		checkArgument(1 <= secretKey.length() && secretKey.length() <= 255, "The secret key must have a length between 1 and 255 bytes. [length: %s]",
-				secretKey.length());
-		checkNotNull(nonce);
-		checkNotNull(associatedData);
-		checkNotNull(ciphertext);
-		checkArgument(nonce.length() == getNonceLengthBytes(), String.format("Invalid nonce length, expected %s", getNonceLengthBytes()));
+	public byte[] authenticatedDecryption(final byte[] secretKey, final byte[] nonce, final byte[] associatedData, final byte[] ciphertext) {
+		checkArgument(nonce.length == getNonceLengthBytes(), String.format("Invalid nonce length, expected %s", getNonceLengthBytes()));
 
 		final Cipher cipher = getCipher(secretKey, nonce, Cipher.DECRYPT_MODE);
-		cipher.updateAAD(associatedData.elements());
+		cipher.updateAAD(associatedData);
 
 		try {
-			return new ImmutableByteArray(cipher.doFinal(ciphertext.elements()));
+			return cipher.doFinal(ciphertext);
 		} catch (final BadPaddingException e) {
 			throw new IllegalStateException("We should never get this exception since no padding is needed for the configured algorithm.", e);
 		} catch (final IllegalBlockSizeException e) {
@@ -105,7 +88,7 @@ public class AES_GCM_256 implements AEAD {
 		return 12;
 	}
 
-	private Cipher getCipher(final ImmutableByteArray encryptionKey, final ImmutableByteArray nonce, final int opmode) {
+	private Cipher getCipher(final byte[] encryptionKey, final byte[] nonce, final int opmode) {
 		// Get Cipher Instance
 		final Cipher cipher;
 		try {
@@ -115,10 +98,10 @@ public class AES_GCM_256 implements AEAD {
 		}
 
 		// Create the encryptionKey
-		final Key key = new SecretKeySpec(encryptionKey.elements(), AES);
+		final Key key = new SecretKeySpec(encryptionKey, AES);
 
 		// Create the algorithm used for the authentication
-		final AlgorithmParameterSpec params = new GCMParameterSpec(AES_GCM_TAG_BYTE_LENGTH * 8, nonce.elements());
+		final AlgorithmParameterSpec params = new GCMParameterSpec(AES_GCM_TAG_BYTE_LENGTH * 8, nonce);
 
 		// Initialize Cipher for the authentication
 		try {

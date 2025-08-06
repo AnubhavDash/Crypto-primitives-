@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ class ElGamalMultiRecipientKeyPairTest {
 		final BigInteger q = BigInteger.valueOf(11);
 		final BigInteger g = BigInteger.TWO;
 
-
+		
 		publicKeyGroup = new GqGroup(p, q, g);
 		privateKeyGroup = ZqGroup.sameOrderAs(publicKeyGroup);
 
@@ -106,9 +106,9 @@ class ElGamalMultiRecipientKeyPairTest {
 		final BigInteger g = BigInteger.valueOf(3);
 
 		final GqGroup smallGroup = new GqGroup(p, q, g);
-		final ElGamalMultiRecipientKeyPair keyPairWithinBounds = ElGamalMultiRecipientKeyPair.genKeyPair(smallGroup, 10 * q.intValue(), randomSer);
-		keyPairWithinBounds.getPrivateKey().stream().forEach(sk -> {
-			assertTrue(sk.getValue().signum() >= 0);
+		final ElGamalMultiRecipientKeyPair keyPair = ElGamalMultiRecipientKeyPair.genKeyPair(smallGroup, 10 * q.intValue(), randomSer);
+		keyPair.getPrivateKey().stream().forEach(sk -> {
+			assertTrue(sk.getValue().compareTo(BigInteger.ZERO) >= 0);
 			assertTrue(sk.getValue().compareTo(q) < 0);
 		});
 	}

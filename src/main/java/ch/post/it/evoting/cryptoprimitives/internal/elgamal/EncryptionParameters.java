@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bouncycastle.crypto.digests.SHAKEDigest;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import com.google.common.primitives.Bytes;
+
 import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
@@ -61,17 +62,17 @@ public final class EncryptionParameters {
 	/**
 	 * Generates verifiable encryption parameters used for the election.
 	 * <p>
-	 * Executions with the same seed, yield the same encryption parameters.
+	 *     Executions with the same seed, yield the same encryption parameters.
 	 * </p>
 	 *
 	 * @param seed        the name of the election event. Must be non-null.
 	 * @param smallPrimes a list of small primes. Must be non-null.
 	 * @return a {@link GqGroup} containing the verifiable encryption parameters p, q and g.
-	 * @throws NullPointerException     if any of the inputs is null.
+	 * @throws NullPointerException if any of the inputs is null.
 	 * @throws IllegalArgumentException if any of the numbers in small primes list is not a prime.
 	 */
-	@SuppressWarnings({"java:S117", "java:S3776"})
-	public GqGroup getEncryptionParameters(final String seed, final ImmutableList<Integer> smallPrimes) {
+	@SuppressWarnings("java:S117")
+	public GqGroup getEncryptionParameters(final String seed, final List<Integer> smallPrimes) {
 		checkNotNull(seed);
 		checkNotNull(smallPrimes);
 		smallPrimes.forEach(prime -> checkArgument(PrimesInternal.isSmallPrime(prime), "The given number is not a prime. [Number: %s]", prime));
@@ -82,8 +83,8 @@ public final class EncryptionParameters {
 		final int l = smallPrimes.size();
 		final int pBitLength = securityLevel.getPBitLength();
 
-		final ImmutableByteArray q_b_hat = shake256(stringToByteArray(seed), pBitLength / 8);
-		final ImmutableByteArray q_b = ImmutableByteArray.concat(ImmutableByteArray.of((byte) 0x02), q_b_hat);
+		final byte[] q_b_hat = shake256(stringToByteArray(seed), pBitLength / 8);
+		final byte[] q_b = Bytes.concat(new byte[] { 0x02 }, q_b_hat);
 		final BigInteger q_prime = byteArrayToInteger(q_b).shiftRight(3);
 		BigInteger q = q_prime.subtract(q_prime.mod(SIX)).add(FIVE);
 		final ArrayList<BigInteger> r = new ArrayList<>(l);
@@ -96,8 +97,7 @@ public final class EncryptionParameters {
 				delta = delta.add(SIX);
 				int i = 0;
 				while (i < l) {
-					if ((r.get(i).add(delta).mod(sp.get(i)).equals(ZERO)) || (TWO.multiply(r.get(i).add(delta)).add(ONE).mod(sp.get(i))
-							.equals(ZERO))) {
+					if ((r.get(i).add(delta).mod(sp.get(i)).equals(ZERO)) || (TWO.multiply(r.get(i).add(delta)).add(ONE).mod(sp.get(i)).equals(ZERO))) {
 						delta = delta.add(SIX);
 						i = 0;
 					} else {
@@ -119,14 +119,14 @@ public final class EncryptionParameters {
 		return new GqGroup(p, q, g);
 	}
 
-	private ImmutableByteArray shake256(final ImmutableByteArray message, final int outputLength) {
+	private byte[] shake256(final byte[] message, final int outputLength) {
 		final byte[] result = new byte[outputLength];
 		final SHAKEDigest shakeDigest = new SHAKEDigest(256);
 
-		shakeDigest.update(message.elements(), 0, message.length());
+		shakeDigest.update(message, 0, message.length);
 		shakeDigest.doFinal(result, 0, outputLength);
 
-		return new ImmutableByteArray(result);
+		return result;
 	}
 
 	/**

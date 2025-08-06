@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
+import ch.post.it.evoting.cryptoprimitives.hashing.HashableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
@@ -83,14 +83,14 @@ class SignatureKeystoreServiceTest {
 		store1.setCertificateEntry(alias2, store2.getCertificate(alias2));
 
 		final SignatureKeystoreService<Supplier<String>> service1 = new SignatureKeystoreService<>(keyStoreToStream(store1, password1), KEYSTORE_TYPE,
-				password1, keystore -> true, () -> alias1, hashService);
+				password1, (keystore) -> true, () -> alias1, hashService);
 		final SignatureKeystoreService<Supplier<String>> service2 = new SignatureKeystoreService<>(keyStoreToStream(store2, password2), KEYSTORE_TYPE,
-				password2, keystore -> true, () -> alias2, hashService);
+				password2, (keystore) -> true, () -> alias2, hashService);
 
-		final ImmutableByteArray message = randomService.randomBytes(1000);
+		final HashableByteArray message = HashableByteArray.from(randomService.randomBytes(1000));
 
 		// when
-		final ImmutableByteArray signature = service1.generateSignature(message, EMPTY_CONTEXT_DATA);
+		final byte[] signature = service1.generateSignature(message, EMPTY_CONTEXT_DATA);
 
 		// then
 		assertTrue(service2.verifySignature(() -> alias1, message, EMPTY_CONTEXT_DATA, signature));
@@ -110,14 +110,14 @@ class SignatureKeystoreServiceTest {
 		final KeyStore store2 = generateNewKeyStore(alias2, password2);
 
 		final SignatureKeystoreService<Supplier<String>> service1 = new SignatureKeystoreService<>(keyStoreToStream(store1, password1), KEYSTORE_TYPE,
-				password1, keystore -> true, () -> alias1, hashService);
+				password1, (keystore) -> true, () -> alias1, hashService);
 		final SignatureKeystoreService<Supplier<String>> service2 = new SignatureKeystoreService<>(keyStoreToStream(store2, password2), KEYSTORE_TYPE,
-				password2, keystore -> true, () -> alias2, hashService);
+				password2, (keystore) -> true, () -> alias2, hashService);
 
-		final ImmutableByteArray message = randomService.randomBytes(1000);
+		final HashableByteArray message = HashableByteArray.from(randomService.randomBytes(1000));
 
 		// when
-		final ImmutableByteArray signature = service1.generateSignature(message, EMPTY_CONTEXT_DATA);
+		final byte[] signature = service1.generateSignature(message, EMPTY_CONTEXT_DATA);
 
 		// then
 		assertThrows(NullPointerException.class, () -> service2.verifySignature(() -> alias1, message, EMPTY_CONTEXT_DATA, signature),
@@ -131,7 +131,7 @@ class SignatureKeystoreServiceTest {
 		final char[] password = "password".toCharArray();
 		final KeyStore keyStore = generateNewKeyStore(alias, password);
 		final SignatureKeystoreService<Supplier<String>> service = new SignatureKeystoreService<>(keyStoreToStream(keyStore, password), KEYSTORE_TYPE,
-				password, keystore -> true, () -> alias, hashService);
+				password, (keystore) -> true, () -> alias, hashService);
 
 		// when
 		final String selfAlias = service.getSigningAlias().get();
@@ -149,7 +149,7 @@ class SignatureKeystoreServiceTest {
 
 		// when / then
 		assertDoesNotThrow(
-				() -> new SignatureKeystoreService<>(keyStoreToStream(keyStore, password), KEYSTORE_TYPE, password, keystore -> true, () -> alias,
+				() -> new SignatureKeystoreService<>(keyStoreToStream(keyStore, password), KEYSTORE_TYPE, password, (keystore) -> true, () -> alias,
 						hashService));
 	}
 
@@ -163,7 +163,7 @@ class SignatureKeystoreServiceTest {
 		// when / then
 		try (final InputStream inputStream = keyStoreToStream(keyStore, password)) {
 			assertThrows(IllegalArgumentException.class,
-					() -> new SignatureKeystoreService<>(inputStream, KEYSTORE_TYPE, password, keystore -> false, () -> alias, hashService));
+					() -> new SignatureKeystoreService<>(inputStream, KEYSTORE_TYPE, password, (keystore) -> false, () -> alias, hashService));
 		}
 	}
 

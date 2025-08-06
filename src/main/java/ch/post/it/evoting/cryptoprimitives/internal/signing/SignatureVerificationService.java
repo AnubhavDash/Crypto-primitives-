@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hash;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
@@ -48,15 +47,21 @@ public class SignatureVerificationService implements SignatureVerification {
 
 	/**
 	 * See {@link SignatureVerification#verifySignature}
+	 *
+	 * @param authorityId           The identifier of the authority. Must be non-null.
+	 * @param message               The message that was signed. Must be non-null.
+	 * @param additionalContextData Additional context data. Must be non-null. May be empty.
+	 * @param signature             The signature of the message. Must be non-null.
+	 * @return
+	 * @throws SignatureException
 	 */
 	@Override
-	public boolean verifySignature(final String authorityId, final Hashable message, final Hashable additionalContextData,
-			final ImmutableByteArray signature)
+	public boolean verifySignature(final String authorityId, final Hashable message, final Hashable additionalContextData, final byte[] signature)
 			throws SignatureException {
 		final String id = checkNotNull(authorityId);
 		final Hashable m = checkNotNull(message);
 		final Hashable c = checkNotNull(additionalContextData);
-		final ImmutableByteArray s = checkNotNull(signature);
+		final byte[] s = checkNotNull(signature);
 
 		final X509Certificate cert = findCertificate(id);
 		final Instant t = getTimeStamp();
@@ -70,7 +75,7 @@ public class SignatureVerificationService implements SignatureVerification {
 		}
 
 		final PublicKey pubKey = cert.getPublicKey();
-		final ImmutableByteArray h = hash.recursiveHash(HashableList.of(m, c));
+		final byte[] h = hash.recursiveHash(HashableList.of(m, c));
 
 		return signatureSupportingAlgorithm.verify(pubKey, h, s);
 	}

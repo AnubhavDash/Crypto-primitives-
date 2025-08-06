@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
  */
 public record Shuffle(GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts,
 					  Permutation permutation, GroupVector<ZqElement, ZqGroup> reEncryptionExponents) {
-	public static final Shuffle EMPTY = new Shuffle(GroupVector.empty(), Permutation.EMPTY, GroupVector.empty());
+	public static final Shuffle EMPTY = new Shuffle(GroupVector.of(), Permutation.EMPTY, GroupVector.of());
 
 	public Shuffle {
 		checkNotNull(ciphertexts);

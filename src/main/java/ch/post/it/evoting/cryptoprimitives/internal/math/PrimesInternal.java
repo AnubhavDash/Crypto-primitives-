@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2024 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
-import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -24,9 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
-
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 
 public class PrimesInternal {
 
@@ -59,7 +57,7 @@ public class PrimesInternal {
 		}
 	}
 
-	public static ImmutableList<Integer> getSmallPrimes() {
+	public static List<Integer> getSmallPrimes() {
 		final ArrayList<Integer> smallPrimes = new ArrayList<>();
 		try (final InputStream smallPrimesInputStream = PrimesInternal.class.getResourceAsStream("/small_primes.txt")) {
 			checkNotNull(smallPrimesInputStream, "Could not find small_primes.txt resource");
@@ -68,10 +66,10 @@ public class PrimesInternal {
 					smallPrimes.add(scanner.nextInt());
 				}
 			}
-		} catch (final IOException e) {
+		} catch (IOException e) {
 			throw new UncheckedIOException("Unable to read small_primes.txt", e);
 		}
 
-		return smallPrimes.stream().collect(toImmutableList());
+		return smallPrimes;
 	}
 }
