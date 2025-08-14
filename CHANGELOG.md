@@ -1,13 +1,23 @@
 # Changelog
 
-## Release 1.5.0
+## Release 1.5.1
 
-Release 1.5.0 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
+Release 1.5.1 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
 We want to thank the experts for their high-quality, constructive remarks:
 
 * Thomas Edmund Haines (Australian National University), Olivier Pereira (Université catholique Louvain), Vanessa Teague (Thinking Cybersecurity)
 * Aleksander Essex (Western University Canada)
 * Rolf Haenni, Reto Koenig, Philipp Locher (Bern University of Applied Sciences)
+
+The following functionalities and improvements are included in release 1.5.1:
+
+* [Specification] Improve byte notation consistency in algorithm CutToBitLength (feedback from Olivier Pereira).
+* [Specification] Correct the statement about the bit length of 0 (reported in GitLab Issue [24](https://gitlab.com/swisspost-evoting/crypto-primitives/crypto-primitives/-/issues/24)).
+* [Code] Update dependencies and third-party libraries.
+
+## Release 1.5.0
+
+Release 1.5.0 includes some feedback from the Federal Chancellery's mandated experts (see above) and other experts of the community.
 
 The following functionalities and improvements are included in release 1.5.0:
 
