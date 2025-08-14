@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,12 @@
 package ch.post.it.evoting.cryptoprimitives.internal.utils;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mockStatic;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -40,6 +38,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
@@ -48,13 +48,14 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
 
+@SuppressWarnings({ "java:S116", "java:S117" })
 class KDFServiceTest {
 
 	private static final int DEFAULT_HASH_LENGTH_BYTES = 32;
 	private static final TestRandomService randomService = new TestRandomService();
-	private static final List<String> emptyInfo = List.of();
+	private static final ImmutableList<String> emptyInfo = ImmutableList.emptyList();
 	private KDFService kdfService;
-	private byte[] PRK;
+	private ImmutableByteArray PRK;
 	private int requiredLength;
 	private BigInteger requestedUpperBound;
 
@@ -76,7 +77,7 @@ class KDFServiceTest {
 
 	@Test
 	void testNoInfoDoesntThrow() {
-		assertDoesNotThrow(() -> kdfService.KDF(PRK, List.of(), requiredLength));
+		assertDoesNotThrow(() -> kdfService.KDF(PRK, emptyInfo, requiredLength));
 	}
 
 	@Test
@@ -86,7 +87,7 @@ class KDFServiceTest {
 
 	@Test
 	void testPRKLengthSmallerThanHashLengthThrows() {
-		final byte[] tooSmallPRK = new byte[DEFAULT_HASH_LENGTH_BYTES - 1];
+		final ImmutableByteArray tooSmallPRK = new ImmutableByteArray(new byte[DEFAULT_HASH_LENGTH_BYTES - 1]);
 		assertThrows(IllegalArgumentException.class, () -> kdfService.KDF(tooSmallPRK, emptyInfo, requiredLength));
 	}
 
@@ -96,7 +97,7 @@ class KDFServiceTest {
 	}
 
 	static Stream<Arguments> KDFRealValuesProvider() {
-		final List<TestParameters> parametersList = TestParameters.fromResource("/utils/hkdf-expand.json");
+		final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/utils/kdf.json");
 
 		return parametersList.stream().parallel().map(testParameters -> {
 			// Context.
@@ -106,13 +107,13 @@ class KDFServiceTest {
 
 			// Inputs.
 			final JsonData input = testParameters.getInput();
-			final byte[] PRK = input.get("prk", byte[].class);
-			final List<String> infos = List.of(input.get("info", String[].class));
+			final ImmutableByteArray PRK = input.get("prk", ImmutableByteArray.class);
+			final ImmutableList<String> infos = ImmutableList.of(input.get("info", String[].class));
 			final Integer requiredByteLength = input.get("length", Integer.class);
 
 			// Output.
 			final JsonData output = testParameters.getOutput();
-			final byte[] OKM = output.get("okm", byte[].class);
+			final ImmutableByteArray OKM = output.get("okm", ImmutableByteArray.class);
 
 			return Arguments.of(hashSupplier, PRK, infos, requiredByteLength, OKM, testParameters.getDescription());
 		});
@@ -121,11 +122,11 @@ class KDFServiceTest {
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("KDFRealValuesProvider")
 	@DisplayName("KeyDerivation returns expected output")
-	void testKDFWithRealValues(final Supplier<Digest> hashSupplier, final byte[] PRK, final List<String> infos, final int requiredByteLength,
-			final byte[] OKM, final String description) {
-		final KDFService kdfService = new KDFService(hashSupplier);
-		final byte[] actualResult = kdfService.KDF(PRK, infos, requiredByteLength);
-		assertArrayEquals(OKM, actualResult, String.format("assertion failed for: %s", description));
+	void testKDFWithRealValues(final Supplier<Digest> hashSupplier, final ImmutableByteArray realPRK, final ImmutableList<String> infos,
+			final int requiredByteLength, final ImmutableByteArray realOKM, final String description) {
+		final KDFService realKdfService = new KDFService(hashSupplier);
+		final ImmutableByteArray actualResult = realKdfService.KDF(realPRK, infos, requiredByteLength);
+		assertEquals(realOKM, actualResult, String.format("assertion failed for: %s", description));
 	}
 
 	@Test
@@ -139,7 +140,7 @@ class KDFServiceTest {
 
 	@Test
 	void testKDFToZqNoInfoDoesntThrow() {
-		assertDoesNotThrow(() -> kdfService.KDFToZq(PRK, List.of(), requestedUpperBound));
+		assertDoesNotThrow(() -> kdfService.KDFToZq(PRK, ImmutableList.emptyList(), requestedUpperBound));
 	}
 
 	@Test
@@ -150,12 +151,12 @@ class KDFServiceTest {
 
 	@Test
 	void testKDFToZqPRKLengthSmallerThanHashLengthThrows() {
-		final byte[] tooSmallPRK = new byte[DEFAULT_HASH_LENGTH_BYTES - 1];
+		final ImmutableByteArray tooSmallPRK = new ImmutableByteArray(new byte[DEFAULT_HASH_LENGTH_BYTES - 1]);
 		assertThrows(IllegalArgumentException.class, () -> kdfService.KDFToZq(tooSmallPRK, emptyInfo, requestedUpperBound));
 	}
 
 	static Stream<Arguments> KDFToZqRealValuesProvider() {
-		final List<TestParameters> parametersList = TestParameters.fromResource("/utils/hkdf-expand-to-zq.json");
+		final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/utils/kdf-to-zq.json");
 
 		return parametersList.stream().map(testParameters -> {
 			// Context.
@@ -165,8 +166,8 @@ class KDFServiceTest {
 
 			// Inputs.
 			final JsonData input = testParameters.getInput();
-			final byte[] PRK = input.get("prk", byte[].class);
-			final List<String> infos = List.of(input.get("info", String[].class));
+			final ImmutableByteArray PRK = input.get("prk", ImmutableByteArray.class);
+			final ImmutableList<String> infos = ImmutableList.of(input.get("info", String[].class));
 			final BigInteger q = input.get("q", BigInteger.class);
 
 			// Output.
@@ -180,13 +181,14 @@ class KDFServiceTest {
 	@ParameterizedTest(name = "{5}")
 	@MethodSource("KDFToZqRealValuesProvider")
 	@DisplayName("KDFToZq returns expected output")
-	void testKDFToZqWithRealValues(final Supplier<Digest> hashSupplier, final byte[] PRK, final List<String> infos, final BigInteger q,
+	void testKDFToZqWithRealValues(final Supplier<Digest> hashSupplier, final ImmutableByteArray realPRK, final ImmutableList<String> infos,
+			final BigInteger q,
 			final ZqElement u, final String description, final SecurityLevelInternal securityLevel) {
 		try (final MockedStatic<SecurityLevelConfig> mockedSecurityLevel = mockStatic(SecurityLevelConfig.class)) {
 			mockedSecurityLevel.when(SecurityLevelConfig::getSystemSecurityLevel).thenReturn(securityLevel);
 
-			final KDFService kdfService = new KDFService(hashSupplier);
-			final ZqElement actualResult = kdfService.KDFToZq(PRK, infos, q);
+			final KDFService realKdfService = new KDFService(hashSupplier);
+			final ZqElement actualResult = realKdfService.KDFToZq(realPRK, infos, q);
 			assertEquals(u, actualResult, String.format("assertion failed for: %s", description));
 		}
 	}

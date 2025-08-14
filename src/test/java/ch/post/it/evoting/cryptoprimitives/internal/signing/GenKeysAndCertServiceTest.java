@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.TestSignatureSupportingAlgorithm;
 import ch.post.it.evoting.cryptoprimitives.signing.AuthorityInformation;
@@ -177,10 +178,10 @@ class GenKeysAndCertServiceTest {
 		final Certificate certificate = output.certificate();
 		final PrivateKey privateKey = output.privateKey();
 
-		final byte[] payload = createRandomPayload();
+		final ImmutableByteArray payload = createRandomPayload();
 
 		// when
-		final byte[] actual = signPayload(privateKey, payload);
+		final ImmutableByteArray actual = signPayload(privateKey, payload);
 
 		// then
 		assertTrue(verifyPayload(certificate.getPublicKey(), payload, actual));
@@ -194,7 +195,7 @@ class GenKeysAndCertServiceTest {
 		return date.toInstant().atZone(ZoneId.of("Europe/Zurich")).toLocalDate();
 	}
 
-	private static byte[] createRandomPayload() {
+	private static ImmutableByteArray createRandomPayload() {
 		return randomService.randomBytes(10);
 	}
 }

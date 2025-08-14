@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.utils;
 
+import static ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays.byteLength;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -27,6 +28,8 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
+
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 
 /**
  * <p>This class is thread safe.</p>
@@ -46,66 +49,59 @@ public final class ConversionsInternal {
 	 * ByteArrayToInteger. We prefer this implementation due to its conciseness.
 	 * </p>
 	 */
-	public static BigInteger byteArrayToInteger(final byte[] bytes) {
+	public static BigInteger byteArrayToInteger(final ImmutableByteArray bytes) {
 		checkNotNull(bytes);
-		checkArgument(bytes.length > 0, "The byte array to convert must be non-empty.");
-		return new BigInteger(1, bytes);
+		return new BigInteger(1, bytes.elements());
 	}
 
 	/**
 	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.Conversions#integerToByteArray}.
-	 * <p>
-	 * NOTE: our implementation slightly deviates from the specifications for performance reasons. Benchmarks show that our implementation is orders
-	 * of magnitude faster than the pseudo-code implementation integerToByteArraySpec. Both implementations are equivalent, and we have a unit test
-	 * ensuring it.
-	 * </p>
 	 */
-	public static byte[] integerToByteArray(final BigInteger x) {
+	public static ImmutableByteArray integerToByteArray(final BigInteger x) {
 		checkNotNull(x);
-		checkArgument(x.compareTo(BigInteger.ZERO) >= 0);
+		checkArgument(x.signum() >= 0);
 
-		// BigInteger#toByteArray gives back a 2s complement representation of the value. Given that we work only with positive BigIntegers, this
-		// representation is equivalent to the binary representation, except for a potential extra leading zero byte. (The presence or not of the
-		// leading zero depends on the number of bits needed to represent this value).
-		final byte[] twosComplement = x.toByteArray();
-		final byte[] result;
-		if (twosComplement[0] == 0 && twosComplement.length > 1) {
-			result = new byte[twosComplement.length - 1];
-			System.arraycopy(twosComplement, 1, result, 0, twosComplement.length - 1);
-		} else {
-			result = twosComplement;
-		}
-		return result;
+		final int n = byteLength(x);
+		return integerToFixedLengthByteArray(x, n);
 	}
 
 	/**
 	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.Conversions#integerToFixedLengthByteArray}.
 	 * <p>
 	 * NOTE: our implementation slightly deviates from the specifications for performance reasons. Benchmarks show that our implementation is orders
-	 * of magnitude faster than the pseudo-code implementation integerToFixedLengthByteArraySpec. Both implementations are equivalent, and we have a unit test
+	 * of magnitude faster than the pseudocode implementation integerToFixedLengthByteArraySpec. Both implementations are equivalent, and we have a unit test
 	 * ensuring it.
 	 * </p>
 	 */
 	@SuppressWarnings("java:S117")
-	public static byte[] integerToFixedLengthByteArray(final BigInteger x, final int n) {
+	public static ImmutableByteArray integerToFixedLengthByteArray(final BigInteger x, final int m) {
 		checkNotNull(x);
 		checkArgument(x.signum() >= 0);
-		checkArgument(Math.ceilDivExact(x.bitLength(), Byte.SIZE) <= n,
-				"The desired length n must be greater than or equal to the byte length of x.");
+		checkArgument(byteLength(x) <= m, "The desired length m must be greater than or equal to the byte length of x.");
 
 		// BigInteger#toByteArray gives back a 2s complement representation of the value. Given that we work only with positive BigIntegers, this
 		// representation is equivalent to the binary representation, except for a potential extra leading zero byte. (The presence or not of the
 		// leading zero depends on the number of bits needed to represent this value).
-		final byte[] B = new byte[n];
-		final byte[] xAsByteArray = integerToByteArray(x);
-		System.arraycopy(xAsByteArray, 0, B, n - xAsByteArray.length, xAsByteArray.length);
-		return B;
+		final ImmutableByteArray twosComplement = new ImmutableByteArray(x.toByteArray());
+		final ImmutableByteArray xAsByteArray;
+		if (twosComplement.get(0) == 0) {
+			xAsByteArray = ImmutableByteArray.copyOfRange(twosComplement, 1, twosComplement.length());
+		} else {
+			xAsByteArray = twosComplement;
+		}
+		if (byteLength(x) == m) {
+			// If the byte length of x is equal to m, we can return the byte array as it is.
+			return xAsByteArray;
+		}
+		final byte[] B = new byte[m];
+		System.arraycopy(xAsByteArray.elements(), 0, B, m - xAsByteArray.length(), xAsByteArray.length());
+		return ImmutableByteArray.of(B);
 	}
 
 	/**
 	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.Conversions#stringToByteArray}
 	 */
-	public static byte[] stringToByteArray(final String s) {
+	public static ImmutableByteArray stringToByteArray(final String s) {
 		checkNotNull(s);
 
 		final CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder()
@@ -120,7 +116,7 @@ public final class ConversionsInternal {
 			final byte[] result = new byte[buffer.remaining()];
 			buffer.get(result);
 
-			return result;
+			return new ImmutableByteArray(result);
 		} catch (final CharacterCodingException e) {
 			throw new IllegalArgumentException("The string does not correspond to a valid sequence of UTF-8 encoding.");
 		}
@@ -129,19 +125,18 @@ public final class ConversionsInternal {
 	/**
 	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.Conversions#byteArrayToString}
 	 */
-	public static String byteArrayToString(final byte[] b) {
+	public static String byteArrayToString(final ImmutableByteArray b) {
 		checkNotNull(b);
-		checkArgument(b.length > 0, "The length of the byte array must be strictly positive.");
 
 		final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder()
 				// Explicitly set the error actions to REPORT to be sure no ignore nor replace action is performed.
 				.onMalformedInput(CodingErrorAction.REPORT)
 				.onUnmappableCharacter(CodingErrorAction.REPORT);
 
-		// The try-catch clause implements the pseudo-code's if statement
+		// The try-catch clause implements the pseudocode's if statement
 		try {
 			// Corresponds to UTF-8^-1(B)
-			return decoder.decode(ByteBuffer.wrap(b)).toString();
+			return decoder.decode(ByteBuffer.wrap(b.elements())).toString();
 		} catch (final CharacterCodingException e) {
 			throw new IllegalArgumentException("The byte array does not correspond to a valid sequence of UTF-8 encoding.");
 		}
@@ -166,7 +161,7 @@ public final class ConversionsInternal {
 	 */
 	public static String integerToString(final BigInteger x) {
 		checkNotNull(x);
-		checkArgument(x.compareTo(BigInteger.ZERO) >= 0);
+		checkArgument(x.signum() >= 0);
 
 		// Corresponds to Decimal^-1(x)
 		return x.toString(10);

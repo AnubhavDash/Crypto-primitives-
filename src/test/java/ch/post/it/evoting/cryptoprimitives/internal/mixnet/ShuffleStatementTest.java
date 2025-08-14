@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,8 +76,8 @@ class ShuffleStatementTest extends TestGroupSetup {
 	@Test
 	@DisplayName("with empty ciphertexts throws IllegalArgumentException")
 	void constructEmptyParams() {
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> emptyCiphertexts = GroupVector.of();
-		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> emptyShuffledCiphertexts = GroupVector.of();
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> emptyCiphertexts = GroupVector.empty();
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> emptyShuffledCiphertexts = GroupVector.empty();
 
 		final IllegalArgumentException emptyCiphertextsException = assertThrows(IllegalArgumentException.class,
 				() -> new ShuffleStatement(emptyCiphertexts, shuffledCiphertexts));

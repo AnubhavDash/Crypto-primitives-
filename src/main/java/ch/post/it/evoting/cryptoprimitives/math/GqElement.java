@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  */
 package ch.post.it.evoting.cryptoprimitives.math;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.List;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsService;
 
 /**
@@ -136,7 +137,7 @@ public sealed class GqElement extends GroupElement<GqGroup> permits PrimeGqEleme
 			checkNotNull(element);
 			checkNotNull(group);
 
-			checkArgument(element.compareTo(BigInteger.ZERO) > 0, "The element must be strictly greater than 0");
+			checkArgument(element.signum() > 0, "The element must be strictly greater than 0");
 			checkArgument(element.compareTo(group.getQ()) < 0, "The element must be smaller than the group's order");
 
 			final BigInteger y = BigIntegerOperationsService.modExponentiate(element, BigInteger.TWO, group.getP());
@@ -158,8 +159,12 @@ public sealed class GqElement extends GroupElement<GqGroup> permits PrimeGqEleme
 			// the GroupVector constructor ensures all bases belong to the same group.
 			checkArgument(exponents.getGroup().hasSameOrderAs(bases.getGroup()));
 
-			final List<BigInteger> basesList = bases.stream().parallel().map(GqElement::getValue).toList();
-			final List<BigInteger> exponentsList = exponents.stream().parallel().map(ZqElement::getValue).toList();
+			final ImmutableList<BigInteger> basesList = bases.stream().parallel()
+					.map(GqElement::getValue)
+					.collect(toImmutableList());
+			final ImmutableList<BigInteger> exponentsList = exponents.stream().parallel()
+					.map(ZqElement::getValue)
+					.collect(toImmutableList());
 
 			return new GqElement(BigIntegerOperationsService.multiModExp(basesList, exponentsList, bases.getGroup().getP()), bases.getGroup());
 		}

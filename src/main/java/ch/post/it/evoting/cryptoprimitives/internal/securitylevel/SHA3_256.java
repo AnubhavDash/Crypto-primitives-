@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.securitylevel;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -23,10 +25,12 @@ import java.security.Security;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+
 /*
 	This class is thread safe.
  */
-@SuppressWarnings("java:S101")
+@SuppressWarnings({"java:S101", "java:S6548"})
 public class SHA3_256 implements HashFunction {
 
 	private static final SHA3_256 INSTANCE = new SHA3_256();
@@ -44,11 +48,12 @@ public class SHA3_256 implements HashFunction {
 	}
 
 	@Override
-	public byte[] hash(final byte[] input) {
+	public ImmutableByteArray hash(final ImmutableByteArray input) {
+		checkNotNull(input);
 		try {
 			final MessageDigest instance = MessageDigest.getInstance("SHA3-256", BouncyCastleProvider.PROVIDER_NAME);
-			return instance.digest(input);
-		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+			return new ImmutableByteArray(instance.digest(input.elements()));
+		} catch (final NoSuchAlgorithmException | NoSuchProviderException e) {
 			throw new IllegalStateException("Failed to create the SHA3-256 message digest for the HashService instantiation.");
 		}
 	}

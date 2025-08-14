@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
@@ -120,7 +121,7 @@ public final class PrimeGqElement extends GqElement {
 			checkArgument(r < 10000, "The desired number of primes must be strictly smaller than 10000.");
 
 			BigInteger current = BigInteger.valueOf(5);
-			final ArrayList<PrimeGqElement> p_vector = new ArrayList<>(r);
+			final List<PrimeGqElement> p_vector = new ArrayList<>(r);
 			int count = 0;
 			// The largest prime in the list is restricted to Integer.MAX_VALUE = 2^31 - 1.
 			while (count < r && current.compareTo(gqGroup.getP()) < 0 && current.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) < 0) {

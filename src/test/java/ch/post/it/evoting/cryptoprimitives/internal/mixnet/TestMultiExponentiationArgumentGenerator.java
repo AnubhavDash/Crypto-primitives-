@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ public class TestMultiExponentiationArgumentGenerator {
 		this.zqGroupGenerator = new ZqGroupGenerator(ZqGroup.sameOrderAs(gqGroup));
 	}
 
+	@SuppressWarnings("java:S117")
 	MultiExponentiationArgument genRandomArgument(final int n, final int m, final int l) {
 		final GqElement cA0 = gqGroupGenerator.genMember();
 		final GroupVector<GqElement, GqGroup> cB = gqGroupGenerator.genRandomGqElementVector(2 * m);

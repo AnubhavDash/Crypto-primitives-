@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,8 @@ class DecryptionProofTest extends TestGroupSetup {
 	@Test
 	@DisplayName("Constructing a DecryptionProof with e and z from different groups throws an IllegalArgumentException")
 	void constructDecryptionProofWithEAndZDifferentGroups() {
-		final GroupVector<ZqElement, ZqGroup> z = otherZqGroupGenerator.genRandomZqElementVector(l);
-		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new DecryptionProof(e, z));
+		final GroupVector<ZqElement, ZqGroup> zFromOtherZqGroup = otherZqGroupGenerator.genRandomZqElementVector(l);
+		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new DecryptionProof(e, zFromOtherZqGroup));
 		assertEquals("e and z must have the same group.", exception.getMessage());
 	}
 

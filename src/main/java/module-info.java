@@ -18,6 +18,7 @@ module ch.post.it.evoting.cryptoprimitives {
 	requires org.bouncycastle.provider;
 	requires org.bouncycastle.pkix;
 	requires org.slf4j;
+	exports ch.post.it.evoting.cryptoprimitives.collection;
 	exports ch.post.it.evoting.cryptoprimitives.elgamal;
 	exports ch.post.it.evoting.cryptoprimitives.hashing;
 	exports ch.post.it.evoting.cryptoprimitives.math;

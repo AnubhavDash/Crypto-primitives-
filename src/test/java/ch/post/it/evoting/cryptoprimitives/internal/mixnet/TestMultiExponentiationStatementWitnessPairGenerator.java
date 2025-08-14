@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,8 @@ public class TestMultiExponentiationStatementWitnessPairGenerator {
 	private final MultiExponentiationArgumentService argumentService;
 	private final CommitmentKey commitmentKey;
 
-	TestMultiExponentiationStatementWitnessPairGenerator(GqGroup group, MultiExponentiationArgumentService argumentService,
-			CommitmentKey commitmentKey) {
+	TestMultiExponentiationStatementWitnessPairGenerator(final GqGroup group, final MultiExponentiationArgumentService argumentService,
+			final CommitmentKey commitmentKey) {
 		this.gqGroup = group;
 		this.zqGroup = ZqGroup.sameOrderAs(gqGroup);
 		this.zqGroupGenerator = new ZqGroupGenerator(zqGroup);
@@ -49,17 +49,17 @@ public class TestMultiExponentiationStatementWitnessPairGenerator {
 	record StatementWitnessPair(MultiExponentiationStatement statement, MultiExponentiationWitness witness) {
 	}
 
-	StatementWitnessPair genPair(int n, int m, int l) {
-		GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> CMatrix = this.elGamalGenerator.genRandomCiphertextMatrix(m, n, l);
-		GroupMatrix<ZqElement, ZqGroup> AMatrix = zqGroupGenerator.genRandomZqElementMatrix(n, m);
-		GroupVector<ZqElement, ZqGroup> rExponents = zqGroupGenerator.genRandomZqElementVector(m);
-		ZqElement rhoExponents = zqGroupGenerator.genRandomZqElementMember();
+	StatementWitnessPair genPair(final int n, final int m, final int l) {
+		final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> ciphertextMatrix = this.elGamalGenerator.genRandomCiphertextMatrix(m, n, l);
+		final GroupMatrix<ZqElement, ZqGroup> aMatrix = zqGroupGenerator.genRandomZqElementMatrix(n, m);
+		final GroupVector<ZqElement, ZqGroup> rExponents = zqGroupGenerator.genRandomZqElementVector(m);
+		final ZqElement rhoExponents = zqGroupGenerator.genRandomZqElementMember();
 
-		ElGamalMultiRecipientCiphertext computedC = argumentService.multiExponentiation(CMatrix, AMatrix, rhoExponents, m, l);
-		GroupVector<GqElement, GqGroup> commitmentToA = CommitmentService.getCommitmentMatrix(
-				AMatrix, rExponents, commitmentKey);
-		MultiExponentiationStatement statement = new MultiExponentiationStatement(CMatrix, computedC, commitmentToA);
-		MultiExponentiationWitness witness = new MultiExponentiationWitness(AMatrix, rExponents, rhoExponents);
+		final ElGamalMultiRecipientCiphertext computedC = argumentService.multiExponentiation(ciphertextMatrix, aMatrix, rhoExponents, m, l);
+		final GroupVector<GqElement, GqGroup> commitmentToA = CommitmentService.getCommitmentMatrix(
+				aMatrix, rExponents, commitmentKey);
+		final MultiExponentiationStatement statement = new MultiExponentiationStatement(ciphertextMatrix, computedC, commitmentToA);
+		final MultiExponentiationWitness witness = new MultiExponentiationWitness(aMatrix, rExponents, rhoExponents);
 		return new StatementWitnessPair(statement, witness);
 	}
 }

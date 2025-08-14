@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInte
 
 import java.math.BigInteger;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 
@@ -28,7 +29,7 @@ import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelC
  */
 public class TestHashService extends HashService {
 
-	private final static HashService DELEGATE_HASH_SERVICE = HashService.getInstance();
+	private static final HashService DELEGATE_HASH_SERVICE = HashService.getInstance();
 
 	private final BigInteger lowerBound;
 	private final BigInteger upperBound;
@@ -68,7 +69,7 @@ public class TestHashService extends HashService {
 	 * @return the bounded hash of the {@code values}.
 	 */
 	@Override
-	public byte[] recursiveHash(final Hashable... values) {
+	public ImmutableByteArray recursiveHash(final Hashable... values) {
 		final BigInteger hashValue = byteArrayToInteger(DELEGATE_HASH_SERVICE.recursiveHash(values));
 		final BigInteger hashValueInBounds = hashValue.mod(upperBound.subtract(lowerBound)).add(lowerBound);
 

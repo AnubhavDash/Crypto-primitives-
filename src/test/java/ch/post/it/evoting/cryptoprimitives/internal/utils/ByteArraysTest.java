@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,11 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.utils;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +31,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.google.common.base.Throwables;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
 
@@ -42,22 +43,31 @@ class ByteArraysTest {
 	}
 
 	@Test
-	void testCutToBitLengtRequestedLengthZeroThrows() {
-		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-				() -> ByteArrays.cutToBitLength(new byte[] { 0b10011 }, 0));
-		assertEquals("The requested length must be strictly positive.", Throwables.getRootCause(exception).getMessage());
+	void testCutToBitLengthRequestedLengthNegativeThrows() {
+		final ImmutableByteArray immutableByteArray = ImmutableByteArray.of((byte) 0b10011);
+		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> ByteArrays.cutToBitLength(immutableByteArray, -1));
+		assertEquals("The requested length must be positive.", Throwables.getRootCause(exception).getMessage());
+	}
+
+	@Test
+	void testCutToBitLengthRequestedLengthZeroReturnsEmpty() {
+		final ImmutableByteArray expected = ImmutableByteArray.of();
+		final ImmutableByteArray result = assertDoesNotThrow(() -> ByteArrays.cutToBitLength(ImmutableByteArray.of((byte) 0b10011), 0));
+		assertEquals(expected, result);
 	}
 
 	@Test
 	void testCutToBitLengthRequestedLengthGreaterThanByteArrayBitLengthThrows() {
+		final ImmutableByteArray immutableByteArray = ImmutableByteArray.of((byte) 0b1001101);
 		final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-				() -> ByteArrays.cutToBitLength(new byte[] { 0b1001101 }, 9));
-		assertEquals("The requested length must not be greater than the bit length of the byte array.", Throwables.getRootCause(exception).getMessage());
+				() -> ByteArrays.cutToBitLength(immutableByteArray, 9));
+		assertEquals("The requested length must not be greater than the bit length of the byte array.",
+				Throwables.getRootCause(exception).getMessage());
 	}
 
 	static Stream<Arguments> jsonFileCutToBitLengthArgumentProvider() {
 
-		final List<TestParameters> parametersList = TestParameters.fromResource("/cut-to-bit-length.json");
+		final ImmutableList<TestParameters> parametersList = TestParameters.fromResource("/cut-to-bit-length.json");
 
 		return parametersList.stream().parallel().map(testParameters -> {
 
@@ -65,10 +75,10 @@ class ByteArraysTest {
 
 			final JsonData input = testParameters.getInput();
 			final Integer bitLength = input.get("bit_length", Integer.class);
-			final byte[] value = input.get("value", byte[].class);
+			final ImmutableByteArray value = input.get("value", ImmutableByteArray.class);
 
-			JsonData output = testParameters.getOutput();
-			final byte[] result = output.get("result", byte[].class);
+			final JsonData output = testParameters.getOutput();
+			final ImmutableByteArray result = output.get("result", ImmutableByteArray.class);
 
 			return Arguments.of(value, bitLength, result, description);
 		});
@@ -77,9 +87,10 @@ class ByteArraysTest {
 	@ParameterizedTest
 	@MethodSource("jsonFileCutToBitLengthArgumentProvider")
 	@DisplayName("cutToBitLength of specific input returns expected output")
-	void testCutToBitLengthWithRealValues(final byte[] byteArray, final int requestedLength, final byte[] expectedResult, final String description) {
-		final byte[] actualResult = ByteArrays.cutToBitLength(byteArray, requestedLength);
-		assertArrayEquals(expectedResult, actualResult, String.format("assertion failed for: %s", description));
+	void testCutToBitLengthWithRealValues(final ImmutableByteArray byteArray, final int requestedLength, final ImmutableByteArray expectedResult,
+			final String description) {
+		final ImmutableByteArray actualResult = ByteArrays.cutToBitLength(byteArray, requestedLength);
+		assertEquals(expectedResult, actualResult, String.format("assertion failed for: %s", description));
 	}
 
 	@Test
@@ -90,6 +101,7 @@ class ByteArraysTest {
 
 	static Stream<Arguments> byteLengthArgumentProvider() {
 		return Stream.of(
+				Arguments.of(BigInteger.ZERO, 0),
 				Arguments.of(BigInteger.ONE, 1),
 				Arguments.of(BigInteger.valueOf(255), 1),
 				Arguments.of(BigInteger.valueOf(256), 2),

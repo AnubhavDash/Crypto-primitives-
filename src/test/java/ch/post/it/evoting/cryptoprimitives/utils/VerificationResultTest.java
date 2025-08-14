@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,15 @@
  */
 package ch.post.it.evoting.cryptoprimitives.utils;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.LinkedList;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.VerificationFailure;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.VerificationSuccess;
 
@@ -41,7 +39,7 @@ class VerificationResultTest {
 	void constructorWithValidMessage() {
 		assertFalse(verificationFailure.isVerified());
 		assertEquals(1, verificationFailure.getErrorMessages().size());
-		assertEquals(initialErrorMessage, verificationFailure.getErrorMessages().getFirst());
+		assertEquals(initialErrorMessage, verificationFailure.getErrorMessages().get(0));
 	}
 
 	@Test
@@ -68,14 +66,12 @@ class VerificationResultTest {
 		final VerificationFailure newVerificationResult = verificationFailure.addErrorMessage("Error message 1.");
 
 		assertEquals(1, verificationFailure.getErrorMessages().size());
-		assertEquals(initialErrorMessage, verificationFailure.getErrorMessages().getFirst());
+		assertEquals(initialErrorMessage, verificationFailure.getErrorMessages().get(0));
 
-		final LinkedList<String> expectedMessages = new LinkedList<>();
-		expectedMessages.push(initialErrorMessage);
-		expectedMessages.push("Error message 1.");
+		final ImmutableList<String> expectedMessages = ImmutableList.of("Error message 1.", initialErrorMessage);
 
 		assertEquals(2, newVerificationResult.getErrorMessages().size());
-		assertArrayEquals(expectedMessages.toArray(), newVerificationResult.getErrorMessages().toArray());
+		assertEquals(expectedMessages, newVerificationResult.getErrorMessages());
 	}
 
 	@Test

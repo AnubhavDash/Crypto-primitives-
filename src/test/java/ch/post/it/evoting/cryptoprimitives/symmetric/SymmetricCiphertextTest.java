@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,39 +20,47 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+
 class SymmetricCiphertextTest {
 
 	@Test
 	void checkConstructionImmutability() {
-		final byte[] sourceCiphertext = new byte[] { 1, 2, 3 };
-		final byte[] sourceNonce = new byte[] { 4, 5, 6 };
+		final byte[] sourceCiphertextBytes = new byte[] { 1, 2, 3 };
+		final byte[] sourceNonceBytes = new byte[] { 4, 5, 6 };
+		final ImmutableByteArray sourceCiphertext = new ImmutableByteArray(sourceCiphertextBytes);
+		final ImmutableByteArray sourceNonce = new ImmutableByteArray(sourceNonceBytes);
 		final SymmetricCiphertext symmetricCiphertext = new SymmetricCiphertext(sourceCiphertext, sourceNonce);
 
 		// Mute source arrays
-		sourceCiphertext[0] = 7;
-		sourceNonce[0] = 8;
+		sourceCiphertextBytes[0] = 7;
+		sourceNonceBytes[0] = 8;
 
 		// SymmetricCiphertext inner values must be not equal to source
-		assertNotEquals(sourceCiphertext[0], symmetricCiphertext.getCiphertext()[0]);
-		assertEquals(1, symmetricCiphertext.getCiphertext()[0]);
-		assertNotEquals(sourceNonce[0], symmetricCiphertext.getNonce()[0]);
-		assertEquals(4, symmetricCiphertext.getNonce()[0]);
+		assertNotEquals(sourceCiphertextBytes[0], symmetricCiphertext.ciphertext().get(0));
+		assertEquals(1, symmetricCiphertext.ciphertext().get(0));
+		assertNotEquals(sourceNonceBytes[0], symmetricCiphertext.nonce().get(0));
+		assertEquals(4, symmetricCiphertext.nonce().get(0));
 	}
 
 	@Test
 	void checkGettersImmutability() {
-		final SymmetricCiphertext symmetricCiphertext = new SymmetricCiphertext(new byte[] { 1, 2, 3 }, new byte[] { 4, 5, 6 });
-		final byte[] ciphertext = symmetricCiphertext.getCiphertext();
-		final byte[] nonce = symmetricCiphertext.getNonce();
+		final SymmetricCiphertext symmetricCiphertext = new SymmetricCiphertext(
+				ImmutableByteArray.of((byte) 1, (byte) 2, (byte) 3),
+				ImmutableByteArray.of((byte) 4, (byte) 5, (byte) 6));
+		final ImmutableByteArray ciphertext = symmetricCiphertext.ciphertext();
+		final ImmutableByteArray nonce = symmetricCiphertext.nonce();
+		final byte[] ciphertextBytes = ciphertext.elements();
+		final byte[] nonceBytes = nonce.elements();
 
 		// Mute arrays from getter
-		ciphertext[0] = 7;
-		nonce[0] = 8;
+		ciphertextBytes[0] = 7;
+		nonceBytes[0] = 8;
 
 		// SymmetricCiphertext inner values must be not equal to muted
-		assertNotEquals(ciphertext[0], symmetricCiphertext.getCiphertext()[0]);
-		assertEquals(1, symmetricCiphertext.getCiphertext()[0]);
-		assertNotEquals(nonce[0], symmetricCiphertext.getNonce()[0]);
-		assertEquals(4, symmetricCiphertext.getNonce()[0]);
+		assertNotEquals(ciphertextBytes[0], symmetricCiphertext.ciphertext().get(0));
+		assertEquals(1, symmetricCiphertext.ciphertext().get(0));
+		assertNotEquals(nonceBytes[0], symmetricCiphertext.nonce().get(0));
+		assertEquals(4, symmetricCiphertext.nonce().get(0));
 	}
 }

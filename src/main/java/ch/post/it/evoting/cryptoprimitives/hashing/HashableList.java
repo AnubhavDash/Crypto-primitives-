@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,58 +15,85 @@
  */
 package ch.post.it.evoting.cryptoprimitives.hashing;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+
 /**
- * Interface to be implemented by classes whose hashable form is an immutable list of {@link Hashable} objects.
+ * Interface to be implemented by classes whose hashable form is an {@link ImmutableList} of {@link Hashable} elements.
  */
 public interface HashableList extends Hashable {
 
 	@Override
-	List<? extends Hashable> toHashableForm();
+	ImmutableList<? extends Hashable> toHashableForm();
 
 	/**
-	 * Creates a HashableList whose hashable form is the provided list.
+	 * Creates a {@link HashableList} whose hashable form is the provided {@link ImmutableList} list.
 	 *
 	 * @param list the hashable form. Non null.
-	 * @return A new HashableList whose hashable form is {@code list}
+	 * @return a new {@link HashableList} whose hashable form is {@code list}
 	 */
-	static HashableList from(final List<? extends Hashable> list) {
+	static HashableList from(final ImmutableList<? extends Hashable> list) {
 		checkNotNull(list);
 
-		// The copy has to be done outside of the lambda, otherwise it will be made only when #toHashableForm is called.
-		final List<? extends Hashable> immutableList = List.copyOf(list);
-		return () -> immutableList;
+		return new HashableList() {
+			@Override
+			public ImmutableList<? extends Hashable> toHashableForm() {
+				return list;
+			}
+
+			@Override
+			public String toString() {
+				return list.toString();
+			}
+
+			@Override
+			public boolean equals(final Object o) {
+				if (this == o) {
+					return true;
+				}
+				if (o == null || getClass() != o.getClass()) {
+					return false;
+				}
+				final HashableList that = (HashableList) o;
+				return this.toHashableForm().equals(that.toHashableForm());
+			}
+
+			@Override
+			public int hashCode() {
+				return Objects.hash(list);
+			}
+		};
 	}
 
 	/**
-	 * Creates a HashableList whose hashable form is an unmodifiable List containing the provided elements.
+	 * Creates a {@link HashableList} whose hashable form is an {@link ImmutableList} containing the provided elements.
 	 *
-	 * @param elements the hashable elements to construct a HashableList from. Non null and must not contain nulls.
+	 * @param elements the hashable elements to construct a {@link HashableList} from. Non-null and must not contain nulls.
 	 * @param <E>      the type of the elements
-	 * @return a HashableList with the provided elements
+	 * @return a {@link HashableList} with the provided elements
 	 */
 	@SafeVarargs
 	static <E extends Hashable> HashableList of(final E... elements) {
 		checkNotNull(elements);
 		Arrays.stream(elements).forEach(Preconditions::checkNotNull);
 
-		return from(Arrays.asList(elements));
+		return from(ImmutableList.of(elements));
 	}
 
 	/**
-	 * Returns a collector that accumulates the input elements into a HashableList.
-	 *
-	 * @return a {@link Collector} for accumulating the input elements into a HashableList
+	 * @return a {@link Collector} for accumulating the input elements into a {@link HashableList}
 	 */
 	static Collector<Hashable, ?, HashableList> toHashableList() {
-		return Collectors.collectingAndThen(Collectors.toList(), HashableList::from);
+		return Collectors.collectingAndThen(toImmutableList(), HashableList::from);
 	}
+
 }

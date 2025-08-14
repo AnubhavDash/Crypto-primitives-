@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ import static ch.post.it.evoting.cryptoprimitives.utils.Validations.allEqual;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
 import java.util.Objects;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
@@ -63,8 +63,8 @@ public class SingleValueProductArgument implements HashableList {
 		this.s_tilde = checkNotNull(s_tilde);
 
 		// Cross group checking.
-		final List<GqElement> gqGroupMembers = List.of(c_d, c_delta, c_Delta);
-		final List<GroupVectorElement<ZqGroup>> zqGroupMembers = List.of(a_tilde, b_tilde, r_tilde, s_tilde);
+		final ImmutableList<GqElement> gqGroupMembers = ImmutableList.of(c_d, c_delta, c_Delta);
+		final ImmutableList<GroupVectorElement<ZqGroup>> zqGroupMembers = ImmutableList.of(a_tilde, b_tilde, r_tilde, s_tilde);
 		checkArgument(allEqual(gqGroupMembers.stream(), GroupVectorElement::getGroup),
 				"cd, cLowerDelta, cUpperDelta must belong to the same group.");
 		checkArgument(allEqual(zqGroupMembers.stream(), GroupVectorElement::getGroup),
@@ -140,8 +140,8 @@ public class SingleValueProductArgument implements HashableList {
 	}
 
 	@Override
-	public List<? extends Hashable> toHashableForm() {
-		return List.of(c_d, c_delta, c_Delta, a_tilde, b_tilde, r_tilde, s_tilde);
+	public ImmutableList<Hashable> toHashableForm() {
+		return ImmutableList.of(c_d, c_delta, c_Delta, a_tilde, b_tilde, r_tilde, s_tilde);
 	}
 
 	/**

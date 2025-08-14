@@ -1,0 +1,18 @@
+[
+	{
+		"description": "3072 - SHA3 - longer output",
+		"context": {
+			"hash": "SHA3-256"
+		},
+		"input": {
+			"prk": "CJQwcYuomRgRkpF+q9UUh/EZhWKLK7LMJgXOl0eczbM=",
+			"info": [
+				"context"
+			],
+			"q": "W/CosUV2lTVfuKxATnp547FziwecWm0rU8JsgijIZ/eZJzucSTZ98vpfxsbGGOux7QNkBV2IwvWnvj2rq/rKwkhn6j6+DN2hCsbKqnvaNedqria8/q+SazCeGOHBzRbvxU0Tteff0OQ74rFCbVvOamFZlJ6QdPL1eBVjBWZJ9sOiEVKXZZHH93LVtW7Br+jQOp6FR7xym+lcrdvOxuV2MhYPT5HcFNrhPAX5w5vvxdmAaAmaUGhewyLl/TnTCwf/HJ4kZd3lAweH/HY2mN9a5ndr+XhdhEALix3jBvotB2WN5pRNg2Xf9RDWhHDCP5+5vGq2dsoyBrd4aem98zgEcMNo35OtzZIO9bI6TSPv79yzGWH1gw2yOV38JhMKJyThaCYZJ3iG8onp+oilxa6bpsnlxDzj6pf+uV0FVzk77T3Q2leKRGx0G1eKQy82G9W0O380hauIkJwVeaDX9Ke73ng2Qdx/qzr4S8g6Vs08PeLc3qWGLJvp9vJh08nLIM5r"
+		},
+		"output": {
+			"u": "AOZBCekMnbZYgLClkTo+STA776hzOBTt2jencO2PHV+kvAGf2a1MK6towb8pm5mwT4zPl78Vo8pJngQ3JrokmKzOAYaLrelHtfYlqBhJ/jWF7vJfAj3JjjJN0TvH+qWEHIeq9ObT04Uw36POwreBmIf7abgvSjvikpDEO1YKdZ6nGBVFBO+5XURNhm8ZxlWi4PIbK2kn9KWpugR0ggCI92uaj6wDyRXIt7tpkU9EBf+HTP7diHnwCyfr5WPjtQF26xejKn9H1f4rkktcghaxnwRjqt8X8yL0L8LYGCZl9HAMcu2Bngvx6U2h5Wl15RrzGGHz0AroTiyhEUiOngzR4aSNAVhZqu1PlvocviQR+P6S+1WwbjZ9ZxUM5+P822DHlkjWGQmwcTe+aNdvw755pOXJpf/RLmxwZdv4aKAZzSSIoXgiVH7vceyw4S/E0s95hXMthCNnp2tUVraytNFkkHk1VX4Kej0yHrSs43x9PRnpYUWjzpJZYaoV4asCaJNK"
+		}
+	}
+]

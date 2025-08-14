@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package ch.post.it.evoting.cryptoprimitives.signing;
 import java.security.SignatureException;
 import java.util.function.Supplier;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 
 public interface SignatureKeystore<T extends Supplier<String>> {
@@ -31,7 +32,7 @@ public interface SignatureKeystore<T extends Supplier<String>> {
 	 * @return the signature for the message as a byte array
 	 * @throws SignatureException if the message is timestamped at a date the certificate is not valid for.
 	 */
-	byte[] generateSignature(Hashable message, Hashable additionalContextData) throws SignatureException;
+	ImmutableByteArray generateSignature(Hashable message, Hashable additionalContextData) throws SignatureException;
 
 	/**
 	 * Verifies that a signature is valid and from the expected authority.
@@ -44,7 +45,7 @@ public interface SignatureKeystore<T extends Supplier<String>> {
 	 * @throws NullPointerException if message is null or if the certificate for the authorityId is not found.
 	 * @throws SignatureException   if the message is timestamped at a date the certificate is not valid for.
 	 */
-	boolean verifySignature(T signerAlias, Hashable message, Hashable additionalContextData, byte[] signature)
+	boolean verifySignature(T signerAlias, Hashable message, Hashable additionalContextData, ImmutableByteArray signature)
 			throws SignatureException;
 
 }

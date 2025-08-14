@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,15 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator
 public class VerifiableDecryptionGenerator {
 	private final GqGroup group;
 
-	public VerifiableDecryptionGenerator(GqGroup group) {
+	public VerifiableDecryptionGenerator(final GqGroup group) {
 		this.group = group;
 	}
 
-	public VerifiableDecryptions genVerifiableDecryption(int numCiphertexts, int ciphertextSize) {
-		ElGamalGenerator elGamalGenerator = new ElGamalGenerator(group);
-		GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator
+	public VerifiableDecryptions genVerifiableDecryption(final int numCiphertexts, final int ciphertextSize) {
+		final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(group);
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator
 				.genRandomCiphertextVector(numCiphertexts, ciphertextSize);
-		GroupVector<DecryptionProof, ZqGroup> decryptionProofs = new DecryptionProofGenerator(ZqGroup.sameOrderAs(group))
+		final GroupVector<DecryptionProof, ZqGroup> decryptionProofs = new DecryptionProofGenerator(ZqGroup.sameOrderAs(group))
 				.genDecryptionProofVector(numCiphertexts, ciphertextSize);
 		return new VerifiableDecryptions(ciphertexts, decryptionProofs);
 	}

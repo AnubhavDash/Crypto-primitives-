@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,30 +48,6 @@ class StringsTest {
 	}
 
 	@Test
-	@DisplayName("truncate with an empty input String throws an IllegalArgumentException.")
-	void truncateEmptyInputThrows() {
-		final String string = "";
-		final int length = 1;
-
-		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
-				() -> Strings.truncate(string, length));
-		assertEquals(String.format("The input string must be non-empty. [u: %s]", string.length()),
-				Throwables.getRootCause(illegalArgumentException).getMessage());
-	}
-
-	@Test
-	@DisplayName("truncate with an input length of zero throws an IllegalArgumentException.")
-	void truncateZeroLengthThrows() {
-		final String string = "string";
-		final int length = 0;
-
-		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
-				() -> Strings.truncate(string, length));
-		assertEquals(String.format("The input length must be strictly positive. [l: %s]", length),
-				Throwables.getRootCause(illegalArgumentException).getMessage());
-	}
-
-	@Test
 	@DisplayName("truncate with an input length negative throws an IllegalArgumentException.")
 	void truncateNegativeLengthThrows() {
 		final String string = "string";
@@ -79,7 +55,7 @@ class StringsTest {
 
 		final IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
 				() -> Strings.truncate(string, length));
-		assertEquals(String.format("The input length must be strictly positive. [l: %s]", length),
+		assertEquals(String.format("The input length must be non-negative. [l: %s]", length),
 				Throwables.getRootCause(illegalArgumentException).getMessage());
 	}
 
@@ -97,10 +73,28 @@ class StringsTest {
 	@DisplayName("truncate implementation is equivalent to specification.")
 	void truncateEnsureEqualityOfImplementation() {
 		final int stringLength = randomService.genRandomInteger(1, 10000);
-		final String string = new String(randomService.randomBytes(stringLength));
+		final String string = new String(randomService.randomBytes(stringLength).elements());
 		final int length = randomService.genRandomInteger(1, 10000);
 
 		assertEquals(truncateFromSpecification(string, length), Strings.truncate(string, length));
+	}
+
+	@Test
+	@DisplayName("truncate with an empty input string returns an empty string.")
+	void truncateEmptyStringInput() {
+		final String string = "";
+		final int length = 1;
+
+		assertEquals(Strings.truncate(string, length), string);
+	}
+
+	@Test
+	@DisplayName("truncate with an input length of zero returns an empty string.")
+	void truncateZeroLengthInput() {
+		final String string = "string";
+		final int length = 0;
+
+		assertEquals("", Strings.truncate(string, length));
 	}
 
 	@ParameterizedTest
@@ -126,7 +120,10 @@ class StringsTest {
 	}
 
 	private String truncateFromSpecification(final String S, final int l) {
-		final int m = Math.min(S.length(), l);
+		final int u = S.length();
+
+		// Operation.
+		final int m = Math.min(u, l);
 		return IntStream.range(0, m)
 				.mapToObj(S::charAt)
 				.map(String::valueOf)

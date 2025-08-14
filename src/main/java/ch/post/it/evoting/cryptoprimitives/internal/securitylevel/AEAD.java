@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package ch.post.it.evoting.cryptoprimitives.internal.securitylevel;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
+
 /**
  * Authenticated Encryption with Associated Data
  */
@@ -23,23 +25,27 @@ public interface AEAD {
 
 	/**
 	 * Authenticated encryption
-	 * @param secretKey the secret key with which to encrypt
-	 * @param nonce a nonce, length defined by the specific algorithm
-	 * @param plaintext the plaintext to encrypt. May be empty.
+	 *
+	 * @param secretKey      the secret key with which to encrypt
+	 * @param nonce          a nonce, length defined by the specific algorithm
+	 * @param plaintext      the plaintext to encrypt. May be empty.
 	 * @param associatedData data to be authenticated but not encrypted. May be empty.
 	 * @return the ciphertext.
 	 */
-	byte[] authenticatedEncryption(final byte[] secretKey, final byte[] nonce, final byte[] plaintext, final byte[] associatedData);
+	ImmutableByteArray authenticatedEncryption(final ImmutableByteArray secretKey, final ImmutableByteArray nonce, final ImmutableByteArray plaintext,
+			final ImmutableByteArray associatedData);
 
 	/**
 	 * Authenticated decryption
-	 * @param secretKey the secret key with which to decrypt
-	 * @param nonce a nonce, length defined by the specific algorithm
+	 *
+	 * @param secretKey      the secret key with which to decrypt
+	 * @param nonce          a nonce, length defined by the specific algorithm
 	 * @param associatedData authenticated but not encrypted data
-	 * @param ciphertext the ciphertext to decrypt.
+	 * @param ciphertext     the ciphertext to decrypt.
 	 * @return the plaintext
 	 */
-	byte[] authenticatedDecryption(final byte[] secretKey, final byte[] nonce, final byte[] associatedData, final byte[] ciphertext);
+	ImmutableByteArray authenticatedDecryption(final ImmutableByteArray secretKey, final ImmutableByteArray nonce,
+			final ImmutableByteArray associatedData, final ImmutableByteArray ciphertext);
 
 	/**
 	 * Gets the byte length of the nonce for this algorithm

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,8 +64,8 @@ class PrimeGqElementFactoryTest {
 
 	@Test
 	void whenCreateAPrimeElementEqualToGroupGeneratorError() {
-		final int groupGenerator = group.getGenerator().value.intValueExact();
-		assertThrows(IllegalArgumentException.class, () -> PrimeGqElement.PrimeGqElementFactory.fromValue(groupGenerator, group));
+		final int groupGeneratorEqualToPrimeElement = group.getGenerator().value.intValueExact();
+		assertThrows(IllegalArgumentException.class, () -> PrimeGqElement.PrimeGqElementFactory.fromValue(groupGeneratorEqualToPrimeElement, group));
 	}
 
 	@Test

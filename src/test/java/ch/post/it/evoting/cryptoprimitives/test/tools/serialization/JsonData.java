@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.stream.StreamSupport;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.math.Base64;
 import ch.post.it.evoting.cryptoprimitives.math.BaseEncodingFactory;
 
@@ -66,7 +67,7 @@ public record JsonData(JsonNode jsonNode) {
 			return clazz.cast(jsonNode.get(field).asText());
 		} else if (clazz.equals(String[].class)) {
 			return clazz.cast(getStringArray(field));
-		} else if (clazz.equals(byte[].class)) {
+		} else if (clazz.equals(ImmutableByteArray.class)) {
 			return clazz.cast(BASE_64.base64Decode(jsonNode.get(field).asText()));
 		} else if (clazz.equals(Boolean.class)) {
 			return clazz.cast(jsonNode.get(field).asBoolean());
@@ -119,11 +120,7 @@ public record JsonData(JsonNode jsonNode) {
 	}
 
 	private static BigInteger stringToBigInteger(final String s) {
-		if (!s.startsWith("0x")) {
-			throw new IllegalArgumentException("Invalid integer format. Must match hexadecimal format starting with: \"0x\".");
-		}
-
-		return new BigInteger(s.substring(2), 16);
+		return new BigInteger(BASE_64.base64Decode(s).elements());
 	}
 
 	private String[] getStringArray(final String field) {

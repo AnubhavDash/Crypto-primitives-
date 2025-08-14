@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.utils;
 
-import java.util.Deque;
-
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.VerificationFailure;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.VerificationSuccess;
 
@@ -38,6 +37,6 @@ public sealed interface VerificationResult permits VerificationFailure, Verifica
 	 * @return a copy of the error messages list. This is analogous to a stack trace of errors. The first error message represents the highest level
 	 * error.
 	 */
-	Deque<String> getErrorMessages();
+	ImmutableList<String> getErrorMessages();
 }
 

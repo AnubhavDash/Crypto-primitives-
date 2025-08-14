@@ -1,5 +1,57 @@
 # Changelog
 
+## Release 1.5.1
+
+Release 1.5.1 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
+We want to thank the experts for their high-quality, constructive remarks:
+
+* Thomas Edmund Haines (Australian National University), Olivier Pereira (Université catholique Louvain), Vanessa Teague (Thinking Cybersecurity)
+* Aleksander Essex (Western University Canada)
+* Rolf Haenni, Reto Koenig, Philipp Locher (Bern University of Applied Sciences)
+
+The following functionalities and improvements are included in release 1.5.1:
+
+* [Specification] Improve byte notation consistency in algorithm CutToBitLength (feedback from Olivier Pereira).
+* [Specification] Correct the statement about the bit length of 0 (reported in GitLab Issue [24](https://gitlab.com/swisspost-evoting/crypto-primitives/crypto-primitives/-/issues/24)).
+* [Code] Update dependencies and third-party libraries.
+
+## Release 1.5.0
+
+Release 1.5.0 includes some feedback from the Federal Chancellery's mandated experts (see above) and other experts of the community.
+
+The following functionalities and improvements are included in release 1.5.0:
+
+* [Code, Specification] Allow edge cases in several algorithms, and so adhere to the Principle of Generality. This affects the pseudocode and implementation of the following algorithms: CutToBitLength, ByteArrayToInteger, ByteLength, ByteArrayToString, Truncate, GenRandomVector, GenRandomString, GenUniqueDecimalStrings, GenCiphertextSymmetric, GetPlaintextSymmetric, GenPermutation (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Specification] Systematically add modulo operator in pseudocode. This affects the pseudocode of the following algorithms: StarMap, GetShuffleArgument, VerifyShuffleArgument, GetMultiExponentiationArgument, VerifyMultiExponentiationArgument, GetProductArgument, GetHadamardArgument, VerifyHadamardArgument, GetZeroArgument, VerifyZeroArgument, ComputeDVector, VerifySingleValueProductArgument, ComputePhiDecryption, GenDecryptionProof, VerifyDecryption, VerifyExponentiation, ComputePhiPlaintextEquality, GenPlaintextEqualityProof, VerifyPlaintextEquality (reported in GitLab Issues [52](https://gitlab.com/swisspost-evoting/e-voting/e-voting-documentation/-/issues/52) and [20](https://gitlab.com/swisspost-evoting/crypto-primitives/crypto-primitives/-/issues/20)).
+* [Code, Specification] Improve variable naming in algorithm IntegerToFixedLengthByteArray (feedback from Aleksander Essex).
+* [Code, Specification] Simplify IntegerToByteArray and IntegerToFixedLengthByteArray (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Code, Specification] Improve variable naming in algorithms KDF and KDFToZq (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Code, Specification] Add requirement in KDFToZq (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Code, Specification] Improve the description of how to generate a signing key and certificate and ensure the generation of certificates complies with RFC 5280 (reported in GitLab Issue [17](https://gitlab.com/swisspost-evoting/verifier/verifier/-/issues/17)).
+* [Specification] Improve the pseudocode of the algorithm GenKeysAndCert (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Specification] Improve the description of the output of algorithms GenSignature and VerifySignature (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Specification] Shorten the description of GenKeyPair by removing textbook-style details (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Code, Specification] Improve variable naming in the algorithm GenKeyPair (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Code, Specification] Improve variable naming in the algorithm GetCiphertextVectorExponentiation (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Code] GenShuffle small alignment to specification (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Code] Extend test cases for algorithm VerifyDecryption (reported in GitLab Issue [23](https://gitlab.com/swisspost-evoting/crypto-primitives/crypto-primitives/-/issues/23)).
+* [Code] Add hash values to test data for VerifyShuffleArgument, VerifyMultiExponentiationArgument, VerifyHadamardArgument (reported in GitLab Issue [21](https://gitlab.com/swisspost-evoting/crypto-primitives/crypto-primitives/-/issues/21)).
+* [Code] Replace base16 by base64 in JsonData and json test files.
+* [Code] Ensure usage of g=4 in test vectors (feedback from Aleksander Essex).
+* [Code] Use new crypto-primitives type ImmutableList instead of List for collections simply holding immutable data.
+* [Code] Replace the usage of List<String> auxiliaryInformation by the new type AuxiliaryInformation.
+* [Code] Replace the usage of byte[] by the new type ImmutableByteArray.
+* [Code] Ensure immutability for map and set objects.
+* [Code] Use ImmutableArray whenever we use vectors.
+* [Code] Change records with multiple arguments of same type to class and add builder.
+* [Specification] Include reasoning for using both SHA3-256 and SHA-256 (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Specification] Clarification in table 2 about group parameters used for the testing-only security level (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Specification] Clarification in table 3 about nonce size and key size of the symmetric algorithm for authenticated encryption and decryption (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Specification] Clarification in table 8 about the variables used for the Argon2 profiles (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Specification] Minor corrections and clarifications (feedback from Rolf Haenni, Reto Koenig, Philipp Locher).
+* [Code] Minor improvements.
+* [Code] Update dependencies and third-party libraries.
+
 ## Release 1.4.5
 
 The following improvements are included in release 1.4.5:
@@ -17,12 +69,7 @@ The following improvements are included in release 1.4.4:
 
 ## Release 1.4.3
 
-Release 1.4.3 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
-We want to thank the experts for their high-quality, constructive remarks:
-
-* Thomas Edmund Haines (Australian National University), Olivier Pereira (Université catholique Louvain), Vanessa Teague (Thinking Cybersecurity)
-* Aleksander Essex (Western University Canada)
-* Rolf Haenni, Reto Koenig, Philipp Locher (Bern University of Applied Sciences)
+Release 1.4.3 includes some feedback from the Federal Chancellery's mandated experts (see above) and other experts of the community.
 
 The following functionalities and improvements are included in release 1.4.3:
 

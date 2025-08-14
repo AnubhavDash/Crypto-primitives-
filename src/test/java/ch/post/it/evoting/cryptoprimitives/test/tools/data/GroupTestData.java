@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  */
 package ch.post.it.evoting.cryptoprimitives.test.tools.data;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
+import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
@@ -31,10 +32,9 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.generator.Generators;
  */
 public class GroupTestData {
 
-	private static final List<GqGroup> smallTestGroups;
 	private static final TestRandomService randomService = new TestRandomService();
 
-	static {
+	private static ImmutableList<GqGroup> getSmallTestGroups() {
 		// More groups can be added to this class as needed.
 		final BigInteger p1 = BigInteger.valueOf(11);
 		final BigInteger q1 = BigInteger.valueOf(5);
@@ -56,7 +56,7 @@ public class GroupTestData {
 		final BigInteger g4 = BigInteger.valueOf(3);
 		final GqGroup group4 = new GqGroup(p4, q4, g4);
 
-		smallTestGroups = List.of(group1, group2, group3, group4);
+		return ImmutableList.of(group1, group2, group3, group4);
 	}
 
 	private GroupTestData() {
@@ -66,7 +66,7 @@ public class GroupTestData {
 	 * @return a random {@link GqGroup} from the predefined groups.
 	 */
 	public static GqGroup getGqGroup() {
-		return getRandomGqGroupFrom(smallTestGroups);
+		return getRandomGqGroupFrom(getSmallTestGroups());
 	}
 
 	/**
@@ -76,8 +76,8 @@ public class GroupTestData {
 	 * @return a different {@link GqGroup}.
 	 */
 	public static GqGroup getDifferentGqGroup(final GqGroup gqGroup) {
-		final List<GqGroup> otherGroups = new ArrayList<>(smallTestGroups);
-		otherGroups.remove(gqGroup);
+		final ImmutableList<GqGroup> otherGroups = getSmallTestGroups().stream().filter(group -> !group.equals(gqGroup)).collect(toImmutableList());
+
 		return getRandomGqGroupFrom(otherGroups);
 	}
 
@@ -113,7 +113,7 @@ public class GroupTestData {
 		}
 	}
 
-	private static GqGroup getRandomGqGroupFrom(final List<GqGroup> groups) {
+	private static GqGroup getRandomGqGroupFrom(final ImmutableList<GqGroup> groups) {
 		return groups.get(randomService.genRandomInteger(groups.size()));
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,7 +114,6 @@ class GqElementFactoryTest {
 
 	@Test
 	void testFromSquareRootWithValidInputReturnsSquaredElement() {
-		final ZqGroup zqGroup = ZqGroup.sameOrderAs(group);
 		final BigInteger one = BigInteger.ONE;
 		final BigInteger two = BigInteger.TWO;
 		final BigInteger five = BigInteger.valueOf(5);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,14 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SignatureSupportingAlgorithm;
 import ch.post.it.evoting.cryptoprimitives.internal.signing.GenKeysAndCertService;
 import ch.post.it.evoting.cryptoprimitives.internal.signing.SignatureGenerationService;
 import ch.post.it.evoting.cryptoprimitives.internal.signing.SignatureVerificationService;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
-import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SignatureSupportingAlgorithm;
 
+@SuppressWarnings({"java:S6548"})
 public class SignatureFactory {
 
 	private static final SecurityLevelInternal SECURITY_LEVEL = SecurityLevelConfig.getSystemSecurityLevel();
