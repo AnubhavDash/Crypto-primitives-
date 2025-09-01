@@ -29,11 +29,11 @@
 		<archunit.version>1.4.1</archunit.version>
 		<guava.version>33.4.8-jre</guava.version>
 		<bouncycastle.version>1.81</bouncycastle.version>
-		<jackson.version>2.19.2</jackson.version>
+		<jackson.version>2.20.0</jackson.version>
 		<jmh.version>1.37</jmh.version>
 		<junit-jupiter.version>5.13.4</junit-jupiter.version>
 		<junit-platform-launcher.version>1.13.4</junit-platform-launcher.version>
-		<mockito.version>5.18.0</mockito.version>
+		<mockito.version>5.19.0</mockito.version>
 		<slf4j.version>2.0.17</slf4j.version>
 		<reproducible-build-maven-plugin.version>0.17.0</reproducible-build-maven-plugin.version>
 
@@ -49,7 +49,7 @@
 		<maven-failsafe-plugin.version>3.5.3</maven-failsafe-plugin.version>
 		<maven-install-plugin.version>3.1.4</maven-install-plugin.version>
 		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-		<maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
+		<maven-javadoc-plugin.version>3.11.3</maven-javadoc-plugin.version>
 		<maven-release-plugin.version>3.1.1</maven-release-plugin.version>
 		<maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
 		<maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
@@ -73,7 +73,7 @@
 		<sonar.exclusions>**/com/verificatum/vmgj/**</sonar.exclusions>
 		<sonar.java.source>${maven.compiler.release}</sonar.java.source>
 		<sonar.java.target>${maven.compiler.release}</sonar.java.target>
-		<sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
+		<sonar-maven-plugin.version>5.2.0.4988</sonar-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>
