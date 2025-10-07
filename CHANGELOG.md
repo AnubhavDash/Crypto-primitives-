@@ -1,5 +1,12 @@
 # Changelog
 
+## Release 1.5.2
+
+Release 1.5.2 is a minor maintenance patch containing the following changes:
+
+* [Code] Isolated improvements to build reproducibility.
+* [Code] Update dependencies and third-party libraries.
+
 ## Release 1.5.1
 
 Release 1.5.1 includes some feedback from the Federal Chancellery's mandated experts and other experts of the community.
