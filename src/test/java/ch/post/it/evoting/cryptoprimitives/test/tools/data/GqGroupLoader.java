@@ -29,7 +29,7 @@ public class GqGroupLoader {
 
 	GqGroupLoader(final String fileName) throws IOException {
 		final ObjectMapper mapper = new ObjectMapper();
-		final JsonNode jsonNode = mapper.readTree(GqGroupLoader.class.getResource(fileName));
+		final JsonNode jsonNode = mapper.readTree(GqGroupLoader.class.getResourceAsStream(fileName));
 
 		final BigInteger p = new BigInteger(jsonNode.get("p").asText(), 10);
 		final BigInteger q = new BigInteger(jsonNode.get("q").asText(), 10);

@@ -38,7 +38,7 @@ class BigIntegerOperationsVMGJTest {
 	}
 
 	@BeforeAll
-	public static void prepare() {
+	static void prepare() {
 		p = new BigInteger(1,
 				HexFormat.of().parseHex("B7E151628AED2A6ABF7158809CF4F3C762E7160F38B4DA56A784D9045190CFEF324E" +
 						"7738926CFBE5F4BF8D8D8C31D763DA06C80ABB1185EB4F7C7B5757F5958490CFD47D7C" +
