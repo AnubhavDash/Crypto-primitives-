@@ -108,7 +108,6 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 		l = randomService.genRandomInteger(publicKeySize) + 1;
 	}
 
-	/// /////// Utilities
 	private void assertThrowsIllegalArgumentExceptionWithMessage(final String errorMsg, final Executable executable) {
 		final Exception exception = assertThrows(IllegalArgumentException.class, executable);
 		assertEquals(errorMsg, exception.getMessage());
@@ -229,7 +228,7 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 			final MultiExponentiationWitness witness = statementWitnessPair.witness();
 
 			final GroupVector<GqElement, GqGroup> computeCommitmentToA = statement.get_c_A();
-			final GqElement firstElement = computeCommitmentToA.get(0);
+			final GqElement firstElement = computeCommitmentToA.getFirst();
 			final GqElement differentFirstElement = Generators.genWhile(gqGroupGenerator::genMember, element -> element.equals(firstElement));
 
 			final GroupVector<GqElement, GqGroup> differentCommitmentToA =
@@ -382,7 +381,8 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 			final ElGamalMultiRecipientPublicKey pk = new ElGamalMultiRecipientPublicKey(GroupVector.of(gqFiftyOne, gqFive));
 			final CommitmentKey ck = new CommitmentKey(gqFive, GroupVector.of(gqTwelve, gqSeventeen));
 			final HashService testHashService = TestHashService.create(g29.getQ());
-			final MultiExponentiationArgumentService testArgumentService = new MultiExponentiationArgumentService(pk, ck, randomService, testHashService);
+			final MultiExponentiationArgumentService testArgumentService = new MultiExponentiationArgumentService(pk, ck, randomService,
+					testHashService);
 			final ElGamalMultiRecipientCiphertext computedC = testArgumentService.multiExponentiation(CMatrix, AMatrix, rhoExponents, 2, 2);
 			final GroupVector<GqElement, GqGroup> commitmentToA = CommitmentService.getCommitmentMatrix(AMatrix, rExponents, ck);
 			final MultiExponentiationStatement statement = new MultiExponentiationStatement(CMatrix, computedC, commitmentToA);
@@ -399,7 +399,8 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 					statement.get_C(),
 					statement.get_c_A()
 			);
-			final VerificationResult verificationResultModified = testArgumentService.verifyMultiExponentiationArgument(modifiedStatement, argument).verify();
+			final VerificationResult verificationResultModified = testArgumentService.verifyMultiExponentiationArgument(modifiedStatement, argument)
+					.verify();
 			assertFalse(verificationResultModified.isVerified());
 		}
 
@@ -454,7 +455,6 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 					.verifyMultiExponentiationArgument(modifiedStatement, localValidArgument).verify();
 			assertFalse(verificationResult.isVerified());
 		}
-
 
 		@Test
 		@SuppressWarnings("java:S117")
@@ -573,7 +573,8 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 				final JsonData output = testParameters.getOutput();
 				final boolean outputValue = Boolean.parseBoolean(output.getJsonData("result").toString());
 
-				return Arguments.of(realPublicKey, realCommitmentKey, multiExpStatement, multiExpArgument, outputValue, testParameters.getDescription());
+				return Arguments.of(realPublicKey, realCommitmentKey, multiExpStatement, multiExpArgument, outputValue,
+						testParameters.getDescription());
 			});
 		}
 

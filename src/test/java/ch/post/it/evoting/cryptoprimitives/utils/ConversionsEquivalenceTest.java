@@ -22,11 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.math.BigInteger;
 
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
-import ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal;
 
 class ConversionsEquivalenceTest {
@@ -70,10 +68,10 @@ class ConversionsEquivalenceTest {
 	}
 
 	/**
-	 * Implements the specification IntegerToFixedLengthByteArray algorithm. It is used in tests to show that it is equivalent to the more performant method used
-	 * which is implemented in {@link ConversionsInternal#integerToFixedLengthByteArray}.
+	 * Implements the specification IntegerToFixedLengthByteArray algorithm. It is used in tests to show that it is equivalent to the more performant
+	 * method used which is implemented in {@link ConversionsInternal#integerToFixedLengthByteArray}.
 	 *
-	 * @param integer x, the non-negative BigInteger to convert.
+	 * @param integer       x, the non-negative BigInteger to convert.
 	 * @param desiredLength m, the desired byte length of the output.
 	 * @return the byte array representation of this BigInteger.
 	 **/

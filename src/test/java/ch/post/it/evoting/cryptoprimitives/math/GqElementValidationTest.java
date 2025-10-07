@@ -37,7 +37,7 @@ class GqElementValidationTest {
 	private static BigInteger elementValue;
 
 	@BeforeAll
-	public static void setUp() {
+	static void setUp() {
 		group = GroupTestData.getLargeGqGroup();
 		p = group.getP();
 		elementValue = BigInteger.ONE;

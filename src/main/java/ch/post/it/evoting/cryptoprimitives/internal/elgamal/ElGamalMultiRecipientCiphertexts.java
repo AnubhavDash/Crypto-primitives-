@@ -17,7 +17,6 @@
 package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
 import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientMessages.getMessage;
-import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -154,7 +153,6 @@ public class ElGamalMultiRecipientCiphertexts {
 		final int l = ciphertext.size();
 		final int k = secretKey.size();
 		checkArgument(l <= k, "There cannot be more message elements than private key elements.");
-
 
 		final GqElement gamma = c.getGamma();
 		final GroupVector<GqElement, GqGroup> m = getMessage(c, sk).getElements();
