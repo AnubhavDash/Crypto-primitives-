@@ -19,7 +19,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.HexFormat;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -29,11 +28,7 @@ import com.google.common.cache.RemovalListener;
 import com.verificatum.vmgj.FpowmTab;
 import com.verificatum.vmgj.VMG;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
-import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
-import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
-import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 
 /**
  * Optimized BigIntegerOperations using Verificatum Multiplicative Groups Library for Java (VMGJ) .
@@ -41,10 +36,9 @@ import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
  * <p>This class is thread-safe.</p>
  */
 public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
-	private static final HashService hashService = HashService.getInstance();
-	private final Cache<String, FpowmTab> fixedBaseCache = CacheBuilder.newBuilder()
-			.expireAfterAccess(30, TimeUnit.DAYS)
-			.removalListener((RemovalListener<String, FpowmTab>) removalNotification -> {
+
+	private final Cache<CacheKey, FpowmTab> fixedBaseCache = CacheBuilder.newBuilder().expireAfterAccess(30, TimeUnit.DAYS)
+			.removalListener((RemovalListener<CacheKey, FpowmTab>) removalNotification -> {
 				if (removalNotification.getValue() != null) {
 					removalNotification.getValue().free();
 				}
@@ -62,7 +56,7 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 		if (!VMG.checkLoaded()) {
 			throw VMG.LOAD_ERROR;
 		}
-		final String key = deriveCacheKey(base, modulus);
+		final CacheKey key = deriveCacheKey(base, modulus);
 
 		try {
 			fixedBaseCache.get(key, () -> new FpowmTab(base, modulus, modulus.bitLength() - 1));
@@ -71,13 +65,9 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 		}
 	}
 
-	private static String deriveCacheKey(final BigInteger base, final BigInteger modulus) {
+	private static CacheKey deriveCacheKey(final BigInteger base, final BigInteger modulus) {
 		checkArgument(modulus.signum() >= 0);
-		final ImmutableByteArray bytes = hashService.recursiveHash(
-				HashableString.from(Boolean.toString(base.signum() >= 0)),
-				HashableBigInteger.from(base.abs()),
-				HashableBigInteger.from(modulus));
-		return HexFormat.of().formatHex(bytes.elements());
+		return new CacheKey(base.signum(), base.abs(), modulus);
 	}
 
 	@Override
@@ -101,7 +91,7 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 		final BigInteger basis = exponentSignum >= 0 ? base : modInvert(base, modulus);
 		final BigInteger exp = exponentSignum >= 0 ? exponent : exponent.negate();
 
-		final String key = deriveCacheKey(basis, modulus);
+		final CacheKey key = deriveCacheKey(basis, modulus);
 
 		final FpowmTab fpowmTab = fixedBaseCache.getIfPresent(key);
 		if (fpowmTab != null) {
@@ -149,5 +139,13 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 				"p must be an odd integer greater than 2");
 
 		return VMG.legendre(a, p);
+	}
+
+	private record CacheKey(int baseSignum, BigInteger absoluteBase, BigInteger modulus) {
+		public CacheKey {
+			checkArgument(baseSignum >= -1 && baseSignum <= 1, "baseSignum must be in range [-1, 1]");
+			checkNotNull(absoluteBase);
+			checkNotNull(modulus);
+		}
 	}
 }

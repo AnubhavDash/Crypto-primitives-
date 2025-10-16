@@ -18,6 +18,7 @@ package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
 import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientMessages.getMessage;
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
+import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -93,7 +94,7 @@ public class ElGamalMultiRecipientCiphertexts {
 	}
 
 	/**
-	 * Takes a vector of ciphertexts, exponentiates them using the supplied exponents and returns the product of the exponentiated ciphertexts.
+	 * Computes the product of ciphertexts raised component-wise to a vector of exponents
 	 * <p>
 	 * The {@code ciphertexts} and {@code exponents} parameters must comply with the following:
 	 * <ul>
@@ -119,17 +120,27 @@ public class ElGamalMultiRecipientCiphertexts {
 		checkArgument(ciphertexts.getGroup().hasSameOrderAs(exponents.getGroup()), "Ciphertexts and exponents must be of the same group.");
 
 		final int l = C.getElementSize();
-		final int N = a.size();
 
 		// Operation.
-		final ElGamalMultiRecipientCiphertext neutralElement = neutralElement(l, C.getGroup());
-		IntStream indices = IntStream.range(0, N);
+		IntStream indices = IntStream.range(0, l);
 		if (ENABLE_PARALLEL_STREAMS) {
 			indices = indices.parallel();
 		}
-		return indices
-				.mapToObj(i -> C.get(i).getCiphertextExponentiation(a.get(i)))
-				.reduce(neutralElement, ElGamalMultiRecipientCiphertext::getCiphertextProduct);
+		final GqElement gamma = GqElementFactory.multiModExp(C.stream().map(ElGamalMultiRecipientCiphertext::getGamma).collect(toGroupVector()), a);
+
+		final GroupVector<GqElement, GqGroup> phi = indices
+				.mapToObj(j -> {
+					// Collect the j-th phi across all ciphertexts: { phi_{i,j} }_i
+							final GroupVector<GqElement, GqGroup> phi_j_vector =
+									C.stream()
+											.map(C_i -> C_i.get(j))
+											.collect(toGroupVector());
+
+					return GqElement.GqElementFactory.multiModExp(phi_j_vector, a);
+				})
+				.collect(toGroupVector());
+
+		return ElGamalMultiRecipientCiphertext.create(gamma, phi);
 	}
 
 	/**
