@@ -16,7 +16,6 @@
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
 import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
-import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -80,8 +79,9 @@ public class CommitmentService {
 		final GroupVector<GqElement, GqGroup> g = ck.getG();
 
 		// Operation.
-		// Compute c = h^r * ∏ g_i^{a_i} mod p in one MultiModExp
-		return GqElementFactory.multiModExp(g.subVector(0, l).prepend(h), a.prepend(r));
+		// Due to 0 indexing of the gs, the indexes used deviate from the spec
+		return h.exponentiate(r).multiply(IntStream.range(0, l).parallel().mapToObj(i -> g.get(i).exponentiate(a.get(i)))
+				.reduce(ck.getGroup().getIdentity(), GqElement::multiply));
 	}
 
 	/**

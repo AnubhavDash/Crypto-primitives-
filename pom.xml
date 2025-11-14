@@ -19,7 +19,7 @@
 
 	<groupId>ch.post.it.evoting.cryptoprimitives</groupId>
 	<artifactId>crypto-primitives</artifactId>
-	<version>1.6.0.0-b0</version>
+	<version>1.5.2.1-RC1</version>
 	<packaging>jar</packaging>
 
 	<name>Crypto Primitives</name>
@@ -31,21 +31,21 @@
 		<bouncycastle.version>1.82</bouncycastle.version>
 		<jackson.version>2.20.0</jackson.version>
 		<jmh.version>1.37</jmh.version>
-		<junit-jupiter.version>5.13.4</junit-jupiter.version>
-		<junit-platform-launcher.version>1.13.4</junit-platform-launcher.version>
+		<junit-jupiter.version>5.14.0</junit-jupiter.version>
+		<junit-platform-launcher.version>1.14.0</junit-platform-launcher.version>
 		<mockito.version>5.20.0</mockito.version>
 		<slf4j.version>2.0.17</slf4j.version>
 		<reproducible-build-maven-plugin.version>0.17.0</reproducible-build-maven-plugin.version>
 
 		<!-- Plugins versions -->
-		<exec-maven-plugin.version>3.5.1</exec-maven-plugin.version>
-		<jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
+		<exec-maven-plugin.version>3.6.2</exec-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
 		<maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
 		<maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
-		<maven-dependency-check.version>12.1.6</maven-dependency-check.version>
-		<maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
+		<maven-dependency-check.version>12.1.8</maven-dependency-check.version>
+		<maven-dependency-plugin.version>3.9.0</maven-dependency-plugin.version>
 		<maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
-		<maven-enforcer-plugin.version>3.6.1</maven-enforcer-plugin.version>
+		<maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version>
 		<maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
 		<maven-install-plugin.version>3.1.4</maven-install-plugin.version>
 		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
@@ -57,11 +57,11 @@
 		<versions-maven-plugin.version>2.19.1</versions-maven-plugin.version>
 
 		<!-- Project settings -->
-		<maven.compiler.release>25</maven.compiler.release>
-		<maven-enforcer-plugin.requiredJavaVersion>[25.0.0]</maven-enforcer-plugin.requiredJavaVersion>
+		<maven.compiler.release>21</maven.compiler.release>
+		<maven-enforcer-plugin.requiredJavaVersion>[21.0.9]</maven-enforcer-plugin.requiredJavaVersion>
 		<maven-enforcer-plugin.requiredMavenVersion>[3.9.11]</maven-enforcer-plugin.requiredMavenVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.outputTimestamp>2025-10-16T13:58:24+02:00</project.build.outputTimestamp>
+		<project.build.outputTimestamp>2025-11-14T14:00:42+02:00</project.build.outputTimestamp>
 
 		<!--  Sonar  -->
 		<sonar.scm.disabled>true</sonar.scm.disabled>

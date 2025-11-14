@@ -15,6 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
+import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static ch.post.it.evoting.cryptoprimitives.internal.mixnet.CommitmentService.getCommitment;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal.byteArrayToInteger;
 import static ch.post.it.evoting.cryptoprimitives.internal.utils.Verifiable.create;
@@ -120,13 +121,9 @@ class SingleValueProductArgumentService {
 
 		// Algorithm
 		// Calculate b_0, ..., b_(n-1)
-		final List<ZqElement> mutableB_vector = new ArrayList<>(n);
-		ZqElement product = one;
-		for (int i = 0; i < n; i++) {
-			product = product.multiply(a.get(i));
-			mutableB_vector.add(product);
-		}
-		final ImmutableList<ZqElement> b_vector = ImmutableList.from(mutableB_vector);
+		final ImmutableList<ZqElement> b_vector = IntStream.range(0, n)
+				.mapToObj(k -> a.stream().limit(k + 1L).reduce(one, ZqElement::multiply))
+				.collect(toImmutableList());
 
 		// Calculate d and r_d
 		final GroupVector<ZqElement, ZqGroup> d = randomService.genRandomVector(q, n);
