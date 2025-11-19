@@ -1,5 +1,11 @@
 # Changelog
 
+## Release 1.5.2.1
+
+Release 1.5.2.1 is a minor maintenance patch containing the following changes:
+
+* [Code] Update dependencies and third-party libraries.
+
 ## Release 1.5.2
 
 Release 1.5.2 is a minor maintenance patch containing the following changes:
