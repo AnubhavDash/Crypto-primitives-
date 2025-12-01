@@ -30,10 +30,18 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 /*
 	This class is thread safe.
  */
-@SuppressWarnings({"java:S101", "java:S6548"})
+@SuppressWarnings({"java:S101", "java:S6548", "java:S5164"})
 public class SHA3_256 implements HashFunction {
 
 	private static final SHA3_256 INSTANCE = new SHA3_256();
+	private final ThreadLocal<MessageDigest> messageDigestThreadLocal = ThreadLocal.withInitial(() -> {
+		try {
+			return MessageDigest.getInstance("SHA3-256", BouncyCastleProvider.PROVIDER_NAME);
+		} catch (final NoSuchAlgorithmException | NoSuchProviderException e) {
+			throw new IllegalStateException("Failed to create the SHA3-256 message digest for the HashService instantiation.");
+		}
+
+	});
 
 	static {
 		Security.addProvider(new BouncyCastleProvider());
@@ -47,14 +55,10 @@ public class SHA3_256 implements HashFunction {
 		return INSTANCE;
 	}
 
+
 	@Override
 	public ImmutableByteArray hash(final ImmutableByteArray input) {
 		checkNotNull(input);
-		try {
-			final MessageDigest instance = MessageDigest.getInstance("SHA3-256", BouncyCastleProvider.PROVIDER_NAME);
-			return new ImmutableByteArray(instance.digest(input.elements()));
-		} catch (final NoSuchAlgorithmException | NoSuchProviderException e) {
-			throw new IllegalStateException("Failed to create the SHA3-256 message digest for the HashService instantiation.");
-		}
+		return new ImmutableByteArray(messageDigestThreadLocal.get().digest(input.elements()));
 	}
 }

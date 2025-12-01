@@ -55,7 +55,7 @@ public class TestMultiExponentiationStatementWitnessPairGenerator {
 		final GroupVector<ZqElement, ZqGroup> rExponents = zqGroupGenerator.genRandomZqElementVector(m);
 		final ZqElement rhoExponents = zqGroupGenerator.genRandomZqElementMember();
 
-		final ElGamalMultiRecipientCiphertext computedC = argumentService.multiExponentiation(ciphertextMatrix, aMatrix, rhoExponents, m, l);
+		final ElGamalMultiRecipientCiphertext computedC = argumentService.multiExponentiation(ciphertextMatrix, aMatrix, rhoExponents, l);
 		final GroupVector<GqElement, GqGroup> commitmentToA = CommitmentService.getCommitmentMatrix(
 				aMatrix, rExponents, commitmentKey);
 		final MultiExponentiationStatement statement = new MultiExponentiationStatement(ciphertextMatrix, computedC, commitmentToA);

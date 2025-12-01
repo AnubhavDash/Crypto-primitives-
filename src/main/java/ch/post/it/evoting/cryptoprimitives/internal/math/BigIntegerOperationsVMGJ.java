@@ -19,9 +19,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.HexFormat;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -29,11 +30,7 @@ import com.google.common.cache.RemovalListener;
 import com.verificatum.vmgj.FpowmTab;
 import com.verificatum.vmgj.VMG;
 
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
-import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
-import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
-import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 
 /**
  * Optimized BigIntegerOperations using Verificatum Multiplicative Groups Library for Java (VMGJ) .
@@ -41,10 +38,14 @@ import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
  * <p>This class is thread-safe.</p>
  */
 public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
-	private static final HashService hashService = HashService.getInstance();
-	private final Cache<String, FpowmTab> fixedBaseCache = CacheBuilder.newBuilder()
-			.expireAfterAccess(30, TimeUnit.DAYS)
-			.removalListener((RemovalListener<String, FpowmTab>) removalNotification -> {
+
+	private static final int DESIRED_PARALLELISM =
+			Math.max(1, Integer.getInteger("vmgj.multi.parallel",
+					Runtime.getRuntime().availableProcessors()));
+	private static final int MULTI_MOD_EXP_MIN_CHUNK_SIZE = Math.max(1, Integer.getInteger("vmgj.multiModExp.min.chunk.size", 32));
+
+	private final Cache<CacheKey, FpowmTab> fixedBaseCache = CacheBuilder.newBuilder().expireAfterAccess(30, TimeUnit.DAYS)
+			.removalListener((RemovalListener<CacheKey, FpowmTab>) removalNotification -> {
 				if (removalNotification.getValue() != null) {
 					removalNotification.getValue().free();
 				}
@@ -62,7 +63,7 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 		if (!VMG.checkLoaded()) {
 			throw VMG.LOAD_ERROR;
 		}
-		final String key = deriveCacheKey(base, modulus);
+		final CacheKey key = deriveCacheKey(base, modulus);
 
 		try {
 			fixedBaseCache.get(key, () -> new FpowmTab(base, modulus, modulus.bitLength() - 1));
@@ -71,13 +72,9 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 		}
 	}
 
-	private static String deriveCacheKey(final BigInteger base, final BigInteger modulus) {
+	private static CacheKey deriveCacheKey(final BigInteger base, final BigInteger modulus) {
 		checkArgument(modulus.signum() >= 0);
-		final ImmutableByteArray bytes = hashService.recursiveHash(
-				HashableString.from(Boolean.toString(base.signum() >= 0)),
-				HashableBigInteger.from(base.abs()),
-				HashableBigInteger.from(modulus));
-		return HexFormat.of().formatHex(bytes.elements());
+		return new CacheKey(base.signum(), base.abs(), modulus);
 	}
 
 	@Override
@@ -101,7 +98,7 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 		final BigInteger basis = exponentSignum >= 0 ? base : modInvert(base, modulus);
 		final BigInteger exp = exponentSignum >= 0 ? exponent : exponent.negate();
 
-		final String key = deriveCacheKey(basis, modulus);
+		final CacheKey key = deriveCacheKey(basis, modulus);
 
 		final FpowmTab fpowmTab = fixedBaseCache.getIfPresent(key);
 		if (fpowmTab != null) {
@@ -113,21 +110,58 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 
 	@Override
 	public BigInteger multiModExp(final ImmutableList<BigInteger> bases, final ImmutableList<BigInteger> exponents, final BigInteger modulus) {
-		final BigInteger[] basesArray = checkNotNull(bases).stream().toArray(BigInteger[]::new);
-		checkArgument(basesArray.length != 0, "Bases must be non empty.");
+		checkNotNull(bases);
+		checkNotNull(exponents);
+		checkNotNull(modulus);
 
-		final int exponentsSize = exponents.size();
-		final BigInteger[] exponentsArray = checkNotNull(exponents).stream()
-				.filter(exponent -> checkNotNull(exponent).signum() >= 0)
-				.toArray(BigInteger[]::new);
-		checkArgument(exponentsSize == exponentsArray.length, "Exponents must be positive");
-
-		// The next check assures also that exponentsArray is not empty
-		checkArgument(basesArray.length == exponentsArray.length, "Bases and exponents must have the same size");
+		final int n = bases.size();
+		checkArgument(n > 0 && n == exponents.size(), "Bases and exponents must have same non-zero size");
 		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
 		checkArgument(modulus.testBit(0), "The modulus must be odd");
 
-		return VMG.spowm(basesArray, exponentsArray, modulus);
+		// if the list has a single element, plain exponentiation (using powm) is faster
+		if (n == 1) {
+			final BigInteger e0 = exponents.getFirst();
+			checkArgument(e0.signum() >= 0, "Exponents must be non negative");
+			return VMG.powm(bases.getFirst(), e0, modulus);
+		}
+
+		final BigInteger[] b = new BigInteger[n];
+		final BigInteger[] e = new BigInteger[n];
+		for (int i = 0; i < n; i++) {
+			final BigInteger ei = exponents.get(i);
+			checkArgument(ei.signum() >= 0, "Exponents must be non negative");
+			b[i] = bases.get(i);
+			e[i] = ei;
+		}
+
+		final int targetChunkSize = (n / DESIRED_PARALLELISM) + 1;
+		final int K = Math.max(MULTI_MOD_EXP_MIN_CHUNK_SIZE, targetChunkSize);
+
+		// If the list is smaller than MULTI_MOD_EXP_MIN_CHUNK_SIZE + 2, we omit chunking.
+		if (n <= K + 2) {
+			return VMG.spowm(b, e, modulus);
+		}
+
+		// We avoid cases where the last chunk is smaller than 2 elements.
+		int chunks = (n + K - 1) / K;
+		final int remainder = n - (chunks - 1) * K;
+		if (chunks > 1 && remainder > 0 && remainder <= 2) {
+			chunks -= 1;
+		}
+
+		final int finalChunks = chunks;
+		final int lastChunkSize = (n - (finalChunks - 1) * K);
+
+		return IntStream.range(0, chunks).parallel()
+				.mapToObj(ci -> {
+					final int from = ci * K;
+					final int to = (ci == finalChunks - 1) ? (from + lastChunkSize) : (from + K);
+					return VMG.spowm(Arrays.copyOfRange(b, from, to),
+							Arrays.copyOfRange(e, from, to),
+							modulus);
+				})
+				.reduce(BigInteger.ONE, (x, y) -> modMultiply(x, y, modulus));
 	}
 
 	@Override
@@ -149,5 +183,13 @@ public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 				"p must be an odd integer greater than 2");
 
 		return VMG.legendre(a, p);
+	}
+
+	private record CacheKey(int baseSignum, BigInteger absoluteBase, BigInteger modulus) {
+		public CacheKey {
+			checkArgument(baseSignum >= -1 && baseSignum <= 1, "baseSignum must be in range [-1, 1]");
+			checkNotNull(absoluteBase);
+			checkNotNull(modulus);
+		}
 	}
 }

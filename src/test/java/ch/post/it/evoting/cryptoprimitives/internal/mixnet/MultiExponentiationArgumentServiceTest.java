@@ -383,7 +383,7 @@ class MultiExponentiationArgumentServiceTest extends TestGroupSetup {
 			final HashService testHashService = TestHashService.create(g29.getQ());
 			final MultiExponentiationArgumentService testArgumentService = new MultiExponentiationArgumentService(pk, ck, randomService,
 					testHashService);
-			final ElGamalMultiRecipientCiphertext computedC = testArgumentService.multiExponentiation(CMatrix, AMatrix, rhoExponents, 2, 2);
+			final ElGamalMultiRecipientCiphertext computedC = testArgumentService.multiExponentiation(CMatrix, AMatrix, rhoExponents, 2);
 			final GroupVector<GqElement, GqGroup> commitmentToA = CommitmentService.getCommitmentMatrix(AMatrix, rExponents, ck);
 			final MultiExponentiationStatement statement = new MultiExponentiationStatement(CMatrix, computedC, commitmentToA);
 			final MultiExponentiationArgument argument = testArgumentService.getMultiExponentiationArgument(statement, witness);

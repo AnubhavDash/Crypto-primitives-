@@ -45,11 +45,9 @@ import com.google.common.annotations.VisibleForTesting;
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
-import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientMessage;
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientPublicKey;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientCiphertexts;
-import ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientMessages;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 import ch.post.it.evoting.cryptoprimitives.internal.math.RandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.Verifiable;
@@ -167,7 +165,7 @@ final class MultiExponentiationArgumentService {
 		checkArgument(l <= k_size, "The ciphertexts must be smaller than the public key.");
 
 		//Ensure that C is the result of the re-encryption and multi exponentiation of matrix C with exponents matrix A
-		final ElGamalMultiRecipientCiphertext computedCCiphertext = multiExponentiation(C_matrix, A, rho, m, l);
+		final ElGamalMultiRecipientCiphertext computedCCiphertext = multiExponentiation(C_matrix, A, rho, l);
 		checkArgument(C.equals(computedCCiphertext),
 				"The computed multi exponentiation ciphertext does not correspond to the one provided in the statement.");
 
@@ -280,25 +278,22 @@ final class MultiExponentiationArgumentService {
 				.build();
 	}
 
+	/**
+	 * Computes the combined multi-exponentiation over a matrix of ElGamal ciphertexts:
+	 * <pre>
+	 * GetCiphertext(1, rho, pk) · ∏_{i,j} C_{i,j}^{A_{j,i}} = (g, pk_0, ... , pk_{l-1})^{rho} · ∏_{i,j} C_{i,j}^{A_{j,i}}
+	 * </pre>
+	 */
 	@VisibleForTesting
 	ElGamalMultiRecipientCiphertext multiExponentiation(final GroupMatrix<ElGamalMultiRecipientCiphertext, GqGroup> C,
-			final GroupMatrix<ZqElement, ZqGroup> AMatrix, final ZqElement rho, final int m, final int l) {
+			final GroupMatrix<ZqElement, ZqGroup> AMatrix, final ZqElement rho, final int l) {
 
-		final ElGamalMultiRecipientCiphertext neutralElement = ElGamalMultiRecipientCiphertexts.neutralElement(l, gqGroup);
+		final ElGamalMultiRecipientCiphertext neutralElementBase = ElGamalMultiRecipientCiphertext.create(C.getGroup().getGenerator(),
 
-		final ElGamalMultiRecipientCiphertext multiExponentiationProduct = IntStream.range(0, m)
-				.parallel()
-				.mapToObj(i -> {
-					final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> C_i = C.getRow(i);
-					//Due to 0 indexing the index i+1 in the spec on the matrix A becomes index i here
-					final GroupVector<ZqElement, ZqGroup> a_i_plus_1 = AMatrix.getColumn(i);
-					return getCiphertextVectorExponentiation(C_i, a_i_plus_1);
-				})
-				.reduce(neutralElement, ElGamalMultiRecipientCiphertext::getCiphertextProduct);
+				pk.getKeyElements().stream().limit(l).collect(toGroupVector()));
 
-		final ElGamalMultiRecipientMessage one = ElGamalMultiRecipientMessages.ones(gqGroup, l);
-		final ElGamalMultiRecipientCiphertext oneCiphertext = getCiphertext(one, rho, pk);
-		return oneCiphertext.getCiphertextProduct(multiExponentiationProduct);
+		return getCiphertextVectorExponentiation(C.flatStream().parallel().collect(toGroupVector()).append(neutralElementBase),
+				AMatrix.transpose().flatStream().parallel().collect(toGroupVector()).append(rho));
 	}
 
 	/**
@@ -444,26 +439,27 @@ final class MultiExponentiationArgumentService {
 		final GqElement commB = getCommitment(GroupVector.of(b), s, ck);
 		final Verifiable verifB = create(() -> prodCb.equals(commB), "product Cb must equal commitment B.");
 
-		final ElGamalMultiRecipientCiphertext prodE = IntStream.range(0, E.size())
+		final ElGamalMultiRecipientCiphertext prodE = getCiphertextVectorExponentiation(E, IntStream.range(0, E.size())
 				.parallel()
-				.boxed()
-				.flatMap(i -> Stream.of(i)
-						.map(E::get)
-						.map(E_k -> E_k.getCiphertextExponentiation(xPowers.apply(i))))
-				.reduce(ElGamalMultiRecipientCiphertexts.neutralElement(l, gqGroup), ElGamalMultiRecipientCiphertext::getCiphertextProduct);
+				.mapToObj(xPowers)
+				.collect(toGroupVector()));
+
 		final ElGamalMultiRecipientCiphertext encryptedGb = Stream.of(b)
 				.map(gqGroup.getGenerator()::exponentiate)
 				.map(g_b -> constantMessage(g_b, l))
 				.map(g_b_vector -> getCiphertext(g_b_vector, tau, pk))
 				.collect(onlyElement());
-		final ElGamalMultiRecipientCiphertext prodC = IntStream.range(0, m)
-				.parallel()
-				.boxed()
-				.flatMap(i -> Stream.of(i)
-						.map(__ -> xPowers.apply(m - i - 1))
-						.map(x_m_minus_i_minus_1 -> vectorScalarMultiplication(x_m_minus_i_minus_1, a))
-						.map(powers -> getCiphertextVectorExponentiation(C_matrix.getRow(i), powers)))
-				.reduce(ElGamalMultiRecipientCiphertexts.neutralElement(l, gqGroup), ElGamalMultiRecipientCiphertext::getCiphertextProduct);
+
+	    // ∏_{k=0}^{n-1} ( ∏_{i=0}^{m-1} C_{i,k}^{ x^{m-i-1} } )^{ a_k } is equivalent to ∏_{i=0}^{m-1} GetCiphertextVectorExponentiation(C_i, x^{m-i-1} * a)
+		final ElGamalMultiRecipientCiphertext prodC = getCiphertextVectorExponentiation(
+				IntStream.range(0, a.size())
+						.parallel()
+						.mapToObj(k -> getCiphertextVectorExponentiation(C_matrix.getColumn(k), IntStream.range(0, m)
+								.parallel()
+								.mapToObj(i -> xPowers.apply(m - i - 1))
+								.collect(toGroupVector())))
+						.collect(toGroupVector()), a);
+
 		final Verifiable verifEC = create(() -> prodE.equals(encryptedGb.getCiphertextProduct(prodC)),
 				"product E must equal ciphertext product of Gb and product C.");
 
