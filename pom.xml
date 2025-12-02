@@ -19,7 +19,7 @@
 
 	<groupId>ch.post.it.evoting.cryptoprimitives</groupId>
 	<artifactId>crypto-primitives</artifactId>
-	<version>1.5.2.2-b0</version>
+	<version>1.6.0.0-b1</version>
 	<packaging>jar</packaging>
 
 	<name>Crypto Primitives</name>
@@ -31,8 +31,8 @@
 		<bouncycastle.version>1.82</bouncycastle.version>
 		<jackson.version>2.20.1</jackson.version>
 		<jmh.version>1.37</jmh.version>
-		<junit-jupiter.version>5.14.1</junit-jupiter.version>
-		<junit-platform-launcher.version>1.14.1</junit-platform-launcher.version>
+		<junit-jupiter.version>6.0.1</junit-jupiter.version>
+		<junit-platform-launcher.version>6.0.1</junit-platform-launcher.version>
 		<mockito.version>5.20.0</mockito.version>
 		<slf4j.version>2.0.17</slf4j.version>
 		<reproducible-build-maven-plugin.version>0.17.0</reproducible-build-maven-plugin.version>
@@ -57,11 +57,11 @@
 		<versions-maven-plugin.version>2.19.1</versions-maven-plugin.version>
 
 		<!-- Project settings -->
-		<maven.compiler.release>21</maven.compiler.release>
-		<maven-enforcer-plugin.requiredJavaVersion>[21.0.9]</maven-enforcer-plugin.requiredJavaVersion>
+		<maven.compiler.release>25</maven.compiler.release>
+		<maven-enforcer-plugin.requiredJavaVersion>[25.0.1]</maven-enforcer-plugin.requiredJavaVersion>
 		<maven-enforcer-plugin.requiredMavenVersion>[3.9.11]</maven-enforcer-plugin.requiredMavenVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.outputTimestamp>2025-12-01T10:50:09+02:00</project.build.outputTimestamp>
+		<project.build.outputTimestamp>2025-12-02T17:46:09+02:00</project.build.outputTimestamp>
 
 		<!--  Sonar  -->
 		<sonar.scm.disabled>true</sonar.scm.disabled>
@@ -237,6 +237,13 @@
 					<configuration>
 						<source>${maven.compiler.release}</source>
 						<target>${maven.compiler.release}</target>
+						<annotationProcessorPaths>
+							<path>
+								<groupId>org.openjdk.jmh</groupId>
+								<artifactId>jmh-generator-annprocess</artifactId>
+								<version>${jmh.version}</version>
+							</path>
+						</annotationProcessorPaths>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -360,6 +367,26 @@
 							<goal>properties</goal>
 						</goals>
 					</execution>
+					<execution>
+						<id>build-classpath</id>
+						<goals>
+							<goal>build-classpath</goal>
+						</goals>
+						<configuration>
+							<includeScope>runtime</includeScope>
+							<outputProperty>depClasspath</outputProperty>
+						</configuration>
+					</execution>
+					<execution>
+						<id>build-test-classpath</id>
+						<goals>
+							<goal>build-classpath</goal>
+						</goals>
+						<configuration>
+							<includeScope>test</includeScope>
+							<outputProperty>depTestClasspath</outputProperty>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -452,6 +479,16 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>${exec-maven-plugin.version}</version>
+				<configuration>
+					<mainClass>ch.post.it.evoting.cryptoprimitives.benchmark.BenchmarkRunner</mainClass>
+					<systemProperties>
+						<systemProperty>
+							<key>java.class.path</key>
+							<value>${project.build.outputDirectory}${path.separator}${depClasspath};${project.build.testOutputDirectory}${path.separator}${depTestClasspath}</value>
+						</systemProperty>
+					</systemProperties>
+					<classpathScope>test</classpathScope>
+				</configuration>
 				<inherited>false</inherited>
 				<executions>
 					<execution>

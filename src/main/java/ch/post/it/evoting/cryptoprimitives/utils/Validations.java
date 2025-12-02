@@ -23,9 +23,6 @@ import java.util.stream.Stream;
  */
 public class Validations {
 
-	private static final boolean ENABLE_PARALLEL_STREAMS = Boolean.parseBoolean(
-			System.getProperty("enable.parallel.streams", Boolean.TRUE.toString()));
-
 	private Validations() {
 		// Intentionally left blank.
 	}
@@ -39,7 +36,7 @@ public class Validations {
 	 * @return true if the vector is empty or all elements are equal under this property. False otherwise.
 	 */
 	public static <T> boolean allEqual(final Stream<T> stream, final Function<? super T, ?> property) {
-		return (ENABLE_PARALLEL_STREAMS ? stream.parallel() : stream)
+		return stream.parallel()
 				.map(property)
 				.distinct()
 				.count() <= 1;
