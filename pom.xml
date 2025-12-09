@@ -19,7 +19,7 @@
 
 	<groupId>ch.post.it.evoting.cryptoprimitives</groupId>
 	<artifactId>crypto-primitives</artifactId>
-	<version>1.6.0.0-b1</version>
+	<version>1.6.0.0-b2</version>
 	<packaging>jar</packaging>
 
 	<name>Crypto Primitives</name>
@@ -61,7 +61,7 @@
 		<maven-enforcer-plugin.requiredJavaVersion>[25.0.1]</maven-enforcer-plugin.requiredJavaVersion>
 		<maven-enforcer-plugin.requiredMavenVersion>[3.9.11]</maven-enforcer-plugin.requiredMavenVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.outputTimestamp>2025-12-02T17:46:09+02:00</project.build.outputTimestamp>
+		<project.build.outputTimestamp>2025-12-09T14:16:56+02:00</project.build.outputTimestamp>
 
 		<!--  Sonar  -->
 		<sonar.scm.disabled>true</sonar.scm.disabled>
@@ -490,22 +490,19 @@
 					<classpathScope>test</classpathScope>
 				</configuration>
 				<inherited>false</inherited>
+			</plugin>
+			<plugin>
+				<groupId>ch.post.it.evoting.hashgenerator</groupId>
+				<artifactId>hash-generator-maven-plugin</artifactId>
+				<version>1.0.0.0-b0</version>
+				<configuration>
+					<excludeClassifiers>javadoc,sources,tests</excludeClassifiers>
+				</configuration>
 				<executions>
 					<execution>
-						<id>run-custom-script</id>
-						<phase>install</phase>
 						<goals>
-							<goal>exec</goal>
+							<goal>hash-generator</goal>
 						</goals>
-						<configuration>
-							<executable>bash</executable>
-							<arguments>
-								<argument>./reproducible-build/generateChecksum.sh</argument>
-								<argument>${project.artifactId}</argument>
-								<argument>${project.version}</argument>
-								<argument>./target</argument>
-							</arguments>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
