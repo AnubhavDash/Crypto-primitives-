@@ -22,7 +22,6 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
  */
 public final class Base64Alphabet extends Alphabet {
 
-	private static final int SIZE = 64;
 	private static final ImmutableList<String> ALPHABET = ImmutableList.of(
 
 			Character.toString(0x0041), // A (U+0041)
@@ -94,10 +93,10 @@ public final class Base64Alphabet extends Alphabet {
 			Character.toString(0x002F)  // / (U+002F)
 	);
 
-	private static final Base64Alphabet INSTANCE = new Base64Alphabet(SIZE, ALPHABET);
+	private static final Base64Alphabet INSTANCE = new Base64Alphabet(ALPHABET);
 
-	private Base64Alphabet(final int size, final ImmutableList<String> alphabet) {
-		super(size, alphabet);
+	private Base64Alphabet(final ImmutableList<String> alphabet) {
+		super(64, alphabet);
 	}
 
 	public static Base64Alphabet getInstance() {

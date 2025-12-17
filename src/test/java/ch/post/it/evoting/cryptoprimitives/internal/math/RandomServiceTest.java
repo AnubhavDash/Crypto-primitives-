@@ -214,8 +214,10 @@ class RandomServiceTest {
 		@Test
 		@DisplayName("invalid arguments throws an IllegalArgumentException")
 		void checkGenRandomVectorInvalidArguments() {
+			final BigInteger minusOne = BigInteger.ONE.negate();
+			assertThrows(IllegalArgumentException.class, () -> randomService.genRandomVector(minusOne, 1));
 			assertThrows(IllegalArgumentException.class, () -> randomService.genRandomVector(BigInteger.ZERO, 1));
-			assertThrows(IllegalArgumentException.class, () -> randomService.genRandomVector(BigInteger.TWO, -1));
+			assertThrows(IllegalArgumentException.class, () -> randomService.genRandomVector(BigInteger.ONE, -1));
 		}
 
 		@RepeatedTest(100)
