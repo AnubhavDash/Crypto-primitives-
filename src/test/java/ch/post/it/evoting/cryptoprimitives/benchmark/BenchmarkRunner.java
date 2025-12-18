@@ -44,9 +44,10 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.MoreCollectors;
+
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 public class BenchmarkRunner {
 
@@ -119,7 +120,7 @@ public class BenchmarkRunner {
 	}
 
 	public static void runBenchmark(final String benchmarkClass, final int forks, final int threads, final int iterations, final boolean checkResult)
-			throws IOException, RunnerException {
+			throws RunnerException {
 		final String[] benchmarkClassParts = benchmarkClass.split("\\.");
 		final String benchmarkName = benchmarkClassParts[benchmarkClassParts.length - 1];
 
@@ -145,7 +146,7 @@ public class BenchmarkRunner {
 					"/benchmark-results/%s".formatted(BENCHMARK_RESULT_FILENAME.formatted(benchmarkName)));
 			if (resultsStream != null) {
 				final ObjectMapper objectMapper = new ObjectMapper();
-				final List<BenchmarkResult> benchmarkResults = objectMapper.readValue(resultsStream, new TypeReference<List<BenchmarkResult>>() {});
+				final List<BenchmarkResult> benchmarkResults = objectMapper.readValue(resultsStream, new TypeReference<>() {});
 				checkResult(newRunResults, benchmarkResults);
 			} else {
 				LOG.warn("No already existing results [fileName: {}].", benchmarkName);

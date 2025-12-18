@@ -50,9 +50,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
@@ -69,6 +66,9 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 import ch.post.it.evoting.cryptoprimitives.test.tools.data.GroupTestData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.TestParameters;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 
 class HashServiceTest {
 
@@ -94,7 +94,7 @@ class HashServiceTest {
 
 		return parametersList.stream().parallel().map(testParameters -> {
 
-			final String messageDigest = testParameters.getContext().getJsonData("hash_function").jsonNode().asText();
+			final String messageDigest = testParameters.getContext().getJsonData("hash_function").jsonNode().asString();
 
 			final JsonData input = testParameters.getInput().getJsonData("values");
 
@@ -127,7 +127,7 @@ class HashServiceTest {
 	}
 
 	private static Hashable readValue(final JsonData data) {
-		final String type = data.getJsonData("type").jsonNode().asText();
+		final String type = data.getJsonData("type").jsonNode().asString();
 		return switch (type) {
 			case "string" -> HashableString.from(data.get("value", String.class));
 			case "integer" -> HashableBigInteger.from(data.get("value", BigInteger.class));

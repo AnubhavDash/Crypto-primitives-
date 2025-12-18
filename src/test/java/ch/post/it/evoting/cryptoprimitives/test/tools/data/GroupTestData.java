@@ -17,8 +17,6 @@ package ch.post.it.evoting.cryptoprimitives.test.tools.data;
 
 import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.math.BigInteger;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
@@ -106,11 +104,7 @@ public class GroupTestData {
 	 * @return a {@link GqGroup}.
 	 */
 	public static GqGroup getLargeGqGroup() {
-		try {
-			return new GqGroupLoader("/large-group.json").getGroup();
-		} catch (final IOException e) {
-			throw new UncheckedIOException("Cannot read large group from file.", e);
-		}
+		return new GqGroupLoader("/large-group.json").getGroup();
 	}
 
 	private static GqGroup getRandomGqGroupFrom(final ImmutableList<GqGroup> groups) {
