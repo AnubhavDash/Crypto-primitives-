@@ -19,7 +19,7 @@
 
 	<groupId>ch.post.it.evoting.cryptoprimitives</groupId>
 	<artifactId>crypto-primitives</artifactId>
-	<version>1.6.0.0-b4</version>
+	<version>1.6.0.0-b5</version>
 	<packaging>jar</packaging>
 
 	<name>Crypto Primitives</name>
@@ -29,10 +29,10 @@
 		<archunit.version>1.4.1</archunit.version>
 		<guava.version>33.5.0-jre</guava.version>
 		<bouncycastle.version>1.82</bouncycastle.version>
-		<jackson.version>3.0.2</jackson.version>
+		<jackson.version>2.20.0</jackson.version>
 		<jmh.version>1.37</jmh.version>
-		<junit-jupiter.version>6.0.1</junit-jupiter.version>
-		<junit-platform-launcher.version>6.0.1</junit-platform-launcher.version>
+		<junit-jupiter.version>6.0.0</junit-jupiter.version>
+		<junit-platform-launcher.version>6.0.0</junit-platform-launcher.version>
 		<mockito.version>5.20.0</mockito.version>
 		<slf4j.version>2.0.17</slf4j.version>
 		<reproducible-build-maven-plugin.version>0.17.0</reproducible-build-maven-plugin.version>
@@ -42,15 +42,15 @@
 		<jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
 		<maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
 		<maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
-		<maven-dependency-check.version>12.1.9</maven-dependency-check.version>
+		<maven-dependency-check.version>12.1.8</maven-dependency-check.version>
 		<maven-dependency-plugin.version>3.9.0</maven-dependency-plugin.version>
 		<maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
 		<maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version>
 		<maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
 		<maven-install-plugin.version>3.1.4</maven-install-plugin.version>
-		<maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
+		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
-		<maven-release-plugin.version>3.2.0</maven-release-plugin.version>
+		<maven-release-plugin.version>3.1.1</maven-release-plugin.version>
 		<maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
 		<maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
 		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
@@ -61,7 +61,7 @@
 		<maven-enforcer-plugin.requiredJavaVersion>[25.0.1]</maven-enforcer-plugin.requiredJavaVersion>
 		<maven-enforcer-plugin.requiredMavenVersion>[3.9.11]</maven-enforcer-plugin.requiredMavenVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.outputTimestamp>2025-12-18T10:45:47+02:00</project.build.outputTimestamp>
+		<project.build.outputTimestamp>2025-12-29T17:46:34+02:00</project.build.outputTimestamp>
 
 		<!--  Sonar  -->
 		<sonar.scm.disabled>true</sonar.scm.disabled>
@@ -73,7 +73,7 @@
 		<sonar.exclusions>**/com/verificatum/vmgj/**</sonar.exclusions>
 		<sonar.java.source>${maven.compiler.release}</sonar.java.source>
 		<sonar.java.target>${maven.compiler.release}</sonar.java.target>
-		<sonar-maven-plugin.version>5.3.0.6276</sonar-maven-plugin.version>
+		<sonar-maven-plugin.version>5.2.0.4988</sonar-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>
@@ -123,7 +123,7 @@
 
 			<!-- com.fasterxml.jackson -->
 			<dependency>
-				<groupId>tools.jackson</groupId>
+				<groupId>com.fasterxml.jackson</groupId>
 				<artifactId>jackson-bom</artifactId>
 				<version>${jackson.version}</version>
 				<type>pom</type>
@@ -189,12 +189,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>tools.jackson.core</groupId>
+			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>tools.jackson.core</groupId>
+			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<scope>test</scope>
 		</dependency>
@@ -490,19 +490,22 @@
 					<classpathScope>test</classpathScope>
 				</configuration>
 				<inherited>false</inherited>
-			</plugin>
-			<plugin>
-				<groupId>ch.post.it.evoting.hashgenerator</groupId>
-				<artifactId>hash-generator-maven-plugin</artifactId>
-				<version>1.0.0.0-b0</version>
-				<configuration>
-					<excludeClassifiers>javadoc,sources,tests</excludeClassifiers>
-				</configuration>
 				<executions>
 					<execution>
+						<id>run-custom-script</id>
+						<phase>install</phase>
 						<goals>
-							<goal>hash-generator</goal>
+							<goal>exec</goal>
 						</goals>
+						<configuration>
+							<executable>bash</executable>
+							<arguments>
+								<argument>./reproducible-build/generateChecksum.sh</argument>
+								<argument>${project.artifactId}</argument>
+								<argument>${project.version}</argument>
+								<argument>./target</argument>
+							</arguments>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

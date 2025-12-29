@@ -47,6 +47,8 @@ import com.verificatum.vmgj.VMG;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
+import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizations;
+import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizationsCacheKey;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 
 /**
@@ -102,33 +104,33 @@ class BigIntegerOperationsTest {
 
 	@BeforeAll
 	static void prepare() {
-				p = new BigInteger(1,
-						HexFormat.of().parseHex("B7E151628AED2A6ABF7158809CF4F3C762E7160F38B4DA56A784D9045190CFEF324E" +
-								"7738926CFBE5F4BF8D8D8C31D763DA06C80ABB1185EB4F7C7B5757F5958490CFD47D7C" +
-								"19BB42158D9554F7B46BCED55C4D79FD5F24D6613C31C3839A2DDF8A9A276BCFBFA1C8" +
-								"77C56284DAB79CD4C2B3293D20E9E5EAF02AC60ACC93ED874422A52ECB238FEEE5AB6A" +
-								"DD835FD1A0753D0A8F78E537D2B95BB79D8DCAEC642C1E9F23B829B5C2780BF38737DF" +
-								"8BB300D01334A0D0BD8645CBFA73A6160FFE393C48CBBBCA060F0FF8EC6D31BEB5CCEE" +
-								"D7F2F0BB088017163BC60DF45A0ECB1BCD289B06CBBFEA21AD08E1847F3F7378D56CED" +
-								"94640D6EF0D3D37BE67008E186D1BF275B9B241DEB64749A47DFDFB96632C3EB061B64" +
-								"72BBF84C26144E49C2D04C324EF10DE513D3F5114B8B5D374D93CB8879C7D52FFD72BA" +
-								"0AAE7277DA7BA1B4AF1488D8E836AF14865E6C37AB6876FE690B571121382AF341AFE9" +
-								"4F77BCF06C83B8FF5675F0979074AD9A787BC5B9BD4B0C5937D3EDE4C3A79396419CD7"));
-				final BigInteger q = new BigInteger(1,
-						HexFormat.of().parseHex("5BF0A8B1457695355FB8AC404E7A79E3B1738B079C5A6D2B53C26C8228C867F79927" +
-								"3B9C49367DF2FA5FC6C6C618EBB1ED0364055D88C2F5A7BE3DABABFACAC24867EA3EBE" +
-								"0CDDA10AC6CAAA7BDA35E76AAE26BCFEAF926B309E18E1C1CD16EFC54D13B5E7DFD0E4" +
-								"3BE2B1426D5BCE6A6159949E9074F2F5781563056649F6C3A21152976591C7F772D5B5" +
-								"6EC1AFE8D03A9E8547BC729BE95CADDBCEC6E57632160F4F91DC14DAE13C05F9C39BEF" +
-								"C5D98068099A50685EC322E5FD39D30B07FF1C9E2465DDE5030787FC763698DF5AE677" +
-								"6BF9785D84400B8B1DE306FA2D07658DE6944D8365DFF510D68470C23F9FB9BC6AB676" +
-								"CA3206B77869E9BDF3380470C368DF93ADCD920EF5B23A4D23EFEFDCB31961F5830DB2" +
-								"395DFC26130A2724E1682619277886F289E9FA88A5C5AE9BA6C9E5C43CE3EA97FEB95D" +
-								"0557393BED3DD0DA578A446C741B578A432F361BD5B43B7F3485AB88909C1579A0D7F4" +
-								"A7BBDE783641DC7FAB3AF84BC83A56CD3C3DE2DCDEA5862C9BE9F6F261D3C9CB20CE6B"));
+		p = new BigInteger(1,
+				HexFormat.of().parseHex("B7E151628AED2A6ABF7158809CF4F3C762E7160F38B4DA56A784D9045190CFEF324E" +
+						"7738926CFBE5F4BF8D8D8C31D763DA06C80ABB1185EB4F7C7B5757F5958490CFD47D7C" +
+						"19BB42158D9554F7B46BCED55C4D79FD5F24D6613C31C3839A2DDF8A9A276BCFBFA1C8" +
+						"77C56284DAB79CD4C2B3293D20E9E5EAF02AC60ACC93ED874422A52ECB238FEEE5AB6A" +
+						"DD835FD1A0753D0A8F78E537D2B95BB79D8DCAEC642C1E9F23B829B5C2780BF38737DF" +
+						"8BB300D01334A0D0BD8645CBFA73A6160FFE393C48CBBBCA060F0FF8EC6D31BEB5CCEE" +
+						"D7F2F0BB088017163BC60DF45A0ECB1BCD289B06CBBFEA21AD08E1847F3F7378D56CED" +
+						"94640D6EF0D3D37BE67008E186D1BF275B9B241DEB64749A47DFDFB96632C3EB061B64" +
+						"72BBF84C26144E49C2D04C324EF10DE513D3F5114B8B5D374D93CB8879C7D52FFD72BA" +
+						"0AAE7277DA7BA1B4AF1488D8E836AF14865E6C37AB6876FE690B571121382AF341AFE9" +
+						"4F77BCF06C83B8FF5675F0979074AD9A787BC5B9BD4B0C5937D3EDE4C3A79396419CD7"));
+		final BigInteger q = new BigInteger(1,
+				HexFormat.of().parseHex("5BF0A8B1457695355FB8AC404E7A79E3B1738B079C5A6D2B53C26C8228C867F79927" +
+						"3B9C49367DF2FA5FC6C6C618EBB1ED0364055D88C2F5A7BE3DABABFACAC24867EA3EBE" +
+						"0CDDA10AC6CAAA7BDA35E76AAE26BCFEAF926B309E18E1C1CD16EFC54D13B5E7DFD0E4" +
+						"3BE2B1426D5BCE6A6159949E9074F2F5781563056649F6C3A21152976591C7F772D5B5" +
+						"6EC1AFE8D03A9E8547BC729BE95CADDBCEC6E57632160F4F91DC14DAE13C05F9C39BEF" +
+						"C5D98068099A50685EC322E5FD39D30B07FF1C9E2465DDE5030787FC763698DF5AE677" +
+						"6BF9785D84400B8B1DE306FA2D07658DE6944D8365DFF510D68470C23F9FB9BC6AB676" +
+						"CA3206B77869E9BDF3380470C368DF93ADCD920EF5B23A4D23EFEFDCB31961F5830DB2" +
+						"395DFC26130A2724E1682619277886F289E9FA88A5C5AE9BA6C9E5C43CE3EA97FEB95D" +
+						"0557393BED3DD0DA578A446C741B578A432F361BD5B43B7F3485AB88909C1579A0D7F4" +
+						"A7BBDE783641DC7FAB3AF84BC83A56CD3C3DE2DCDEA5862C9BE9F6F261D3C9CB20CE6B"));
 
-				exponent = randomService.genRandomIntegerOfLength(q.bitLength() + 256).mod(q);
-				knownBase = BigInteger.TWO;
+		exponent = randomService.genRandomIntegerOfLength(q.bitLength() + 256).mod(q);
+		knownBase = BigInteger.TWO;
 	}
 
 	@Test
@@ -137,7 +139,7 @@ class BigIntegerOperationsTest {
 		final BigInteger resultBeforeCache = operations.modExponentiate(knownBase, exponent, p);
 
 		if (operations.isFixedBaseExponentiationSupported()) {
-			operations.generateCache(knownBase, p);
+			operations.generateCache(knownBase, p, BigIntegersOptimizations.BlockWidth.STANDARD);
 		}
 
 		final BigInteger resultAfterCache = operations.modExponentiate(knownBase, exponent, p);
@@ -158,7 +160,7 @@ class BigIntegerOperationsTest {
 	 *     <li>null input throws a {@link NullPointerException}</li>
 	 *     <li>m < 2 throws an {@link IllegalArgumentException}</li>
 	 *     <li>deriveCacheKey(b - m, m) deriveCacheKey(b, m) = deriveCacheKey(b + m, m)</li>
-	 *     <li>same base but different modulus returns different {@link BigIntegerOperationsVMGJ.CacheKey}</li>
+	 *     <li>same base but different modulus returns different {@link BigIntegersOptimizationsCacheKey}</li>
 	 * </ul>
 	 */
 	@Nested
@@ -171,13 +173,13 @@ class BigIntegerOperationsTest {
 
 		@Test
 		void testGenerateCache_nullInputThrows() {
-			assertThrows(NullPointerException.class, () -> operations.generateCache(null, p));
-			assertThrows(NullPointerException.class, () -> operations.generateCache(knownBase, null));
+			assertThrows(NullPointerException.class, () -> operations.generateCache(null, p, BigIntegersOptimizations.BlockWidth.STANDARD));
+			assertThrows(NullPointerException.class, () -> operations.generateCache(knownBase, null, BigIntegersOptimizations.BlockWidth.STANDARD));
 		}
 
 		@Test
 		void testGenerateCache_invalidModulusThrows() {
-			assertThrows(IllegalArgumentException.class, () -> operations.generateCache(knownBase, ONE));
+			assertThrows(IllegalArgumentException.class, () -> operations.generateCache(knownBase, ONE, BigIntegersOptimizations.BlockWidth.STANDARD));
 		}
 
 		@Test
@@ -193,17 +195,17 @@ class BigIntegerOperationsTest {
 
 		@Test
 		void testDeriveCacheKey_equivalentBasesGiveSameKey() {
-			final BigIntegerOperationsVMGJ.CacheKey expected = BigIntegerOperationsVMGJ.deriveCacheKey(knownBase, p);
-			final BigIntegerOperationsVMGJ.CacheKey resultAddP = BigIntegerOperationsVMGJ.deriveCacheKey(knownBase.add(p), p);
-			final BigIntegerOperationsVMGJ.CacheKey resultSubtractP = BigIntegerOperationsVMGJ.deriveCacheKey(knownBase.subtract(p), p);
+			final BigIntegersOptimizationsCacheKey expected = BigIntegerOperationsVMGJ.deriveCacheKey(knownBase, p);
+			final BigIntegersOptimizationsCacheKey resultAddP = BigIntegerOperationsVMGJ.deriveCacheKey(knownBase.add(p), p);
+			final BigIntegersOptimizationsCacheKey resultSubtractP = BigIntegerOperationsVMGJ.deriveCacheKey(knownBase.subtract(p), p);
 			assertEquals(expected, resultAddP);
 			assertEquals(expected, resultSubtractP);
 		}
 
 		@Test
 		void testDeriveCacheKey_differentModulusGiveDifferentKey() {
-			final BigIntegerOperationsVMGJ.CacheKey result1 = BigIntegerOperationsVMGJ.deriveCacheKey(knownBase, p);
-			final BigIntegerOperationsVMGJ.CacheKey result2 = BigIntegerOperationsVMGJ.deriveCacheKey(knownBase, p.add(TWO));
+			final BigIntegersOptimizationsCacheKey result1 = BigIntegerOperationsVMGJ.deriveCacheKey(knownBase, p);
+			final BigIntegersOptimizationsCacheKey result2 = BigIntegerOperationsVMGJ.deriveCacheKey(knownBase, p.add(TWO));
 			assertNotEquals(result1, result2);
 		}
 	}
@@ -553,7 +555,8 @@ class BigIntegerOperationsTest {
 
 		@ParameterizedTest
 		@MethodSource("provideValidInputs")
-		void testMultiModExp_validInputs(final ImmutableList<BigInteger> bases, final ImmutableList<BigInteger> exponents, final BigInteger modulus, final BigInteger expected) {
+		void testMultiModExp_validInputs(final ImmutableList<BigInteger> bases, final ImmutableList<BigInteger> exponents, final BigInteger modulus,
+				final BigInteger expected) {
 			assertEquals(expected, operations.multiModExp(bases, exponents, modulus));
 		}
 
@@ -682,7 +685,7 @@ class BigIntegerOperationsTest {
 
 		@ParameterizedTest
 		@ValueSource(ints = { 1, 2, 31, 32, 33, 63, 64, 65 })
-		void testMultiModExp_differentListSizes(final  int size) {
+		void testMultiModExp_differentListSizes(final int size) {
 			final ImmutableList<BigInteger> bases = randomService.genRandomVector(modulus, size).stream().map(ZqElement::getValue)
 					.collect(ImmutableList.toImmutableList());
 			final ImmutableList<BigInteger> exponents = randomService.genRandomVector(modulus, size).stream().map(ZqElement::getValue)
@@ -752,7 +755,7 @@ class BigIntegerOperationsTest {
 			assertThrows(IllegalArgumentException.class, () -> operations.modInvert(ONE, ONE));
 		}
 
-		static  Stream<Arguments> provideInvalidCases() {
+		static Stream<Arguments> provideInvalidCases() {
 			return Stream.of(
 					Arguments.of(TWO, FOUR),
 					Arguments.of(THREE, NINE),
@@ -803,10 +806,11 @@ class BigIntegerOperationsTest {
 		record ExtendedGCD(BigInteger gcd, BigInteger x, BigInteger y) {}
 
 		/**
-		 * Calculates the greatest common divisor (gcd) of two integers <i>a</i> and <i>b</i> and the unique integers <i>x, y</i>
-		 * such that <i>ax</i> + <i>by</i> = gcd(<i>a</i>, <i>b</i>).
+		 * Calculates the greatest common divisor (gcd) of two integers <i>a</i> and <i>b</i> and the unique integers <i>x, y</i> such that <i>ax</i>
+		 * + <i>by</i> = gcd(<i>a</i>, <i>b</i>).
 		 * <p>
 		 * If gcd(<i>a</i>, <i>b</i>) = 1, then <i>x</i> = <i>a</i><sup>-1</sup>
+		 *
 		 * @param a the first integer
 		 * @param b the second integer
 		 * @return (gcd(a, b), x, y) such that ax + by = gcd(a, b)

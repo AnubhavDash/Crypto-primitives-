@@ -22,10 +22,14 @@ import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
+
+import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizations;
 
 @BenchmarkMode(value = Mode.AverageTime)
 @Fork(value = 1)
@@ -52,7 +56,7 @@ public class FixedBaseBenchmark {
 	@Benchmark
 	public void generateCache(final MyState state) {
 		final BigIntegerOperations operations = new BigIntegerOperationsVMGJ();
-		operations.generateCache(state.knownBase, state.p);
+		operations.generateCache(state.knownBase, state.p, state.blockWidth);
 	}
 
 	@Benchmark
@@ -78,6 +82,9 @@ public class FixedBaseBenchmark {
 		private final BigInteger randomBase;
 		private final BigIntegerOperations bigIntegerOperationsWithoutTable = new BigIntegerOperationsVMGJ();
 		private final BigIntegerOperations bigIntegerOperationsWithTable = new BigIntegerOperationsVMGJ();
+
+		@Param({ "TINY", "SMALL", "STANDARD", "BIG", "BIGGER", "HUGE" })
+		private BigIntegersOptimizations.BlockWidth blockWidth;
 
 		public MyState() {
 			p = new BigInteger("B7E151628AED2A6ABF7158809CF4F3C762E7160F38B4DA56A784D9045190CFEF324E" +
@@ -107,8 +114,12 @@ public class FixedBaseBenchmark {
 			knownBase = BigInteger.TWO;
 			final BigInteger random = randomService.genRandomIntegerOfLength(q.bitLength());
 			randomBase = random.multiply(random).mod(p);
-
-			bigIntegerOperationsWithTable.generateCache(knownBase, p);
 		}
+
+		@Setup
+		public void setup() {
+			bigIntegerOperationsWithTable.generateCache(knownBase, p, blockWidth);
+		}
+
 	}
 }

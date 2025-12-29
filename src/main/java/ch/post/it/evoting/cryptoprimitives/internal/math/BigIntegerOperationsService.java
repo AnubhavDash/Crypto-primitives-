@@ -15,6 +15,8 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.math.BigInteger;
 
 import org.slf4j.Logger;
@@ -23,6 +25,8 @@ import org.slf4j.LoggerFactory;
 import com.verificatum.vmgj.VMG;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizations;
+import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizationsCacheKey;
 
 /**
  * <p>This class is thread-safe.</p>
@@ -67,9 +71,18 @@ public class BigIntegerOperationsService {
 		return bigIntegerOperations.getLegendre(a, p);
 	}
 
-	public static void generateCache(final BigInteger basis, final BigInteger modulus) {
+	public static BigIntegersOptimizationsCacheKey generateCache(final BigInteger basis, final BigInteger modulus, final BigIntegersOptimizations.BlockWidth blockWidth) {
 		if (bigIntegerOperations.isFixedBaseExponentiationSupported()) {
-			bigIntegerOperations.generateCache(basis, modulus);
+			return bigIntegerOperations.generateCache(basis, modulus, blockWidth);
+		} else {
+			return null;
+		}
+	}
+
+	public static void releaseCache(final BigIntegersOptimizationsCacheKey key) {
+		checkNotNull(key);
+		if (bigIntegerOperations.isFixedBaseExponentiationSupported()) {
+			bigIntegerOperations.releaseCache(key);
 		}
 	}
 

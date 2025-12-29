@@ -22,6 +22,7 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
  */
 public final class Base10Alphabet extends Alphabet {
 
+	private static final int SIZE = 10;
 	private static final ImmutableList<String> ALPHABET = ImmutableList.of(
 
 			Character.toString(0x0030), // 0 (U+0030)
@@ -36,10 +37,10 @@ public final class Base10Alphabet extends Alphabet {
 			Character.toString(0x0039)  // 9 (U+0039)
 	);
 
-	private static final Base10Alphabet INSTANCE = new Base10Alphabet(ALPHABET);
+	private static final Base10Alphabet INSTANCE = new Base10Alphabet(SIZE, ALPHABET);
 
-	private Base10Alphabet(final ImmutableList<String> alphabet) {
-		super(10, alphabet);
+	private Base10Alphabet(final int size, final ImmutableList<String> alphabet) {
+		super(size, alphabet);
 	}
 
 	public static Base10Alphabet getInstance() {

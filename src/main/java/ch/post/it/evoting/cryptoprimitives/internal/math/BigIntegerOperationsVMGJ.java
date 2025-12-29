@@ -32,6 +32,8 @@ import com.verificatum.vmgj.FpowmTab;
 import com.verificatum.vmgj.VMG;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizations;
+import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizationsCacheKey;
 
 /**
  * Optimized BigIntegerOperations using Verificatum Multiplicative Groups Library for Java (VMGJ) .
@@ -46,13 +48,16 @@ public class BigIntegerOperationsVMGJ extends BigIntegerOperationsJava {
 					Runtime.getRuntime().availableProcessors()));
 	private static final int MULTI_MOD_EXP_MIN_CHUNK_SIZE = Math.max(1, Integer.getInteger("vmgj.multiModExp.min.chunk.size", 32));
 
-	private final Cache<CacheKey, FpowmTab> fixedBaseCache = CacheBuilder.newBuilder().expireAfterAccess(30, TimeUnit.DAYS)
-			.removalListener((RemovalListener<CacheKey, FpowmTab>) removalNotification -> {
-				if (removalNotification.getValue() != null) {
-					removalNotification.getValue().free();
-				}
-			})
-			.build();
+	private final Cache<BigIntegersOptimizationsCacheKey, FpowmTab> fixedBaseCache = BigIntegersOptimizationsEventPublisher.attachCachePublisher(
+			CacheBuilder.newBuilder().expireAfterAccess(30, TimeUnit.DAYS)
+					.removalListener((RemovalListener<BigIntegersOptimizationsCacheKey, FpowmTab>) removalNotification -> {
+						if (removalNotification.getValue() != null) {
+							removalNotification.getValue().free();
+						}
+					})
+					.build());
+
+
 
 	@Override
 	public boolean isFixedBaseExponentiationSupported() {
@@ -60,24 +65,31 @@ public class BigIntegerOperationsVMGJ extends BigIntegerOperationsJava {
 	}
 
 	@Override
-	public void generateCache(final BigInteger base, final BigInteger modulus) {
+	public BigIntegersOptimizationsCacheKey generateCache(final BigInteger base, final BigInteger modulus, final BigIntegersOptimizations.BlockWidth blockWidth) {
 		if (!VMG.checkLoaded()) {
 			throw VMG.LOAD_ERROR;
 		}
-		final CacheKey key = deriveCacheKey(base, modulus);
+		final BigIntegersOptimizationsCacheKey key = deriveCacheKey(base, modulus);
 
 		try {
-			fixedBaseCache.get(key, () -> new FpowmTab(base, modulus, modulus.bitLength() - 1));
+			fixedBaseCache.get(key, () -> new FpowmTab(base, modulus, blockWidth.getValue(), modulus.bitLength() - 1));
 		} catch (final ExecutionException e) {
 			throw new IllegalStateException("Could not create precomputed table for the given basis and modulus.", e);
 		}
+		return key;
+	}
+
+	@Override
+	public void releaseCache(final BigIntegersOptimizationsCacheKey key) {
+		fixedBaseCache.invalidate(key);
+		fixedBaseCache.cleanUp();
 	}
 
 	@VisibleForTesting
-	static CacheKey deriveCacheKey(final BigInteger base, final BigInteger modulus) {
+	static BigIntegersOptimizationsCacheKey deriveCacheKey(final BigInteger base, final BigInteger modulus) {
 		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
 		final BigInteger b = base.mod(modulus);
-		return new CacheKey(b, modulus);
+		return new BigIntegersOptimizationsCacheKey(b, modulus);
 	}
 
 	@Override
@@ -96,7 +108,7 @@ public class BigIntegerOperationsVMGJ extends BigIntegerOperationsJava {
 		final BigInteger basis = exponentSignum >= 0 ? base : modInvert(base, modulus);
 		final BigInteger exp = exponentSignum >= 0 ? exponent : exponent.negate();
 
-		final CacheKey key = deriveCacheKey(basis, modulus);
+		final BigIntegersOptimizationsCacheKey key = deriveCacheKey(basis, modulus);
 
 		final FpowmTab fpowmTab = fixedBaseCache.getIfPresent(key);
 		if (fpowmTab != null) {
@@ -183,10 +195,4 @@ public class BigIntegerOperationsVMGJ extends BigIntegerOperationsJava {
 		return VMG.legendre(a, p);
 	}
 
-	record CacheKey(BigInteger base, BigInteger modulus) {
-		public CacheKey {
-			checkNotNull(base);
-			checkNotNull(modulus);
-		}
-	}
 }

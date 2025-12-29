@@ -18,6 +18,8 @@ package ch.post.it.evoting.cryptoprimitives.internal.math;
 import java.math.BigInteger;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizations;
+import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizationsCacheKey;
 
 public interface BigIntegerOperations {
 
@@ -36,8 +38,13 @@ public interface BigIntegerOperations {
 	 *
 	 * @param base    the base
 	 * @param modulus the modulus
+	 * @param blockWidth the width of the block to place in cache
 	 */
-	default void generateCache(final BigInteger base, final BigInteger modulus) {
+	default BigIntegersOptimizationsCacheKey generateCache(final BigInteger base, final BigInteger modulus, final BigIntegersOptimizations.BlockWidth blockWidth) {
+		throw new UnsupportedOperationException("This implementation does not support fixed base optimizations");
+	}
+
+	default void releaseCache(final BigIntegersOptimizationsCacheKey key) {
 		throw new UnsupportedOperationException("This implementation does not support fixed base optimizations");
 	}
 
