@@ -19,7 +19,7 @@
 
 	<groupId>ch.post.it.evoting.cryptoprimitives</groupId>
 	<artifactId>crypto-primitives</artifactId>
-	<version>1.6.0.0-b5</version>
+	<version>1.5.3.0-b0</version>
 	<packaging>jar</packaging>
 
 	<name>Crypto Primitives</name>
@@ -28,40 +28,40 @@
 		<!-- Dependencies versions -->
 		<archunit.version>1.4.1</archunit.version>
 		<guava.version>33.5.0-jre</guava.version>
-		<bouncycastle.version>1.82</bouncycastle.version>
-		<jackson.version>2.20.0</jackson.version>
+		<bouncycastle.version>1.83</bouncycastle.version>
+		<jackson.version>2.20.1</jackson.version>
 		<jmh.version>1.37</jmh.version>
-		<junit-jupiter.version>6.0.0</junit-jupiter.version>
-		<junit-platform-launcher.version>6.0.0</junit-platform-launcher.version>
-		<mockito.version>5.20.0</mockito.version>
+		<junit-jupiter.version>5.14.1</junit-jupiter.version>
+		<junit-platform-launcher.version>1.14.1</junit-platform-launcher.version>
+		<mockito.version>5.21.0</mockito.version>
 		<slf4j.version>2.0.17</slf4j.version>
 		<reproducible-build-maven-plugin.version>0.17.0</reproducible-build-maven-plugin.version>
 
 		<!-- Plugins versions -->
-		<exec-maven-plugin.version>3.6.2</exec-maven-plugin.version>
+		<exec-maven-plugin.version>3.6.3</exec-maven-plugin.version>
 		<jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
 		<maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
 		<maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
-		<maven-dependency-check.version>12.1.8</maven-dependency-check.version>
+		<maven-dependency-check.version>12.1.9</maven-dependency-check.version>
 		<maven-dependency-plugin.version>3.9.0</maven-dependency-plugin.version>
 		<maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
 		<maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version>
 		<maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
 		<maven-install-plugin.version>3.1.4</maven-install-plugin.version>
-		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+		<maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
-		<maven-release-plugin.version>3.1.1</maven-release-plugin.version>
-		<maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+		<maven-release-plugin.version>3.3.1</maven-release-plugin.version>
+		<maven-resources-plugin.version>3.4.0</maven-resources-plugin.version>
 		<maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
-		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-		<versions-maven-plugin.version>2.19.1</versions-maven-plugin.version>
+		<maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+		<versions-maven-plugin.version>2.20.1</versions-maven-plugin.version>
 
 		<!-- Project settings -->
-		<maven.compiler.release>25</maven.compiler.release>
-		<maven-enforcer-plugin.requiredJavaVersion>[25.0.1]</maven-enforcer-plugin.requiredJavaVersion>
+		<maven.compiler.release>21</maven.compiler.release>
+		<maven-enforcer-plugin.requiredJavaVersion>[21.0.9]</maven-enforcer-plugin.requiredJavaVersion>
 		<maven-enforcer-plugin.requiredMavenVersion>[3.9.11]</maven-enforcer-plugin.requiredMavenVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.outputTimestamp>2025-12-29T17:46:34+02:00</project.build.outputTimestamp>
+		<project.build.outputTimestamp>2026-01-08T14:24:20+02:00</project.build.outputTimestamp>
 
 		<!--  Sonar  -->
 		<sonar.scm.disabled>true</sonar.scm.disabled>
@@ -73,7 +73,7 @@
 		<sonar.exclusions>**/com/verificatum/vmgj/**</sonar.exclusions>
 		<sonar.java.source>${maven.compiler.release}</sonar.java.source>
 		<sonar.java.target>${maven.compiler.release}</sonar.java.target>
-		<sonar-maven-plugin.version>5.2.0.4988</sonar-maven-plugin.version>
+		<sonar-maven-plugin.version>5.5.0.6356</sonar-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>
@@ -237,13 +237,6 @@
 					<configuration>
 						<source>${maven.compiler.release}</source>
 						<target>${maven.compiler.release}</target>
-						<annotationProcessorPaths>
-							<path>
-								<groupId>org.openjdk.jmh</groupId>
-								<artifactId>jmh-generator-annprocess</artifactId>
-								<version>${jmh.version}</version>
-							</path>
-						</annotationProcessorPaths>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -367,26 +360,6 @@
 							<goal>properties</goal>
 						</goals>
 					</execution>
-					<execution>
-						<id>build-classpath</id>
-						<goals>
-							<goal>build-classpath</goal>
-						</goals>
-						<configuration>
-							<includeScope>runtime</includeScope>
-							<outputProperty>depClasspath</outputProperty>
-						</configuration>
-					</execution>
-					<execution>
-						<id>build-test-classpath</id>
-						<goals>
-							<goal>build-classpath</goal>
-						</goals>
-						<configuration>
-							<includeScope>test</includeScope>
-							<outputProperty>depTestClasspath</outputProperty>
-						</configuration>
-					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -479,16 +452,6 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>${exec-maven-plugin.version}</version>
-				<configuration>
-					<mainClass>ch.post.it.evoting.cryptoprimitives.benchmark.BenchmarkRunner</mainClass>
-					<systemProperties>
-						<systemProperty>
-							<key>java.class.path</key>
-							<value>${project.build.outputDirectory}${path.separator}${depClasspath};${project.build.testOutputDirectory}${path.separator}${depTestClasspath}</value>
-						</systemProperty>
-					</systemProperties>
-					<classpathScope>test</classpathScope>
-				</configuration>
 				<inherited>false</inherited>
 				<executions>
 					<execution>

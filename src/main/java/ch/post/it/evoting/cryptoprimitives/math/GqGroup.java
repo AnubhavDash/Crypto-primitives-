@@ -28,7 +28,6 @@ import ch.post.it.evoting.cryptoprimitives.hashing.Hashable;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsService;
-import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegersOptimizationsEventPublisher;
 import ch.post.it.evoting.cryptoprimitives.internal.math.MathematicalGroup;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelConfig;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
@@ -97,8 +96,7 @@ public final class GqGroup implements MathematicalGroup<GqGroup>, HashableList {
 		generator = GqElementFactory.fromValue(g, this);
 
 		identity = GqElementFactory.fromValue(BigInteger.ONE, this);
-
-		BigIntegersOptimizationsEventPublisher.INSTANCE.publishGqGroupCreationEvent(g, p);
+		BigIntegersOptimizations.prepareFixedBaseOptimizations(g, p);
 	}
 
 	/**

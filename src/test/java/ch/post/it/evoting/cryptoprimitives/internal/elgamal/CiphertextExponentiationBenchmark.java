@@ -42,11 +42,11 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 
-@BenchmarkMode(value = Mode.AverageTime)
+@BenchmarkMode(value = Mode.Throughput)
 @Fork(value = 1)
-@Measurement(iterations = 5)
-@Warmup(iterations = 1)
-public class CiphertextVectorExponentiationBenchmark {
+@Measurement(iterations = 3)
+@Warmup(iterations = 0)
+public class CiphertextExponentiationBenchmark {
 	@Benchmark
 	public void ciphertextMultimodExp(final CiphertextMultimodExpState state, final Blackhole bh) {
 		bh.consume(ElGamalMultiRecipientCiphertexts.getCiphertextVectorExponentiation(state.ciphertexts, state.exponents));
@@ -72,10 +72,10 @@ public class CiphertextVectorExponentiationBenchmark {
 		public GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts;
 		public GroupVector<ZqElement, ZqGroup> exponents;
 
-		@Param({ "10", "100" })
+		@Param({ "5", "10" })
 		public int ciphertextCount;
 
-		@Param({ "1", "16", "31" })
+		@Param({ "1", "5" })
 		public int ciphertextSize;
 
 		@Setup(Level.Trial)
