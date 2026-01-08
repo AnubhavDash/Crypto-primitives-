@@ -17,6 +17,8 @@ package ch.post.it.evoting.cryptoprimitives.internal.math;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.TWO;
 
 import java.math.BigInteger;
 import java.util.stream.IntStream;
@@ -29,8 +31,8 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 public class BigIntegerOperationsJava implements BigIntegerOperations {
 
 	private static final BigInteger ZERO = BigInteger.ZERO;
-	private static final BigInteger ONE = BigInteger.ONE;
-	private static final BigInteger TWO = BigInteger.TWO;
+
+	protected final RandomService random = new RandomService();
 
 	@Override
 	public BigInteger modMultiply(final BigInteger n1, final BigInteger n2, final BigInteger modulus) {
@@ -122,5 +124,55 @@ public class BigIntegerOperationsJava implements BigIntegerOperations {
 		}
 
 		return 0;
+	}
+
+	/**
+	 * Runs the Miller-Rabin probabilistic primality test.
+	 *
+	 * @param candidate n, an odd integer greater than 3 to be tested. Must be non-null.
+	 * @param rounds    t, the number of rounds to be done. Must be strictly positive.
+	 * @return {@code true} if the candidate is probably prime, {@code false} if the candidate is definitely composite.
+	 */
+	@SuppressWarnings("java:S117")
+	@Override
+	public boolean millerRabin(final BigInteger candidate, final int rounds) {
+		checkNotNull(candidate);
+		checkArgument(candidate.compareTo(TWO) > 0, "n must be at least three.");
+		checkArgument(candidate.mod(TWO).equals(ONE), "n must be odd.");
+		checkArgument(rounds > 0, "The number of rounds must be strictly positive.");
+
+		// For n = 3, we cannot choose a random integer a, 2 <= a <= n - 2
+		if (candidate.equals(BigInteger.valueOf(3))) {
+			return true;
+		}
+
+		final BigInteger n = candidate;
+		final int t = rounds;
+
+		// Write n - 1 = 2^s * r such that r is odd
+		final BigInteger n_minus_one = n.subtract(ONE);
+		final int s = n_minus_one.getLowestSetBit();
+		final BigInteger r = n_minus_one.shiftRight(s);
+		return IntStream.range(0, t).parallel().allMatch(i -> {
+			// Choose a random integer a, 2 <= a <= n - 2
+			BigInteger a;
+			do {
+				a = random.genRandomInteger(BigInteger.valueOf(n.bitLength()));
+			} while (a.compareTo(ONE) <= 0 || a.compareTo(n_minus_one) >= 0);
+
+			BigInteger y = modExponentiate(a, r, n);
+			if (!y.equals(ONE) && !y.equals(n_minus_one)) {
+				int j = 1;
+				while (j <= s - 1 && !y.equals(n_minus_one)) {
+					y = modExponentiate(y, TWO, n);
+					if (y.equals(ONE)) {
+						return false;
+					}
+					j = j + 1;
+				}
+				return y.equals(n_minus_one);
+			}
+			return true;
+		});
 	}
 }

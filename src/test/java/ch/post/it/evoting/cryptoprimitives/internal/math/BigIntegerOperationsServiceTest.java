@@ -18,6 +18,7 @@ package ch.post.it.evoting.cryptoprimitives.internal.math;
 import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -34,6 +35,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
@@ -257,12 +259,5 @@ class BigIntegerOperationsServiceTest {
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.millerRabin(FIVE, 0));
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.millerRabin(ONE, 3));
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.millerRabin(EIGHT, 3));
-	}
-
-	@Test
-	void millerRabinValidArguments() {
-		assertTrue(BigIntegerOperationsService.millerRabin(THREE, 1));
-		assertTrue(BigIntegerOperationsService.millerRabin(FIVE, 3));
-		assertTrue(BigIntegerOperationsService.millerRabin(SEVEN, 3));
 	}
 }

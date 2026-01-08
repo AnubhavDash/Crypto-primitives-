@@ -101,6 +101,10 @@ class ByteArraysTest {
 
 	static Stream<Arguments> byteLengthArgumentProvider() {
 		return Stream.of(
+				Arguments.of(BigInteger.valueOf(Integer.MIN_VALUE), 4),
+				Arguments.of(BigInteger.valueOf(-257), 2),
+				Arguments.of(BigInteger.valueOf(-256), 1),
+				Arguments.of(BigInteger.ONE.negate(), 0),
 				Arguments.of(BigInteger.ZERO, 0),
 				Arguments.of(BigInteger.ONE, 1),
 				Arguments.of(BigInteger.valueOf(255), 1),
