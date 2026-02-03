@@ -15,19 +15,18 @@
  */
 package ch.post.it.evoting.cryptoprimitives.test.tools.serialization;
 
+import java.io.IOException;
 import java.io.InputStream;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.securitylevel.SecurityLevelInternal;
-
-import tools.jackson.core.JsonParser;
-import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.ValueDeserializer;
-import tools.jackson.databind.annotation.JsonDeserialize;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * General deserialization of json test files according to the schema defined in the specifications.
@@ -57,11 +56,13 @@ public final class TestParameters {
 	public static ImmutableList<TestParameters> fromResource(final String resourceName) {
 		final InputStream inputStream = TestParameters.class.getResourceAsStream(resourceName);
 
-		final ObjectMapper jsonMapper = JsonMapper.builder()
-				.disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
-				.build();
+		try {
+			final ObjectMapper jsonMapper = new ObjectMapper();
 
-		return ImmutableList.of(jsonMapper.readValue(inputStream, TestParameters[].class));
+			return ImmutableList.of(jsonMapper.readValue(inputStream, TestParameters[].class));
+		} catch (final IOException e) {
+			throw new RuntimeException("Read values failed for file " + resourceName + ". " + e.getMessage());
+		}
 	}
 
 	public SecurityLevelInternal getSecurityLevel() {
@@ -94,17 +95,15 @@ public final class TestParameters {
 		return mocked;
 	}
 
-	private static final class JsonDataDeserializer extends ValueDeserializer<JsonData> {
+	private static final class JsonDataDeserializer extends JsonDeserializer<JsonData> {
 		private final ObjectMapper mapper;
 
 		public JsonDataDeserializer() {
-			this.mapper = JsonMapper.builder()
-					.disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
-					.build();
+			this.mapper = new ObjectMapper();
 		}
 
 		@Override
-		public JsonData deserialize(final JsonParser jsonParser, final DeserializationContext ctxt) {
+		public JsonData deserialize(final JsonParser jsonParser, final DeserializationContext ctxt) throws IOException {
 			final JsonNode root = mapper.readTree(jsonParser);
 			return new JsonData(root);
 		}

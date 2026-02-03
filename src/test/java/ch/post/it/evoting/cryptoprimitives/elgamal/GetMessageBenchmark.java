@@ -49,9 +49,9 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator
 @Warmup(iterations = 1)
 @Measurement(iterations = 5)
 @Fork(value = 1)
-@BenchmarkMode(Mode.AverageTime)
+@BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.SECONDS)
-public class GetMessageComparisonBenchmark {
+public class GetMessageBenchmark {
 
 	// In order to run this benchmark, the following environment variables must be set:
 	// SECURITY_LEVEL=TESTING_ONLY
@@ -73,6 +73,8 @@ public class GetMessageComparisonBenchmark {
 	@State(Scope.Benchmark)
 	public static class MyState {
 
+		private static final boolean ENABLE_PARALLEL_STREAMS = Boolean.parseBoolean(
+				System.getProperty("enable.parallel.streams", Boolean.TRUE.toString()));
 		private final int numElements = 30;
 		private final GqGroup gqGroup = GroupTestData.getLargeGqGroup();
 		final ElGamalMultiRecipientCiphertext ciphertext = new ElGamalGenerator(gqGroup).genRandomCiphertext(numElements);
@@ -94,10 +96,14 @@ public class GetMessageComparisonBenchmark {
 			final int l = c.size();
 			final GqElement gamma = c.getGamma();
 
+			IntStream indices = IntStream.range(0, l);
+			if (MyState.ENABLE_PARALLEL_STREAMS) {
+				indices = indices.parallel();
+			}
+
 			// Algorithm.
 			final GqElement gamma_reciprocal = gamma.invert();
-			final GroupVector<GqElement, GqGroup> messageElements = IntStream.range(0, l)
-					.parallel()
+			final GroupVector<GqElement, GqGroup> messageElements = indices
 					.mapToObj(i -> c.get(i).multiply(gamma_reciprocal.exponentiate(sk.get(i))))
 					.collect(toGroupVector());
 

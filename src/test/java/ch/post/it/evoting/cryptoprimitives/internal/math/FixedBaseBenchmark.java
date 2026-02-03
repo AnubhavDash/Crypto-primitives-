@@ -27,14 +27,11 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
-@BenchmarkMode(value = Mode.AverageTime)
+@BenchmarkMode(value = Mode.Throughput)
 @Fork(value = 1)
-@Measurement(iterations = 5)
-@Warmup(iterations = 1)
+@Measurement(iterations = 3)
+@Warmup(iterations = 0)
 public class FixedBaseBenchmark {
-
-	private static final TestRandomService randomService = new TestRandomService();
-
 	@Benchmark
 	public BigInteger knownBaseBeforeCache(final MyState state) {
 		final BigIntegerOperations operations = state.bigIntegerOperationsWithoutTable;
@@ -71,6 +68,8 @@ public class FixedBaseBenchmark {
 
 	@State(Scope.Benchmark)
 	public static class MyState {
+
+		private static final TestRandomService randomService = new TestRandomService();
 
 		private final BigInteger p;
 		private final BigInteger knownBase;
