@@ -15,25 +15,24 @@
  */
 package ch.post.it.evoting.cryptoprimitives.test.tools.data;
 
-import java.io.IOException;
 import java.math.BigInteger;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 public class GqGroupLoader {
 
 	private final GqGroup group;
 
-	GqGroupLoader(final String fileName) throws IOException {
+	GqGroupLoader(final String fileName) {
 		final ObjectMapper mapper = new ObjectMapper();
 		final JsonNode jsonNode = mapper.readTree(GqGroupLoader.class.getResourceAsStream(fileName));
 
-		final BigInteger p = new BigInteger(jsonNode.get("p").asText(), 10);
-		final BigInteger q = new BigInteger(jsonNode.get("q").asText(), 10);
-		final BigInteger g = new BigInteger(jsonNode.get("g").asText(), 10);
+		final BigInteger p = new BigInteger(jsonNode.get("p").asString(), 10);
+		final BigInteger q = new BigInteger(jsonNode.get("q").asString(), 10);
+		final BigInteger g = new BigInteger(jsonNode.get("g").asString(), 10);
 
 		this.group = new GqGroup(p, q, g);
 	}
