@@ -24,7 +24,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
@@ -35,11 +34,10 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 
 /**
  * Optimized BigIntegerOperations using Verificatum Multiplicative Groups Library for Java (VMGJ) .
- * The methods which are not optimized yet will use the java implementation by inheritance.
  *
  * <p>This class is thread-safe.</p>
  */
-public class BigIntegerOperationsVMGJ extends BigIntegerOperationsJava {
+public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 
 	private static final int DESIRED_PARALLELISM =
 			Math.max(1, Integer.getInteger("vmgj.multi.parallel",
@@ -53,6 +51,7 @@ public class BigIntegerOperationsVMGJ extends BigIntegerOperationsJava {
 				}
 			})
 			.build();
+	private final BigIntegerOperations bigIntegerOperationsJava = new BigIntegerOperationsJava();
 
 	@Override
 	public boolean isFixedBaseExponentiationSupported() {
@@ -73,11 +72,14 @@ public class BigIntegerOperationsVMGJ extends BigIntegerOperationsJava {
 		}
 	}
 
-	@VisibleForTesting
-	static CacheKey deriveCacheKey(final BigInteger base, final BigInteger modulus) {
-		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
-		final BigInteger b = base.mod(modulus);
-		return new CacheKey(b, modulus);
+	private static CacheKey deriveCacheKey(final BigInteger base, final BigInteger modulus) {
+		checkArgument(modulus.signum() >= 0);
+		return new CacheKey(base.signum(), base.abs(), modulus);
+	}
+
+	@Override
+	public BigInteger modMultiply(final BigInteger n1, final BigInteger n2, final BigInteger modulus) {
+		return bigIntegerOperationsJava.modMultiply(n1, n2, modulus);
 	}
 
 	@Override
@@ -167,8 +169,8 @@ public class BigIntegerOperationsVMGJ extends BigIntegerOperationsJava {
 		checkNotNull(n);
 		checkNotNull(modulus);
 		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
-		// For performance reasons, we omit an explicit check that n and the modulus are relatively prime.
-		// modInvert is only called in the context of Gq element inversion, so n and the modulus are always relatively prime.
+		// For performance reasons, we omit an explicit check that n and the modulus are relatively prime. GMP throws a division by zero error if the
+		// two operands are not relatively prime.
 
 		return VMG.powm(n, BigInteger.ONE.negate(), modulus);
 	}
@@ -183,9 +185,10 @@ public class BigIntegerOperationsVMGJ extends BigIntegerOperationsJava {
 		return VMG.legendre(a, p);
 	}
 
-	record CacheKey(BigInteger base, BigInteger modulus) {
+	private record CacheKey(int baseSignum, BigInteger absoluteBase, BigInteger modulus) {
 		public CacheKey {
-			checkNotNull(base);
+			checkArgument(baseSignum >= -1 && baseSignum <= 1, "baseSignum must be in range [-1, 1]");
+			checkNotNull(absoluteBase);
 			checkNotNull(modulus);
 		}
 	}

@@ -44,6 +44,3 @@ out/
 
 # SonarLint plugin
 .idea/sonarlint/
-
-# Mise plugin
-.idea/mise.xml

@@ -61,12 +61,12 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator
  * </ul>
  * The values for the total number of ciphertexts (N) and the ciphertext size (l) are parameterized and can be easily changed according to the needs.
  */
-@Warmup(iterations = 1)
+@Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @Fork(value = 1)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MINUTES)
-public class GetShuffleArgumentComparisonBenchmark {
+public class GetShuffleArgumentBenchmark {
 
 	@Fork(value = 1, jvmArgs = {"-Xms5g", "-Xmx30g"})
 	@Benchmark
@@ -84,7 +84,7 @@ public class GetShuffleArgumentComparisonBenchmark {
 	@State(Scope.Thread)
 	public static class BenchmarkState_m_And_n_Chosen_With_getMatrixDimensions extends BenchmarkState {
 
-		@Param({ "900", "907", "4900", "10000" })
+		@Param({ "900", "901", "902", "903", "904", "905", "906", "907", "908", "909", "4900", "10000" })
 		int N;
 		@Param({ "1", "31" })
 		int l;
@@ -108,7 +108,7 @@ public class GetShuffleArgumentComparisonBenchmark {
 	@State(Scope.Thread)
 	public static class BenchmarkState_m_Equals_1 extends BenchmarkState {
 
-		@Param({ "900", "907", "9967", "10000" })
+		@Param({ "900", "901", "902", "903", "904", "905", "906", "907", "908", "909", "4900", "10000" })
 		int N;
 		@Param({ "1", "31"})
 		int l;

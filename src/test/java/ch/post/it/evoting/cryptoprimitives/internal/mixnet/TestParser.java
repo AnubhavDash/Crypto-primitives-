@@ -23,13 +23,13 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.math.GqElement;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.test.tools.serialization.JsonData;
-
-import tools.jackson.databind.JsonNode;
 
 public class TestParser {
 
