@@ -18,15 +18,91 @@ package ch.post.it.evoting.cryptoprimitives.math;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
+import java.util.function.Consumer;
 
 import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegerOperationsService;
+import ch.post.it.evoting.cryptoprimitives.internal.math.BigIntegersOptimizationsEventPublisher;
 
 public class BigIntegersOptimizations {
+
+	public static final String CACHE_METHOD_NAME_CLEAN_UP = "cleanUp";
+	public static final String CACHE_METHOD_NAME_INVALIDATE = "invalidate";
+	public static final String CACHE_METHOD_NAME_GET = "get";
+	public static final String CACHE_METHOD_NAME_GET_IF_PRESENT = "getIfPresent";
+	public static final String CACHE_METHOD_NAME_PUT = "put";
+
 	private BigIntegersOptimizations() {
 		// Intentionally left blank.
 	}
 
 	public static void prepareFixedBaseOptimizations(final BigInteger basis, final BigInteger modulus) {
-		BigIntegerOperationsService.generateCache(checkNotNull(basis), checkNotNull(modulus));
+		checkNotNull(basis);
+		checkNotNull(modulus);
+		prepareFixedBaseOptimizations(basis, modulus, BlockWidth.STANDARD);
+	}
+
+	public static void prepareFixedBaseOptimizations(final BigInteger basis, final BigInteger modulus,
+			final BigIntegersOptimizations.BlockWidth blockWidth) {
+		checkNotNull(basis);
+		checkNotNull(modulus);
+		checkNotNull(blockWidth);
+		BigIntegerOperationsService.generateCache(basis, modulus, blockWidth);
+	}
+
+	public static void releaseFixedBaseOperations(final BigIntegersOptimizationsCacheKey key) {
+		checkNotNull(key);
+		BigIntegerOperationsService.releaseCache(key);
+	}
+
+	/**
+	 * Subscribes to big integers optimizations events.
+	 *
+	 * @param subscriber the subscriber object.
+	 * @param callback   the callback to be invoked when an event is published.
+	 */
+	public static void subscribeBigIntegersOptimizationsEvent(final Object subscriber, final Consumer<BigIntegersOptimizationsEvent> callback) {
+		checkNotNull(subscriber);
+		checkNotNull(callback);
+		BigIntegersOptimizationsEventPublisher.INSTANCE.subscribeCacheEvent(subscriber, callback);
+	}
+
+	/**
+	 * Unsubscribes from big integers optimizations events.
+	 *
+	 * @param subscriber the subscriber object.
+	 */
+	public static void unsubscribeBigIntegersOptimizationsEvent(final Object subscriber) {
+		checkNotNull(subscriber);
+		BigIntegersOptimizationsEventPublisher.INSTANCE.unsubscribeCacheEvent(subscriber);
+	}
+
+	/**
+	 * Represents the block width used for big integer optimizations. Each block width defines a specific value and estimated memory usage. The choice
+	 * of block width impacts the performance and memory consumption of fixed-base exponentiation optimizations.
+	 */
+	public enum BlockWidth {
+
+		TINY(10, 393_216L),
+		SMALL(12, 1_572_864L),
+		STANDARD(16, 25_165_824L),
+		BIG(20, 402_653_184L),
+		BIGGER(22, 1_610_612_736L),
+		HUGE(24, 6_442_450_944L);
+
+		private final int value;
+		private final long memoryUsage;
+
+		BlockWidth(final int value, final long memoryUsage) {
+			this.value = value;
+			this.memoryUsage = memoryUsage;
+		}
+
+		public int getValue() {
+			return value;
+		}
+
+		public long getMemoryUsage() {
+			return memoryUsage;
+		}
 	}
 }

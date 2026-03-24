@@ -55,7 +55,7 @@ public final class ByteArrays {
 			B_prime[i] = B.get(offset + i);
 		}
 		if (n % Byte.SIZE != 0) {
-			B_prime[0] = (byte) (B.get(offset) & (byte) (Math.pow(2, n % Byte.SIZE) - 1));
+			B_prime[0] = (byte) (B.get(offset) & (byte) ((1 << (n % Byte.SIZE)) - 1)); // 1 << (n % Byte.SIZE) = 2^(n % 8)
 		}
 
 

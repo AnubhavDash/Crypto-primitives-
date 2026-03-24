@@ -1,0 +1,1111 @@
+[
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "ch.post.it.evoting.cryptoprimitives.internal.math.GenUniqueDecimalStringsBenchmark.genUniqueDecimalStrings",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 3,
+        "jvm" : "C:\\work\\jrepo-local\\tools\\java\\jdk-25+36\\bin\\java.exe",
+        "jvmArgs" : [
+            "-Djava.net.useSystemProxies=true",
+            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+            "--enable-native-access=ALL-UNNAMED",
+            "-Dclassworlds.conf=C:/work/jrepo-local/tools/maven/maven-3.9.11/bin/m2.conf",
+            "-Dmaven.home=C:/work/jrepo-local/tools/maven/maven-3.9.11",
+            "-Dlibrary.jansi.path=C:/work/jrepo-local/tools/maven/maven-3.9.11/lib/jansi-native",
+            "-Dmaven.multiModuleProjectDirectory=C:/work/projects/evotingecosystem/crypto-primitives"
+        ],
+        "jdkVersion" : "25",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25+36-LTS",
+        "warmupIterations" : 1,
+        "warmupTime" : "10 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 10,
+        "measurementTime" : "10 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "codeLength" : "4",
+            "numberOfCodes" : "10"
+        },
+        "primaryMetric" : {
+            "score" : 0.03741753301380965,
+            "scoreError" : 3.7627216757198676E-4,
+            "scoreConfidence" : [
+                0.03704126084623766,
+                0.03779380518138164
+            ],
+            "scorePercentiles" : {
+                "0.0" : 0.036420357630606186,
+                "50.0" : 0.03742389903975857,
+                "90.0" : 0.03791975809902079,
+                "95.0" : 0.0386993076563077,
+                "99.0" : 0.03891295505128325,
+                "99.9" : 0.03891295505128325,
+                "99.99" : 0.03891295505128325,
+                "99.999" : 0.03891295505128325,
+                "99.9999" : 0.03891295505128325,
+                "100.0" : 0.03891295505128325
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    0.03782177504141108,
+                    0.03759973532242541,
+                    0.037746710871427544,
+                    0.03791620010918355,
+                    0.03756725895761801,
+                    0.03747521864578259,
+                    0.037568194112608755,
+                    0.03791716125069666,
+                    0.038524505242236794,
+                    0.03732552260809525
+                ],
+                [
+                    0.03732147711369446,
+                    0.03723281035920653,
+                    0.037760163418188955,
+                    0.03792004663772347,
+                    0.037275577447044836,
+                    0.03737257943373454,
+                    0.03777970200339251,
+                    0.037498412853152356,
+                    0.03891295505128325,
+                    0.037250964704480104
+                ],
+                [
+                    0.03697367778952583,
+                    0.03651207367383447,
+                    0.03674548063180404,
+                    0.037731794173350736,
+                    0.0367888239384029,
+                    0.036647367900366046,
+                    0.036420357630606186,
+                    0.03667582476419592,
+                    0.03713504323965052,
+                    0.03710857548916653
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+            "jfr" : {
+                "score" : "NaN",
+                "scoreError" : "NaN",
+                "scoreConfidence" : [
+                    "NaN",
+                    "NaN"
+                ],
+                "scorePercentiles" : {
+                    "0.0" : "NaN",
+                    "50.0" : "NaN",
+                    "90.0" : "NaN",
+                    "95.0" : "NaN",
+                    "99.0" : "NaN",
+                    "99.9" : "NaN",
+                    "99.99" : "NaN",
+                    "99.999" : "NaN",
+                    "99.9999" : "NaN",
+                    "100.0" : "NaN"
+                },
+                "scoreUnit" : "---",
+                "rawData" : [
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ]
+                ]
+            }
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "ch.post.it.evoting.cryptoprimitives.internal.math.GenUniqueDecimalStringsBenchmark.genUniqueDecimalStrings",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 3,
+        "jvm" : "C:\\work\\jrepo-local\\tools\\java\\jdk-25+36\\bin\\java.exe",
+        "jvmArgs" : [
+            "-Djava.net.useSystemProxies=true",
+            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+            "--enable-native-access=ALL-UNNAMED",
+            "-Dclassworlds.conf=C:/work/jrepo-local/tools/maven/maven-3.9.11/bin/m2.conf",
+            "-Dmaven.home=C:/work/jrepo-local/tools/maven/maven-3.9.11",
+            "-Dlibrary.jansi.path=C:/work/jrepo-local/tools/maven/maven-3.9.11/lib/jansi-native",
+            "-Dmaven.multiModuleProjectDirectory=C:/work/projects/evotingecosystem/crypto-primitives"
+        ],
+        "jdkVersion" : "25",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25+36-LTS",
+        "warmupIterations" : 1,
+        "warmupTime" : "10 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 10,
+        "measurementTime" : "10 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "codeLength" : "4",
+            "numberOfCodes" : "100"
+        },
+        "primaryMetric" : {
+            "score" : 0.37355805892426314,
+            "scoreError" : 0.005600710604878056,
+            "scoreConfidence" : [
+                0.3679573483193851,
+                0.3791587695291412
+            ],
+            "scorePercentiles" : {
+                "0.0" : 0.3626760380026834,
+                "50.0" : 0.37161410458313154,
+                "90.0" : 0.3868752869399421,
+                "95.0" : 0.39115268863474845,
+                "99.0" : 0.3944189501498659,
+                "99.9" : 0.3944189501498659,
+                "99.99" : 0.3944189501498659,
+                "99.999" : 0.3944189501498659,
+                "99.9999" : 0.3944189501498659,
+                "100.0" : 0.3944189501498659
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    0.3944189501498659,
+                    0.36859592761848603,
+                    0.3662816064168773,
+                    0.3884802928496524,
+                    0.3688811264384774,
+                    0.36703765413975337,
+                    0.36718712093398925,
+                    0.3692562197688587,
+                    0.3678843547675103,
+                    0.3850452413952414
+                ],
+                [
+                    0.38496889290938485,
+                    0.3740555991921005,
+                    0.3727792814281987,
+                    0.3837540539503473,
+                    0.37798053214407196,
+                    0.37336692672365523,
+                    0.37437109123568596,
+                    0.3741232587716017,
+                    0.37610308010530275,
+                    0.3870786253337977
+                ],
+                [
+                    0.3798380805894193,
+                    0.36360090532286216,
+                    0.3645906780896828,
+                    0.3699927828949802,
+                    0.37044892773806437,
+                    0.3626760380026834,
+                    0.36285901472828846,
+                    0.369702402602203,
+                    0.3650162755046173,
+                    0.3763668259822369
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+            "jfr" : {
+                "score" : "NaN",
+                "scoreError" : "NaN",
+                "scoreConfidence" : [
+                    "NaN",
+                    "NaN"
+                ],
+                "scorePercentiles" : {
+                    "0.0" : "NaN",
+                    "50.0" : "NaN",
+                    "90.0" : "NaN",
+                    "95.0" : "NaN",
+                    "99.0" : "NaN",
+                    "99.9" : "NaN",
+                    "99.99" : "NaN",
+                    "99.999" : "NaN",
+                    "99.9999" : "NaN",
+                    "100.0" : "NaN"
+                },
+                "scoreUnit" : "---",
+                "rawData" : [
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ]
+                ]
+            }
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "ch.post.it.evoting.cryptoprimitives.internal.math.GenUniqueDecimalStringsBenchmark.genUniqueDecimalStrings",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 3,
+        "jvm" : "C:\\work\\jrepo-local\\tools\\java\\jdk-25+36\\bin\\java.exe",
+        "jvmArgs" : [
+            "-Djava.net.useSystemProxies=true",
+            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+            "--enable-native-access=ALL-UNNAMED",
+            "-Dclassworlds.conf=C:/work/jrepo-local/tools/maven/maven-3.9.11/bin/m2.conf",
+            "-Dmaven.home=C:/work/jrepo-local/tools/maven/maven-3.9.11",
+            "-Dlibrary.jansi.path=C:/work/jrepo-local/tools/maven/maven-3.9.11/lib/jansi-native",
+            "-Dmaven.multiModuleProjectDirectory=C:/work/projects/evotingecosystem/crypto-primitives"
+        ],
+        "jdkVersion" : "25",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25+36-LTS",
+        "warmupIterations" : 1,
+        "warmupTime" : "10 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 10,
+        "measurementTime" : "10 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "codeLength" : "4",
+            "numberOfCodes" : "1000"
+        },
+        "primaryMetric" : {
+            "score" : 5.184308130509925,
+            "scoreError" : 0.08501522363061674,
+            "scoreConfidence" : [
+                5.099292906879309,
+                5.269323354140542
+            ],
+            "scorePercentiles" : {
+                "0.0" : 4.949304007916873,
+                "50.0" : 5.188235059773008,
+                "90.0" : 5.356459694328303,
+                "95.0" : 5.437647856541244,
+                "99.0" : 5.440957857531267,
+                "99.9" : 5.440957857531267,
+                "99.99" : 5.440957857531267,
+                "99.999" : 5.440957857531267,
+                "99.9999" : 5.440957857531267,
+                "100.0" : 5.440957857531267
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    5.171102325581395,
+                    4.949304007916873,
+                    5.006868268268268,
+                    5.017465112781955,
+                    5.135103696098563,
+                    4.979413588850174,
+                    4.992175211970075,
+                    5.126185392106612,
+                    5.223573420365535,
+                    5.440957857531267
+                ],
+                [
+                    5.325350319488818,
+                    5.2439888306240166,
+                    5.20536779396462,
+                    5.2312964958159,
+                    5.434939673913044,
+                    5.309585881104034,
+                    5.214613451511991,
+                    5.258527970557308,
+                    5.359916291532691,
+                    5.313832306057385
+                ],
+                [
+                    5.253782825630252,
+                    5.131656564102564,
+                    5.118551944728761,
+                    5.1100817066939195,
+                    5.2723756457564575,
+                    5.10504808575804,
+                    5.139872661870504,
+                    5.095906113092206,
+                    5.143829460154242,
+                    5.2185710114702815
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+            "jfr" : {
+                "score" : "NaN",
+                "scoreError" : "NaN",
+                "scoreConfidence" : [
+                    "NaN",
+                    "NaN"
+                ],
+                "scorePercentiles" : {
+                    "0.0" : "NaN",
+                    "50.0" : "NaN",
+                    "90.0" : "NaN",
+                    "95.0" : "NaN",
+                    "99.0" : "NaN",
+                    "99.9" : "NaN",
+                    "99.99" : "NaN",
+                    "99.999" : "NaN",
+                    "99.9999" : "NaN",
+                    "100.0" : "NaN"
+                },
+                "scoreUnit" : "---",
+                "rawData" : [
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ]
+                ]
+            }
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "ch.post.it.evoting.cryptoprimitives.internal.math.GenUniqueDecimalStringsBenchmark.genUniqueDecimalStrings",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 3,
+        "jvm" : "C:\\work\\jrepo-local\\tools\\java\\jdk-25+36\\bin\\java.exe",
+        "jvmArgs" : [
+            "-Djava.net.useSystemProxies=true",
+            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+            "--enable-native-access=ALL-UNNAMED",
+            "-Dclassworlds.conf=C:/work/jrepo-local/tools/maven/maven-3.9.11/bin/m2.conf",
+            "-Dmaven.home=C:/work/jrepo-local/tools/maven/maven-3.9.11",
+            "-Dlibrary.jansi.path=C:/work/jrepo-local/tools/maven/maven-3.9.11/lib/jansi-native",
+            "-Dmaven.multiModuleProjectDirectory=C:/work/projects/evotingecosystem/crypto-primitives"
+        ],
+        "jdkVersion" : "25",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25+36-LTS",
+        "warmupIterations" : 1,
+        "warmupTime" : "10 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 10,
+        "measurementTime" : "10 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "codeLength" : "8",
+            "numberOfCodes" : "10"
+        },
+        "primaryMetric" : {
+            "score" : 0.07302984898683247,
+            "scoreError" : 0.0010273467488912304,
+            "scoreConfidence" : [
+                0.07200250223794125,
+                0.0740571957357237
+            ],
+            "scorePercentiles" : {
+                "0.0" : 0.0707970967399384,
+                "50.0" : 0.07259176881661826,
+                "90.0" : 0.07529718752711086,
+                "95.0" : 0.07611520204137026,
+                "99.0" : 0.07685567877041306,
+                "99.9" : 0.07685567877041306,
+                "99.99" : 0.07685567877041306,
+                "99.999" : 0.07685567877041306,
+                "99.9999" : 0.07685567877041306,
+                "100.0" : 0.07685567877041306
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    0.0755093574448807,
+                    0.07408639623088775,
+                    0.0741991304541374,
+                    0.07420926387652123,
+                    0.07685567877041306,
+                    0.07439033616258396,
+                    0.07537220040847395,
+                    0.07393472127753956,
+                    0.07416233842320329,
+                    0.07462207159484302
+                ],
+                [
+                    0.07390710949509283,
+                    0.0730129335581886,
+                    0.07193470095306599,
+                    0.07196985117376974,
+                    0.07425499008739428,
+                    0.07226402450920179,
+                    0.07259029396820789,
+                    0.07259324366502863,
+                    0.07245777591003942,
+                    0.07205896983277255
+                ],
+                [
+                    0.0720150840000288,
+                    0.07193287781581749,
+                    0.07117298358975818,
+                    0.0712517242116363,
+                    0.07360046733098809,
+                    0.07146215059448954,
+                    0.0707970967399384,
+                    0.07214018222347264,
+                    0.07100655364103,
+                    0.0711309616615691
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+            "jfr" : {
+                "score" : "NaN",
+                "scoreError" : "NaN",
+                "scoreConfidence" : [
+                    "NaN",
+                    "NaN"
+                ],
+                "scorePercentiles" : {
+                    "0.0" : "NaN",
+                    "50.0" : "NaN",
+                    "90.0" : "NaN",
+                    "95.0" : "NaN",
+                    "99.0" : "NaN",
+                    "99.9" : "NaN",
+                    "99.99" : "NaN",
+                    "99.999" : "NaN",
+                    "99.9999" : "NaN",
+                    "100.0" : "NaN"
+                },
+                "scoreUnit" : "---",
+                "rawData" : [
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ]
+                ]
+            }
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "ch.post.it.evoting.cryptoprimitives.internal.math.GenUniqueDecimalStringsBenchmark.genUniqueDecimalStrings",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 3,
+        "jvm" : "C:\\work\\jrepo-local\\tools\\java\\jdk-25+36\\bin\\java.exe",
+        "jvmArgs" : [
+            "-Djava.net.useSystemProxies=true",
+            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+            "--enable-native-access=ALL-UNNAMED",
+            "-Dclassworlds.conf=C:/work/jrepo-local/tools/maven/maven-3.9.11/bin/m2.conf",
+            "-Dmaven.home=C:/work/jrepo-local/tools/maven/maven-3.9.11",
+            "-Dlibrary.jansi.path=C:/work/jrepo-local/tools/maven/maven-3.9.11/lib/jansi-native",
+            "-Dmaven.multiModuleProjectDirectory=C:/work/projects/evotingecosystem/crypto-primitives"
+        ],
+        "jdkVersion" : "25",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25+36-LTS",
+        "warmupIterations" : 1,
+        "warmupTime" : "10 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 10,
+        "measurementTime" : "10 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "codeLength" : "8",
+            "numberOfCodes" : "100"
+        },
+        "primaryMetric" : {
+            "score" : 0.7249767450350946,
+            "scoreError" : 0.006175654017001387,
+            "scoreConfidence" : [
+                0.7188010910180932,
+                0.731152399052096
+            ],
+            "scorePercentiles" : {
+                "0.0" : 0.7117116772219455,
+                "50.0" : 0.7227534756966808,
+                "90.0" : 0.7416429914678013,
+                "95.0" : 0.7451647489597043,
+                "99.0" : 0.7474885060907257,
+                "99.9" : 0.7474885060907257,
+                "99.99" : 0.7474885060907257,
+                "99.999" : 0.7474885060907257,
+                "99.9999" : 0.7474885060907257,
+                "100.0" : 0.7474885060907257
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    0.7474885060907257,
+                    0.7210648666186013,
+                    0.7302947718145308,
+                    0.7245408346616432,
+                    0.7255539973882763,
+                    0.7320615485948477,
+                    0.718034824120603,
+                    0.7290465155270448,
+                    0.7246458445040215,
+                    0.7195601769911505
+                ],
+                [
+                    0.7419439614243324,
+                    0.7220479026785069,
+                    0.7262517682085542,
+                    0.7182268888250503,
+                    0.7221995667557224,
+                    0.7432634931252322,
+                    0.7199666186739616,
+                    0.7164598366528155,
+                    0.7280023293055757,
+                    0.7196909542314335
+                ],
+                [
+                    0.7387976656570879,
+                    0.7158070574762007,
+                    0.7215352860543972,
+                    0.7233073846376392,
+                    0.7117116772219455,
+                    0.7389342618590217,
+                    0.7163832617103567,
+                    0.713931160765277,
+                    0.7237812576886895,
+                    0.7147681317895941
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+            "jfr" : {
+                "score" : "NaN",
+                "scoreError" : "NaN",
+                "scoreConfidence" : [
+                    "NaN",
+                    "NaN"
+                ],
+                "scorePercentiles" : {
+                    "0.0" : "NaN",
+                    "50.0" : "NaN",
+                    "90.0" : "NaN",
+                    "95.0" : "NaN",
+                    "99.0" : "NaN",
+                    "99.9" : "NaN",
+                    "99.99" : "NaN",
+                    "99.999" : "NaN",
+                    "99.9999" : "NaN",
+                    "100.0" : "NaN"
+                },
+                "scoreUnit" : "---",
+                "rawData" : [
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ]
+                ]
+            }
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "ch.post.it.evoting.cryptoprimitives.internal.math.GenUniqueDecimalStringsBenchmark.genUniqueDecimalStrings",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 3,
+        "jvm" : "C:\\work\\jrepo-local\\tools\\java\\jdk-25+36\\bin\\java.exe",
+        "jvmArgs" : [
+            "-Djava.net.useSystemProxies=true",
+            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+            "--enable-native-access=ALL-UNNAMED",
+            "-Dclassworlds.conf=C:/work/jrepo-local/tools/maven/maven-3.9.11/bin/m2.conf",
+            "-Dmaven.home=C:/work/jrepo-local/tools/maven/maven-3.9.11",
+            "-Dlibrary.jansi.path=C:/work/jrepo-local/tools/maven/maven-3.9.11/lib/jansi-native",
+            "-Dmaven.multiModuleProjectDirectory=C:/work/projects/evotingecosystem/crypto-primitives"
+        ],
+        "jdkVersion" : "25",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25+36-LTS",
+        "warmupIterations" : 1,
+        "warmupTime" : "10 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 10,
+        "measurementTime" : "10 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "codeLength" : "8",
+            "numberOfCodes" : "1000"
+        },
+        "primaryMetric" : {
+            "score" : 8.463599638152376,
+            "scoreError" : 0.14274856108894277,
+            "scoreConfidence" : [
+                8.320851077063432,
+                8.606348199241319
+            ],
+            "scorePercentiles" : {
+                "0.0" : 8.075513478611784,
+                "50.0" : 8.489501950805767,
+                "90.0" : 8.75696820579379,
+                "95.0" : 8.856405235561917,
+                "99.0" : 8.885610124333926,
+                "99.9" : 8.885610124333926,
+                "99.99" : 8.885610124333926,
+                "99.999" : 8.885610124333926,
+                "99.9999" : 8.885610124333926,
+                "100.0" : 8.885610124333926
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    8.69309887054735,
+                    8.412914465937764,
+                    8.392608808724832,
+                    8.560608383233532,
+                    8.395752013422818,
+                    8.76406479859895,
+                    8.48892332485157,
+                    8.51925059625213,
+                    8.568211130136985,
+                    8.66011567099567
+                ],
+                [
+                    8.832510326566638,
+                    8.485784223918575,
+                    8.490080576759967,
+                    8.585684978540773,
+                    8.544338514090521,
+                    8.885610124333926,
+                    8.557250128314799,
+                    8.641333678756476,
+                    8.529042881500427,
+                    8.669815164644714
+                ],
+                [
+                    8.459197464074387,
+                    8.238420098846788,
+                    8.203861607875307,
+                    8.237012757201645,
+                    8.25216303630363,
+                    8.252934818481847,
+                    8.264609578860446,
+                    8.075513478611784,
+                    8.09167006472492,
+                    8.155607579462103
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+            "jfr" : {
+                "score" : "NaN",
+                "scoreError" : "NaN",
+                "scoreConfidence" : [
+                    "NaN",
+                    "NaN"
+                ],
+                "scorePercentiles" : {
+                    "0.0" : "NaN",
+                    "50.0" : "NaN",
+                    "90.0" : "NaN",
+                    "95.0" : "NaN",
+                    "99.0" : "NaN",
+                    "99.9" : "NaN",
+                    "99.99" : "NaN",
+                    "99.999" : "NaN",
+                    "99.9999" : "NaN",
+                    "100.0" : "NaN"
+                },
+                "scoreUnit" : "---",
+                "rawData" : [
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ]
+                ]
+            }
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "ch.post.it.evoting.cryptoprimitives.internal.math.GenUniqueDecimalStringsBenchmark.genUniqueDecimalStrings",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 3,
+        "jvm" : "C:\\work\\jrepo-local\\tools\\java\\jdk-25+36\\bin\\java.exe",
+        "jvmArgs" : [
+            "-Djava.net.useSystemProxies=true",
+            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+            "--enable-native-access=ALL-UNNAMED",
+            "-Dclassworlds.conf=C:/work/jrepo-local/tools/maven/maven-3.9.11/bin/m2.conf",
+            "-Dmaven.home=C:/work/jrepo-local/tools/maven/maven-3.9.11",
+            "-Dlibrary.jansi.path=C:/work/jrepo-local/tools/maven/maven-3.9.11/lib/jansi-native",
+            "-Dmaven.multiModuleProjectDirectory=C:/work/projects/evotingecosystem/crypto-primitives"
+        ],
+        "jdkVersion" : "25",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25+36-LTS",
+        "warmupIterations" : 1,
+        "warmupTime" : "10 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 10,
+        "measurementTime" : "10 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "codeLength" : "12",
+            "numberOfCodes" : "10"
+        },
+        "primaryMetric" : {
+            "score" : 0.10704359718475523,
+            "scoreError" : 0.0015745437442638238,
+            "scoreConfidence" : [
+                0.1054690534404914,
+                0.10861814092901906
+            ],
+            "scorePercentiles" : {
+                "0.0" : 0.10330292549894632,
+                "50.0" : 0.10732294728572737,
+                "90.0" : 0.11033939196867863,
+                "95.0" : 0.11272590897373935,
+                "99.0" : 0.11289220305691644,
+                "99.9" : 0.11289220305691644,
+                "99.99" : 0.11289220305691644,
+                "99.999" : 0.11289220305691644,
+                "99.9999" : 0.11289220305691644,
+                "100.0" : 0.11289220305691644
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    0.11258985017841264,
+                    0.10759323084205656,
+                    0.10722807628808508,
+                    0.10640827073269349,
+                    0.10869279007086033,
+                    0.1075874622112726,
+                    0.10930870411051728,
+                    0.10776829328736127,
+                    0.10749149533011618,
+                    0.10850086256469235
+                ],
+                [
+                    0.10717238064619836,
+                    0.10419980516977319,
+                    0.10364086222084046,
+                    0.10330292549894632,
+                    0.10461869527465975,
+                    0.10504214274460374,
+                    0.10629218145487011,
+                    0.10386423007415717,
+                    0.10471276397483012,
+                    0.10361488618821164
+                ],
+                [
+                    0.11289220305691644,
+                    0.10750350420827466,
+                    0.10764438452596228,
+                    0.10665837981379377,
+                    0.10741781828336967,
+                    0.10759120583552094,
+                    0.11045391284180767,
+                    0.1074258904786457,
+                    0.10709457407506559,
+                    0.10699613356014165
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+            "jfr" : {
+                "score" : "NaN",
+                "scoreError" : "NaN",
+                "scoreConfidence" : [
+                    "NaN",
+                    "NaN"
+                ],
+                "scorePercentiles" : {
+                    "0.0" : "NaN",
+                    "50.0" : "NaN",
+                    "90.0" : "NaN",
+                    "95.0" : "NaN",
+                    "99.0" : "NaN",
+                    "99.9" : "NaN",
+                    "99.99" : "NaN",
+                    "99.999" : "NaN",
+                    "99.9999" : "NaN",
+                    "100.0" : "NaN"
+                },
+                "scoreUnit" : "---",
+                "rawData" : [
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ]
+                ]
+            }
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "ch.post.it.evoting.cryptoprimitives.internal.math.GenUniqueDecimalStringsBenchmark.genUniqueDecimalStrings",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 3,
+        "jvm" : "C:\\work\\jrepo-local\\tools\\java\\jdk-25+36\\bin\\java.exe",
+        "jvmArgs" : [
+            "-Djava.net.useSystemProxies=true",
+            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+            "--enable-native-access=ALL-UNNAMED",
+            "-Dclassworlds.conf=C:/work/jrepo-local/tools/maven/maven-3.9.11/bin/m2.conf",
+            "-Dmaven.home=C:/work/jrepo-local/tools/maven/maven-3.9.11",
+            "-Dlibrary.jansi.path=C:/work/jrepo-local/tools/maven/maven-3.9.11/lib/jansi-native",
+            "-Dmaven.multiModuleProjectDirectory=C:/work/projects/evotingecosystem/crypto-primitives"
+        ],
+        "jdkVersion" : "25",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25+36-LTS",
+        "warmupIterations" : 1,
+        "warmupTime" : "10 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 10,
+        "measurementTime" : "10 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "codeLength" : "12",
+            "numberOfCodes" : "100"
+        },
+        "primaryMetric" : {
+            "score" : 1.0963432973705531,
+            "scoreError" : 0.027645535854916647,
+            "scoreConfidence" : [
+                1.0686977615156366,
+                1.1239888332254697
+            ],
+            "scorePercentiles" : {
+                "0.0" : 1.0541882681564245,
+                "50.0" : 1.0828510363917614,
+                "90.0" : 1.1690615482749604,
+                "95.0" : 1.1820327856777513,
+                "99.0" : 1.1832839091339329,
+                "99.9" : 1.1832839091339329,
+                "99.99" : 1.1832839091339329,
+                "99.999" : 1.1832839091339329,
+                "99.9999" : 1.1832839091339329,
+                "100.0" : 1.1832839091339329
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    1.0925634735117422,
+                    1.079954151819458,
+                    1.056446524403127,
+                    1.0612900573005093,
+                    1.0660517322247096,
+                    1.0605771898197243,
+                    1.100730552498349,
+                    1.0597213264116963,
+                    1.0588844150344097,
+                    1.0619197048518951
+                ],
+                [
+                    1.0903429303390384,
+                    1.0973093921439543,
+                    1.0541882681564245,
+                    1.0625422607032826,
+                    1.0664270633397313,
+                    1.065313334753435,
+                    1.1007112040501872,
+                    1.070311772260274,
+                    1.06594494777233,
+                    1.0694509088964927
+                ],
+                [
+                    1.09939993405144,
+                    1.1258104682575416,
+                    1.0857479209640648,
+                    1.1510127057198758,
+                    1.1832839091339329,
+                    1.1810091392136026,
+                    1.1596470376811594,
+                    1.170107605007605,
+                    1.1463281751490142,
+                    1.1472708156475853
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+            "jfr" : {
+                "score" : "NaN",
+                "scoreError" : "NaN",
+                "scoreConfidence" : [
+                    "NaN",
+                    "NaN"
+                ],
+                "scorePercentiles" : {
+                    "0.0" : "NaN",
+                    "50.0" : "NaN",
+                    "90.0" : "NaN",
+                    "95.0" : "NaN",
+                    "99.0" : "NaN",
+                    "99.9" : "NaN",
+                    "99.99" : "NaN",
+                    "99.999" : "NaN",
+                    "99.9999" : "NaN",
+                    "100.0" : "NaN"
+                },
+                "scoreUnit" : "---",
+                "rawData" : [
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ]
+                ]
+            }
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "ch.post.it.evoting.cryptoprimitives.internal.math.GenUniqueDecimalStringsBenchmark.genUniqueDecimalStrings",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 3,
+        "jvm" : "C:\\work\\jrepo-local\\tools\\java\\jdk-25+36\\bin\\java.exe",
+        "jvmArgs" : [
+            "-Djava.net.useSystemProxies=true",
+            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+            "--enable-native-access=ALL-UNNAMED",
+            "-Dclassworlds.conf=C:/work/jrepo-local/tools/maven/maven-3.9.11/bin/m2.conf",
+            "-Dmaven.home=C:/work/jrepo-local/tools/maven/maven-3.9.11",
+            "-Dlibrary.jansi.path=C:/work/jrepo-local/tools/maven/maven-3.9.11/lib/jansi-native",
+            "-Dmaven.multiModuleProjectDirectory=C:/work/projects/evotingecosystem/crypto-primitives"
+        ],
+        "jdkVersion" : "25",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25+36-LTS",
+        "warmupIterations" : 1,
+        "warmupTime" : "10 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 10,
+        "measurementTime" : "10 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "codeLength" : "12",
+            "numberOfCodes" : "1000"
+        },
+        "primaryMetric" : {
+            "score" : 12.744253563190293,
+            "scoreError" : 0.49956882512496786,
+            "scoreConfidence" : [
+                12.244684738065326,
+                13.24382238831526
+            ],
+            "scorePercentiles" : {
+                "0.0" : 11.881410095011876,
+                "50.0" : 12.551856234050426,
+                "90.0" : 13.943844362329227,
+                "95.0" : 14.003029913233485,
+                "99.0" : 14.0324095371669,
+                "99.9" : 14.0324095371669,
+                "99.99" : 14.0324095371669,
+                "99.999" : 14.0324095371669,
+                "99.9999" : 14.0324095371669,
+                "100.0" : 14.0324095371669
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    13.978992039106146,
+                    13.957541004184101,
+                    13.477212786002692,
+                    14.0324095371669,
+                    13.774043466299862,
+                    13.82057458563536,
+                    13.58859347826087,
+                    13.70026493150685,
+                    13.233918121693122,
+                    13.252170331125829
+                ],
+                [
+                    12.7852625798212,
+                    13.022611979166667,
+                    12.652702781289507,
+                    12.584840503144655,
+                    12.774763090676883,
+                    12.212715628815628,
+                    11.881410095011876,
+                    12.281825889570552,
+                    11.986077724550897,
+                    11.894436385255649
+                ],
+                [
+                    12.518871964956196,
+                    12.240589486552567,
+                    12.381161633663366,
+                    11.975461842105263,
+                    11.950416487455197,
+                    12.056957590361446,
+                    11.927885458879619,
+                    12.370530531520396,
+                    12.03265204326923,
+                    11.980712918660288
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+            "jfr" : {
+                "score" : "NaN",
+                "scoreError" : "NaN",
+                "scoreConfidence" : [
+                    "NaN",
+                    "NaN"
+                ],
+                "scorePercentiles" : {
+                    "0.0" : "NaN",
+                    "50.0" : "NaN",
+                    "90.0" : "NaN",
+                    "95.0" : "NaN",
+                    "99.0" : "NaN",
+                    "99.9" : "NaN",
+                    "99.99" : "NaN",
+                    "99.999" : "NaN",
+                    "99.9999" : "NaN",
+                    "100.0" : "NaN"
+                },
+                "scoreUnit" : "---",
+                "rawData" : [
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ],
+                    [
+                        "NaN"
+                    ]
+                ]
+            }
+        }
+    }
+]
+
+

@@ -31,42 +31,35 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
 import ch.post.it.evoting.cryptoprimitives.internal.utils.ConversionsInternal;
 
-@State(Scope.Benchmark)
+@Warmup(iterations = 1)
+@Fork(value = 1)
+@Measurement(iterations = 5)
 public class ConversionServiceBenchmark {
 
 	private static final TestRandomService randomService = new TestRandomService();
 
-	@Param({ "3072" })
-	static int bitLength;
-
 	@Benchmark
-	@Warmup(iterations = 4, time = 5)
-	@Fork(value = 1)
-	@Measurement(iterations = 4, time = 5)
 	public ImmutableByteArray bigIntegerToByteArray(final MyState state) {
 		return ConversionsInternal.integerToByteArray(state.randomBigInteger);
 	}
 
 	@Benchmark
-	@Warmup(iterations = 4, time = 5)
-	@Fork(value = 1)
-	@Measurement(iterations = 4, time = 5)
 	public ImmutableByteArray bigIntegerToFixedLengthByteArrayUsingJdk(final MyState state) {
-		return ConversionsInternal.integerToFixedLengthByteArray(state.randomBigInteger, bitLength);
+		return ConversionsInternal.integerToFixedLengthByteArray(state.randomBigInteger, state.bitLength);
 	}
 
 	@Benchmark
-	@Warmup(iterations = 4, time = 5)
-	@Fork(value = 1)
-	@Measurement(iterations = 4, time = 5)
 	public ImmutableByteArray bigIntegerToFixedLengthByteArray(final MyState state) {
-		return ConversionsEquivalenceTest.integerToFixedLengthByteArraySpec(state.randomBigInteger, bitLength);
+		return ConversionsEquivalenceTest.integerToFixedLengthByteArraySpec(state.randomBigInteger, state.bitLength);
 	}
 
 	@State(Scope.Thread)
 	public static class MyState {
 
 		private BigInteger randomBigInteger;
+
+		@Param({ "3072" })
+		int bitLength;
 
 		@Setup(Level.Invocation)
 		public void genRandomBigInteger() {

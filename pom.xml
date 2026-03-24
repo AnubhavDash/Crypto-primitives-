@@ -19,7 +19,7 @@
 
 	<groupId>ch.post.it.evoting.cryptoprimitives</groupId>
 	<artifactId>crypto-primitives</artifactId>
-	<version>1.5.3.0-b5</version>
+	<version>1.6.0.0-b9</version>
 	<packaging>jar</packaging>
 
 	<name>Crypto Primitives</name>
@@ -29,16 +29,16 @@
 		<archunit.version>1.4.1</archunit.version>
 		<guava.version>33.5.0-jre</guava.version>
 		<bouncycastle.version>1.83</bouncycastle.version>
-		<jackson.version>2.21.1</jackson.version>
+		<jackson.version>3.0.4</jackson.version>
 		<jmh.version>1.37</jmh.version>
-		<junit-jupiter.version>5.14.3</junit-jupiter.version>
-		<junit-platform-launcher.version>1.14.3</junit-platform-launcher.version>
+		<junit-jupiter.version>6.0.3</junit-jupiter.version>
 		<mockito.version>5.21.0</mockito.version>
 		<slf4j.version>2.0.17</slf4j.version>
 		<reproducible-build-maven-plugin.version>0.17.0</reproducible-build-maven-plugin.version>
 
 		<!-- Plugins versions -->
 		<exec-maven-plugin.version>3.6.3</exec-maven-plugin.version>
+		<hash-generator-maven-plugin.version>1.0.0.0-b2</hash-generator-maven-plugin.version>
 		<jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
 		<maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
 		<maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
@@ -58,10 +58,10 @@
 
 		<!-- Project settings -->
 		<maven.compiler.release>25</maven.compiler.release>
-		<maven-enforcer-plugin.requiredJavaVersion>[25.0.2]</maven-enforcer-plugin.requiredJavaVersion>
+		<maven-enforcer-plugin.requiredJavaVersion>[25.0.1]</maven-enforcer-plugin.requiredJavaVersion>
 		<maven-enforcer-plugin.requiredMavenVersion>[3.9.11]</maven-enforcer-plugin.requiredMavenVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.outputTimestamp>2026-03-02T13:48:44+02:00</project.build.outputTimestamp>
+		<project.build.outputTimestamp>2026-03-24T08:23:44+02:00</project.build.outputTimestamp>
 
 		<!--  Sonar  -->
 		<sonar.scm.disabled>true</sonar.scm.disabled>
@@ -123,7 +123,7 @@
 
 			<!-- com.fasterxml.jackson -->
 			<dependency>
-				<groupId>com.fasterxml.jackson</groupId>
+				<groupId>tools.jackson</groupId>
 				<artifactId>jackson-bom</artifactId>
 				<version>${jackson.version}</version>
 				<type>pom</type>
@@ -143,7 +143,7 @@
 			<dependency>
 				<groupId>org.junit.platform</groupId>
 				<artifactId>junit-platform-launcher</artifactId>
-				<version>${junit-platform-launcher.version}</version>
+				<version>${junit-jupiter.version}</version>
 			</dependency>
 		</dependencies>
 
@@ -189,12 +189,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
+			<groupId>tools.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
+			<groupId>tools.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<scope>test</scope>
 		</dependency>
@@ -237,6 +237,13 @@
 					<configuration>
 						<source>${maven.compiler.release}</source>
 						<target>${maven.compiler.release}</target>
+						<annotationProcessorPaths>
+							<path>
+								<groupId>org.openjdk.jmh</groupId>
+								<artifactId>jmh-generator-annprocess</artifactId>
+								<version>${jmh.version}</version>
+							</path>
+						</annotationProcessorPaths>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -360,6 +367,26 @@
 							<goal>properties</goal>
 						</goals>
 					</execution>
+					<execution>
+						<id>build-classpath</id>
+						<goals>
+							<goal>build-classpath</goal>
+						</goals>
+						<configuration>
+							<includeScope>runtime</includeScope>
+							<outputProperty>depClasspath</outputProperty>
+						</configuration>
+					</execution>
+					<execution>
+						<id>build-test-classpath</id>
+						<goals>
+							<goal>build-classpath</goal>
+						</goals>
+						<configuration>
+							<includeScope>test</includeScope>
+							<outputProperty>depTestClasspath</outputProperty>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -410,6 +437,14 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<executions>
 					<execution>
+						<id>test-jar</id>
+						<configuration>
+							<excludes>
+								<exclude>**/benchmark-results</exclude>
+								<exclude>**/benchmark/*</exclude>
+								<exclude>**/*Benchmark*</exclude>
+							</excludes>
+						</configuration>
 						<goals>
 							<goal>test-jar</goal>
 						</goals>
@@ -452,23 +487,30 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>${exec-maven-plugin.version}</version>
+				<configuration>
+					<mainClass>ch.post.it.evoting.cryptoprimitives.benchmark.BenchmarkRunner</mainClass>
+					<systemProperties>
+						<systemProperty>
+							<key>java.class.path</key>
+							<value>${project.build.outputDirectory}${path.separator}${depClasspath};${project.build.testOutputDirectory}${path.separator}${depTestClasspath}</value>
+						</systemProperty>
+					</systemProperties>
+					<classpathScope>test</classpathScope>
+				</configuration>
 				<inherited>false</inherited>
+			</plugin>
+			<plugin>
+				<groupId>ch.post.it.evoting.hashgenerator</groupId>
+				<artifactId>hash-generator-maven-plugin</artifactId>
+				<version>${hash-generator-maven-plugin.version}</version>
+				<configuration>
+					<excludeClassifiers>javadoc,sources,tests</excludeClassifiers>
+				</configuration>
 				<executions>
 					<execution>
-						<id>run-custom-script</id>
-						<phase>install</phase>
 						<goals>
-							<goal>exec</goal>
+							<goal>hash-generator</goal>
 						</goals>
-						<configuration>
-							<executable>bash</executable>
-							<arguments>
-								<argument>./reproducible-build/generateChecksum.sh</argument>
-								<argument>${project.artifactId}</argument>
-								<argument>${project.version}</argument>
-								<argument>./target</argument>
-							</arguments>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
