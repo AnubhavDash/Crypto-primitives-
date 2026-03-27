@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.IntStream;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import org.bouncycastle.crypto.digests.SHAKEDigest;
 
@@ -43,12 +42,12 @@ import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
  */
 public final class EncryptionParameters {
 
+	private static final BigInteger ZERO = BigInteger.ZERO;
 	private static final BigInteger ONE = BigInteger.ONE;
 	private static final BigInteger TWO = BigInteger.TWO;
 	private static final BigInteger THREE = BigInteger.valueOf(3);
 	private static final BigInteger FIVE = BigInteger.valueOf(5);
 	private static final BigInteger SIX = BigInteger.valueOf(6);
-	private static final int OMEGA = 50_000; // Number of candidate offsets tested per chunk
 
 	private final SecurityLevelInternal securityLevel;
 
@@ -71,70 +70,53 @@ public final class EncryptionParameters {
 	 * @throws NullPointerException     if any of the inputs is null.
 	 * @throws IllegalArgumentException if any of the numbers in small primes list is not a prime.
 	 */
-	@SuppressWarnings({ "java:S117", "java:S3776" })
+	@SuppressWarnings({"java:S117", "java:S3776"})
 	public GqGroup getEncryptionParameters(final String seed, final ImmutableList<Integer> smallPrimes) {
 		checkNotNull(seed);
 		checkNotNull(smallPrimes);
 		smallPrimes.forEach(prime -> checkArgument(PrimesInternal.isSmallPrime(prime), "The given number is not a prime. [Number: %s]", prime));
 
-		final int[] sp = smallPrimes.stream()
-				.mapToInt(Integer::intValue)
-				.toArray();
-
 		final int lambda = securityLevel.getSecurityStrength();
-		// getPBitLength ensures |p| mod 8 = 0.
+		final ArrayList<BigInteger> sp = smallPrimes.stream().map(BigInteger::valueOf)
+				.collect(Collectors.toCollection(ArrayList::new));
+		final int l = smallPrimes.size();
 		final int pBitLength = securityLevel.getPBitLength();
 
-		// Operation.
-		final ImmutableByteArray q_b_hat = shake256(stringToByteArray(seed), pBitLength / Byte.SIZE);
+		final ImmutableByteArray q_b_hat = shake256(stringToByteArray(seed), pBitLength / 8);
 		final ImmutableByteArray q_b = ImmutableByteArray.concat(ImmutableByteArray.of((byte) 0x02), q_b_hat);
 		final BigInteger q_prime = byteArrayToInteger(q_b).shiftRight(3);
-		final BigInteger q = q_prime.subtract(q_prime.mod(SIX)).add(FIVE);
-
-		final int[] r = Arrays.stream(sp)
-				.map(sp_i -> q.mod(BigInteger.valueOf(sp_i)).intValue())
-				.toArray();
-
-		long kappa = 0;
-
-		while (true) {
-			final long mu = kappa * OMEGA;
-
-			final ImmutableList<BigInteger> C = IntStream.range(0, OMEGA)
-					.parallel()
-					.mapToObj(k -> {
-						final long delta = 6 * (mu + k + 1);
-						if (!passesSmallPrimeSieve(r, delta, sp)) {
-							return null;
-						}
-
-						final BigInteger q_cand = q.add(BigInteger.valueOf(delta));
-						if (!millerRabin(q_cand, 1)) {
-							return null;
-						}
-
-						if (!millerRabin(TWO.multiply(q_cand).add(ONE), 1)) {
-							return null;
-						}
-
-						return q_cand;
-					})
-					.filter(Objects::nonNull)
-					// Ensure ascending order of the candidates.
-					.sorted(BigInteger::compareTo)
-					.collect(ImmutableList.toImmutableList());
-
-			for (final BigInteger q_cand : C) {
-				final BigInteger p_cand = TWO.multiply(q_cand).add(ONE);
-
-				if (millerRabin(q_cand, lambda / 2) && millerRabin(p_cand, lambda / 2)) {
-					final BigInteger g = isTwoGroupMember(p_cand) ? TWO : THREE;
-
-					return new GqGroup(p_cand, q_cand, g);
-				}
-			}
-			kappa++;
+		BigInteger q = q_prime.subtract(q_prime.mod(SIX)).add(FIVE);
+		final ArrayList<BigInteger> r = new ArrayList<>(l);
+		for (int i = 0; i < l; i++) {
+			r.add(i, q.mod(sp.get(i)));
 		}
+		BigInteger delta = ZERO;
+		do {
+			do {
+				delta = delta.add(SIX);
+				int i = 0;
+				while (i < l) {
+					if ((r.get(i).add(delta).mod(sp.get(i)).equals(ZERO)) || (TWO.multiply(r.get(i).add(delta)).add(ONE).mod(sp.get(i))
+							.equals(ZERO))) {
+						delta = delta.add(SIX);
+						i = 0;
+					} else {
+						i = i + 1;
+					}
+				}
+			} while (!(millerRabin(q.add(delta), 1)) || !(millerRabin(TWO.multiply(q.add(delta)).add(ONE), 1)));
+		} while (!(millerRabin(q.add(delta), lambda / 2)) || !(millerRabin(TWO.multiply(q.add(delta)).add(ONE), lambda / 2)));
+		q = q.add(delta);
+		final BigInteger p = TWO.multiply(q).add(ONE);
+
+		final BigInteger g;
+		if (isTwoGroupMember(p)) {
+			g = TWO;
+		} else {
+			g = THREE;
+		}
+
+		return new GqGroup(p, q, g);
 	}
 
 	private ImmutableByteArray shake256(final ImmutableByteArray message, final int outputLength) {
@@ -154,41 +136,4 @@ public final class EncryptionParameters {
 		return BigIntegerOperationsService.getLegendre(TWO, p) == 1;
 	}
 
-	/**
-	 * Word-sized sieve for rejecting composite safe-prime candidates.
-	 * <p>
-	 * This method tests whether a candidate safe-prime offset {@code delta} passes a small-prime divisibility sieve. For each small prime
-	 * {@code sp[i]}, it checks that neither the candidate {@code qCandidate = qBase + delta} nor the associated value
-	 * {@code pCandidate = 2 · qCandidate + 1} is divisible by {@code sp[i]}.
-	 * </p>
-	 * <p>
-	 * The test is performed using word-sized modular arithmetic. For each small prime {@code sp[i]}, the offset {@code delta} is reduced modulo
-	 * {@code sp[i]} and added to the corresponding precomputed residue {@code r[i]}, where {@code r[i]} denotes the residue of the fixed base value
-	 * modulo {@code sp[i]}. This allows efficient rejection of composite candidates before applying probabilistic primality tests.
-	 * </p>
-	 * <p>
-	 * <strong>Performance considerations:</strong> This method is performance-critical
-	 * and intentionally avoids any input validation or defensive checks. It is a private helper invoked in a controlled context, and all inputs are
-	 * assumed to satisfy the required preconditions by contract.
-	 * </p>
-	 *
-	 * @param r     the precomputed residues of the fixed base value modulo the small primes; assumed to be aligned with {@code sp}.
-	 * @param delta the non-negative offset applied to the base value.
-	 * @param sp    the small primes used for trial division.
-	 * @return {@code true} if both {@code qCandidate} and {@code pCandidate} are not divisible by any of the given small primes; {@code false}
-	 * otherwise.
-	 */
-	private static boolean passesSmallPrimeSieve(final int[] r, final long delta, final int[] sp) {
-		final int l = sp.length;
-		for (int i = 0; i < l; i++) {
-			final int r_prime = (r[i] + (int) (delta % sp[i])) % sp[i];
-			if (r_prime == 0) {
-				return false;
-			}
-			if ((2 * r_prime + 1) % sp[i] == 0) {
-				return false;
-			}
-		}
-		return true;
-	}
 }

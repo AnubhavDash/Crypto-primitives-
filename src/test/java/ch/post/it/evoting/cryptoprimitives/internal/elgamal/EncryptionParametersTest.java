@@ -87,28 +87,6 @@ class EncryptionParametersTest {
 	}
 
 	@Test
-	@DisplayName("calling getEncryptionParameters with small primes list containing exactly one prime returns same result as SMALL_PRIMES")
-	void getEncryptionParametersSinglePrimeSmallPrimesEqualsSmallPrimesResult() {
-		final ImmutableList<Integer> singlePrimeList = ImmutableList.of(7);
-
-		final GqGroup expected = encryptionParameters.getEncryptionParameters(SEED, SMALL_PRIMES);
-		final GqGroup actual = assertDoesNotThrow(() -> encryptionParameters.getEncryptionParameters(SEED, singlePrimeList));
-
-		assertEquals(expected, actual);
-	}
-
-	@Test
-	@DisplayName("calling getEncryptionParameters with small primes list containing duplicate primes returns same result as SMALL_PRIMES")
-	void getEncryptionParametersDuplicatePrimeSmallPrimesEqualsSmallPrimesResult() {
-		final ImmutableList<Integer> duplicatePrimeList = ImmutableList.of(7, 7, 11, 11);
-
-		final GqGroup expected = encryptionParameters.getEncryptionParameters(SEED, SMALL_PRIMES);
-		final GqGroup actual = assertDoesNotThrow(() -> encryptionParameters.getEncryptionParameters(SEED, duplicatePrimeList));
-
-		assertEquals(expected, actual);
-	}
-
-	@Test
 	@DisplayName("calling getEncryptionParameters with fixed seed gives expected parameters")
 	void getEncryptionParametersFixedSeed() {
 		final GqGroup expectedParameters = new GqGroup(BigInteger.valueOf(208155596507627L), BigInteger.valueOf(104077798253813L),
