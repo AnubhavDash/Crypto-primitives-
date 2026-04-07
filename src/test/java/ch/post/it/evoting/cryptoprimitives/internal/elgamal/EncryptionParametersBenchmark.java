@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2026 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,32 +15,42 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
+import java.util.concurrent.TimeUnit;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 import ch.post.it.evoting.cryptoprimitives.internal.math.PrimesInternal;
-import ch.post.it.evoting.cryptoprimitives.internal.math.TestRandomService;
-import ch.post.it.evoting.cryptoprimitives.math.Base64Alphabet;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 
+@BenchmarkMode(value = Mode.AverageTime)
+@Fork(value = 1)
+@Measurement(iterations = 5)
+@Warmup(iterations = 1)
+@OutputTimeUnit(TimeUnit.SECONDS)
 public class EncryptionParametersBenchmark {
 
 	private static final ImmutableList<Integer> SMALL_PRIMES = PrimesInternal.getSmallPrimes();
 	public static final EncryptionParameters encryptionParameters = new EncryptionParameters();
-	static final TestRandomService randomService = new TestRandomService();
 
 	@Benchmark
-	@Warmup(iterations = 0)
-	@Fork(value = 10)
-	@Measurement(iterations = 10)
-	@BenchmarkMode(Mode.AverageTime)
-	public GqGroup benchGetEncryptionParameters() {
-		final String seed = randomService.genRandomString(10, Base64Alphabet.getInstance());
-		return encryptionParameters.getEncryptionParameters(seed, SMALL_PRIMES);
+	public GqGroup benchGetEncryptionParameters(final BenchmarkState state) {
+		return encryptionParameters.getEncryptionParameters(state.seed, SMALL_PRIMES);
+	}
+
+	@State(Scope.Benchmark)
+	public static class BenchmarkState {
+
+		@Param({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" })
+		String seed;
 	}
 }

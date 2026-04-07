@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2026 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,7 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.TWO;
-
 import java.math.BigInteger;
-import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +23,8 @@ import org.slf4j.LoggerFactory;
 import com.verificatum.vmgj.VMG;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizations;
+import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizationsCacheKey;
 
 /**
  * <p>This class is thread-safe.</p>
@@ -37,7 +33,6 @@ public class BigIntegerOperationsService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BigIntegerOperationsService.class);
 	private static final BigIntegerOperations bigIntegerOperations;
-	private static final RandomService randomService;
 
 	static {
 		if (VMG.checkLoaded()) {
@@ -48,7 +43,6 @@ public class BigIntegerOperationsService {
 					+ "integer operations will now take longer. Verify that the libraries GMP, GMPMEE and VMGJ are installed and referenced in the java.library.path");
 			bigIntegerOperations = new BigIntegerOperationsJava();
 		}
-		randomService = new RandomService();
 	}
 
 	private BigIntegerOperationsService() {
@@ -75,58 +69,19 @@ public class BigIntegerOperationsService {
 		return bigIntegerOperations.getLegendre(a, p);
 	}
 
-	public static void generateCache(final BigInteger basis, final BigInteger modulus) {
+	public static void generateCache(final BigInteger basis, final BigInteger modulus, final BigIntegersOptimizations.BlockWidth blockWidth) {
 		if (bigIntegerOperations.isFixedBaseExponentiationSupported()) {
-			bigIntegerOperations.generateCache(basis, modulus);
+			bigIntegerOperations.generateCache(basis, modulus, blockWidth);
 		}
 	}
 
-	/**
-	 * Runs the Miller-Rabin probabilistic primality test.
-	 *
-	 * @param candidate n, an odd integer greater than 3 to be tested. Must be non-null.
-	 * @param rounds    t, the number of rounds to be done. Must be strictly positive.
-	 * @return {@code true} if the candidate is probably prime, {@code false} if the candidate is definitely composite.
-	 */
-	@SuppressWarnings("java:S117")
-	public static boolean millerRabin(final BigInteger candidate, final int rounds) {
-		checkNotNull(candidate);
-		checkArgument(candidate.compareTo(TWO) > 0, "n must be at least three.");
-		checkArgument(candidate.mod(TWO).equals(ONE), "n must be odd.");
-		checkArgument(rounds > 0, "The number of rounds must be strictly positive.");
-
-		// For n = 3, we cannot choose a random integer a, 2 <= a <= n - 2
-		if (candidate.equals(BigInteger.valueOf(3))) {
-			return true;
+	public static void releaseCache(final BigIntegersOptimizationsCacheKey key) {
+		if (bigIntegerOperations.isFixedBaseExponentiationSupported()) {
+			bigIntegerOperations.releaseCache(key);
 		}
+	}
 
-		final BigInteger n = candidate;
-		final int t = rounds;
-
-		// Write n - 1 = 2^s * r such that r is odd
-		final BigInteger n_minus_one = n.subtract(ONE);
-		final int s = n_minus_one.getLowestSetBit();
-		final BigInteger r = n_minus_one.shiftRight(s);
-		return IntStream.range(0, t).parallel().allMatch(i -> {
-			// Choose a random integer a, 2 <= a <= n - 2
-			BigInteger a;
-			do {
-				a = randomService.genRandomInteger(n_minus_one);
-			} while (a.compareTo(ONE) <= 0 || a.compareTo(n_minus_one) >= 0);
-
-			BigInteger y = bigIntegerOperations.modExponentiate(a, r, n);
-			if (!y.equals(ONE) && !y.equals(n_minus_one)) {
-				int j = 1;
-				while (j <= s - 1 && !y.equals(n_minus_one)) {
-					y = bigIntegerOperations.modExponentiate(y, TWO, n);
-					if (y.equals(ONE)) {
-						return false;
-					}
-					j = j + 1;
-				}
-				return y.equals(n_minus_one);
-			}
-			return true;
-		});
+	public static boolean millerRabin(final BigInteger candidate, final int rounds) {
+		return bigIntegerOperations.millerRabin(candidate, rounds);
 	}
 }

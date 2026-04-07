@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2026 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package ch.post.it.evoting.cryptoprimitives.internal.elgamal;
 
 import static ch.post.it.evoting.cryptoprimitives.internal.elgamal.ElGamalMultiRecipientMessages.getMessage;
-import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static ch.post.it.evoting.cryptoprimitives.math.GqElement.GqElementFactory;
+import static ch.post.it.evoting.cryptoprimitives.math.GroupVector.toGroupVector;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,9 +36,6 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 
 public class ElGamalMultiRecipientCiphertexts {
-
-	private static final boolean ENABLE_PARALLEL_STREAMS = Boolean.parseBoolean(
-			System.getProperty("enable.parallel.streams", Boolean.TRUE.toString()));
 
 	private ElGamalMultiRecipientCiphertexts() {
 		// Intentionally left blank.
@@ -82,11 +79,8 @@ public class ElGamalMultiRecipientCiphertexts {
 		// Algorithm.
 		final GqElement gamma = g.exponentiate(r);
 
-		IntStream indices = IntStream.range(0, l);
-		if (ENABLE_PARALLEL_STREAMS) {
-			indices = indices.parallel();
-		}
-		final GroupVector<GqElement, GqGroup> phis = indices
+		final GroupVector<GqElement, GqGroup> phis = IntStream.range(0, l)
+				.parallel()
 				.mapToObj(i -> pk.get(i).exponentiate(r).multiply(m.get(i)))
 				.collect(toGroupVector());
 
@@ -122,19 +116,20 @@ public class ElGamalMultiRecipientCiphertexts {
 		final int l = C.getElementSize();
 
 		// Operation.
-		IntStream indices = IntStream.range(0, l);
-		if (ENABLE_PARALLEL_STREAMS) {
-			indices = indices.parallel();
-		}
-		final GqElement gamma = GqElementFactory.multiModExp(C.stream().map(ElGamalMultiRecipientCiphertext::getGamma).collect(toGroupVector()), a);
+		final GqElement gamma = GqElementFactory.multiModExp(
+				C.stream()
+						.map(ElGamalMultiRecipientCiphertext::getGamma)
+						.collect(toGroupVector()),
+				a);
 
-		final GroupVector<GqElement, GqGroup> phi = indices
+		final GroupVector<GqElement, GqGroup> phi = IntStream.range(0, l)
+				.parallel()
 				.mapToObj(j -> {
 					// Collect the j-th phi across all ciphertexts: { phi_{i,j} }_i
-							final GroupVector<GqElement, GqGroup> phi_j_vector =
-									C.stream()
-											.map(C_i -> C_i.get(j))
-											.collect(toGroupVector());
+					final GroupVector<GqElement, GqGroup> phi_j_vector =
+							C.stream()
+									.map(C_i -> C_i.get(j))
+									.collect(toGroupVector());
 
 					return GqElement.GqElementFactory.multiModExp(phi_j_vector, a);
 				})

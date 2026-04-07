@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2026 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,11 @@
  */
 package ch.post.it.evoting.cryptoprimitives.internal.math;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.math.BigInteger;
+import java.util.Comparator;
 import java.util.HexFormat;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -33,28 +37,35 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
 
-import com.google.common.base.Preconditions;
-
-import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
-import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
-import ch.post.it.evoting.cryptoprimitives.hashing.HashableString;
 import ch.post.it.evoting.cryptoprimitives.internal.hashing.HashService;
 
-@BenchmarkMode(value = Mode.Throughput)
+@BenchmarkMode(value = Mode.AverageTime)
 @Fork(value = 1)
-@Measurement(iterations = 3)
-@Warmup(iterations = 0)
+@Measurement(iterations = 5)
+@Warmup(iterations = 1)
 @Threads(3)
 public class FixedBaseCacheBenchmark {
 	private static final HashService hashService = HashService.getInstance();
 
-	private static String deriveCacheKey(final BigInteger base, final BigInteger modulus) {
-		Preconditions.checkArgument(modulus.signum() >= 0);
-		final ImmutableByteArray bytes = hashService.recursiveHash(
-				HashableString.from(Boolean.toString(base.signum() >= 0)),
-				HashableBigInteger.from(base.abs()),
-				HashableBigInteger.from(modulus));
-		return HexFormat.of().formatHex(bytes.elements());
+	private static CacheKey deriveCacheKey(final BigInteger base, final BigInteger modulus) {
+		checkArgument(modulus.signum() >= 0);
+		return new CacheKey(base.signum(), base.abs(), modulus);
+	}
+
+	private record CacheKey(int baseSignum, BigInteger absoluteBase, BigInteger modulus) implements Comparable<CacheKey> {
+		public CacheKey {
+			checkArgument(baseSignum >= -1 && baseSignum <= 1, "baseSignum must be in range [-1, 1]");
+			checkNotNull(absoluteBase);
+			checkNotNull(modulus);
+		}
+
+		@Override
+		public int compareTo(final CacheKey o) {
+			return Comparator.comparingInt(CacheKey::baseSignum)
+					.thenComparing(CacheKey::absoluteBase)
+					.thenComparing(CacheKey::modulus)
+					.compare(this, o);
+		}
 	}
 
 	@Benchmark
@@ -68,7 +79,7 @@ public class FixedBaseCacheBenchmark {
 		private final BigInteger modulus;
 		@Param({ "1", "10", "1000" })
 		private int numberOfEntries;
-		private Map<String, String> cache;
+		private Map<CacheKey, String> cache;
 
 		public MyState() {
 			modulus = new BigInteger(1,
@@ -88,11 +99,11 @@ public class FixedBaseCacheBenchmark {
 		@Setup(Level.Trial)
 		public void setup() {
 			cache = new ConcurrentSkipListMap<>();
-			final String knownKey = deriveCacheKey(knownBase, modulus);
+			final CacheKey knownKey = deriveCacheKey(knownBase, modulus);
 			cache.put(knownKey, "Hi");
 
 			for (int i = 0; i < numberOfEntries - 1; i++) {
-				cache.put(HexFormat.of().formatHex(hashService.recursiveHash(HashableBigInteger.from(i + 1)).elements()), "Nope");
+				cache.put(new CacheKey(1, BigInteger.valueOf(i + 3), modulus), "Nope");
 			}
 		}
 	}

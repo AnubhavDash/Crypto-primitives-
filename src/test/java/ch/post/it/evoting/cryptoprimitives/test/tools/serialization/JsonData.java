@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2026 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.math.BigInteger;
 import java.util.stream.StreamSupport;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 import ch.post.it.evoting.cryptoprimitives.math.Base64;
 import ch.post.it.evoting.cryptoprimitives.math.BaseEncodingFactory;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * Represents one of the general object present in the json test files and provides utility method to convert data to the supported types.
@@ -64,11 +64,11 @@ public record JsonData(JsonNode jsonNode) {
 		} else if (clazz.equals(BigInteger[][].class)) {
 			return clazz.cast(getBigIntegerArrayArray(field));
 		} else if (clazz.equals(String.class)) {
-			return clazz.cast(jsonNode.get(field).asText());
+			return clazz.cast(jsonNode.get(field).asString());
 		} else if (clazz.equals(String[].class)) {
 			return clazz.cast(getStringArray(field));
 		} else if (clazz.equals(ImmutableByteArray.class)) {
-			return clazz.cast(BASE_64.base64Decode(jsonNode.get(field).asText()));
+			return clazz.cast(BASE_64.base64Decode(jsonNode.get(field).asString()));
 		} else if (clazz.equals(Boolean.class)) {
 			return clazz.cast(jsonNode.get(field).asBoolean());
 		} else if (clazz.equals(Integer.class)) {
@@ -98,14 +98,14 @@ public record JsonData(JsonNode jsonNode) {
 	}
 
 	private BigInteger getBigInteger(final String field) {
-		return stringToBigInteger(jsonNode.get(field).asText());
+		return stringToBigInteger(jsonNode.get(field).asString());
 	}
 
 	private BigInteger[] getBigIntegerArray(final String field) {
 		final ArrayNode arrayNode = jsonNode.withArray(field);
 
 		return StreamSupport.stream(arrayNode.spliterator(), false)
-				.map(n -> stringToBigInteger(n.asText()))
+				.map(n -> stringToBigInteger(n.asString()))
 				.toArray(BigInteger[]::new);
 	}
 
@@ -114,7 +114,7 @@ public record JsonData(JsonNode jsonNode) {
 
 		return StreamSupport.stream(outerArrayNode.spliterator(), false)
 				.map(innerArrayNode -> StreamSupport.stream(innerArrayNode.spliterator(), false)
-						.map(n -> stringToBigInteger(n.asText()))
+						.map(n -> stringToBigInteger(n.asString()))
 						.toArray(BigInteger[]::new))
 				.toArray(BigInteger[][]::new);
 	}
@@ -127,7 +127,7 @@ public record JsonData(JsonNode jsonNode) {
 		final ArrayNode arrayNode = jsonNode.withArray(field);
 
 		return StreamSupport.stream(arrayNode.spliterator(), false)
-				.map(JsonNode::asText)
+				.map(JsonNode::asString)
 				.toArray(String[]::new);
 	}
 }

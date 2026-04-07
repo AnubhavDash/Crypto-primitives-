@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2026 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,28 @@ class EncryptionParametersTest {
 	@DisplayName("calling getEncryptionParameters with an empty small primes list does not throw")
 	void getEncryptionParametersEmptySmallPrimesDoesNotThrow() {
 		assertDoesNotThrow(() -> encryptionParameters.getEncryptionParameters(SEED, ImmutableList.emptyList()));
+	}
+
+	@Test
+	@DisplayName("calling getEncryptionParameters with small primes list containing exactly one prime returns same result as SMALL_PRIMES")
+	void getEncryptionParametersSinglePrimeSmallPrimesEqualsSmallPrimesResult() {
+		final ImmutableList<Integer> singlePrimeList = ImmutableList.of(7);
+
+		final GqGroup expected = encryptionParameters.getEncryptionParameters(SEED, SMALL_PRIMES);
+		final GqGroup actual = assertDoesNotThrow(() -> encryptionParameters.getEncryptionParameters(SEED, singlePrimeList));
+
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	@DisplayName("calling getEncryptionParameters with small primes list containing duplicate primes returns same result as SMALL_PRIMES")
+	void getEncryptionParametersDuplicatePrimeSmallPrimesEqualsSmallPrimesResult() {
+		final ImmutableList<Integer> duplicatePrimeList = ImmutableList.of(7, 7, 11, 11);
+
+		final GqGroup expected = encryptionParameters.getEncryptionParameters(SEED, SMALL_PRIMES);
+		final GqGroup actual = assertDoesNotThrow(() -> encryptionParameters.getEncryptionParameters(SEED, duplicatePrimeList));
+
+		assertEquals(expected, actual);
 	}
 
 	@Test

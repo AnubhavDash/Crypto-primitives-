@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2026 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package ch.post.it.evoting.cryptoprimitives.internal.math;
 import java.math.BigInteger;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
+import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizations;
+import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizationsCacheKey;
 
 public interface BigIntegerOperations {
 
@@ -36,9 +38,14 @@ public interface BigIntegerOperations {
 	 *
 	 * @param base    the base
 	 * @param modulus the modulus
+	 * @param blockWidth the width of the block to place in cache
 	 */
-	default void generateCache(final BigInteger base, final BigInteger modulus) {
-		throw new UnsupportedOperationException("This implementation does not support fixed base optimizations");
+	default BigIntegersOptimizationsCacheKey generateCache(final BigInteger base, final BigInteger modulus, final BigIntegersOptimizations.BlockWidth blockWidth) {
+		throw new UnsupportedOperationException("This implementation does not support fixed base optimizations.");
+	}
+
+	default void releaseCache(final BigIntegersOptimizationsCacheKey key) {
+		throw new UnsupportedOperationException("This implementation does not support fixed base optimizations.");
 	}
 
 	/**
@@ -62,8 +69,8 @@ public interface BigIntegerOperations {
 	BigInteger modExponentiate(BigInteger base, BigInteger exponent, BigInteger modulus);
 
 	/**
-	 * Exponentiates the elements of a list of {@link BigInteger}s by the elements of a second list and multiply the resulting terms. If an exponent
-	 * is negative, then the corresponding base must be relatively prime to the modulus. This operations needs both lists to be of equal size.
+	 * Exponentiates the elements of a list of {@link BigInteger}s by the elements of a second list and multiply the resulting terms. All exponents
+	 * must be positive. This operation needs both lists to be of equal size.
 	 *
 	 * @param bases     the list of base values
 	 * @param exponents the list of exponent values
@@ -95,4 +102,15 @@ public interface BigIntegerOperations {
 	 * @throws IllegalArgumentException if p is not an odd integer strictly greater than 2.
 	 */
 	int getLegendre(BigInteger a, BigInteger p);
+
+	/**
+	 * Runs the Miller-Rabin probabilistic primality test.
+	 *
+	 * @param candidate n, an odd integer greater than 3 to be tested. Must be non-null.
+	 * @param rounds    t, the number of rounds to be done. Must be strictly positive.
+	 * @return {@code true} if the candidate is probably prime, {@code false} if the candidate is definitely composite.
+	 * @throws NullPointerException     if candidate is null
+	 * @throws IllegalArgumentException if candidate is not valid or rounds is not positive
+	 */
+	boolean millerRabin(BigInteger candidate, int rounds);
 }

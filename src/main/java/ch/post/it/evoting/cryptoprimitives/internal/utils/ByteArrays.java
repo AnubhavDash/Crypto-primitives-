@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2026 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,10 +42,10 @@ public final class ByteArrays {
 		final int N = B.length();
 		final int n = requestedLength;
 
-		checkArgument(n >= 0, "The requested length must be positive.");
+		checkArgument(n >= 0, "The requested length must be non-negative. [n: %s]", n);
 
 		// Require.
-		checkArgument(n <= (N * Byte.SIZE), "The requested length must not be greater than the bit length of the byte array.");
+		checkArgument(n <= (N * Byte.SIZE), "The requested length must not be greater than the bit length of the byte array. [n: %s, bitLength: %s]", n, N * Byte.SIZE);
 
 		// Operation.
 		final int length = Math.ceilDivExact(n, Byte.SIZE);
@@ -55,23 +55,20 @@ public final class ByteArrays {
 			B_prime[i] = B.get(offset + i);
 		}
 		if (n % Byte.SIZE != 0) {
-			B_prime[0] = (byte) (B.get(offset) & (byte) (Math.pow(2, n % Byte.SIZE) - 1));
+			B_prime[0] = (byte) (B.get(offset) & (byte) ((1 << (n % Byte.SIZE)) - 1)); // 1 << (n % Byte.SIZE) = 2^(n % 8)
 		}
-
 
 		// Output.
 		return new ImmutableByteArray(B_prime);
 	}
 
 	/**
-	 * Computes the length of the byte representation of an integer.
-	 *
-	 * @param x the integer of which to compute the byte length. Must be non-null.
-	 * @return the length of the byte representation of the given integer.
-	 * @throws NullPointerException if the given x is null.
+	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.ByteArrays#byteLength}
 	 */
 	public static int byteLength(final BigInteger x) {
+		// Input.
 		checkNotNull(x);
+		checkArgument(x.signum() >= 0, "The input must be non-negative. [x: %s]", x);
 
 		return Math.ceilDivExact(x.bitLength(), Byte.SIZE);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2026 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,9 +49,9 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ElGamalGenerator
 @Warmup(iterations = 1)
 @Measurement(iterations = 5)
 @Fork(value = 1)
-@BenchmarkMode(Mode.Throughput)
+@BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.SECONDS)
-public class GetMessageBenchmark {
+public class GetMessageComparisonBenchmark {
 
 	// In order to run this benchmark, the following environment variables must be set:
 	// SECURITY_LEVEL=TESTING_ONLY
@@ -73,8 +73,6 @@ public class GetMessageBenchmark {
 	@State(Scope.Benchmark)
 	public static class MyState {
 
-		private static final boolean ENABLE_PARALLEL_STREAMS = Boolean.parseBoolean(
-				System.getProperty("enable.parallel.streams", Boolean.TRUE.toString()));
 		private final int numElements = 30;
 		private final GqGroup gqGroup = GroupTestData.getLargeGqGroup();
 		final ElGamalMultiRecipientCiphertext ciphertext = new ElGamalGenerator(gqGroup).genRandomCiphertext(numElements);
@@ -96,14 +94,10 @@ public class GetMessageBenchmark {
 			final int l = c.size();
 			final GqElement gamma = c.getGamma();
 
-			IntStream indices = IntStream.range(0, l);
-			if (MyState.ENABLE_PARALLEL_STREAMS) {
-				indices = indices.parallel();
-			}
-
 			// Algorithm.
 			final GqElement gamma_reciprocal = gamma.invert();
-			final GroupVector<GqElement, GqGroup> messageElements = indices
+			final GroupVector<GqElement, GqGroup> messageElements = IntStream.range(0, l)
+					.parallel()
 					.mapToObj(i -> c.get(i).multiply(gamma_reciprocal.exponentiate(sk.get(i))))
 					.collect(toGroupVector());
 

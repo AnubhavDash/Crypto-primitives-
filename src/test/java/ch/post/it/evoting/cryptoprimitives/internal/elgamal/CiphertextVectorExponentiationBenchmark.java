@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2026 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,11 +42,11 @@ import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
 
-@BenchmarkMode(value = Mode.Throughput)
+@BenchmarkMode(value = Mode.AverageTime)
 @Fork(value = 1)
-@Measurement(iterations = 3)
-@Warmup(iterations = 0)
-public class CiphertextExponentiationBenchmark {
+@Measurement(iterations = 5)
+@Warmup(iterations = 1)
+public class CiphertextVectorExponentiationBenchmark {
 	@Benchmark
 	public void ciphertextMultimodExp(final CiphertextMultimodExpState state, final Blackhole bh) {
 		bh.consume(ElGamalMultiRecipientCiphertexts.getCiphertextVectorExponentiation(state.ciphertexts, state.exponents));
@@ -72,10 +72,10 @@ public class CiphertextExponentiationBenchmark {
 		public GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts;
 		public GroupVector<ZqElement, ZqGroup> exponents;
 
-		@Param({ "5", "10" })
+		@Param({ "10", "100" })
 		public int ciphertextCount;
 
-		@Param({ "1", "5" })
+		@Param({ "1", "16", "31" })
 		public int ciphertextSize;
 
 		@Setup(Level.Trial)

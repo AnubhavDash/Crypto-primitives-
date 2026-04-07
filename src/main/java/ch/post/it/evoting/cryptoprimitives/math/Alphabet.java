@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2026 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,18 +31,15 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
 public abstract sealed class Alphabet
 		permits Base10Alphabet, Base16Alphabet, Base32Alphabet, Base64Alphabet, UsabilityBase32Alphabet, LatinAlphabet {
 
-	private final int size;
 	private final ImmutableList<String> alphabetInternal;
 
 	Alphabet(final int size, final ImmutableList<String> alphabet) {
-		this.size = size;
-		this.alphabetInternal = checkNotNull(alphabet);
+		checkArgument(size > 0, "The size of the alphabet must be strictly positive. [size: %s]", size);
+		checkNotNull(alphabet);
+		checkArgument(alphabet.size() == size, "The size of the alphabet must be %s. [actual size: %s]", size, alphabet.size());
 
-		checkArgument(this.alphabetInternal.size() == size, "The size of the alphabet must be %s. [actual size: %s]", size,
-				this.alphabetInternal.size());
-
-		checkArgument(new HashSet<>(this.alphabetInternal.stream().toList()).size() == this.alphabetInternal.size(),
-				"The alphabet must not contain duplicates.");
+		checkArgument(new HashSet<>(alphabet.stream().toList()).size() == alphabet.size(), "The alphabet must not contain duplicates.");
+		this.alphabetInternal = alphabet;
 	}
 
 	/**
@@ -52,7 +49,8 @@ public abstract sealed class Alphabet
 	 */
 	public String get(final int index) {
 		checkArgument(index >= 0, "The index cannot be negative. [index: %s]", index);
-		checkArgument(index < size, "The index must be strictly smaller than the alphabet size. [index: %s, size: %s]", index, size);
+		checkArgument(index < alphabetInternal.size(), "The index must be strictly smaller than the alphabet size. [index: %s, size: %s]", index,
+				alphabetInternal.size());
 
 		return this.alphabetInternal.get(index);
 	}
@@ -61,7 +59,7 @@ public abstract sealed class Alphabet
 	 * @return the size of the alphabet.
 	 */
 	public int size() {
-		return size;
+		return alphabetInternal.size();
 	}
 
 	/**

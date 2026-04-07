@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2026 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImm
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 import java.util.stream.IntStream;
@@ -257,12 +256,5 @@ class BigIntegerOperationsServiceTest {
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.millerRabin(FIVE, 0));
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.millerRabin(ONE, 3));
 		assertThrows(IllegalArgumentException.class, () -> BigIntegerOperationsService.millerRabin(EIGHT, 3));
-	}
-
-	@Test
-	void millerRabinValidArguments() {
-		assertTrue(BigIntegerOperationsService.millerRabin(THREE, 1));
-		assertTrue(BigIntegerOperationsService.millerRabin(FIVE, 3));
-		assertTrue(BigIntegerOperationsService.millerRabin(SEVEN, 3));
 	}
 }

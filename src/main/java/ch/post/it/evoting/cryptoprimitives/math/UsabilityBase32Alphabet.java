@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2026 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
  */
 public final class UsabilityBase32Alphabet extends Alphabet {
 
-	private static final int SIZE = 32;
 	private static final ImmutableList<String> ALPHABET = ImmutableList.of(
 
 			Character.toString(0x0061), // a (U+0061)
@@ -66,10 +65,10 @@ public final class UsabilityBase32Alphabet extends Alphabet {
 			Character.toString(0x0039)  // 9 (U+0039) --> Added
 	);
 
-	private static final UsabilityBase32Alphabet INSTANCE = new UsabilityBase32Alphabet(SIZE, ALPHABET);
+	private static final UsabilityBase32Alphabet INSTANCE = new UsabilityBase32Alphabet(ALPHABET);
 
-	private UsabilityBase32Alphabet(final int size, final ImmutableList<String> alphabet) {
-		super(size, alphabet);
+	private UsabilityBase32Alphabet(final ImmutableList<String> alphabet) {
+		super(32, alphabet);
 	}
 
 	public static UsabilityBase32Alphabet getInstance() {

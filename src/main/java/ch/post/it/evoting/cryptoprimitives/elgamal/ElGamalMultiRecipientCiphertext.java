@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2026 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,9 +44,6 @@ import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
  */
 @SuppressWarnings({ "java:S117", "java:S1117" })
 public final class ElGamalMultiRecipientCiphertext implements GroupVectorElement<GqGroup>, HashableList {
-
-	private static final boolean ENABLE_PARALLEL_STREAMS = Boolean.parseBoolean(
-			System.getProperty("enable.parallel.streams", Boolean.TRUE.toString()));
 
 	private final GqElement gamma;
 	private final GroupVector<GqElement, GqGroup> phis;
@@ -108,12 +105,8 @@ public final class ElGamalMultiRecipientCiphertext implements GroupVectorElement
 		final GroupVector<GqElement, GqGroup> phi_a = C_a.phis;
 		final GroupVector<GqElement, GqGroup> phi_b = C_b.phis;
 
-		IntStream indices = IntStream.range(0, l);
-		if (ENABLE_PARALLEL_STREAMS) {
-			indices = indices.parallel();
-		}
-
-		final GroupVector<GqElement, GqGroup> phi = indices
+		final GroupVector<GqElement, GqGroup> phi = IntStream.range(0, l)
+				.parallel()
 				.mapToObj(i -> phi_a.get(i).multiply(phi_b.get(i)))
 				.collect(toGroupVector());
 
@@ -135,18 +128,11 @@ public final class ElGamalMultiRecipientCiphertext implements GroupVectorElement
 	public ElGamalMultiRecipientCiphertext getCiphertextExponentiation(final ZqElement exponent) {
 		checkNotNull(exponent);
 		checkArgument(this.group.hasSameOrderAs(exponent.getGroup()));
-		final ZqElement a = exponent;
 
+		final ZqElement a = exponent;
 		final GqElement gamma = this.gamma.exponentiate(a);
 
-		final Stream<GqElement> elementStream;
-
-		if (ENABLE_PARALLEL_STREAMS) {
-			elementStream = this.phis.parallelStream();
-		} else {
-			elementStream = this.phis.stream();
-		}
-		final GroupVector<GqElement, GqGroup> phi = elementStream
+		final GroupVector<GqElement, GqGroup> phi = this.phis.parallelStream()
 				.map(phi_i -> phi_i.exponentiate(a))
 				.collect(toGroupVector());
 

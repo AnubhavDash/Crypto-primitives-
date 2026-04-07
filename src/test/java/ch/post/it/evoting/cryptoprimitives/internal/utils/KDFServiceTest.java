@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Swiss Post Ltd
+ * Copyright 2026 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,8 +63,11 @@ class KDFServiceTest {
 	void setup() {
 		kdfService = KDFService.getInstance();
 		PRK = randomService.randomBytes(DEFAULT_HASH_LENGTH_BYTES * 8);
-		requiredLength = randomService.genRandomInteger(255 * DEFAULT_HASH_LENGTH_BYTES);
-		requestedUpperBound = randomService.genRandomIntegerOfLength(DEFAULT_HASH_LENGTH_BYTES * 8 + 3);
+		requiredLength = 1 + randomService.genRandomInteger(255 * DEFAULT_HASH_LENGTH_BYTES);
+
+		requestedUpperBound = BigInteger.ONE
+				.shiftLeft(DEFAULT_HASH_LENGTH_BYTES * 8 - 1) // 2^255 => byteLength = 32
+				.add(randomService.genRandomIntegerOfLength(8));
 	}
 
 	@Test
