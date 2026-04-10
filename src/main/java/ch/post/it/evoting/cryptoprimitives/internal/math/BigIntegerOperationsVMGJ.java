@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
@@ -32,32 +31,27 @@ import com.verificatum.vmgj.FpowmTab;
 import com.verificatum.vmgj.VMG;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
-import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizations;
-import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizationsCacheKey;
 
 /**
  * Optimized BigIntegerOperations using Verificatum Multiplicative Groups Library for Java (VMGJ) .
- * The methods which are not optimized yet will use the java implementation by inheritance.
  *
  * <p>This class is thread-safe.</p>
  */
-public class BigIntegerOperationsVMGJ extends BigIntegerOperationsJava {
+public class BigIntegerOperationsVMGJ implements BigIntegerOperations {
 
 	private static final int DESIRED_PARALLELISM =
 			Math.max(1, Integer.getInteger("vmgj.multi.parallel",
 					Runtime.getRuntime().availableProcessors()));
 	private static final int MULTI_MOD_EXP_MIN_CHUNK_SIZE = Math.max(1, Integer.getInteger("vmgj.multiModExp.min.chunk.size", 32));
 
-	private final Cache<BigIntegersOptimizationsCacheKey, FpowmTab> fixedBaseCache = BigIntegersOptimizationsEventPublisher.attachCachePublisher(
-			CacheBuilder.newBuilder().expireAfterAccess(30, TimeUnit.DAYS)
-					.removalListener((RemovalListener<BigIntegersOptimizationsCacheKey, FpowmTab>) removalNotification -> {
-						if (removalNotification.getValue() != null) {
-							removalNotification.getValue().free();
-						}
-					})
-					.build());
-
-
+	private final Cache<CacheKey, FpowmTab> fixedBaseCache = CacheBuilder.newBuilder().expireAfterAccess(30, TimeUnit.DAYS)
+			.removalListener((RemovalListener<CacheKey, FpowmTab>) removalNotification -> {
+				if (removalNotification.getValue() != null) {
+					removalNotification.getValue().free();
+				}
+			})
+			.build();
+	private final BigIntegerOperations bigIntegerOperationsJava = new BigIntegerOperationsJava();
 
 	@Override
 	public boolean isFixedBaseExponentiationSupported() {
@@ -65,35 +59,27 @@ public class BigIntegerOperationsVMGJ extends BigIntegerOperationsJava {
 	}
 
 	@Override
-	public BigIntegersOptimizationsCacheKey generateCache(final BigInteger base, final BigInteger modulus, final BigIntegersOptimizations.BlockWidth blockWidth) {
-		checkNotNull(base);
-		checkNotNull(modulus);
-		checkNotNull(blockWidth);
+	public void generateCache(final BigInteger base, final BigInteger modulus) {
 		if (!VMG.checkLoaded()) {
 			throw VMG.LOAD_ERROR;
 		}
-		final BigIntegersOptimizationsCacheKey key = deriveCacheKey(base, modulus);
+		final CacheKey key = deriveCacheKey(base, modulus);
 
 		try {
-			fixedBaseCache.get(key, () -> new FpowmTab(base, modulus, blockWidth.getValue(), modulus.bitLength() - 1));
+			fixedBaseCache.get(key, () -> new FpowmTab(base, modulus, modulus.bitLength() - 1));
 		} catch (final ExecutionException e) {
 			throw new IllegalStateException("Could not create precomputed table for the given basis and modulus.", e);
 		}
-		return key;
+	}
+
+	private static CacheKey deriveCacheKey(final BigInteger base, final BigInteger modulus) {
+		checkArgument(modulus.signum() >= 0);
+		return new CacheKey(base.signum(), base.abs(), modulus);
 	}
 
 	@Override
-	public void releaseCache(final BigIntegersOptimizationsCacheKey key) {
-		checkNotNull(key);
-		fixedBaseCache.invalidate(key);
-		fixedBaseCache.cleanUp();
-	}
-
-	@VisibleForTesting
-	static BigIntegersOptimizationsCacheKey deriveCacheKey(final BigInteger base, final BigInteger modulus) {
-		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
-		final BigInteger b = base.mod(modulus);
-		return new BigIntegersOptimizationsCacheKey(b, modulus);
+	public BigInteger modMultiply(final BigInteger n1, final BigInteger n2, final BigInteger modulus) {
+		return bigIntegerOperationsJava.modMultiply(n1, n2, modulus);
 	}
 
 	@Override
@@ -112,7 +98,7 @@ public class BigIntegerOperationsVMGJ extends BigIntegerOperationsJava {
 		final BigInteger basis = exponentSignum >= 0 ? base : modInvert(base, modulus);
 		final BigInteger exp = exponentSignum >= 0 ? exponent : exponent.negate();
 
-		final BigIntegersOptimizationsCacheKey key = deriveCacheKey(basis, modulus);
+		final CacheKey key = deriveCacheKey(basis, modulus);
 
 		final FpowmTab fpowmTab = fixedBaseCache.getIfPresent(key);
 		if (fpowmTab != null) {
@@ -183,8 +169,8 @@ public class BigIntegerOperationsVMGJ extends BigIntegerOperationsJava {
 		checkNotNull(n);
 		checkNotNull(modulus);
 		checkArgument(modulus.compareTo(BigInteger.ONE) > 0, MODULUS_CHECK_MESSAGE);
-		// For performance reasons, we omit an explicit check that n and the modulus are relatively prime.
-		// modInvert is only called in the context of Gq element inversion, so n and the modulus are always relatively prime.
+		// For performance reasons, we omit an explicit check that n and the modulus are relatively prime. GMP throws a division by zero error if the
+		// two operands are not relatively prime.
 
 		return VMG.powm(n, BigInteger.ONE.negate(), modulus);
 	}
@@ -199,4 +185,11 @@ public class BigIntegerOperationsVMGJ extends BigIntegerOperationsJava {
 		return VMG.legendre(a, p);
 	}
 
+	private record CacheKey(int baseSignum, BigInteger absoluteBase, BigInteger modulus) {
+		public CacheKey {
+			checkArgument(baseSignum >= -1 && baseSignum <= 1, "baseSignum must be in range [-1, 1]");
+			checkNotNull(absoluteBase);
+			checkNotNull(modulus);
+		}
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package ch.post.it.evoting.cryptoprimitives.test.tools.data;
 
 import static ch.post.it.evoting.cryptoprimitives.collection.ImmutableList.toImmutableList;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.math.BigInteger;
 
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
@@ -104,7 +106,11 @@ public class GroupTestData {
 	 * @return a {@link GqGroup}.
 	 */
 	public static GqGroup getLargeGqGroup() {
-		return new GqGroupLoader("/large-group.json").getGroup();
+		try {
+			return new GqGroupLoader("/large-group.json").getGroup();
+		} catch (final IOException e) {
+			throw new UncheckedIOException("Cannot read large group from file.", e);
+		}
 	}
 
 	private static GqGroup getRandomGqGroupFrom(final ImmutableList<GqGroup> groups) {

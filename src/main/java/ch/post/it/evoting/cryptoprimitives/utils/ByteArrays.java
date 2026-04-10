@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package ch.post.it.evoting.cryptoprimitives.utils;
 
-import java.math.BigInteger;
-
 import ch.post.it.evoting.cryptoprimitives.collection.ImmutableByteArray;
 
 public interface ByteArrays {
@@ -33,17 +31,5 @@ public interface ByteArrays {
 	 */
 	static ImmutableByteArray cutToBitLength(final ImmutableByteArray byteArray, final int requestedLength) {
 		return ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays.cutToBitLength(byteArray, requestedLength);
-	}
-
-	/**
-	 * Computes the length in bytes of the given non-negative integer.
-	 *
-	 * @param x the integer of which to compute the byte length. Must be non-null and non-negative.
-	 * @return the length of the byte representation of the given integer.
-	 * @throws NullPointerException     if the given x is null.
-	 * @throws IllegalArgumentException if the given x is negative.
-	 */
-	static int byteLength(final BigInteger x) {
-		return ch.post.it.evoting.cryptoprimitives.internal.utils.ByteArrays.byteLength(x);
 	}
 }

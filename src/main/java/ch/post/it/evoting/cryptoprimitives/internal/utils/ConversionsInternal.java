@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,8 +69,8 @@ public final class ConversionsInternal {
 	 * See {@link ch.post.it.evoting.cryptoprimitives.utils.Conversions#integerToFixedLengthByteArray}.
 	 * <p>
 	 * NOTE: our implementation slightly deviates from the specifications for performance reasons. Benchmarks show that our implementation is orders
-	 * of magnitude faster than the pseudocode implementation integerToFixedLengthByteArraySpec. Both implementations are equivalent, and we have a
-	 * unit test ensuring it.
+	 * of magnitude faster than the pseudocode implementation integerToFixedLengthByteArraySpec. Both implementations are equivalent, and we have a unit test
+	 * ensuring it.
 	 * </p>
 	 */
 	@SuppressWarnings("java:S117")
@@ -148,9 +148,9 @@ public final class ConversionsInternal {
 	public static BigInteger stringToInteger(final String s) {
 		checkNotNull(s);
 
-		// Checks that s is not empty and is a valid non-negative decimal representation.
+		// Checks that s is not empty and is a valid decimal representation.
 		checkArgument(DECIMAL_PATTERN.matcher(s).matches(),
-				String.format("The string to convert \"%s\" is not a valid non-negative decimal representation of a BigInteger.", s));
+				String.format("The string to convert \"%s\" is not a valid decimal representation of a BigInteger.", s));
 
 		// Corresponds to Decimal(S)
 		return new BigInteger(s, 10);

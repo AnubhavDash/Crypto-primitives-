@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,6 @@ public interface Mixnet {
 	/**
 	 * Shuffles (including re-encryption) and provides a Bayer-Groth argument of the shuffle.
 	 * <p>
-	 * The optimization mode is controlled by the system property {@code MIXNET_OPTIMIZATION_MODE}. If not set, the default is
-	 * {@link MixnetOptimizationMode#COMPUTATION_OPTIMIZED}.
-	 * <p>
 	 * Additionally to the individual arguments preconditions the following cross-argument preconditions must be met:
 	 * <ul>
 	 *     <li>All ciphertexts and the public key must be from the same group</li>
@@ -47,9 +44,6 @@ public interface Mixnet {
 	/**
 	 * Verifies the correctness of a shuffle argument for the given ciphertexts and their shuffled and re-encrypted counterparts.
 	 * <p>
-	 * The optimization mode is controlled by the system property {@code MIXNET_OPTIMIZATION_MODE}. If not set, the default is
-	 * {@link MixnetOptimizationMode#COMPUTATION_OPTIMIZED}.
-	 * <p>
 	 * Additionally to the individual arguments preconditions the following cross-argument preconditions must be met:
 	 * <ul>
 	 *     <li>All ciphertexts, the shuffle argument and the public key must be from the same group</li>
@@ -59,14 +53,11 @@ public interface Mixnet {
 	 *     <li>The ciphertext vector size must be 2 or greater and not bigger than q - 3</li>
 	 * </ul>
 	 *
-	 * @param ciphertexts         C, the un-shuffled ciphertexts. Must not be null and not contain null elements.
-	 * @param shuffledCiphertexts C', the shuffled and re-encrypted ciphertexts. Must not be null and not contain null elements.
-	 * @param shuffleArgument     the shuffle argument to verify. Must not be null.
-	 * @param publicKey           pk, the public key used for the re-encryption. Must be non null.
+	 * @param ciphertexts       C, the un-shuffled ciphertexts. Must not be null and not contain null elements.
+	 * @param publicKey         pk, the public key used for the re-encryption. Must be non null.
 	 * @return the result of the verification.
 	 */
 	VerificationResult verifyShuffle(final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts,
-			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> shuffledCiphertexts,
-			final ShuffleArgument shuffleArgument,
+			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> shuffledCiphertexts, ShuffleArgument shuffleArgument,
 			final ElGamalMultiRecipientPublicKey publicKey);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@ package ch.post.it.evoting.cryptoprimitives.internal.mixnet;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import ch.post.it.evoting.cryptoprimitives.mixnet.MixnetOptimizationMode;
-
 public class MatrixUtils {
 
 	private MatrixUtils() {
@@ -26,40 +24,27 @@ public class MatrixUtils {
 	}
 
 	/**
-	 * Computes the matrix dimensions {@code (m, n)} for a given vector size {@code N} according to the optimization mode configured via the system
-	 * property {@code MIXNET_OPTIMIZATION_MODE}.
-	 * <p>
-	 * This method implements the algorithm GetMatrixDimensions as specified in the Crypto-Primitives Specification.
-	 * <p>
-	 * If the optimization mode is {@link MixnetOptimizationMode#MEMORY_OPTIMIZED}, the dimensions are chosen to be size-optimal, meaning {@code m} and
-	 * {@code n} are as close as possible to the dimensions of a square matrix. This minimizes the size of the Bayer-Groth shuffle argument and the
-	 * communication complexity.
-	 * <p>
-	 * If the optimization mode is {@link MixnetOptimizationMode#COMPUTATION_OPTIMIZED}, the dimensions are chosen to optimize computation performance,
-	 * resulting in {@code m = 1} and {@code n = N}.
+	 * Computes the size-optimal number of rows and columns for a given vector size {@code N}. The dimensions are size-optimal when they are as close
+	 * as possible to the dimensions of a square matrix, resulting in the smallest size of the shuffle argument.
 	 *
-	 * @param vectorSize N, the vector size to decompose into matrix dimensions. Must be greater than or equal to 2.
-	 * @return an array {@code [m, n]} with {@code m} the number of rows, {@code n} the number of columns and {@code m × n = N}, where {@code m ≤ n}.
+	 * @param vectorSize N, the vector size to decompose into size-optimal matrix dimensions. Must be greater than or equal to 2.
+	 * @return an array [m, n] with m the number of rows, n the number of columns and m x n = N, where m <= n.
 	 */
 	public static int[] getMatrixDimensions(final int vectorSize) {
 		final int N = vectorSize;
 		checkArgument(N >= 2, "The size to decompose must be greater than or equal to 2.");
 
-		final MixnetOptimizationMode optimizationMode = MixnetOptimizationConfig.getMixnetOptimizationMode();
-
 		int m = 1;
 		int n = N;
-
-		if (optimizationMode == MixnetOptimizationMode.MEMORY_OPTIMIZED) {
-			for (int i = (int) Math.floor(Math.sqrt(N)); i > 1; i--) {
-				if (N % i == 0) {
-					m = i;
-					n = N / i;
-					break;
-				}
+		for (int i = (int) Math.floor(Math.sqrt(N)); i > 1; i--) {
+			if (N % i == 0) {
+				m = i;
+				n = N / i;
+				break;
 			}
-
 		}
+
 		return new int[] { m, n };
 	}
+
 }

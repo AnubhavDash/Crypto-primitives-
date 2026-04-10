@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import ch.post.it.evoting.cryptoprimitives.collection.ImmutableList;
  */
 public final class Base32Alphabet extends Alphabet {
 
+	private static final int SIZE = 32;
 	private static final ImmutableList<String> ALPHABET = ImmutableList.of(
 
 			Character.toString(0x0041), // A (U+0041)
@@ -61,10 +62,10 @@ public final class Base32Alphabet extends Alphabet {
 			Character.toString(0x0037)  // 7 (U+0037)
 	);
 
-	private static final Base32Alphabet INSTANCE = new Base32Alphabet(ALPHABET);
+	private static final Base32Alphabet INSTANCE = new Base32Alphabet(SIZE, ALPHABET);
 
-	private Base32Alphabet(final ImmutableList<String> alphabet) {
-		super(32, alphabet);
+	private Base32Alphabet(final int size, final ImmutableList<String> alphabet) {
+		super(size, alphabet);
 	}
 
 	public static Base32Alphabet getInstance() {

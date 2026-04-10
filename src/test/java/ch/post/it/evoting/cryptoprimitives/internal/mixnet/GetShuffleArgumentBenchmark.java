@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,6 @@ import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
-import ch.post.it.evoting.cryptoprimitives.mixnet.MixnetOptimizationMode;
 import ch.post.it.evoting.cryptoprimitives.mixnet.Permutation;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ShuffleArgument;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ShuffleStatement;
@@ -62,21 +61,20 @@ import ch.post.it.evoting.cryptoprimitives.test.tools.generator.ZqGroupGenerator
  * </ul>
  * The values for the total number of ciphertexts (N) and the ciphertext size (l) are parameterized and can be easily changed according to the needs.
  */
-@Warmup(iterations = 1)
+@Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @Fork(value = 1)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MINUTES)
-public class GetShuffleArgumentComparisonBenchmark {
+public class GetShuffleArgumentBenchmark {
 
-	@Fork(value = 1, jvmArgs = { "-Xms5g", "-Xmx30g" })
+	@Fork(value = 1, jvmArgs = {"-Xms5g", "-Xmx30g"})
 	@Benchmark
-	public ShuffleArgument getShuffleArgumentFor_m_And_n_Chosen_With_getMatrixDimensions(
-			final BenchmarkState_m_And_n_Chosen_With_getMatrixDimensions state) {
+	public ShuffleArgument getShuffleArgumentFor_m_And_n_Chosen_With_getMatrixDimensions(final BenchmarkState_m_And_n_Chosen_With_getMatrixDimensions state) {
 		return state.getShuffleArgument();
 	}
 
-	@Fork(value = 1, jvmArgs = { "-Xms5g", "-Xmx30g" })
+	@Fork(value = 1, jvmArgs = {"-Xms5g", "-Xmx30g"})
 	@Benchmark
 	public ShuffleArgument getShuffleArgumentFor_m_Equals_1(final BenchmarkState_m_Equals_1 state) {
 		return state.getShuffleArgument();
@@ -86,7 +84,7 @@ public class GetShuffleArgumentComparisonBenchmark {
 	@State(Scope.Thread)
 	public static class BenchmarkState_m_And_n_Chosen_With_getMatrixDimensions extends BenchmarkState {
 
-		@Param({ "900", "907", "4900", "10000" })
+		@Param({ "900", "901", "902", "903", "904", "905", "906", "907", "908", "909", "4900", "10000" })
 		int N;
 		@Param({ "1", "31" })
 		int l;
@@ -95,11 +93,9 @@ public class GetShuffleArgumentComparisonBenchmark {
 
 		@Setup(Level.Trial)
 		public void setup() {
-			try (final var _ = MixnetOptimizationModeContext.set(MixnetOptimizationMode.MEMORY_OPTIMIZED)) {
-				final int[] dimensions = MatrixUtils.getMatrixDimensions(N);
-				m = dimensions[0];
-				n = dimensions[1];
-			}
+			final int[] dimensions = MatrixUtils.getMatrixDimensions(N);
+			m = dimensions[0];
+			n = dimensions[1];
 			super.setup(n, N, l);
 		}
 
@@ -112,9 +108,9 @@ public class GetShuffleArgumentComparisonBenchmark {
 	@State(Scope.Thread)
 	public static class BenchmarkState_m_Equals_1 extends BenchmarkState {
 
-		@Param({ "900", "907", "9967", "10000" })
+		@Param({ "900", "901", "902", "903", "904", "905", "906", "907", "908", "909", "4900", "10000" })
 		int N;
-		@Param({ "1", "31" })
+		@Param({ "1", "31"})
 		int l;
 
 		@Setup(Level.Trial)

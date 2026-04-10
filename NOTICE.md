@@ -3,7 +3,7 @@
 ---
 
 Crypto-Primitives  
-Copyright 2026 Post CH Ltd.
+Copyright 2025 Post CH Ltd.
 
 The crypto-primitives library implements cryptographic algorithms of the Swiss Post Voting System developed at Post CH Ltd.
 

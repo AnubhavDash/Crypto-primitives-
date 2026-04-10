@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,23 +22,16 @@ import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
-import ch.post.it.evoting.cryptoprimitives.math.BigIntegersOptimizations;
-
-@BenchmarkMode(value = Mode.AverageTime)
+@BenchmarkMode(value = Mode.Throughput)
 @Fork(value = 1)
-@Measurement(iterations = 5)
-@Warmup(iterations = 1)
+@Measurement(iterations = 3)
+@Warmup(iterations = 0)
 public class FixedBaseBenchmark {
-
-	private static final TestRandomService randomService = new TestRandomService();
-
 	@Benchmark
 	public BigInteger knownBaseBeforeCache(final MyState state) {
 		final BigIntegerOperations operations = state.bigIntegerOperationsWithoutTable;
@@ -56,7 +49,7 @@ public class FixedBaseBenchmark {
 	@Benchmark
 	public void generateCache(final MyState state) {
 		final BigIntegerOperations operations = new BigIntegerOperationsVMGJ();
-		operations.generateCache(state.knownBase, state.p, state.blockWidth);
+		operations.generateCache(state.knownBase, state.p);
 	}
 
 	@Benchmark
@@ -76,15 +69,14 @@ public class FixedBaseBenchmark {
 	@State(Scope.Benchmark)
 	public static class MyState {
 
+		private static final TestRandomService randomService = new TestRandomService();
+
 		private final BigInteger p;
 		private final BigInteger knownBase;
 		private final BigInteger exponent;
 		private final BigInteger randomBase;
 		private final BigIntegerOperations bigIntegerOperationsWithoutTable = new BigIntegerOperationsVMGJ();
 		private final BigIntegerOperations bigIntegerOperationsWithTable = new BigIntegerOperationsVMGJ();
-
-		@Param({ "TINY", "SMALL", "STANDARD", "BIG", "BIGGER", "HUGE" })
-		private BigIntegersOptimizations.BlockWidth blockWidth;
 
 		public MyState() {
 			p = new BigInteger("B7E151628AED2A6ABF7158809CF4F3C762E7160F38B4DA56A784D9045190CFEF324E" +
@@ -114,12 +106,8 @@ public class FixedBaseBenchmark {
 			knownBase = BigInteger.TWO;
 			final BigInteger random = randomService.genRandomIntegerOfLength(q.bitLength());
 			randomBase = random.multiply(random).mod(p);
-		}
 
-		@Setup
-		public void setup() {
-			bigIntegerOperationsWithTable.generateCache(knownBase, p, blockWidth);
+			bigIntegerOperationsWithTable.generateCache(knownBase, p);
 		}
-
 	}
 }

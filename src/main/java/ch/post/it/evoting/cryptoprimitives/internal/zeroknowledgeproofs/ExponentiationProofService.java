@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import ch.post.it.evoting.cryptoprimitives.collection.AuxiliaryInformation;
 import ch.post.it.evoting.cryptoprimitives.hashing.HashableBigInteger;
@@ -44,6 +45,8 @@ import ch.post.it.evoting.cryptoprimitives.zeroknowledgeproofs.ZeroKnowledgeProo
 public class ExponentiationProofService {
 
 	private static final HashableString EXPONENTIATION_PROOF = HashableString.from("ExponentiationProof");
+	private static final boolean ENABLE_PARALLEL_STREAMS = Boolean.parseBoolean(
+			System.getProperty("enable.parallel.streams", Boolean.TRUE.toString()));
 
 	private final RandomService randomService;
 	private final HashService hashService;
@@ -76,7 +79,14 @@ public class ExponentiationProofService {
 		final ZqElement x = preimage;
 		final GroupVector<GqElement, GqGroup> g = bases;
 
-		return g.parallelStream()
+		final Stream<GqElement> gStream;
+		if (ENABLE_PARALLEL_STREAMS) {
+			gStream = g.stream().parallel();
+		} else {
+			gStream = g.stream();
+		}
+
+		return gStream
 				.map(g_i -> g_i.exponentiate(x))
 				.collect(toGroupVector());
 	}
@@ -167,8 +177,13 @@ public class ExponentiationProofService {
 		final GroupVector<GqElement, GqGroup> x = computePhiExponentiation(z, g);
 		final HashableList f = HashableList.of(HashableBigInteger.from(p), HashableBigInteger.from(q), g);
 		// Since |e| << |q|, inverting y before exponentiating with e yields better performance than exponentiating y to a negated e
-		final GroupVector<GqElement, GqGroup> c_prime = IntStream.range(0, n)
-				.parallel()
+		final IntStream rangeStream;
+		if (ENABLE_PARALLEL_STREAMS) {
+			rangeStream = IntStream.range(0, n).parallel();
+		} else {
+			rangeStream = IntStream.range(0, n);
+		}
+		final GroupVector<GqElement, GqGroup> c_prime = rangeStream
 				.mapToObj(i -> x.get(i).multiply(y.get(i).invert().exponentiate(e)))
 				.collect(toGroupVector());
 		final HashableList h_aux;

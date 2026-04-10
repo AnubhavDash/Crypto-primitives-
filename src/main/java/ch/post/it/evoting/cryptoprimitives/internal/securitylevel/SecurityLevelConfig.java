@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ package ch.post.it.evoting.cryptoprimitives.internal.securitylevel;
 public class SecurityLevelConfig {
 
 	private SecurityLevelConfig() {
-		// Intentionally left blank
+		throw new UnsupportedOperationException("SecurityLevelConfig should not be instantiated");
 	}
 
 	/**
-	 * Gets the system security level provided by the environment variable SECURITY_LEVEL. If SECURITY_LEVEL is not set,
-	 * {@link SecurityLevelInternal#STANDARD} is used.
+	 * Gets the system security level provided by the environment variable SECURITY_LEVEL. If SECURITY_LEVEL is not set, {@link SecurityLevelInternal#STANDARD}
+	 * is used.
 	 *
 	 * @return a {@link SecurityLevelInternal}
 	 */

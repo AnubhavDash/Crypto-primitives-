@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,6 @@ import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.math.ZqElement;
 import ch.post.it.evoting.cryptoprimitives.math.ZqGroup;
-import ch.post.it.evoting.cryptoprimitives.mixnet.MixnetOptimizationMode;
 import ch.post.it.evoting.cryptoprimitives.mixnet.MultiExponentiationArgument;
 import ch.post.it.evoting.cryptoprimitives.mixnet.Permutation;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ProductArgument;
@@ -594,17 +593,15 @@ class ShuffleArgumentServiceTest extends TestGroupSetup {
 
 				//m and n
 				final int vectorSize = ciphertexts.size();
-				try (final var _ = MixnetOptimizationModeContext.set(MixnetOptimizationMode.MEMORY_OPTIMIZED)) {
-					final int[] dimensions = MatrixUtils.getMatrixDimensions(vectorSize);
-					final int m = dimensions[0];
-					final int n = dimensions[1];
+				final int[] dimensions = MatrixUtils.getMatrixDimensions(vectorSize);
+				final int m = dimensions[0];
+				final int n = dimensions[1];
 
-					//Output
-					final JsonData output = testParameters.getOutput();
-					final boolean outputValue = Boolean.parseBoolean(output.getJsonData("result").toString());
+				//Output
+				final JsonData output = testParameters.getOutput();
+				final boolean outputValue = Boolean.parseBoolean(output.getJsonData("result").toString());
 
-					return Arguments.of(publicKey, commitmentKey, statement, argument, m, n, outputValue, testParameters.getDescription());
-				}
+				return Arguments.of(publicKey, commitmentKey, statement, argument, m, n, outputValue, testParameters.getDescription());
 			});
 		}
 

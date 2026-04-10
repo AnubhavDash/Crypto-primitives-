@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,9 @@ import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 
 public class ElGamalMultiRecipientMessages {
+
+	private static final boolean ENABLE_PARALLEL_STREAMS = Boolean.parseBoolean(
+			System.getProperty("enable.parallel.streams", Boolean.TRUE.toString()));
 
 	private ElGamalMultiRecipientMessages() {
 		// Intentionally left blank.
@@ -84,9 +87,13 @@ public class ElGamalMultiRecipientMessages {
 		final int l = c.size();
 		final GqElement gamma = c.getGamma();
 
+		IntStream indices = IntStream.range(0, l);
+		if (ENABLE_PARALLEL_STREAMS) {
+			indices = indices.parallel();
+		}
+
 		// Operation.
-		final GroupVector<GqElement, GqGroup> messageElements = IntStream.range(0, l)
-				.parallel()
+		final GroupVector<GqElement, GqGroup> messageElements = indices
 				.mapToObj(i -> c.get(i).multiply(gamma.exponentiate(sk.get(i).negate())))
 				.collect(toGroupVector());
 

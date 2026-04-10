@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +33,6 @@ import ch.post.it.evoting.cryptoprimitives.internal.hashing.TestHashService;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
 import ch.post.it.evoting.cryptoprimitives.mixnet.Mixnet;
-import ch.post.it.evoting.cryptoprimitives.mixnet.MixnetOptimizationMode;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ShuffleArgument;
 import ch.post.it.evoting.cryptoprimitives.mixnet.VerifiableShuffle;
 import ch.post.it.evoting.cryptoprimitives.test.tools.TestGroupSetup;
@@ -56,7 +54,6 @@ class MixnetServiceTest extends TestGroupSetup {
 	class GetVerifiableShuffleTest {
 
 		@Test
-		@DisplayName("throws when shuffle inputs are null")
 		void testNullChecking() {
 			final HashService hashService = mock(HashService.class);
 			final Mixnet mixnet = new MixnetService(hashService);
@@ -67,7 +64,6 @@ class MixnetServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("throws when q is too small for the shuffle hash length")
 		void testTooSmallGqGroup() {
 			final MixnetService mixnetService = new MixnetService();
 			final int minNumberOfVotes = 2;
@@ -82,7 +78,6 @@ class MixnetServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("throws when fewer than two ciphertexts are provided for shuffle generation")
 		void testMultipleCipherTextsCheck() {
 			final HashService hashService = mock(HashService.class);
 			final Mixnet mixnet = new MixnetService(hashService);
@@ -100,12 +95,11 @@ class MixnetServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("throws when the number of ciphertexts exceeds q minus 3")
 		void testNumberOfCiphertextsTooLargeThrows() {
 			final HashService hashService = mock(HashService.class);
 			final Mixnet mixnet = new MixnetService(hashService);
 
-			final int maxNumberCiphertexts = gqGroup.getQ().intValueExact() - 3;
+			final int maxNumberCiphertexts = gqGroup.getQ().intValueExact() + 3;
 			final int Nc = maxNumberCiphertexts + 1;
 			final int l = keySize;
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator.genRandomCiphertextVector(Nc, l);
@@ -116,7 +110,6 @@ class MixnetServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("throws when ciphertexts and public key are from different groups")
 		void testSameGroup() {
 			final HashService hashService = mock(HashService.class);
 			final Mixnet mixnet = new MixnetService(hashService);
@@ -135,7 +128,6 @@ class MixnetServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("generates a verifiable shuffle for valid inputs")
 		void testValidShuffle() {
 			final GqGroup group = GroupTestData.getLargeGqGroup();
 			final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(group);
@@ -154,34 +146,11 @@ class MixnetServiceTest extends TestGroupSetup {
 			assertNotNull(verifiableShuffle);
 			assertNotNull(verifiableShuffle.shuffleArgument());
 			assertEquals(inputCiphertextList.size(), verifiableShuffle.shuffledCiphertexts().size());
+
 		}
 
 		@Test
-		@DisplayName("generates a verifiable shuffle with computation optimized mode")
-		void testValidShuffleWithComputationOptimized() {
-			final GqGroup group = GroupTestData.getLargeGqGroup();
-			final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(group);
-			final ElGamalMultiRecipientPublicKey pk = elGamalGenerator.genRandomPublicKey(keySize);
-
-			final HashService hashService = HashService.getInstance();
-			final Mixnet mixnet = new MixnetService(hashService);
-
-			final int Nc = 9; // square
-			final int l = Math.min(keySize, 3);
-			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> inputCiphertextList = elGamalGenerator.genRandomCiphertextVector(Nc, l);
-
-			try (final var _ = MixnetOptimizationModeContext.set(MixnetOptimizationMode.COMPUTATION_OPTIMIZED)) {
-				final VerifiableShuffle verifiableShuffle = mixnet.genVerifiableShuffle(inputCiphertextList, pk);
-
-				assertNotNull(verifiableShuffle);
-				assertNotNull(verifiableShuffle.shuffleArgument());
-				assertEquals(inputCiphertextList.size(), verifiableShuffle.shuffledCiphertexts().size());
-			}
-		}
-
-		@Test
-		@DisplayName("throws when ciphertexts contain more elements than the public key")
-		void testNumberOfCipherTextsGreaterThanPublicKey() {
+		void testNumberOfCipherTextsGreaterthanPublicKey() {
 			final HashService hashService = TestHashService.create(gqGroup.getQ());
 			final Mixnet mixnet = new MixnetService(hashService);
 
@@ -193,6 +162,7 @@ class MixnetServiceTest extends TestGroupSetup {
 					() -> mixnet.genVerifiableShuffle(inputCiphertextList, publicKey));
 
 			assertEquals("Ciphertexts must not contain more elements than the publicKey", illegalArgumentException.getMessage());
+
 		}
 	}
 
@@ -200,14 +170,14 @@ class MixnetServiceTest extends TestGroupSetup {
 	class VerifyShuffleTest {
 
 		@Test
-		@DisplayName("throws when verification inputs are null")
 		void testNullChecking() {
 			final GqGroup gqGroup = GroupTestData.getLargeGqGroup();
 			final HashService hashService = HashService.getInstance();
 			final Mixnet mixnet = new MixnetService(hashService);
 
 			final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(gqGroup);
-			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator.genRandomCiphertextVector(2, keySize);
+			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator
+					.genRandomCiphertextVector(2, keySize);
 			final ElGamalMultiRecipientPublicKey randomPublicKey = elGamalGenerator.genRandomPublicKey(keySize);
 			final VerifiableShuffle verifiableShuffle = mixnet.genVerifiableShuffle(ciphertexts, randomPublicKey);
 			final ShuffleArgument shuffleArgument = verifiableShuffle.shuffleArgument();
@@ -220,7 +190,6 @@ class MixnetServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("throws when q is too small during shuffle verification")
 		void testTooSmallGqGroup() {
 			final MixnetService mixnetService = new MixnetService();
 			final int minNumberOfVotes = 2;
@@ -238,7 +207,6 @@ class MixnetServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("throws when no ciphertexts are provided for verification")
 		void testEmptyCipherTextsCheck() {
 			final HashService hashService = mock(HashService.class);
 			final Mixnet mixnet = new MixnetService(hashService);
@@ -253,7 +221,6 @@ class MixnetServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("throws when only one ciphertext is provided for verification")
 		void testOnlyOneCipherTextCheck() {
 			final HashService hashService = mock(HashService.class);
 			final Mixnet mixnet = new MixnetService(hashService);
@@ -270,7 +237,6 @@ class MixnetServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("throws when too many ciphertexts are provided for verification")
 		void testNumberOfCiphertextsTooLargeThrows() {
 			final HashService hashService = mock(HashService.class);
 			final Mixnet mixnet = new MixnetService(hashService);
@@ -289,7 +255,6 @@ class MixnetServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("throws when original and shuffled ciphertexts are from different groups")
 		void testCiphertextsSameGroup() {
 			final HashService hashService = mock(HashService.class);
 			final Mixnet mixnet = new MixnetService(hashService);
@@ -311,7 +276,6 @@ class MixnetServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("throws when shuffle argument and ciphertexts are from different groups")
 		void testShuffleArgumentSameGroup() {
 			final HashService hashService = mock(HashService.class);
 			final Mixnet mixnet = new MixnetService(hashService);
@@ -331,7 +295,6 @@ class MixnetServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("throws when public key and ciphertexts are from different groups")
 		void testPublicKeySameGroup() {
 			final HashService hashService = mock(HashService.class);
 			final Mixnet mixnet = new MixnetService(hashService);
@@ -349,7 +312,6 @@ class MixnetServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("throws when ciphertext vectors have different sizes")
 		void testCiphertextVectorDimensions() {
 			final HashService hashService = mock(HashService.class);
 			final Mixnet mixnet = new MixnetService(hashService);
@@ -370,7 +332,6 @@ class MixnetServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("throws when ciphertext element sizes differ")
 		void testCiphertextDimensions() {
 			final HashService hashService = mock(HashService.class);
 			final Mixnet mixnet = new MixnetService(hashService);
@@ -390,7 +351,6 @@ class MixnetServiceTest extends TestGroupSetup {
 		}
 
 		@Test
-		@DisplayName("verifies a correctly generated shuffle argument")
 		void testVerifiesCorrectlyGeneratedArgument() {
 			final GqGroup gqGroup = GroupTestData.getLargeGqGroup();
 			final HashService hashService = HashService.getInstance();
@@ -409,96 +369,6 @@ class MixnetServiceTest extends TestGroupSetup {
 			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> shuffledCiphertexts = verifiableShuffle.shuffledCiphertexts();
 
 			assertTrue(() -> mixnet.verifyShuffle(ciphertexts, shuffledCiphertexts, shuffleArgument, randomPublicKey).isVerified());
-		}
-
-		@Test
-		@DisplayName("verifies a correctly generated shuffle argument with computation optimized mode")
-		void testVerifiesCorrectlyGeneratedArgumentWithComputationOptimized() {
-			final GqGroup group = GroupTestData.getLargeGqGroup();
-			final HashService hashService = HashService.getInstance();
-			final Mixnet mixnet = new MixnetService(hashService);
-
-			final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(group);
-			final int Nc = 9; // square
-			final int l = Math.min(keySize, 3);
-
-			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator.genRandomCiphertextVector(Nc, l);
-			final ElGamalMultiRecipientPublicKey pk = elGamalGenerator.genRandomPublicKey(keySize);
-
-			try (final var _ = MixnetOptimizationModeContext.set(MixnetOptimizationMode.COMPUTATION_OPTIMIZED)) {
-				final VerifiableShuffle verifiableShuffle = mixnet.genVerifiableShuffle(ciphertexts, pk);
-				final ShuffleArgument shuffleArgument = verifiableShuffle.shuffleArgument();
-				final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> shuffledCiphertexts = verifiableShuffle.shuffledCiphertexts();
-
-				assertTrue(mixnet.verifyShuffle(ciphertexts, shuffledCiphertexts, shuffleArgument, pk).isVerified());
-			}
-		}
-
-		@Test
-		@DisplayName("cross-mode verification succeeds for a prime number of ciphertexts")
-		void testPrimeCiphertextsCrossModeVerificationSucceeds() {
-			final GqGroup group = GroupTestData.getLargeGqGroup();
-			final HashService hashService = HashService.getInstance();
-			final Mixnet mixnet = new MixnetService(hashService);
-
-			final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(group);
-			final int Nc = 11; // prime
-			final int l = Math.min(keySize, 3);
-			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator.genRandomCiphertextVector(Nc, l);
-			final ElGamalMultiRecipientPublicKey pk = elGamalGenerator.genRandomPublicKey(keySize);
-
-			// Generate in memory optimized mode, verify in compute optimized mode
-			try (final var _ = MixnetOptimizationModeContext.set(MixnetOptimizationMode.MEMORY_OPTIMIZED)) {
-				final VerifiableShuffle verifiableShuffleMemory = mixnet.genVerifiableShuffle(ciphertexts, pk);
-				try (final var _ = MixnetOptimizationModeContext.set(MixnetOptimizationMode.COMPUTATION_OPTIMIZED)) {
-					assertTrue(mixnet.verifyShuffle(ciphertexts,
-							verifiableShuffleMemory.shuffledCiphertexts(),
-							verifiableShuffleMemory.shuffleArgument(),
-							pk).isVerified());
-				}
-			}
-
-			// Generate in compute optimized mode, verify in memory optimized mode
-			try (final var _ = MixnetOptimizationModeContext.set(MixnetOptimizationMode.COMPUTATION_OPTIMIZED)) {
-				final VerifiableShuffle verifiableShuffleCompute = mixnet.genVerifiableShuffle(ciphertexts, pk);
-				try (final var _ = MixnetOptimizationModeContext.set(MixnetOptimizationMode.MEMORY_OPTIMIZED)) {
-					assertTrue(mixnet.verifyShuffle(ciphertexts,
-							verifiableShuffleCompute.shuffledCiphertexts(),
-							verifiableShuffleCompute.shuffleArgument(),
-							pk).isVerified());
-				}
-			}
-		}
-
-		@Test
-		@DisplayName("cross-mode verification fails for a composite number of ciphertexts")
-		void testCompositeCiphertextsCrossModeVerificationFails() {
-			final GqGroup group = GroupTestData.getLargeGqGroup();
-			final HashService hashService = HashService.getInstance();
-			final Mixnet mixnet = new MixnetService(hashService);
-
-			final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(group);
-			final int Nc = 12; // composite
-			final int l = Math.min(keySize, 3);
-			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts =
-					elGamalGenerator.genRandomCiphertextVector(Nc, l);
-			final ElGamalMultiRecipientPublicKey pk = elGamalGenerator.genRandomPublicKey(keySize);
-
-			try (final var _ = MixnetOptimizationModeContext.set(MixnetOptimizationMode.MEMORY_OPTIMIZED)) {
-				final VerifiableShuffle verifiableShuffleMemory = mixnet.genVerifiableShuffle(ciphertexts, pk);
-				final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> shuffledCiphertexts = verifiableShuffleMemory.shuffledCiphertexts();
-				final ShuffleArgument shuffleArgument = verifiableShuffleMemory.shuffleArgument();
-
-				assertTrue(mixnet.verifyShuffle(ciphertexts, shuffledCiphertexts, shuffleArgument, pk).isVerified());
-
-				// Cross-mode is expected to fail: dimensions (m,n) mismatch
-				try (final var _ = MixnetOptimizationModeContext.set(MixnetOptimizationMode.COMPUTATION_OPTIMIZED)) {
-					final IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-							() -> mixnet.verifyShuffle(ciphertexts, shuffledCiphertexts, shuffleArgument, pk));
-
-					assertEquals("The m dimension of the argument must be equal to the input parameter m.", ex.getMessage());
-				}
-			}
 		}
 	}
 }

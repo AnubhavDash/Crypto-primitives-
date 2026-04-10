@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,10 +85,10 @@ public interface Conversions {
 	/**
 	 * Converts a decimal {@link String} representation to a {@link BigInteger} representation.
 	 *
-	 * @param s S, the decimal {@link String} representation to convert. Not Null, not empty, no whitespace, and all characters must be decimal characters.
+	 * @param s S, the decimal {@link String} representation to convert. Not Null, not empty and all characters must be decimal characters.
 	 * @return x, the {@link BigInteger} representation of the string.
 	 * @throws NullPointerException     if the string s is null
-	 * @throws IllegalArgumentException if the string s is empty, contains whitespace, or is not a valid non-negative decimal representation of a BigInteger.
+	 * @throws IllegalArgumentException if the string s is empty or not a valid decimal representation of a BigInteger.
 	 */
 	static BigInteger stringToInteger(final String s) {
 		return ConversionsInternal.stringToInteger(s);

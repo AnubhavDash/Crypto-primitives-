@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Swiss Post Ltd
+ * Copyright 2025 Swiss Post Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,9 @@ package ch.post.it.evoting.cryptoprimitives.test.tools.generator;
 
 import ch.post.it.evoting.cryptoprimitives.elgamal.ElGamalMultiRecipientCiphertext;
 import ch.post.it.evoting.cryptoprimitives.internal.mixnet.MatrixUtils;
-import ch.post.it.evoting.cryptoprimitives.internal.mixnet.MixnetOptimizationModeContext;
 import ch.post.it.evoting.cryptoprimitives.internal.mixnet.TestArgumentGenerator;
 import ch.post.it.evoting.cryptoprimitives.math.GqGroup;
 import ch.post.it.evoting.cryptoprimitives.math.GroupVector;
-import ch.post.it.evoting.cryptoprimitives.mixnet.MixnetOptimizationMode;
 import ch.post.it.evoting.cryptoprimitives.mixnet.ShuffleArgument;
 import ch.post.it.evoting.cryptoprimitives.mixnet.VerifiableShuffle;
 
@@ -34,16 +32,14 @@ public class VerifiableShuffleGenerator {
 	}
 
 	public VerifiableShuffle genVerifiableShuffle(final int numCiphertexts, final int ciphertextSize) {
-		try (final var _ = MixnetOptimizationModeContext.set(MixnetOptimizationMode.MEMORY_OPTIMIZED)) {
-			final int[] matrixDimensions = MatrixUtils.getMatrixDimensions(numCiphertexts);
-			final int m = matrixDimensions[0];
-			final int n = matrixDimensions[1];
+		final int[] matrixDimensions = MatrixUtils.getMatrixDimensions(numCiphertexts);
+		final int m = matrixDimensions[0];
+		final int n = matrixDimensions[1];
 
-			final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(group);
-			final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator
-					.genRandomCiphertextVector(numCiphertexts, ciphertextSize);
-			final ShuffleArgument shuffleArgument = new TestArgumentGenerator(group).genShuffleArgument(m, n, ciphertextSize);
-			return new VerifiableShuffle(ciphertexts, shuffleArgument);
-		}
+		final ElGamalGenerator elGamalGenerator = new ElGamalGenerator(group);
+		final GroupVector<ElGamalMultiRecipientCiphertext, GqGroup> ciphertexts = elGamalGenerator
+				.genRandomCiphertextVector(numCiphertexts, ciphertextSize);
+		final ShuffleArgument shuffleArgument = new TestArgumentGenerator(group).genShuffleArgument(m, n, ciphertextSize);
+		return new VerifiableShuffle(ciphertexts, shuffleArgument);
 	}
 }
