@@ -1,5 +1,16 @@
 # Changelog
 
+## Release 1.5.3
+
+The following functionalities and improvements are included in release 1.5.3:
+
+* [Code] Fix a bug in the implementation of the Miller-Rabin method (reported in GitLab Issue [77](https://gitlab.com/swisspost-evoting/e-voting/e-voting-documentation/-/work_items/77)).
+* [Code] Implement a more efficient divide-and-conquer strategy for simultaneous modular exponentiation (MultiModExp).
+* [Code, Specification] Improve usage of MultiModExp in the algorithm GetCiphertextVectorExponentiation.
+* [Code] Improve usage of MultiModExp in the Multi-Exponentiation Argument and GetCommitment algorithm.
+* [Code] Remove quadratic bottleneck in the Single Value Product Argument, optimize cache for fixed-base computations, optimize instantiation of hash objects, and improve the derivation of cache keys.
+* [Code] Update dependencies and third-party libraries.
+
 ## Release 1.5.2.1
 
 Release 1.5.2.1 is a minor maintenance patch containing the following changes:
