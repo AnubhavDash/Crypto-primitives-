@@ -28,7 +28,7 @@
 		<!-- Dependencies versions -->
 		<archunit.version>1.4.1</archunit.version>
 		<guava.version>33.5.0-jre</guava.version>
-		<bouncycastle.version>1.82</bouncycastle.version>
+		<bouncycastle.version>1.84</bouncycastle.version>
 		<jackson.version>2.20.0</jackson.version>
 		<jmh.version>1.37</jmh.version>
 		<junit-jupiter.version>5.13.4</junit-jupiter.version>
